@@ -41,10 +41,22 @@ def show(title: str, r: httpx.Response) -> dict:
 def main() -> None:
     token = ask("WA_TOKEN", "WA_TOKEN (hidden): ", secret=True)
     phone_id = ask("WA_PHONE_NUMBER_ID", "WA_PHONE_NUMBER_ID: ")
-    waba = ask("WA_BUSINESS_ACCOUNT_ID", "WhatsApp Business Account ID (WhatsApp → API Setup): ")
+    waba = os.environ.get("WA_BUSINESS_ACCOUNT_ID", "").strip()
     h = {"Authorization": f"Bearer {token}"}
     with httpx.Client(timeout=20) as c:
         show("Token belongs to", c.get(f"{GRAPH}/me", headers=h))
+        if not waba:  # find the WhatsApp Business Account(s) this token was granted
+            dbg = c.get(f"{GRAPH}/debug_token", headers=h, params={"input_token": token}).json().get("data", {})
+            ids = sorted(
+                {
+                    t
+                    for sc in dbg.get("granular_scopes", [])
+                    if sc.get("scope", "").startswith("whatsapp_")
+                    for t in sc.get("target_ids", [])
+                }
+            )
+            print(f"\nWhatsApp Business Account IDs on this token: {ids or 'none found'}")
+            waba = ids[0] if len(ids) == 1 else ask("_", "WhatsApp Business Account ID to use: ")
         p = show(
             "Phone number (compare with the number you message)",
             c.get(
