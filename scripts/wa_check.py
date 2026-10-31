@@ -52,7 +52,7 @@ def main() -> None:
             f"\nToken was issued for app: {td.get('application')} (app id {td.get('app_id')})"
             "  ← must be the app whose webhook points at Chanakya"
         )
-        if not waba:  # find the WhatsApp Business Account(s) this token was granted
+        if not waba and "--subscribe" in sys.argv:  # find the WhatsApp Business Account(s) this token was granted
             r = c.get(f"{GRAPH}/debug_token", headers=h, params={"input_token": token})
             dbg = r.json().get("data", {}) if r.status_code < 400 else {}
             if r.status_code >= 400:
@@ -90,6 +90,8 @@ def main() -> None:
         if "--send" in sys.argv:
             i = sys.argv.index("--send")
             to = "".join(ch for ch in (sys.argv[i + 1] if len(sys.argv) > i + 1 else "") if ch.isdigit())
+            while len(to) < 10:  # missing or a placeholder like 91XXXXXXXXXX
+                to = "".join(ch for ch in input("Your WhatsApp number (e.g. 919876543210): ") if ch.isdigit())
             if len(to) == 10:
                 to = "91" + to
             show(
