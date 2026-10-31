@@ -53,6 +53,19 @@ async def receive(request: Request):
     except json.JSONDecodeError:
         raise HTTPException(400) from None
     msgs, statuses = parse(payload, received)
+    try:  # which account/number the webhook came from (ids only)
+        e0 = (payload.get("entry") or [{}])[0]
+        v0 = (e0.get("changes") or [{}])[0].get("value") or {}
+        diag.mark(
+            "last_webhook_source",
+            {
+                "waba_id": e0.get("id"),
+                "field": (e0.get("changes") or [{}])[0].get("field"),
+                "phone_number_id": (v0.get("metadata") or {}).get("phone_number_id"),
+            },
+        )
+    except Exception:
+        pass
     diag.bump("messages_in", len(msgs))
     diag.bump("statuses_in", len(statuses))
     if msgs:
