@@ -37,6 +37,6 @@ Every message has at most 3 lines and 3 buttons.
 
 **7. After the sale.** The Parivaar Card goes to the decider. The installation job reaches the installer with wall, socket and floor details. The customer gets a reminder the day before and a "चालू आहे ✓" confirmation check on install day, and a problem alerts the manager. This fixes the AC story.
 
-**8. Scope choices.** The voice and vision model is not wired in this build; the AI seam is ready, and rules or fixture modes run today. Cut to the roadmap: perspective warping, credit attribution, queues and multiple instances, and live resQ/POS integration. Next: a resQ household record, credit that follows the customer, and more languages.
+**8. Scope choices.** Gemini handles voice and photos, but it only extracts and classifies. Product answers are built from the database by code, and offline rules take over for typed text if the model is unavailable. Cut to the roadmap: perspective warping, credit attribution, queues and multiple instances, and live resQ/POS integration. Next: a resQ household record, credit that follows the customer, and more languages.
 
 **9. Prediction.** With Chanakya, a new associate reaches Guide level (11 or more of 14) on the TV scenario. The golden path scores 14/14.
