@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from chanakya.app import admin, webhook
+from chanakya.app import admin, legal, webhook
 from chanakya.app.bootstrap import build, shutdown, start_renderer
 from chanakya.channel.whatsapp import WhatsAppChannel
 from chanakya.config import get_settings
@@ -32,3 +32,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Chanakya — Store IQ (TEST)", lifespan=lifespan)
 app.include_router(webhook.router)
 app.include_router(admin.router)
+app.include_router(legal.router)

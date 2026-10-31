@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     render_cards: bool = True  # False → skip Playwright (falls back to Pillow cards)
     scheduler_enabled: bool = True
     log_level: str = "INFO"
+    privacy_contact: str = ""  # shown on /privacy (optional)
 
     @field_validator("database_url")
     @classmethod
