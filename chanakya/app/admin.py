@@ -23,11 +23,34 @@ async def health(request: Request):
         await repo.setting_get("health")
     except Exception:
         db_ok = False
+    from chanakya.app import diag
+
+    s = get_settings()
+    phones = {
+        "associate": s.associate_phone,
+        "customer": s.customer_phone,
+        "manager": s.manager_phone,
+        "expert": s.expert_phone,
+        "test_number": s.wa_test_number,
+    }
+    config = {
+        "wa_token_set": bool(s.wa_token),
+        "phone_number_id_set": bool(s.wa_phone_number_id),
+        "app_secret_set": bool(s.wa_app_secret),
+        "verify_token_set": bool(s.wa_verify_token),
+        "ai_mode": s.ai_mode,
+        "phones": {
+            k: ("placeholder" if v == "15551234567" else "ok" if len(v) >= 10 else "missing" if not v else "too_short")
+            for k, v in phones.items()
+        },
+    }
     return {
         "ok": bool(rt) and db_ok,
         "db": db_ok,
         "renderer": bool(rt and rt.renderer and getattr(rt.renderer, "ready", False)),
         "packs": len(rt.packs.packs) if rt else 0,
+        "config": config,
+        "delivery": diag.snapshot(),
     }
 
 

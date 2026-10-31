@@ -8,6 +8,7 @@ import time
 
 import httpx
 
+from chanakya.app import diag
 from chanakya.channel.base import SendError
 from chanakya.config import Settings
 from chanakya.core.contracts import OutMessage
@@ -52,6 +53,17 @@ class WhatsAppChannel:
                     subcode=err.get("error_subcode"),
                     message=err.get("message"),
                     status=r.status_code,
+                )
+                diag.bump("send_errors")
+                diag.mark(
+                    "last_send_error",
+                    {
+                        "code": err.get("code"),
+                        "subcode": err.get("error_subcode"),
+                        "message": (err.get("message") or "")[:160],
+                        "http": r.status_code,
+                        "path": path.split("/")[-1],
+                    },
                 )
                 raise SendError(err.get("code"), err.get("message", r.text[:200]))
             return r.json()
@@ -138,6 +150,8 @@ class WhatsAppChannel:
 
     async def send(self, msg: OutMessage) -> str:
         data = await self._post(f"{self.s.wa_phone_number_id}/messages", json=self.payload(msg))
+        diag.bump("sent_ok")
+        diag.mark("last_send_ok_at")
         return (data.get("messages") or [{}])[0].get("id", "")
 
     async def upload_media(self, data: bytes, mime: str, filename: str) -> str:

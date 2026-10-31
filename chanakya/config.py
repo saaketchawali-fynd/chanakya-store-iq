@@ -59,9 +59,18 @@ class Settings(BaseSettings):
             v = "postgresql+asyncpg://" + v[len("postgresql://") :]
         return v
 
+    @field_validator(
+        "associate_phone", "customer_phone", "manager_phone", "expert_phone", "visitor_phone", "wa_test_number"
+    )
+    @classmethod
+    def _digits_only(cls, v: str) -> str:
+        """'+91 98765-43210' → '919876543210' (WhatsApp sends senders as digits only)."""
+        d = "".join(ch for ch in (v or "") if ch.isdigit())
+        return d[2:] if d.startswith("00") else d
+
     @property
     def role_switch_phones(self) -> set[str]:
-        return {p.strip() for p in self.demo_role_switch_allowed.split(",") if p.strip()}
+        return {"".join(c for c in p if c.isdigit()) for p in self.demo_role_switch_allowed.split(",") if p.strip()}
 
     @property
     def is_postgres(self) -> bool:

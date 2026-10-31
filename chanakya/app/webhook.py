@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
+from chanakya.app import diag
 from chanakya.channel.parse import parse
 from chanakya.config import get_settings
 from chanakya.log import get_log
@@ -29,7 +30,9 @@ def verify_signature(secret: str, body: bytes, header: str | None) -> bool:
 async def verify(request: Request):
     p = request.query_params
     if p.get("hub.mode") == "subscribe" and p.get("hub.verify_token") == get_settings().wa_verify_token:
+        diag.bump("verify_ok")
         return PlainTextResponse(p.get("hub.challenge", ""))
+    diag.bump("verify_failed")
     raise HTTPException(403)
 
 
@@ -38,14 +41,31 @@ async def receive(request: Request):
     s = get_settings()
     received = datetime.now(UTC)
     body = await request.body()
+    diag.bump("webhook_posts")
+    diag.mark("last_webhook_at")
     if s.wa_app_secret or not s.demo_mode:
         if not verify_signature(s.wa_app_secret, body, request.headers.get("X-Hub-Signature-256")):
+            diag.bump("bad_signature")
+            log.warning("webhook_bad_signature")
             raise HTTPException(401)
     try:
         payload = json.loads(body or b"{}")
     except json.JSONDecodeError:
         raise HTTPException(400) from None
-    msgs, _statuses = parse(payload, received)
+    msgs, statuses = parse(payload, received)
+    diag.bump("messages_in", len(msgs))
+    diag.bump("statuses_in", len(statuses))
+    if msgs:
+        diag.mark("last_message_at")
+    for st in statuses:
+        if st.get("status") == "failed":
+            diag.mark(
+                "last_status_error",
+                {
+                    "codes": [e.get("code") for e in st.get("errors", [])],
+                    "titles": [e.get("title") for e in st.get("errors", [])],
+                },
+            )
     rt = request.app.state.rt
     for m in msgs:
         rt.orch.spawn(rt.orch.handle_inbound(m))
