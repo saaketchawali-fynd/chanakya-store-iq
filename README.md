@@ -31,6 +31,12 @@ SQLite is the default locally. In production, set `DATABASE_URL=postgresql://…
 3. Once the deploy is live, open `https://<service>.onrender.com/health`. It should show `"ok": true`.
 4. In Meta → WhatsApp → Configuration → Webhook, set the callback URL to `https://<service>.onrender.com/webhook`. Use the generated `WA_VERIFY_TOKEN` (from the service's Environment page) and subscribe to `messages`.
 
+5. **Required on new Meta apps:** subscribe your app to the test number's WhatsApp Business Account. Until you do, the account forwards real messages only to Meta's internal "WA DevX Webhook Events 1P App": the dashboard **Test** button reaches Chanakya, but real messages never do. Run this once and enter the token at the hidden prompt:
+   ```bash
+   python scripts/wa_check.py --subscribe
+   ```
+   It reads the account ID from the phone number (the ID in the Business Settings URL is a different one), subscribes the app, and checks that **YOUR app is subscribed ✓**. `/health` then shows each real message under `delivery`.
+
 Every push to `main` redeploys automatically.
 
 ## Simulator
