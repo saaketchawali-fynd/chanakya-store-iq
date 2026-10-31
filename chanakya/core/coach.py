@@ -33,6 +33,7 @@ def coach_reply(
         to=ctx.actor_wa_id,
         kind="buttons" if buttons else "text",
         body=body,
+        footer=ctx.t("footer_menu"),
         buttons=buttons[:3],
         card=card,
         coach=True,

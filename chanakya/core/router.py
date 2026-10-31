@@ -20,6 +20,7 @@ from chanakya.skills import (
     customer,
     expert,
     facts_qa,
+    flowctl,
     follow,
     manager,
     recommend,
@@ -53,7 +54,22 @@ CMD = {
     "options": {"options", "option", "पर्याय"},
     "offers": {"offers", "daam", "price", "offer", "दाम", "किंमत"},
     "khatam": {"khatam", "done", "end", "संपलं", "खतम"},
-    "help": {"help", "madad", "मदत", "मदद"},
+    "help": {"help", "madad", "मदत", "मदद", "menu", "मेनू", "मेन्यू"},
+    "exit": {"exit", "band", "band karo", "cancel", "बंद", "बंद करो", "बंद करा", "थांबा"},
+    "restart": {
+        "restart",
+        "start over",
+        "shuru se",
+        "phir se shuru",
+        "fir se shuru",
+        "phir se",
+        "fresh start",
+        "new start",
+        "फिर से शुरू",
+        "शुरू से",
+        "पुन्हा सुरू",
+        "सुरुवातीपासून",
+    },
     "floor": {"floor"},
     "digest": {"digest"},
     "visit": {"visit"},
@@ -136,6 +152,8 @@ async def dispatch(ctx: SkillContext) -> Reply:
         return await set_staff_language(ctx, b0.get(1, "hi"))
     if ctx.staff and (name == "language" or (not ctx.staff.lang_set and name not in ("role", "clock", "reset"))):
         return language_picker(ctx)
+    if name in ("exit", "restart") and ctx.role != "associate":
+        return await (flowctl.exit_ask(ctx) if name == "exit" else flowctl.restart_ask(ctx))
     if name in ("role", "clock", "lang") or (name == "reset" and ctx.svc.settings.demo_mode):
         r = await staff_command(ctx, name, arg)
         if r is not None:
@@ -365,8 +383,20 @@ async def global_action(ctx: SkillContext, bid: ButtonId) -> Reply:
         return await assess.new_session(ctx)
     if a == "status":
         return await assess.status(ctx)
-    if a == "help":
-        return brief.help_reply(ctx)
+    if a in ("help", "menu"):
+        return await flowctl.menu(ctx)
+    if a == "exit":
+        return await flowctl.exit_ask(ctx)
+    if a == "exitok":
+        return await flowctl.exit_ok(ctx)
+    if a == "exitnew":
+        return await flowctl.exit_and_new(ctx)
+    if a == "restart":
+        return await flowctl.restart_ask(ctx)
+    if a == "restartok":
+        return await flowctl.restart_ok(ctx)
+    if a == "langpick":
+        return language_picker(ctx)
     if a == "clip":
         return await brief.clip(ctx, bid.get(1, "translate"))
     if a == "quiz":
@@ -397,7 +427,11 @@ async def command(ctx: SkillContext, name: str, arg: str) -> Reply:
     if name == "new":
         return await assess.new_session(ctx)
     if name == "help":
-        return brief.help_reply(ctx)
+        return await flowctl.menu(ctx)
+    if name == "exit":
+        return await flowctl.exit_ask(ctx)
+    if name == "restart":
+        return await flowctl.restart_ask(ctx)
     if name == "score":
         return await review.last_score(ctx)
     if name == "switch":

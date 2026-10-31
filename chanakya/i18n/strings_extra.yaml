@@ -258,3 +258,31 @@ row_payable: {hi: "ऑफ़र के बाद देय", mr: "ऑफरन�
 voice_retry: {hi: "Voice note saaf samajh nahi aaya — dobara boliye ya text likhiye.", mr: "व्हॉइस नोट नीट समजली नाही — पुन्हा बोला किंवा टेक्स्ट लिहा.", en: "I couldn't make out that voice note. Please say it again or type it."}
 oldtv_ask: {hi: "Photo mein jo TV laga hai, woh kitne inch ka hai? Isse naya TV ekdum sahi size mein dikhega.", mr: "फोटोतला टीव्ही किती इंचाचा आहे? त्यामुळे नवा टीव्ही अगदी योग्य आकारात दिसेल.", en: "How big is the TV already in the photo? It lets me show the new TV at exactly the right size."}
 oldtv_none: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
+
+# ---------- flow control: menu, end the customer, start over ----------
+b_menu: {hi: "Menu", mr: "मेनू", en: "Menu"}
+b_restart: {hi: "Shuru se", mr: "पुन्हा सुरू", en: "Start over"}
+b_exit_yes: {hi: "Haan, band karo", mr: "हो, बंद करा", en: "Yes, end it"}
+b_khatam_score: {hi: "Khatam + score", mr: "संपलं + स्कोअर", en: "Done + score"}
+b_restart_yes: {hi: "Haan, shuru se", mr: "हो, पुन्हा सुरू", en: "Yes, start over"}
+b_switch: {hi: "Customer badlo", mr: "ग्राहक बदला", en: "Switch customer"}
+menu_new: {hi: "🆕 Naya customer", mr: "🆕 नवीन ग्राहक", en: "🆕 New customer"}
+menu_new_d: {hi: "Naya shuru; {who} 'Customer badlo' mein rahega", mr: "नवीन सुरू; {who} 'ग्राहक बदला' मध्ये राहील", en: "Start fresh; {who} stays under 'Switch customer'"}
+menu_new_d0: {hi: "Naye customer ke saath shuru", mr: "नवीन ग्राहकासोबत सुरू", en: "Start with a new customer"}
+menu_exitnew: {hi: "⏹ Band karke naya", mr: "⏹ बंद करून नवीन", en: "⏹ End & start new"}
+menu_exitnew_d: {hi: "{who} band, turant naya customer", mr: "{who} बंद, लगेच नवीन ग्राहक", en: "End {who} and start a new customer now"}
+menu_khatam: {hi: "✅ Khatam + score", mr: "✅ संपलं + स्कोअर", en: "✅ Done + score"}
+menu_khatam_d: {hi: "{who} ka result aur aapka score", mr: "{who} चा निकाल आणि तुमचा स्कोअर", en: "{who}: outcome and your score"}
+menu_restart: {hi: "🔄 Shuru se", mr: "🔄 सुरुवातीपासून", en: "🔄 Start over"}
+menu_restart_d: {hi: "Sab band: bhasha → brief → naya customer", mr: "सर्व बंद: भाषा → ब्रीफ → नवीन ग्राहक", en: "Close all: language → brief → new customer"}
+menu_switch: {hi: "👥 Customer badlo", mr: "👥 ग्राहक बदला", en: "👥 Switch customer"}
+menu_switch_d: {hi: "Chalu customers ki list", mr: "चालू ग्राहकांची यादी", en: "Open customers"}
+menu_status: {hi: "📋 Status", mr: "📋 स्थिती", en: "📋 Status"}
+menu_catalog: {hi: "🛍 Catalogue", mr: "🛍 कॅटलॉग", en: "🛍 Catalogue"}
+menu_lang: {hi: "🌐 Bhasha badlo", mr: "🌐 भाषा बदला", en: "🌐 Change language"}
+exit_confirm: {hi: "{who} ka flow band karein? Score nahi banega — score chahiye to 'Khatam + score'.", mr: "{who} चा फ्लो बंद करायचा? स्कोअर बनणार नाही — स्कोअर हवा तर 'संपलं + स्कोअर'.", en: "End {who} now? No score is saved; tap 'Done + score' to get one."}
+exit_done: {hi: "{who} band ✓ Ab kya karein?", mr: "{who} बंद ✓ आता काय करायचं?", en: "{who} ended ✓ What next?"}
+exit_done_short: {hi: "{who} band ✓", mr: "{who} बंद ✓", en: "{who} ended ✓"}
+restart_confirm: {hi: "{n} chalu customer band karke bilkul shuru se karein? (bhasha → brief → naya customer)", mr: "{n} चालू ग्राहक बंद करून अगदी सुरुवातीपासून? (भाषा → ब्रीफ → नवीन ग्राहक)", en: "Close {n} open customer(s) and start over? (language → brief → new customer)"}
+footer_menu: {hi: "menu: naya customer · shuru se", mr: "menu: नवीन ग्राहक · पुन्हा सुरू", en: "menu: new customer · start over"}
+help_body: {hi: "Voice note: customer ke ghar ki baat · Photo: label ya kamra\nNaya = naya customer · Khatam = score · 'shuru se' = bilkul shuru se", mr: "व्हॉइस नोट: ग्राहकाच्या घराबद्दल · फोटो: लेबल किंवा खोली\nनवीन = नवीन ग्राहक · संपलं = स्कोअर · 'पुन्हा सुरू' = अगदी सुरुवातीपासून", en: "Voice note: the customer's home · Photo: a label or the room\nNew = new customer · Done = score · 'start over' = from the very beginning"}
