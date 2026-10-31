@@ -84,11 +84,11 @@ async def on_note(ctx: SkillContext) -> Reply:
     draft = await repo.visit_draft(ctx.actor_wa_id)
     if draft is None:
         draft = await repo.visit_save(None, ctx.actor_wa_id, {}, "draft")
-    audio = None
+    audio, amime = None, None
     if ctx.inbound.type == "audio" and ctx.inbound.media_id:
-        audio, _ = await ctx.svc.channel.download_media(ctx.inbound.media_id)
+        audio, amime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
     try:
-        entry = await ctx.ai.extract_visit(ctx.inbound.text, audio)
+        entry = await ctx.ai.extract_visit(ctx.inbound.text, audio, mime=amime)
     except AIUnavailable:
         return ctx.reply(info_reply(ctx, ctx.t("voice_unavailable")))
     merged = _merge(draft.entry or {}, entry)

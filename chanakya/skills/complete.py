@@ -160,6 +160,7 @@ def kharcha_card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
             "lifetime_text": life,
             "stamp": stamp,
             "optional_count": sheet.optional_count,
+            "product_image": p.image,
         },
     )
 

@@ -18,6 +18,7 @@ from chanakya.core.coach import coach_reply, info_reply
 from chanakya.core.contracts import Button, Card, OutMessage, Reply, Step
 from chanakya.core.status import short_name
 from chanakya.skills import common as C
+from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 from chanakya.truth import fmt
 
@@ -205,6 +206,20 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
             for v in (q.monthly_str, q.fee_str, q.total_str, q.extra_str, q.months_str):
                 ctx.reg.raw(v, f"snapshot:finance:{q.plan_id}")
             finance_text = finance_sentence(ctx, q, lang)
+    cost_rows = []
+    if s.cost_snapshot:
+        cs = s.cost_snapshot
+        cost_rows.append({"label": ctx.t("row_full_cost", lang), "value": cs["zaroori_total_str"], "strong": True})
+        if cs["with_suggestions_total"] != cs["zaroori_total"] and not s.extra.get("suggestions_off"):
+            cost_rows.append(
+                {"label": ctx.t("row_with_sug", lang), "value": cs["with_suggestions_total_str"], "strong": False}
+            )
+    if s.offer_snapshot and s.offer_snapshot.get("applied"):
+        a = s.offer_snapshot["applied"][0]
+        cost_rows.append({"label": ctx.t("row_offer", lang), "value": "−" + a["amount_str"], "strong": False})
+        cost_rows.append(
+            {"label": ctx.t("row_payable", lang), "value": s.offer_snapshot["payable_str"], "strong": True}
+        )
     if s.extra.get("delivery_choice"):
         from datetime import date
 
@@ -224,6 +239,8 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
             "product_title": C.product_title(ctx, p, lang),
             "reasons": _reasons(ctx, sku, lang),
             "cost_text": cost_text,
+            "cost_rows": cost_rows,
+            "key_specs": PV.key_specs(ctx, p, lang, 4),
             "offer_text": offer_text,
             "finance_text": finance_text,
             "delivery_text": delivery_text,

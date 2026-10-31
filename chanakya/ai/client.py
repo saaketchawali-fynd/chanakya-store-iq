@@ -1,11 +1,13 @@
-"""AIClient — the AI seam. The Google/Gemini model is intentionally NOT wired in this build.
+"""AIClient — the AI seam (spec Section 8).
 
 Modes (AI_MODE):
+  auto    — Gemini when GEMINI_API_KEY is set, else rules (default)
+  live    — Gemini (voice, text, photos, visit log, expert formatting); falls back to rules for text
+  rules   — deterministic offline understanding from pack keywords (no voice)
   fixture — canned JSON from data/fixtures (tests, simulator; no network)
-  rules   — deterministic offline understanding from pack keywords (default for live WhatsApp)
 
-To plug a model later, implement the same five coroutines (understand, read_image, edit_image,
-extract_visit, format_expert_answer) using the prompts in ai/prompts.py and schemas in ai/schemas.py."""
+The model only extracts and classifies into fixed schemas. Products, prices and every number shown come from
+the database through the skills and the number firewall."""
 
 from __future__ import annotations
 
@@ -14,36 +16,75 @@ import json
 import re
 from pathlib import Path
 
-from chanakya.ai import rules
-from chanakya.ai.schemas import ExpertAnswer, ImageRead, Spec, StepScore, Understanding, VisitEntry
+from chanakya.ai import prompts, rules
+from chanakya.ai.gemini import AIUnavailable
+from chanakya.ai.schemas import ExpertAnswer, FactQuery, ImageRead, Spec, StepScore, Understanding, VisitEntry
 from chanakya.brain.packs import PackRegistry
 from chanakya.config import ROOT, Settings
 from chanakya.log import get_log
 
 log = get_log("ai")
 FIX_DIR = ROOT / "data" / "fixtures"
+__all__ = ["AIClient", "AIUnavailable"]
 
 
-class AIUnavailable(Exception):
-    """The requested capability needs a model that is not configured (e.g. voice transcription)."""
+def _audio_mime(mime: str | None) -> str:
+    m = (mime or "audio/ogg").split(";")[0].strip()
+    return m or "audio/ogg"
 
 
 class AIClient:
     def __init__(self, s: Settings, packs: PackRegistry, fixtures: Path = FIX_DIR):
-        self.mode = s.ai_mode if s.ai_mode in ("fixture", "rules") else "rules"
+        mode = (s.ai_mode or "auto").lower()
+        if mode == "auto":
+            mode = "live" if s.gemini_api_key else "rules"
+        if mode == "live" and not s.gemini_api_key:
+            log.warning("ai_live_without_key", using="rules")
+            mode = "rules"
+        if mode not in ("live", "rules", "fixture"):
+            mode = "rules"
+        self.mode = mode
         self.packs = packs
         self.fix = fixtures
-        if s.ai_mode not in ("fixture", "rules"):
-            log.warning("ai_mode_unsupported", mode=s.ai_mode, using="rules")
+        self.gemini = None
+        if mode == "live":
+            from chanakya.ai.gemini import GeminiClient
+
+            self.gemini = GeminiClient(s)
+
+    @property
+    def live(self) -> bool:
+        return self.gemini is not None
 
     # ---------- 8.2 ----------
-    async def understand(self, text: str | None, audio: bytes | None, ctx: dict) -> Understanding:
+    async def understand(
+        self, text: str | None, audio: bytes | None, ctx: dict, mime: str | None = None
+    ) -> Understanding:
         if text and text.startswith("FIX:"):
             return self._fixture("understand", text[4:].strip(), Understanding)
         if audio is not None:
             key = hashlib.sha1(audio).hexdigest()
             if (self.fix / "understand" / f"{key}.json").exists():
                 return self._fixture("understand", key, Understanding)
+        if self.live:
+            from google.genai import types
+
+            part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime)) if audio is not None else (text or "")
+            try:
+                u = await self.gemini.json(
+                    [part, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)],
+                    Understanding,
+                    prompts.UNDERSTAND_SYSTEM,
+                    timeout=8.0 if audio is not None else 6.0,
+                    kind="understand_audio" if audio is not None else "understand_text",
+                )
+                if not u.transcript and text:
+                    u.transcript = text
+                return u
+            except AIUnavailable:
+                if audio is not None:
+                    raise
+        if audio is not None:
             raise AIUnavailable("voice")
         myths = [m["id"] for m in ctx.get("myths", [])] or None
         return rules.understand_text(
@@ -54,11 +95,27 @@ class AIClient:
     async def read_image(
         self, img: bytes, filename: str | None = None, caption: str | None = None, hint: str | None = None
     ) -> ImageRead:
-        """Fixture by filename stem; else a caption/hint-based read (no vision model)."""
+        """Fixture by filename stem; Gemini vision when live; else a caption/hint-based read."""
         if filename:
             stem = Path(filename).stem
             if (self.fix / "image_read" / f"{stem}.json").exists():
                 return self._fixture("image_read", stem, ImageRead)
+        if self.live:
+            from google.genai import types
+
+            ask = "Read this photo." + (f" Caption from the associate: {caption}" if caption else "")
+            if hint == "room":
+                ask += " It is a photo of a room in the customer's home."
+            try:
+                return await self.gemini.json(
+                    [types.Part.from_bytes(data=img, mime_type="image/jpeg"), ask],
+                    ImageRead,
+                    prompts.READ_IMAGE_SYSTEM + prompts.READ_IMAGE_GEOMETRY,
+                    timeout=12.0,
+                    kind="read_image",
+                )
+            except AIUnavailable:
+                pass
         cap = (caption or "").strip()
         if hint == "room" or re.search(
             r"\b(room|kamra|kamre|deewar|diwar|wall|hall)\b|कमरा|खोली|भिंत|दीवार", cap.lower()
@@ -84,20 +141,64 @@ class AIClient:
 
     # ---------- 8.4 ----------
     async def edit_image(self, image_bytes: bytes, prompt: str) -> bytes | None:
+        if self.live:
+            return await self.gemini.edit_image(image_bytes, prompt)
         return None  # no image model: try-on keeps the deterministic composite
 
+    # ---------- product question → one data field ----------
+    async def map_fact_question(self, question: str, products: list[dict], fields: list[dict]) -> FactQuery | None:
+        if not self.live:
+            return None
+        ctx = {"PRODUCTS": products[:40], "FIELDS": fields}
+        try:
+            return await self.gemini.json(
+                [question, json.dumps(ctx, ensure_ascii=False)],
+                FactQuery,
+                prompts.FACT_QUERY_SYSTEM,
+                timeout=5.0,
+                kind="fact_query",
+            )
+        except AIUnavailable:
+            return None
+
     # ---------- 8.5 ----------
-    async def extract_visit(self, text: str | None, audio: bytes | None) -> VisitEntry:
+    async def extract_visit(self, text: str | None, audio: bytes | None, mime: str | None = None) -> VisitEntry:
         if text and text.startswith("FIX:"):
             return self._fixture("visit", text[4:].strip(), VisitEntry)
+        if self.live:
+            from google.genai import types
+
+            part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime)) if audio is not None else (text or "")
+            try:
+                return await self.gemini.json([part], VisitEntry, prompts.VISIT_SYSTEM, timeout=10.0, kind="visit")
+            except AIUnavailable:
+                if audio is not None:
+                    raise
         if audio is not None:
             raise AIUnavailable("voice")
         return _visit_rules(text or "")
 
     # ---------- 8.6 ----------
     async def format_expert_answer(
-        self, text: str | None, audio: bytes | None, assoc_lang: str, cust_lang: str
+        self, text: str | None, audio: bytes | None, assoc_lang: str, cust_lang: str, mime: str | None = None
     ) -> ExpertAnswer:
+        if self.live:
+            from google.genai import types
+
+            part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime)) if audio is not None else (text or "")
+            names = {"hi": "Hindi (Roman script, Hinglish)", "mr": "Marathi (Devanagari)", "en": "English"}
+            cust = {"hi": "Hindi (Devanagari)", "mr": "Marathi (Devanagari)", "en": "English"}
+            try:
+                return await self.gemini.json(
+                    [part, f"ASSOCIATE language: {names.get(assoc_lang)}. CUSTOMER language: {cust.get(cust_lang)}."],
+                    ExpertAnswer,
+                    prompts.FORMAT_EXPERT_SYSTEM,
+                    timeout=10.0,
+                    kind="expert",
+                )
+            except AIUnavailable:
+                if audio is not None:
+                    raise
         if audio is not None:
             raise AIUnavailable("voice")
         t = " ".join((text or "").split())

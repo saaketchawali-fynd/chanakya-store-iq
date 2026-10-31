@@ -16,7 +16,7 @@ LANG_TITLES = {"hi": "b_lang_hi", "mr": "b_lang_mr", "en": "b_lang_en"}
 
 async def new_session(ctx: SkillContext, customer_lang: str | None = None, ask_lang: bool = True) -> Reply:
     svc = ctx.svc
-    cat = ctx.staff.dept if ctx.staff and ctx.staff.dept in ctx.packs.packs else "tv"
+    cat = ctx.staff.dept if ctx.staff and ctx.staff.dept in ctx.packs.packs else None
     ctx.session = await svc.sessions.create(ctx.actor_wa_id, ctx.now, customer_lang or ctx.lang, cat)
     ctx.staff.current_session_id = ctx.session.id
     ctx.ev("session_started", code=ctx.session.code, category=cat, lang=ctx.session.home.customer_lang)
@@ -25,6 +25,25 @@ async def new_session(ctx: SkillContext, customer_lang: str | None = None, ask_l
     code = ctx.reg.raw(ctx.session.code, "session:code")
     btns = [ctx.b(LANG_TITLES[lg], ctx.sid("lang", lg)) for lg in ("hi", "mr", "en")]
     return ctx.reply(info_reply(ctx, ctx.t("new_customer_lang", code=code), btns))
+
+
+def category_question(ctx: SkillContext) -> Reply:
+    btns = [
+        ctx.b("b_cat_tv", ctx.sid("cat", "tv")),
+        ctx.b("b_cat_ac", ctx.sid("cat", "ac")),
+        ctx.b("b_cat_wm", ctx.sid("cat", "wm")),
+    ]
+    return ctx.reply(info_reply(ctx, ctx.t("ask_category"), btns))
+
+
+async def set_category(ctx: SkillContext, cat: str) -> Reply:
+    s = ctx.session
+    if cat not in ctx.packs.packs:
+        return category_question(ctx)
+    s.home.category = cat  # type: ignore[assignment]
+    pending = s.extra.pop("pending_u", None)
+    u = Understanding.model_validate(pending) if pending else Understanding()
+    return await on_info(ctx, u, "voice")
 
 
 async def set_customer_lang(ctx: SkillContext, lang: str) -> Reply:
@@ -47,7 +66,11 @@ def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voic
         if ctx.packs.get(u.category):
             home.category = u.category
     if home.category is None:
-        home.category = "tv"
+        dept = ctx.staff.dept if ctx.staff else None
+        if dept not in ctx.packs.packs:  # unknown product: the router asks "Kaunsa product?" first
+            s.extra["pending_u"] = u.model_dump()
+            return 0
+        home.category = dept
     pack = ctx.pack
     if u.customer_name and not home.customer_name:
         home.customer_name = u.customer_name

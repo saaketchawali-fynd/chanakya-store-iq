@@ -125,11 +125,11 @@ async def expert_message(ctx: SkillContext) -> Reply:
     alang = assoc.lang if assoc else "hi"
     s = await ctx.svc.sessions.get(q.session_id) if q.session_id else None
     clang = s.home.customer_lang if s else alang
-    audio = None
+    audio, amime = None, None
     if ctx.inbound.type == "audio" and ctx.inbound.media_id:
-        audio, _ = await ctx.svc.channel.download_media(ctx.inbound.media_id)
+        audio, amime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
     try:
-        ans = await ctx.ai.format_expert_answer(ctx.inbound.text, audio, alang, clang)
+        ans = await ctx.ai.format_expert_answer(ctx.inbound.text, audio, alang, clang, mime=amime)
     except AIUnavailable:
         if audio is not None:  # no transcription model: forward the expert's voice note as-is
             mid = await ctx.svc.channel.upload_media(audio, "audio/ogg", "expert.ogg")

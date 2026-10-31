@@ -9,7 +9,7 @@ from chanakya.core import repo, state
 from chanakya.core.buttons import encode
 from chanakya.core.clock import today
 from chanakya.core.coach import coach_reply, info_reply
-from chanakya.core.contracts import Button, Reply, Step
+from chanakya.core.contracts import Button, OutMessage, Reply, Step
 from chanakya.i18n.lang import fill
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -99,12 +99,58 @@ async def quote(ctx: SkillContext, alt: bool = False) -> Reply:
     else:
         why = ctx.t("kyun_no_offer", payable=res.payable_str)
     cites = C.known_cites(ctx, ["mounting", "exchange_old", "outdoor_spot", "family_size", "carry"])
-    btns = [
-        ctx.b("b_emi", ctx.sid("emi")),
+    btns = [  # spec 12.7: [Customer ko bhejo] [Delivery din] [Parivaar Card]
+        ctx.b("b_send_customer", ctx.sid("sendoffer")),
         ctx.b("b_delivery", ctx.sid("delivery")),
         ctx.b("b_parivaar", ctx.sid("parivaar")),
     ]
     return ctx.reply(coach_reply(ctx, say, why, cites, btns))
+
+
+async def send_to_customer(ctx: SkillContext) -> Reply:
+    """[Customer ko bhejo]: the offer + finance summary to the customer (consent first, as for the Parivaar Card)."""
+    s = ctx.session
+    if not s.consent or not s.customer_wa_id:
+        from chanakya.skills import follow
+
+        return await follow.parivaar(ctx)
+    os_ = s.offer_snapshot or {}
+    sku = os_.get("sku") or _sku(ctx)
+    p = ctx.facts.product_sync(sku)
+    lang = s.home.customer_lang
+    lines = [C.product_title(ctx, p, lang)]
+    if s.cost_snapshot:
+        lines[0] += " · " + ctx.t(
+            "parivaar_cost", lang, total=ctx.reg.raw(s.cost_snapshot["zaroori_total_str"], "snapshot")
+        )
+    if os_.get("applied"):
+        a = os_["applied"][0]
+        from datetime import date
+
+        o = next((o for o in ctx.facts.snap.offers if o.id == a["id"]), None)
+        lines.append(
+            ctx.t(
+                "parivaar_offer",
+                lang,
+                offer=ctx.pick(o.title, lang) if o else a["id"],
+                amount=ctx.reg.raw(a["amount_str"], f"offer:{a['id']}"),
+                date=ctx.reg.raw(fmt.date_short(date.fromisoformat(a["valid_to"]), lang), f"offer:{a['id']}"),
+                payable=ctx.reg.raw(os_.get("payable_str", ""), "snapshot:payable"),
+            )
+        )
+    if os_.get("finance"):
+        q = finance.FinanceQuote.model_validate(os_["finance"])
+        for v in (q.monthly_str, q.fee_str, q.total_str, q.extra_str, q.months_str):
+            ctx.reg.raw(v, f"snapshot:finance:{q.plan_id}")
+        lines.append(finance_sentence(ctx, q, lang))
+    ctx.ev("offer_sent_to_customer", sku=sku)
+    to_cust = OutMessage(to=s.customer_wa_id, kind="text", body="\n".join(lines[:3]), allowed_numbers=ctx.reg.allowed())
+    btns = [
+        ctx.b("b_delivery", ctx.sid("delivery")),
+        ctx.b("b_parivaar", ctx.sid("parivaar")),
+        ctx.b("b_khatam", ctx.sid("khatam")),
+    ]
+    return ctx.reply(to_cust, info_reply(ctx, ctx.t("relay_sent"), btns))
 
 
 def finance_sentence(ctx: SkillContext, q: finance.FinanceQuote, lang: str) -> str:

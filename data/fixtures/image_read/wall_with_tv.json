@@ -1,0 +1,9 @@
+{"kind": "room", "light": "moderate", "frontal": true, "people_present": false,
+ "boxes": [
+  {"label": "wall", "box_2d": [100, 120, 640, 880]},
+  {"label": "existing_tv", "box_2d": [300, 405, 455, 595]},
+  {"label": "tv_unit", "box_2d": [560, 330, 640, 670]},
+  {"label": "door", "box_2d": [140, 30, 760, 140]}
+ ],
+ "wall_corners": [{"x": 120, "y": 100}, {"x": 880, "y": 100}, {"x": 880, "y": 640}, {"x": 120, "y": 640}],
+ "floor_y": 760, "ceiling_y": 60}

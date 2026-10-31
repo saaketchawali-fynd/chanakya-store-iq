@@ -26,7 +26,11 @@ class Settings(BaseSettings):
     # AI: the Google/Gemini model is intentionally not wired in this build.
     #   fixture → canned JSON from data/fixtures (tests, simulator)
     #   rules   → deterministic offline understanding (keywords from packs) — default for live WhatsApp
-    ai_mode: str = "rules"
+    ai_mode: str = "auto"  # auto = Gemini when GEMINI_API_KEY is set, else offline rules
+    gemini_api_key: str = ""
+    gemini_fast_model: str = "gemini-flash-latest"
+    gemini_fallback_model: str = "gemini-flash-lite-latest"
+    gemini_image_model: str = "gemini-2.5-flash-image"
 
     database_url: str = "sqlite+aiosqlite:///./chanakya.db"
     public_base_url: str = "http://localhost:8000"

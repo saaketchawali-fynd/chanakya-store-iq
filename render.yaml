@@ -38,7 +38,11 @@ services:
       - key: WA_API_VERSION
         value: v23.0
       - key: AI_MODE
-        value: rules
+        value: auto              # Gemini when GEMINI_API_KEY is set, else offline rules
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: HARMONISE_TRYON
+        value: "true"
       - key: STORE_ID
         value: RD-JUHU
       - key: DEMO_MODE

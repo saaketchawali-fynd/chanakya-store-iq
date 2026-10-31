@@ -112,7 +112,7 @@ async def main() -> None:
     ap.add_argument("--db", default=f"sqlite+aiosqlite:///{ROOT / 'sim.db'}")
     a = ap.parse_args()
     setup_logging("WARNING")
-    h = await Harness.create(a.db, ai_mode="rules" if a.rules else "fixture", render=a.render)
+    h = await Harness.create(a.db, ai_mode="rules" if a.rules else "fixture", render=a.render, lang_set=False)
     counter = [0]
     try:
         if a.script:

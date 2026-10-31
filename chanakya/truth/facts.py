@@ -192,7 +192,7 @@ class FactsService:
         if not text:
             return None
         low = text.lower()
-        best, best_s = None, 0.0
+        best, best_key = None, (0.0, 0)
         for p in self.snap.products.values():
             if category and p.category != category:
                 continue
@@ -202,9 +202,11 @@ class FactsService:
             size = (p.specs or {}).get("size_in")
             if size is not None and not re.search(rf"\b{int(size)}\b", low):
                 s -= 20
-            if s > best_s:
-                best, best_s = p.sku, s
-        return best if best_s >= 85 else None
+            # ties ("Meru 55 QLED" vs "Meru 55 QLED Pro" both inside the text): the longer, more specific name wins
+            key = (s, len(p.model) if p.model.lower() in low else 0)
+            if key > best_key:
+                best, best_key = p.sku, key
+        return best if best_key[0] >= 85 else None
 
     # ---------- money and rules ----------
     async def charges(self, category: str) -> list[Charge]:

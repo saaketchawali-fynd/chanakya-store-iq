@@ -9,15 +9,17 @@ from chanakya.ai.client import AIUnavailable
 from chanakya.core import clock, repo, state
 from chanakya.core.buttons import ButtonId, decode, encode
 from chanakya.core.coach import info_reply
-from chanakya.core.contracts import InboundMessage, ListRow, ListSection, OutMessage, Reply, Step
+from chanakya.core.contracts import Button, InboundMessage, ListRow, ListSection, OutMessage, Reply, Step
 from chanakya.log import get_log
 from chanakya.skills import (
     assess,
     brief,
+    catalog,
     close,
     complete,
     customer,
     expert,
+    facts_qa,
     follow,
     manager,
     recommend,
@@ -32,6 +34,11 @@ from chanakya.truth.firewall import NumberRegistry
 
 log = get_log("router")
 _unknown_replied: set[str] = set()
+FEATURES_OF_OPTION = re.compile(
+    r"(?:\boption\s*|\b)([ABCabc])\s*(?:ke|ka|ki|के|का|की|चे|च्या|ची|'s)?\s*"
+    r"(?:features?|fayde|faayde|फायदे|फ़ायदे|ख़ूबियाँ|खूबियाँ|वैशिष्ट्ये|specs?)",
+    re.IGNORECASE,
+)
 
 
 def _cmd(text: str | None) -> str:
@@ -54,6 +61,8 @@ CMD = {
     "reset": {"reset"},
     "sold": {"sold", "bik gaya"},
     "score": {"score"},
+    "language": {"language", "bhasha", "भाषा", "lang"},
+    "catalog": {"catalog", "catalogue", "products", "models", "सूची", "यादी"},
 }
 
 
@@ -69,6 +78,8 @@ def command_of(text: str | None) -> tuple[str | None, str]:
         ("/role ", "role"),
         ("/clock ", "clock"),
         ("r ", "relay"),
+        ("catalog ", "catalog"),
+        ("catalogue ", "catalog"),
     ):
         if c.startswith(pre):
             return name, (text or "").strip()[len(pre) :].strip()
@@ -119,6 +130,12 @@ async def dispatch(ctx: SkillContext) -> Reply:
         return await dispatch_customer(ctx)
     # staff: demo + shared commands first
     name, arg = command_of(msg.text) if msg.type == "text" else (None, "")
+    # first contact (or 'language'): the associate picks a language; everything after uses only that language
+    b0 = decode(msg.reply_id) if msg.type in ("button_reply", "list_reply") else None
+    if b0 and b0.scope == "g" and b0.get(0) == "alang":
+        return await set_staff_language(ctx, b0.get(1, "hi"))
+    if ctx.staff and (name == "language" or (not ctx.staff.lang_set and name not in ("role", "clock", "reset"))):
+        return language_picker(ctx)
     if name in ("role", "clock", "lang") or (name == "reset" and ctx.svc.settings.demo_mode):
         r = await staff_command(ctx, name, arg)
         if r is not None:
@@ -166,6 +183,40 @@ async def dispatch(ctx: SkillContext) -> Reply:
     return await dispatch_associate(ctx, name, arg)
 
 
+LANG_BUTTONS = (("en", "English"), ("hi", "हिंदी"), ("mr", "मराठी"))
+
+
+def language_picker(ctx: SkillContext) -> Reply:
+    name = ctx.staff.name if ctx.staff else ""
+    body = f"Namaste {name}! 🙏 Main Chanakya, aapka sales saathi.\nभाषा निवडा · Bhasha chuniye · Choose your language"
+    btns = [Button(id=encode("g", "alang", lg), title=title) for lg, title in LANG_BUTTONS]
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="buttons", body=body, buttons=btns))
+
+
+async def set_staff_language(ctx: SkillContext, lang: str) -> Reply:
+    st = ctx.staff
+    st.lang = lang if lang in ("hi", "mr", "en") else "hi"
+    st.lang_set = True
+    role = ctx.role
+    if role == "manager":
+        return ctx.reply(
+            info_reply(
+                ctx,
+                ctx.t("manager_help"),
+                [
+                    ctx.b("b_digest", encode("m", "digest")),
+                    ctx.b("b_team", encode("m", "team")),
+                    ctx.b("b_approvals", encode("m", "approvals")),
+                ],
+            )
+        )
+    if role == "expert":
+        return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
+    if role == "visitor":
+        return await visitlog.start(ctx)
+    return await brief.brief(ctx)
+
+
 async def staff_command(ctx: SkillContext, name: str, arg: str) -> Reply | None:
     st = ctx.staff
     settings = ctx.svc.settings
@@ -173,6 +224,7 @@ async def staff_command(ctx: SkillContext, name: str, arg: str) -> Reply | None:
         lg = arg.strip().lower()[:2]
         if lg in ("hi", "mr", "en"):
             st.lang = lg
+            st.lang_set = True
             return ctx.reply(info_reply(ctx, ctx.t("lang_set")))
         return None
     allowed = settings.demo_mode and (not settings.role_switch_phones or ctx.actor_wa_id in settings.role_switch_phones)
@@ -332,6 +384,9 @@ async def global_action(ctx: SkillContext, bid: ButtonId) -> Reply:
         return await review.last_score(ctx)
     if a == "brief":
         return await brief.brief(ctx)
+    if a == "catalog":
+        page = bid.get(2, "0")
+        return await catalog.show(ctx, bid.get(1), int(page) if page.isdigit() else 0)
     return await _fallback(ctx)
 
 
@@ -371,6 +426,11 @@ async def command(ctx: SkillContext, name: str, arg: str) -> Reply:
         )
     if name == "status":
         return await assess.status(ctx)
+    if name == "catalog":
+        cat = {"washing": "wm", "washing machine": "wm", "wm": "wm", "ac": "ac", "tv": "tv", "laptop": "laptop"}.get(
+            (arg or "").strip().lower()
+        )
+        return await catalog.show(ctx, cat)
     if name == "expert":
         return await expert.ask(ctx, arg)
     if name == "relay":
@@ -423,6 +483,7 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "sold": lambda: follow.sold(ctx),
         "expert": lambda: expert.ask(ctx, ctx.session.extra.get("last_claim_text") or ctx.inbound.text or ""),
         "askmgr": lambda: close.ask_manager(ctx),
+        "sendoffer": lambda: close.send_to_customer(ctx),
     }
     if action in table:
         return await table[action]()
@@ -431,6 +492,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         return await assess.set_customer_lang(ctx, a0 or "hi")
     if action == "slot" and a0 and a1:
         return await assess.tap_slot(ctx, a0, a1)
+    if action == "cat" and a0:
+        return await assess.set_category(ctx, a0)
     if action == "slotask" and a0:
         from chanakya.skills import common
 
@@ -456,6 +519,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         return await review.price_first(ctx, a0 or "none")
     if action == "islot":
         return await follow.create_install(ctx, a0 or "t1")
+    if action == "oldtv":
+        return await tryon_flow.set_old_tv(ctx, a0 or "none")
     if action == "wallw":
         return await tryon_flow.set_wall_width(ctx, a0 or "w9")
     if action == "tpick" and a0:
@@ -469,16 +534,30 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     return await _fallback(ctx)
 
 
-def _understand_ctx(ctx: SkillContext) -> dict:
+async def _understand_ctx(ctx: SkillContext) -> dict:
     s = ctx.session
     pack = ctx.pack or ctx.packs.get("tv")
     known = {k: [v.value for v in vals] for k, vals in (s.home.slots.items() if s else [])}
+    lib = await repo.library_all(pack.category)
+    opts = {}
+    for k, sku in s.option_labels.items() if s else []:
+        p = ctx.facts.product_sync(sku)
+        opts[k] = p.model if p else sku
     return {
         "category": (s.home.category if s else None) or (ctx.staff.dept if ctx.staff else "tv"),
         "known_slots": known,
-        "slots": [{"id": sd.id, "values": sd.values} for sd in pack.slots],
+        "slots": [
+            {
+                "id": sd.id,
+                "hint": sd.ask.get("en", ""),
+                "number_name": sd.number,
+                "values": [{"id": v, "means": sd.value_title(v, "en")} for v in sd.values],
+            }
+            for sd in pack.slots
+        ],
         "myths": [{"id": m.id, "belief": m.belief} for m in ctx.packs.all_myths(pack.category)][:30],
-        "options_shown": {k: v for k, v in (s.option_labels.items() if s else [])},
+        "library": [{"id": f"L{e.id}", "q": e.question} for e in lib][:30],
+        "options_shown": opts,
     }
 
 
@@ -500,18 +579,22 @@ async def on_speech(ctx: SkillContext) -> Reply:
             return await validate.honest_version(ctx, phrase)
         if validate.looks_bait(ctx, text):
             return await validate.no_looks(ctx)
-    audio = None
+    if text and not text.startswith("FIX:") and facts_qa.looks_like_product_question(text):
+        r = await facts_qa.answer(ctx, text)
+        if r is not None:
+            return r
+    audio, amime = None, None
     if msg.type == "audio" and msg.media_id:
-        audio, _ = await ctx.svc.channel.download_media(msg.media_id)
+        audio, amime = await ctx.svc.channel.download_media(msg.media_id)
     try:
-        u = await ctx.ai.understand(text, audio, _understand_ctx(ctx))
+        u = await ctx.ai.understand(text, audio, await _understand_ctx(ctx), mime=amime or msg.mime_type)
     except AIUnavailable:
         btns = [
             ctx.b("b_next_q", ctx.sid("go")) if s else ctx.b("b_new_customer", encode("g", "new")),
             ctx.b("b_status", encode("g", "status")),
             ctx.b("b_help", encode("g", "help")),
         ]
-        return ctx.reply(info_reply(ctx, ctx.t("voice_unavailable"), btns))
+        return ctx.reply(info_reply(ctx, ctx.t("voice_retry" if ctx.ai.live else "voice_unavailable"), btns))
     tr = u.transcript or text or ""
     # guards on the transcript (fixtures / future voice model)
     if validate.looks_bait(ctx, tr):
@@ -529,10 +612,18 @@ async def on_speech(ctx: SkillContext) -> Reply:
         if u.category:
             s.home.category = u.category
     # 2. apply slots and numbers
+    if s.home.category is None and u.category and ctx.packs.get(u.category):
+        s.home.category = u.category
+    if s.home.category is None and (ctx.staff.dept if ctx.staff else None) not in ctx.packs.packs:
+        s.extra["pending_u"] = u.model_dump()
+        return assess.category_question(ctx)
     gate_before = state.options_gate_open(s, ctx.pack)
     assess.apply_understanding(ctx, u, "voice" if msg.type == "audio" or (text or "").startswith("FIX:") else "text")
     s.extra["last_claim_text"] = tr[:200]
     intents = set(u.intents)
+    m = FEATURES_OF_OPTION.search(tr)
+    if m and s.option_labels.get(m.group(1).upper()):  # "B ke features" → Translate for that option
+        return await translate.show_sku(ctx, s.option_labels[m.group(1).upper()])
     if "price_asked" in intents:
         return await validate.price_rescue(ctx)
     if u.claim_id:
@@ -541,6 +632,10 @@ async def on_speech(ctx: SkillContext) -> Reply:
         return await close.objection(ctx, u.objection)
     if u.option_choice and s.option_labels:
         return await complete.choose(ctx, u.option_choice)
+    if u.question_for_expert and not u.library_id:  # data first; the expert only when the data has no answer
+        r = await facts_qa.answer(ctx, u.question_for_expert or tr)
+        if r is not None:
+            return r
     if u.library_id or u.question_for_expert:
         return await expert.ask(
             ctx, u.question_for_expert or tr, via_truth_check=bool(u.question_for_expert), library_id=u.library_id

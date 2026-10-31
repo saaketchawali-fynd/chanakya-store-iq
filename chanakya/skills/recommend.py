@@ -10,6 +10,7 @@ from chanakya.core.buttons import encode
 from chanakya.core.coach import coach_reply, info_reply
 from chanakya.core.contracts import Button, Card, OutMessage, Reply, Step
 from chanakya.skills import common as C
+from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 
 
@@ -117,6 +118,8 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
                 "stock_line": _stock_line(ctx, p),
                 "image": p.image,
                 "is_best": o.role == "best",
+                "features": PV.features(ctx, p, ctx.clang, 3),
+                "dims_text": PV.dims_text(ctx, p),
             }
         )
         btns.append(C.option_button(ctx, o.label, p))

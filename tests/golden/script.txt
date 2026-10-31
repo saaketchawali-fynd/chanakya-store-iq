@@ -1,5 +1,6 @@
 # Golden path (TV): associate hi, customer mr — spec 18.3
 say namaste
+tap g:alang:hi
 tap g:new
 tap s:C1:lang:mr
 voice assess_1

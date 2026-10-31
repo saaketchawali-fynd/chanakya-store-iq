@@ -197,6 +197,8 @@ def understand_text(
     text: str, packs: PackRegistry, category: str | None, myth_ids: list[str] | None = None, options_shown: bool = False
 ) -> Understanding:
     raw = text or ""
+    if category not in packs.packs:  # e.g. a department of "all": treat as not yet known
+        category = None
     t0 = _norm(raw)  # keyword matching (number words kept as words)
     t = _words_to_digits(t0)  # number extraction
     common = packs.common

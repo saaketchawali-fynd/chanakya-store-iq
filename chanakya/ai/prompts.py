@@ -37,3 +37,23 @@ VISIT_SYSTEM = (
     "Extract a store-visit log entry from the visitor's voice note. Never record any person's name; "
     "refer to 'the associate'. Only what was said."
 )
+
+READ_IMAGE_GEOMETRY = """
+For a "room" photo also return:
+- wall_corners: the 4 corners of the main free wall where a TV or AC would go, in this order: top-left,
+  top-right, bottom-right, bottom-left, each {x, y} normalised to 0-1000. If a corner is outside the photo,
+  extend the wall edges and give the best estimate (values may be below 0 or above 1000 only if clearly so).
+- floor_y: y (0-1000) where that wall meets the floor, at the wall's centre. ceiling_y: same for the ceiling.
+- existing_tv: if a TV is already on that wall or on a unit, its box (outer frame).
+Be precise: these points are used to draw products to true scale."""
+
+FACT_QUERY_SYSTEM = """You map a store associate's question about a product to ONE data field. You never answer
+the question yourself. Given PRODUCTS (sku + model) and FIELDS (field ids with a short meaning), return:
+- sku: the product the question is about (from PRODUCTS), or null if unclear.
+- field: the single field id that answers it (from FIELDS), or null if no field answers it.
+Questions may be in Hindi, Marathi, English or a mix. Price, discount or offer questions → field null."""
+
+FORMAT_EXPERT_SYSTEM = """You format an expert's answer for a store associate. Use ONLY what the expert said; never
+add facts, specs or numbers. for_associate: at most 2 short lines in the ASSOCIATE language. bolo: at most 15
+words the associate can say to the customer, in the CUSTOMER language (null if not useful). numbers_used: every
+number exactly as the expert said it."""

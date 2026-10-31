@@ -29,7 +29,10 @@ def session() -> AsyncSession:
 
 
 # Columns added after the first deploy (create_all never alters an existing table).
-_ADDED_COLUMNS = [("products", "info", "JSONB", "JSON", "'{}'")]
+_ADDED_COLUMNS = [
+    ("products", "info", "JSONB", "JSON", "'{}'"),
+    ("staff", "lang_set", "BOOLEAN", "BOOLEAN", "false"),
+]
 
 
 async def create_all(drop: bool = False) -> None:

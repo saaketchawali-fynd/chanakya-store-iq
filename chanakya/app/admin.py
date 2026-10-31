@@ -37,6 +37,8 @@ async def health(request: Request):
         "wa_token_set": bool(s.wa_token),
         "phone_number_id_set": bool(s.wa_phone_number_id),
         "app_secret_set": bool(s.wa_app_secret),
+        "gemini_key_set": bool(s.gemini_api_key),
+        "ai_mode_effective": rt.ai.mode if rt else None,
         "verify_token_set": bool(s.wa_verify_token),
         "ai_mode": s.ai_mode,
         "phones": {

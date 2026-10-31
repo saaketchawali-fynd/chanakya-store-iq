@@ -111,6 +111,12 @@ class ImageRead(BaseModel):
     ceiling_y: int | None = None  # where the main wall meets the ceiling, at the wall's centre (0-1000)
 
 
+# ---------- product question → one data field (the answer itself is built from data by code) ----------
+class FactQuery(BaseModel):
+    sku: str | None = None
+    field: str | None = None
+
+
 # ---------- 8.5 Visit log ----------
 class StepScore(BaseModel):
     step: Literal["validate", "assess", "translate", "demonstrate", "complete", "close", "follow_through"]

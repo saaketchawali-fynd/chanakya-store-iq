@@ -49,7 +49,10 @@ class SkillContext:
     def pack(self) -> Pack | None:
         if not self.session:
             return None
-        return self.packs.get(self.session.home.category or (self.staff.dept if self.staff else None) or "tv")
+        for cat in (self.session.home.category, self.staff.dept if self.staff else None, "tv"):
+            if cat and self.packs.get(cat):
+                return self.packs.get(cat)
+        return None
 
     @property
     def x(self) -> dict:

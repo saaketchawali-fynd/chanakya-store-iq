@@ -51,11 +51,22 @@ class Harness:
 
     @classmethod
     async def create(
-        cls, db_url: str, ai_mode: str = "fixture", render: bool = False, drop: bool = True, **kw
+        cls,
+        db_url: str,
+        ai_mode: str = "fixture",
+        render: bool = False,
+        drop: bool = True,
+        lang_set: bool = True,
+        **kw,
     ) -> Harness:
         locks.reset()
         ch = FakeChannel(renders_cards=render)
         rt = await build(harness_settings(db_url, ai_mode, **kw), ch, drop=drop, render=render)
+        if lang_set:  # skip the first-contact language picker (tests that check it pass lang_set=False)
+            from chanakya.core import repo
+
+            for st in await repo.staff_all():
+                await repo.staff_update(st.wa_id, lang_set=True)
         if render:
             await start_renderer(rt)
         return cls(rt, ch)

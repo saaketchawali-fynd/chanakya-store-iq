@@ -13,7 +13,7 @@ async def ev_types(sid):
 
 
 async def test_golden_path(tmp_path):
-    h = await make_harness(tmp_path)
+    h = await make_harness(tmp_path, lang_set=False)
     allm = []
 
     async def step(fn, *a):
@@ -23,8 +23,12 @@ async def test_golden_path(tmp_path):
         return out
 
     try:
-        # 1 brief
+        # 0 first contact: the associate picks a language, and everything after is in that language
         out = await step(h.say, "namaste")
+        assert [b.id for b in out[0].buttons] == ["g:alang:en", "g:alang:hi", "g:alang:mr"]
+        assert not any(m.card for m in out)
+        # 1 brief (Hindi chosen)
+        out = await step(h.tap, "g:alang:hi")
         brief = next(m for m in out if m.card and m.card.template == "brief")
         assert any("Meru 55 QLED Pro" in c["text"] for c in brief.card.data["changes"])
         assert [b.title for b in brief.buttons] == ["Clip dekho", "Aaj ka sawaal", "Naya customer"]

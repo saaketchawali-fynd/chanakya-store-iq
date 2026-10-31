@@ -112,6 +112,7 @@ class Orchestrator:
                     base_role=ctx.staff.base_role,
                     current_session_id=ctx.staff.current_session_id,
                     streak=ctx.staff.streak,
+                    lang_set=ctx.staff.lang_set,
                     last_brief_date=ctx.staff.last_brief_date,
                 )
         except Exception:

@@ -283,3 +283,23 @@ async def test_languages(h, assoc, cust):
     await h.tap("s:C1:shown")
     out = await h.tap("s:C1:opt:B")
     assert out[-1].card.lang == cust and out[-1].card.data["zaroori_total_str"] == "₹65,288"
+
+
+async def test_language_picker_then_single_language(tmp_path):
+    hh = await make_harness(tmp_path, lang_set=False)
+    try:
+        out = await hh.tap("g:new")  # any first message gets the picker, nothing else
+        assert len(out) == 1 and [b.title for b in out[0].buttons] == ["English", "हिंदी", "मराठी"]
+        out = await hh.tap("g:alang:mr")
+        assert any(m.card and m.card.template == "brief" and m.card.lang == "mr" for m in out)
+        out = await hh.tap("g:new")
+        assert "नवीन ग्राहक" in out[0].body  # Marathi from now on
+        out = await hh.tap("s:C1:lang:hi")  # customer speaks Hindi: only the Bolo line follows the customer
+        out = await hh.voice("assess_1")
+        body = out[0].body
+        assert "🗣 बोला" in body and "💡 का" in body  # associate labels stay Marathi
+        assert "दीवार" in body  # the line to say is in the customer's Hindi
+        await hh.say("language")
+        assert [b.id for b in hh.ch.sent[-1].msg.buttons] == ["g:alang:en", "g:alang:hi", "g:alang:mr"]
+    finally:
+        await hh.close()

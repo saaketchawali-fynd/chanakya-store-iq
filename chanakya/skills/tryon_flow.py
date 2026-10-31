@@ -6,6 +6,7 @@ import io
 
 from PIL import Image
 
+from chanakya.ai.schemas import ImageRead
 from chanakya.brain import packs as P
 from chanakya.brain.fit import fit, tv_size_range
 from chanakya.brain.options import candidate_set
@@ -15,10 +16,13 @@ from chanakya.core.coach import coach_reply, info_reply
 from chanakya.core.contracts import ListRow, ListSection, OutMessage, Reply
 from chanakya.log import get_log
 from chanakya.skills import common as C
+from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 from chanakya.tryon import TryonProduct, TryonRequest, run
 
 log = get_log("tryon_flow")
+OLD_TV_SIZES = (24, 32, 40, 43, 50, 55, 65)
+TRYON_FIELDS = set(getattr(TryonProduct, "__dataclass_fields__", {}))
 WALL_WIDTHS = {"w7": 7, "w9": 9, "w11": 11, "w13": 13}
 WALL_TITLES = {"w7": "6-8 ft", "w9": "8-10 ft", "w11": "10-12 ft", "w13": "12 ft+"}
 
@@ -81,14 +85,38 @@ async def job(ctx: SkillContext) -> Reply:
     if not products:
         return ctx.reply(info_reply(ctx, ctx.t("tryon_failed")))
     read = None
-    try:
-        read = await ctx.ai.read_image(raw.data, s.extra.get("room_photo_name"), hint="room")
-        if read.kind != "room":
-            read = None
-    except Exception:
-        log.exception("room_read_failed")
-    if read and read.light and not P.known(s.home, "room_light"):
-        pass  # light from a photo is a hint only; the associate's words decide the Home Card
+    cached = s.extra.get("room_read") or {}
+    if cached.get("media_id") == raw.id:  # same photo: don't read it twice (e.g. after the old-TV answer)
+        read = ImageRead.model_validate(cached["read"]) if cached.get("read") else None
+    else:
+        try:
+            read = await ctx.ai.read_image(raw.data, s.extra.get("room_photo_name"), hint="room")
+            if read.kind != "room":
+                read = None
+        except Exception:
+            log.exception("room_read_failed")
+        s.extra["room_read"] = {"media_id": raw.id, "read": read.model_dump() if read else None}
+        s.extra.pop("oldtv_asked", None)
+    # A TV already on that wall is the best size reference: ask its size once (one tap), then draw.
+    old_tv = P.number(s.home, "existing_tv_in")
+    has_old_tv = bool(read and any(b.label == "existing_tv" for b in read.boxes))
+    if has_old_tv and old_tv is None and not s.extra.get("oldtv_asked"):
+        s.extra["oldtv_asked"] = True
+        rows = [ListRow(id=ctx.sid("oldtv", str(n)), title=f'{n}"') for n in OLD_TV_SIZES]
+        rows.append(ListRow(id=ctx.sid("oldtv", "none"), title=ctx.t("oldtv_none")))
+        for r in rows:
+            ctx.reg.static(r.title)
+        return ctx.reply(
+            OutMessage(
+                to=ctx.actor_wa_id,
+                kind="list",
+                body=ctx.t("oldtv_ask"),
+                list_button=ctx.t("list_choose"),
+                sections=[ListSection(rows=rows)],
+                allowed_numbers=ctx.reg.allowed(),
+            )
+        )
+    mount = "stand" if P.value(s.home, "mounting") == "stand" else "wall"
     tps = []
     for i, p in enumerate(products[:2]):
         size = p.spec("size_in")
@@ -97,6 +125,11 @@ async def job(ctx: SkillContext) -> Reply:
             label = f'{ctx.reg.num(size, f"spec:{p.sku}:size_in")}" · {name}'
         else:
             label = p.model
+        extra = {}
+        if "dims_text" in TRYON_FIELDS:
+            extra["dims_text"] = PV.dims_text(ctx, p)
+        if "mount" in TRYON_FIELDS:
+            extra["mount"] = mount
         tps.append(
             TryonProduct(
                 sku=p.sku,
@@ -105,6 +138,7 @@ async def job(ctx: SkillContext) -> Reply:
                 height_mm=p.spec("height_mm"),
                 label=label,
                 solid=(i == 0),
+                **extra,
             )
         )
     dist = P.number(s.home, "seat_distance", ctx.pack)
@@ -117,6 +151,7 @@ async def job(ctx: SkillContext) -> Reply:
         wall_width_ft=ww,
         niche_width_cm=P.number(s.home, "niche_width_cm"),
         distance_text=dist_text,
+        existing_tv_size_in=old_tv,
     )
     res = await run(req, editor=ctx.ai, harmonise=bool(ctx.svc and ctx.svc.settings.harmonise_tryon))
     if res.blurred_photo:
@@ -158,6 +193,13 @@ async def job(ctx: SkillContext) -> Reply:
     m.image_bytes = res.image
     m.kind = "buttons"
     return ctx.reply(m)
+
+
+async def set_old_tv(ctx: SkillContext, size: str) -> Reply:
+    s = ctx.session
+    if size.isdigit():
+        P.set_slot(s.home, None, "existing_tv_in", "num", float(size), "tap", ctx.now)
+    return ctx.reply(info_reply(ctx, ctx.t("room_photo_ack")), background=["tryon"])
 
 
 async def set_wall_width(ctx: SkillContext, key: str) -> Reply:

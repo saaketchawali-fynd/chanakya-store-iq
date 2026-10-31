@@ -241,3 +241,20 @@ cust_voice_assoc: {hi: "🎤 {name} ka voice note:", mr: "🎤 {name} यां�
 cust_wants_talk: {hi: "📞 {name} baat karna chahte hain. Bolo: \"Namaste, main store se bol raha hoon — kya madad karun?\"", mr: "📞 {name} बोलू इच्छितात. बोला: \"नमस्कार, मी स्टोअरमधून बोलतोय — काय मदत करू?\"", en: "📞 {name} wants to talk. Say: \"Namaste, calling from the store: how can I help?\""}
 cust_working_ack: {hi: "बहुत अच्छा ✓ कोई सवाल हो तो यहीं लिखिए।", mr: "छान ✓ काही प्रश्न असल्यास इथेच लिहा.", en: "Great ✓ Write here if you have any question."}
 gate_price_no_options: {hi: "Daam demo ke baad. Pehle options dikhaiye, phir farak.", mr: "किंमत डेमोनंतर. आधी पर्याय दाखवा, मग फरक.", en: "Price comes after the demo. Show the options first, then the difference."}
+ask_category: {hi: "Customer kaunsa product dekh rahe hain?", mr: "ग्राहक कोणतं उत्पादन बघत आहेत?", en: "Which product is the customer looking for?"}
+b_cat_tv: {hi: "TV", mr: "टीव्ही", en: "TV"}
+b_cat_ac: {hi: "AC", mr: "AC", en: "AC"}
+b_cat_wm: {hi: "Washing machine", mr: "वॉशिंग मशीन", en: "Washing machine"}
+fact_from_data: {hi: "Store data se ✓ — yahi boliye, andaza nahi.", mr: "स्टोअर डेटामधून ✓ — हेच सांगा, अंदाज नाही.", en: "From store data ✓ Say exactly this; don't guess."}
+catalog_title: {hi: "{cat} catalogue", mr: "{cat} कॅटलॉग", en: "{cat} catalogue"}
+catalog_body: {hi: "{cat}: store mein {n} models. Specs aur offers sirf data se.", mr: "{cat}: स्टोअरमध्ये {n} मॉडेल्स. स्पेक्स आणि ऑफर फक्त डेटामधून.", en: "{cat}: {n} models in store. Specs and offers come only from the data."}
+catalog_sub_price: {hi: "Aaj ke daam · TEST DATA", mr: "आजच्या किंमती · TEST DATA", en: "Today's prices · TEST DATA"}
+catalog_sub_noprice: {hi: "Daam demo ke baad dikhenge", mr: "किंमत डेमोनंतर दिसेल", en: "Prices show after the demo"}
+b_more: {hi: "Aur dikhao", mr: "आणखी दाखवा", en: "Show more"}
+row_full_cost: {hi: "पूरा खर्च", mr: "पूर्ण खर्च", en: "Full cost"}
+row_with_sug: {hi: "सुझाव सहित", mr: "सूचनांसह", en: "With suggestions"}
+row_offer: {hi: "आज का ऑफ़र", mr: "आजची ऑफर", en: "Today's offer"}
+row_payable: {hi: "ऑफ़र के बाद देय", mr: "ऑफरनंतर देय", en: "Payable after offer"}
+voice_retry: {hi: "Voice note saaf samajh nahi aaya — dobara boliye ya text likhiye.", mr: "व्हॉइस नोट नीट समजली नाही — पुन्हा बोला किंवा टेक्स्ट लिहा.", en: "I couldn't make out that voice note. Please say it again or type it."}
+oldtv_ask: {hi: "Photo mein jo TV laga hai, woh kitne inch ka hai? Isse naya TV ekdum sahi size mein dikhega.", mr: "फोटोतला टीव्ही किती इंचाचा आहे? त्यामुळे नवा टीव्ही अगदी योग्य आकारात दिसेल.", en: "How big is the TV already in the photo? It lets me show the new TV at exactly the right size."}
+oldtv_none: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
