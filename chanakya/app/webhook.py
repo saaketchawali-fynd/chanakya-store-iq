@@ -1,0 +1,52 @@
+"""GET /webhook (verify), POST /webhook (receive → enqueue; 200 immediately)."""
+
+from __future__ import annotations
+
+import hashlib
+import hmac
+import json
+from datetime import UTC, datetime
+
+from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import PlainTextResponse
+
+from chanakya.channel.parse import parse
+from chanakya.config import get_settings
+from chanakya.log import get_log
+
+router = APIRouter()
+log = get_log("webhook")
+
+
+def verify_signature(secret: str, body: bytes, header: str | None) -> bool:
+    if not header or not header.startswith("sha256="):
+        return False
+    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, header[len("sha256=") :])
+
+
+@router.get("/webhook")
+async def verify(request: Request):
+    p = request.query_params
+    if p.get("hub.mode") == "subscribe" and p.get("hub.verify_token") == get_settings().wa_verify_token:
+        return PlainTextResponse(p.get("hub.challenge", ""))
+    raise HTTPException(403)
+
+
+@router.post("/webhook")
+async def receive(request: Request):
+    s = get_settings()
+    received = datetime.now(UTC)
+    body = await request.body()
+    if s.wa_app_secret or not s.demo_mode:
+        if not verify_signature(s.wa_app_secret, body, request.headers.get("X-Hub-Signature-256")):
+            raise HTTPException(401)
+    try:
+        payload = json.loads(body or b"{}")
+    except json.JSONDecodeError:
+        raise HTTPException(400) from None
+    msgs, _statuses = parse(payload, received)
+    rt = request.app.state.rt
+    for m in msgs:
+        rt.orch.spawn(rt.orch.handle_inbound(m))
+    return {"ok": True}

@@ -1,0 +1,8 @@
+# TEST DATA ONLY — exchange value ranges
+- {id: EX-TV-W-S, category: tv, condition: working, size_band: {max_in: 43}, min_value: 2000, max_value: 4000, test_data: true}
+- {id: EX-TV-W-L, category: tv, condition: working, size_band: {min_in: 50}, min_value: 4000, max_value: 7000, test_data: true}
+- {id: EX-TV-NW, category: tv, condition: not_working, size_band: {}, min_value: 500, max_value: 1500, test_data: true}
+- {id: EX-AC-W, category: ac, condition: working, size_band: {}, min_value: 3000, max_value: 6000, test_data: true}
+- {id: EX-AC-NW, category: ac, condition: not_working, size_band: {}, min_value: 1000, max_value: 2000, test_data: true}
+- {id: EX-WM-W, category: wm, condition: working, size_band: {}, min_value: 1500, max_value: 3500, test_data: true}
+- {id: EX-WM-NW, category: wm, condition: not_working, size_band: {}, min_value: 500, max_value: 1000, test_data: true}

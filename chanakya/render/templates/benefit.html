@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block style %}
+  .benefit { display: flex; gap: 24px; align-items: center; background: #fff; border-radius: 22px;
+             padding: 24px 28px; margin-bottom: 18px; border-left: 10px solid var(--green); }
+  .benefit .icon { font-size: 52px; width: 70px; text-align: center; }
+  .benefit .text { font-size: 38px; font-weight: 600; }
+  .ignore { background: #F1EEE8; border-radius: 22px; padding: 22px 28px; font-size: 28px; color: var(--muted); }
+  .imgwrap { background: #fff; border-radius: 22px; padding: 20px; margin-bottom: 24px; }
+{% endblock %}
+{% block band %}
+  <div class="kicker">{{ L.title }}</div>
+  <h1>{{ product_title|default('', true) }}</h1>
+{% endblock %}
+{% block content %}
+  {% if product_image %}<div class="imgwrap"><img class="product" src="{{ product_image }}"></div>{% endif %}
+  {% if benefits %}
+  <div class="label">{{ L.benefits }}</div>
+  {% for b in benefits %}
+  <div class="benefit"><div class="icon">{{ b.icon|default('✓', true) }}</div><div class="text">{{ b.text }}</div></div>
+  {% endfor %}
+  {% endif %}
+  {% if ignore_text %}
+  <div class="label">{{ L.ignore }}</div>
+  <div class="ignore">{{ ignore_text }}</div>
+  {% endif %}
+{% endblock %}

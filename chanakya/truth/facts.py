@@ -1,0 +1,276 @@
+"""FactsService — read-only queries over the truth tables (spec 9.3).
+
+The data set is small and read-only, so it is loaded once into memory (refresh() reloads). Every object
+carries its row id so callers can cite sources (price:<sku>@<store>, charge:<code>, offer:<id> …)."""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass, field
+from datetime import date
+from typing import Any
+
+from rapidfuzz import fuzz
+from sqlalchemy import select
+
+from chanakya.ai.schemas import ImageRead
+from chanakya.truth import db
+from chanakya.truth.models import (
+    Charge,
+    Content,
+    ExchangeValue,
+    FinancePlan,
+    Guide,
+    Offer,
+    PriceStock,
+    Product,
+    ProtectionPlan,
+    Store,
+)
+
+
+@dataclass
+class ProductWithStock:
+    sku: str
+    category: str
+    brand: str
+    model: str
+    title: dict
+    specs: dict
+    dims: dict
+    energy: dict
+    image: str | None
+    test_data: bool
+    store_id: str
+    price: int
+    mrp: int
+    qty: int
+    qty_yesterday: int
+    nearby_store_id: str | None
+    nearby_qty: int
+    delivery_days: int
+
+    @property
+    def price_source(self) -> str:
+        return f"price:{self.sku}@{self.store_id}"
+
+    @property
+    def in_stock(self) -> bool:
+        return self.qty > 0
+
+    @property
+    def available(self) -> bool:
+        return self.qty > 0 or self.nearby_qty > 0
+
+    def spec(self, key: str, default: Any = None) -> Any:
+        for d in (self.specs, self.dims, self.energy):
+            if d and key in d:
+                return d[key]
+        return default
+
+    def short_name(self) -> str:
+        """'Meru 55 QLED Pro' → 'Meru 55 Pro'-style short label for buttons (≤ 14 chars where possible)."""
+        m = self.model
+        return m if len(m) <= 14 else m.replace("QLED ", "").replace(" 4K", "")[:16]
+
+
+@dataclass
+class Snapshot:
+    stores: dict[str, Store] = field(default_factory=dict)
+    products: dict[str, Product] = field(default_factory=dict)
+    stock: dict[tuple[str, str], PriceStock] = field(default_factory=dict)
+    offers: list[Offer] = field(default_factory=list)
+    finance: list[FinancePlan] = field(default_factory=list)
+    charges: list[Charge] = field(default_factory=list)
+    protection: list[ProtectionPlan] = field(default_factory=list)
+    exchange: list[ExchangeValue] = field(default_factory=list)
+    guides: dict[str, Any] = field(default_factory=dict)
+    content: list[Content] = field(default_factory=list)
+
+
+class FactsService:
+    def __init__(self, store_id: str):
+        self.store_id = store_id
+        self.snap = Snapshot()
+
+    async def refresh(self) -> None:
+        snap = Snapshot()
+        async with db.session() as s:
+            snap.stores = {r.id: r for r in (await s.execute(select(Store))).scalars()}
+            snap.products = {r.sku: r for r in (await s.execute(select(Product))).scalars()}
+            snap.stock = {(r.sku, r.store_id): r for r in (await s.execute(select(PriceStock))).scalars()}
+            snap.offers = list((await s.execute(select(Offer))).scalars())
+            snap.finance = list((await s.execute(select(FinancePlan))).scalars())
+            snap.charges = list((await s.execute(select(Charge))).scalars())
+            snap.protection = list((await s.execute(select(ProtectionPlan))).scalars())
+            snap.exchange = list((await s.execute(select(ExchangeValue))).scalars())
+            snap.guides = {r.kind: r.rows for r in (await s.execute(select(Guide))).scalars()}
+            snap.content = list((await s.execute(select(Content))).scalars())
+        self.snap = snap
+
+    # ---------- products ----------
+    def _with_stock(self, p: Product, store_id: str) -> ProductWithStock | None:
+        st = self.snap.stock.get((p.sku, store_id))
+        if st is None:
+            return None
+        return ProductWithStock(
+            sku=p.sku,
+            category=p.category,
+            brand=p.brand,
+            model=p.model,
+            title=p.title or {},
+            specs=p.specs or {},
+            dims=p.dims or {},
+            energy=p.energy or {},
+            image=p.image,
+            test_data=p.test_data,
+            store_id=store_id,
+            price=st.price,
+            mrp=st.mrp,
+            qty=st.qty,
+            qty_yesterday=st.qty_yesterday,
+            nearby_store_id=st.nearby_store_id,
+            nearby_qty=st.nearby_qty or 0,
+            delivery_days=st.delivery_days or 1,
+        )
+
+    def product_sync(self, sku: str, store_id: str | None = None) -> ProductWithStock | None:
+        p = self.snap.products.get(sku)
+        return self._with_stock(p, store_id or self.store_id) if p else None
+
+    async def product(self, sku: str, store_id: str | None = None) -> ProductWithStock | None:
+        return self.product_sync(sku, store_id)
+
+    def products_sync(self, category: str, store_id: str | None = None) -> list[ProductWithStock]:
+        sid = store_id or self.store_id
+        out = [self._with_stock(p, sid) for p in self.snap.products.values() if p.category == category]
+        return sorted([p for p in out if p], key=lambda p: (p.price, p.sku))
+
+    async def products(self, category: str, store_id: str | None = None) -> list[ProductWithStock]:
+        return self.products_sync(category, store_id)
+
+    def store_name(self, store_id: str | None = None) -> str:
+        s = self.snap.stores.get(store_id or self.store_id)
+        return s.name if s else (store_id or self.store_id)
+
+    async def match_label(self, read: ImageRead, category_hint: str | None = None) -> tuple[str | None, float]:
+        cands = self.rank_label(read, category_hint)
+        return (cands[0][0], cands[0][1]) if cands else (None, 0.0)
+
+    def rank_label(self, read: ImageRead, category_hint: str | None = None) -> list[tuple[str, float]]:
+        """Fuzzy model match (rapidfuzz) boosted by brand, size and category. Scores 0–100."""
+        text = " ".join(x for x in [read.brand or "", read.model_text or ""] if x).strip()
+        if not text and read.size_in is None:
+            return []
+        cat = read.category or category_hint
+        scored: list[tuple[str, float]] = []
+        for p in self.snap.products.values():
+            if cat and p.category != cat:
+                continue
+            if read.model_text:
+                s = float(fuzz.ratio(read.model_text.lower(), p.model.lower()))
+            elif text:
+                s = float(fuzz.token_sort_ratio(text.lower(), p.model.lower()))
+            else:
+                s = 40.0
+            if read.brand and read.brand.lower() == p.brand.lower():
+                s += 5
+            elif read.brand:
+                s -= 25
+            size = (p.specs or {}).get("size_in")
+            if read.size_in and size:
+                s += 5 if abs(float(size) - float(read.size_in)) < 0.6 else -30
+            if read.confidence is not None and read.confidence < 0.5:
+                s *= read.confidence / 0.5
+            scored.append((p.sku, max(0.0, min(100.0, s))))
+        return sorted(scored, key=lambda x: -x[1])[:3]
+
+    def find_in_text(self, text: str, category: str | None = None) -> str | None:
+        """Find a product model mentioned in free text (e.g. an image caption)."""
+        if not text:
+            return None
+        low = text.lower()
+        best, best_s = None, 0.0
+        for p in self.snap.products.values():
+            if category and p.category != category:
+                continue
+            s = fuzz.partial_ratio(p.model.lower(), low)
+            if p.brand.lower() not in low:
+                continue
+            size = (p.specs or {}).get("size_in")
+            if size is not None and not re.search(rf"\b{int(size)}\b", low):
+                s -= 20
+            if s > best_s:
+                best, best_s = p.sku, s
+        return best if best_s >= 85 else None
+
+    # ---------- money and rules ----------
+    async def charges(self, category: str) -> list[Charge]:
+        return [c for c in self.snap.charges if c.category == category]
+
+    async def protection(self, category: str) -> list[ProtectionPlan]:
+        return [c for c in self.snap.protection if c.category == category]
+
+    async def exchange(self, category: str, condition: str, size_in: float | None) -> tuple[int, int, str] | None:
+        for e in self.snap.exchange:
+            if e.category != category or e.condition != condition:
+                continue
+            band = e.size_band or {}
+            if size_in is not None:
+                if "max_in" in band and size_in > band["max_in"]:
+                    continue
+                if "min_in" in band and size_in < band["min_in"]:
+                    continue
+            elif band:
+                continue
+            return e.min_value, e.max_value, e.id
+        return None
+
+    async def offers(self, category: str, on_date: date) -> list[Offer]:
+        return [
+            o for o in self.snap.offers if category in (o.categories or []) and o.valid_from <= on_date <= o.valid_to
+        ]
+
+    async def all_offers(self, on_date: date) -> list[Offer]:
+        return [o for o in self.snap.offers if o.valid_from <= on_date <= o.valid_to]
+
+    async def finance(self, category: str) -> list[FinancePlan]:
+        return [f for f in self.snap.finance if category in (f.categories or [])]
+
+    def guide_sync(self, kind: str) -> Any:
+        return self.snap.guides.get(kind)
+
+    async def guide(self, kind: str) -> Any:
+        return self.guide_sync(kind)
+
+    def content(self, kind: str, step: str | None = None) -> list[Content]:
+        return [c for c in self.snap.content if c.kind == kind and (step is None or c.step == step)]
+
+    async def stock_changes(self, store_id: str, dept: str) -> list[dict]:
+        out = []
+        for (sku, sid), st in self.snap.stock.items():
+            if sid != store_id:
+                continue
+            p = self.snap.products.get(sku)
+            if not p or (dept not in ("all", None) and p.category != dept):
+                continue
+            kind = None
+            if st.qty > 0 and st.qty_yesterday == 0:
+                kind = "back_in_stock"
+            elif st.qty == 0 and st.qty_yesterday > 0:
+                kind = "out_of_stock"
+            elif 0 < st.qty <= 2:
+                kind = "low"
+            if kind:
+                out.append(
+                    {
+                        "sku": sku,
+                        "model": p.model,
+                        "kind": kind,
+                        "qty": st.qty,
+                        "qty_yesterday": st.qty_yesterday,
+                        "source": f"stock:{sku}@{sid}",
+                    }
+                )
+        order = {"back_in_stock": 0, "out_of_stock": 1, "low": 2}
+        return sorted(out, key=lambda r: (order[r["kind"]], r["sku"]))

@@ -1,0 +1,44 @@
+{
+  "kind": "room",
+  "boxes": [
+    {
+      "label": "wall",
+      "box_2d": [
+        80,
+        180,
+        600,
+        820
+      ]
+    },
+    {
+      "label": "sofa",
+      "box_2d": [
+        560,
+        280,
+        800,
+        720
+      ]
+    },
+    {
+      "label": "door",
+      "box_2d": [
+        150,
+        40,
+        880,
+        160
+      ]
+    },
+    {
+      "label": "window",
+      "box_2d": [
+        150,
+        850,
+        450,
+        960
+      ]
+    }
+  ],
+  "light": "sunny",
+  "frontal": true,
+  "people_present": false
+}

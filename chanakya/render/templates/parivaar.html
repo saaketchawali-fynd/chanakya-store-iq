@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block style %}
+  .hero { background: #fff; border-radius: 22px; padding: 16px; margin-bottom: 18px; }
+  .hero img { width: 100%; max-height: 250px; object-fit: contain; display: block; border-radius: 14px; }
+  .ptitle { font-size: 40px; font-weight: 800; color: var(--indigo); margin-bottom: 6px; }
+  .reason { display: flex; gap: 16px; align-items: flex-start; padding: 6px 0; font-size: 31px; }
+  .reason .tick { color: var(--green); font-weight: 900; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+  .cell { background: #fff; border-radius: 20px; padding: 18px 22px; font-size: 28px; }
+  .cell .k { font-size: 22px; font-weight: 900; color: var(--saffron); text-transform: uppercase; letter-spacing: 1px; }
+  .cell.wide { grid-column: span 2; }
+  .from { margin-top: 20px; font-size: 26px; color: var(--muted); text-align: center; }
+{% endblock %}
+{% block band %}
+  <div class="kicker">Reliance Digital · Chanakya</div>
+  <h1>{{ title|default('', true) }}</h1>
+{% endblock %}
+{% block content %}
+  {% if image %}<div class="hero"><img src="{{ image }}"></div>{% endif %}
+  <div class="ptitle">{{ product_title|default('', true) }}</div>
+  {% if reasons %}
+  <div class="label">{{ L.reasons }}</div>
+  {% for r in reasons[:3] %}<div class="reason"><span class="tick">✓</span><span>{{ r }}</span></div>{% endfor %}
+  {% endif %}
+  <div class="grid">
+    {% if cost_text %}<div class="cell wide"><div class="k">{{ L.cost }}</div>{{ cost_text }}</div>{% endif %}
+    {% if offer_text %}<div class="cell"><div class="k">{{ L.offer }}</div>{{ offer_text }}</div>{% endif %}
+    {% if delivery_text %}<div class="cell"><div class="k">{{ L.delivery }}</div>{{ delivery_text }}</div>{% endif %}
+    {% if finance_text %}<div class="cell wide"><div class="k">{{ L.finance }}</div>{{ finance_text }}</div>{% endif %}
+  </div>
+  {% if associate_name or store_name %}
+  <div class="from">{{ L.from }}: <b>{{ associate_name|default('', true) }}</b>{% if store_name %} · {{ store_name }}{% endif %}</div>
+  {% endif %}
+{% endblock %}

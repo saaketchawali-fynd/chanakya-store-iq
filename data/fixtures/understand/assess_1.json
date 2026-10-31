@@ -1,0 +1,41 @@
+{
+ "language": "hi",
+ "customer_language": null,
+ "category": "tv",
+ "customer_name": "Shah ji",
+ "sports_viewer": "papa",
+ "slots": [
+  {
+   "slot": "room_light",
+   "value": "sunny"
+  },
+  {
+   "slot": "content",
+   "value": "sports"
+  },
+  {
+   "slot": "content",
+   "value": "kids"
+  }
+ ],
+ "numbers": [
+  {
+   "name": "seat_distance_ft",
+   "value": 10
+  },
+  {
+   "name": "budget_inr",
+   "value": 50000
+  }
+ ],
+ "intents": [
+  "customer_info"
+ ],
+ "claim_id": null,
+ "objection": null,
+ "option_choice": null,
+ "library_id": null,
+ "question_for_expert": null,
+ "customer_request": null,
+ "transcript": "Shah ji ka living room hai, sofa se das feet, dopahar mein dhoop aati hai, papa cricket dekhte hain, bachche cartoon, budget around pachaas hazaar"
+}

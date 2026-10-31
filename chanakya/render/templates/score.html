@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block style %}
+  .big { font-size: 120px; font-weight: 900; color: var(--indigo); text-align: center; line-height: 1; }
+  .level { text-align: center; font-size: 36px; font-weight: 700; color: var(--green); margin: 10px 0 24px; }
+  .step { display: flex; justify-content: space-between; align-items: center; padding: 12px 0;
+          border-bottom: 2px solid #EFEAE2; }
+  .step:last-child { border-bottom: none; }
+  .dots span { display: inline-block; width: 34px; height: 34px; border-radius: 50%; margin-left: 10px;
+               background: #E4DED4; }
+  .dots span.on { background: var(--green); }
+  .note { border-radius: 22px; padding: 22px 28px; margin-top: 18px; font-size: 30px; }
+  .note.p { background: var(--pale-green); }
+  .note.t { background: var(--pale-orange); }
+  .note b { display: block; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; color: var(--saffron); }
+{% endblock %}
+{% block band %}
+  <div class="kicker">Chanakya · Seekh</div>
+  <h1>{{ L.title }}</h1>
+{% endblock %}
+{% block content %}
+  <div class="big">{{ score_str|default('', true) }}</div>
+  {% if level_text %}<div class="level">{{ level_text }}</div>{% endif %}
+  <div class="panel">
+    {% for s in steps|default([]) %}
+    {% set p = (s.points|default(0))|int %}
+    <div class="step"><span>{{ s.name }}</span>
+      <span class="dots"><span class="{{ 'on' if p >= 1 }}"></span><span class="{{ 'on' if p >= 2 }}"></span></span></div>
+    {% endfor %}
+  </div>
+  {% if praise %}<div class="note p"><b>{{ L.praise }}</b>{{ praise }}</div>{% endif %}
+  {% if tip %}<div class="note t"><b>{{ L.tip }}</b>{{ tip }}</div>{% endif %}
+{% endblock %}

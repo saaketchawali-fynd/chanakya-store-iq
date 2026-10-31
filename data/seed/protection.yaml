@@ -1,0 +1,16 @@
+# TEST DATA ONLY — resQ protection plans
+- {code: TV_EW2_S, category: tv, years: 2, price: 3499, filter: {size_in_max: 55}, suggest_if: {slot: content, has: kids},
+   title: {hi: "resQ 2 साल अतिरिक्त वारंटी", mr: "resQ 2 वर्षे अतिरिक्त वॉरंटी", en: "resQ 2-year extended warranty"},
+   reason: {hi: "ghar mein bachche hain, roz chalega", mr: "घरात मुलं आहेत, रोज चालेल", en: "kids at home, daily use"}, test_data: true}
+- {code: TV_EW2_L, category: tv, years: 2, price: 4999, filter: {size_in_min: 65}, suggest_if: {slot: content, has: kids},
+   title: {hi: "resQ 2 साल अतिरिक्त वारंटी", mr: "resQ 2 वर्षे अतिरिक्त वॉरंटी", en: "resQ 2-year extended warranty"},
+   reason: {hi: "ghar mein bachche hain, roz chalega", mr: "घरात मुलं आहेत, रोज चालेल", en: "kids at home, daily use"}, test_data: true}
+- {code: AC_CARE4, category: ac, years: 4, price: 3499, suggest_if: {number: hours_per_day, gte: 8},
+   title: {hi: "resQ 4 साल कवर", mr: "resQ 4 वर्षे कव्हर", en: "resQ 4-year cover"},
+   reason: {hi: "roz lambe ghante chalega", mr: "रोज जास्त तास चालेल", en: "long daily use"}, test_data: true}
+- {code: WM_EW2, category: wm, years: 2, price: 2499, suggest_if: {number: family_size, gte: 4},
+   title: {hi: "resQ 2 साल अतिरिक्त वारंटी", mr: "resQ 2 वर्षे अतिरिक्त वॉरंटी", en: "resQ 2-year extended warranty"},
+   reason: {hi: "bada parivaar, roz dhulai", mr: "मोठं कुटुंब, रोज धुलाई", en: "big family, daily washing"}, test_data: true}
+- {code: LP_ADP1, category: laptop, years: 1, price: 3999, suggest_if: {slot: carry, eq: daily},
+   title: {hi: "1 साल एक्सीडेंटल डैमेज", mr: "1 वर्ष अपघाती नुकसान", en: "1-year accidental damage"},
+   reason: {hi: "roz college le jayenge", mr: "रोज कॉलेजला नेणार", en: "carried to college daily"}, test_data: true}

@@ -1,0 +1,19 @@
+{
+ "language": "hi",
+ "customer_language": null,
+ "category": "tv",
+ "customer_name": null,
+ "sports_viewer": null,
+ "slots": [],
+ "numbers": [],
+ "intents": [
+  "customer_claim"
+ ],
+ "claim_id": "tv_4k_useless",
+ "objection": null,
+ "option_choice": null,
+ "library_id": null,
+ "question_for_expert": null,
+ "customer_request": null,
+ "transcript": "Customer bol rahi hain 4K bekaar hai, channel toh HD hi aate hain"
+}

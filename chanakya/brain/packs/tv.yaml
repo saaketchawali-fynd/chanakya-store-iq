@@ -1,0 +1,391 @@
+category: tv
+label: {hi: "TV", mr: "टीव्ही", en: "TV"}
+required_slots: [seat_distance, room_light, content, mounting, elders, seating, decider]
+gate_min_slots: 4
+cost_slots: [mounting, exchange_old]
+budget_bands:
+  - {id: b1, inr: 35000, title: {hi: "40k tak", mr: "40k पर्यंत", en: "Up to 40k"}}
+  - {id: b2, inr: 55000, title: {hi: "40k–70k", mr: "40k–70k", en: "40k–70k"}}
+  - {id: b3, inr: 90000, title: {hi: "70k se upar", mr: "70k पेक्षा जास्त", en: "Above 70k"}}
+  - {id: none, inr: null, title: {hi: "Nahi bataya", mr: "सांगितलं नाही", en: "Not told"}}
+slots:
+  - id: seat_distance
+    phase: life
+    number: seat_distance_ft
+    title: {hi: "Sofa se doori", mr: "सोफ्यापासून अंतर", en: "Seat distance"}
+    ask: {hi: "सोफ़े से टीवी कितने कदम दूर होगा?", mr: "सोफ्यापासून टीव्ही किती पावलं लांब असेल?", en: "How many steps from the sofa to the TV?"}
+    why: {hi: "Isse sahi size tay hota hai", mr: "यावरून योग्य साइज ठरते", en: "This decides the right size"}
+    quick:
+      - {id: d6_8, number: 7, title: {hi: "6-8 ft (2-3 kadam)", mr: "6-8 ft (2-3 पावलं)", en: "6-8 ft"}}
+      - {id: d8_10, number: 9, title: {hi: "8-10 ft (3-4 kadam)", mr: "8-10 ft (3-4 पावलं)", en: "8-10 ft"}}
+      - {id: d10_12, number: 11, title: {hi: "10 ft se zyada", mr: "10 ft पेक्षा जास्त", en: "Over 10 ft"}}
+    values: [d_le6, d6_8, d8_10, d10_12, d_gt12]
+    value_titles:
+      d_le6: {hi: "6 ft tak", mr: "6 ft पर्यंत", en: "Up to 6 ft"}
+      d6_8: {hi: "6-8 ft", mr: "6-8 ft", en: "6-8 ft"}
+      d8_10: {hi: "8-10 ft", mr: "8-10 ft", en: "8-10 ft"}
+      d10_12: {hi: "10-12 ft", mr: "10-12 ft", en: "10-12 ft"}
+      d_gt12: {hi: "12 ft se zyada", mr: "12 ft पेक्षा जास्त", en: "Over 12 ft"}
+    bands: [{max: 6, value: d_le6}, {max: 8, value: d6_8}, {max: 10, value: d8_10}, {max: 12, value: d10_12}, {max: 99, value: d_gt12}]
+    priors: {d6_8: 0.3, d8_10: 0.45, d10_12: 0.25}
+    keywords:
+      d_le6: ["bahut paas", "chhota kamra", "chota kamra", "very close", "बहुत पास", "खूप जवळ"]
+      d6_8: ["2-3 kadam", "do teen kadam", "6-8 ft", "6 se 8", "दो तीन कदम", "दोन तीन पावलं"]
+      d8_10: ["3-4 kadam", "teen chaar kadam", "8-10 ft", "8 se 10", "तीन चार कदम", "तीन चार पावलं"]
+      d10_12: ["10-12 ft", "10 se 12", "chaar paanch kadam", "चार पाँच कदम", "चार पाच पावलं"]
+      d_gt12: ["bahut door", "bada hall", "very far", "बहुत दूर", "खूप लांब", "मोठा हॉल"]
+  - id: room_light
+    phase: life
+    title: {hi: "Roshni", mr: "प्रकाश", en: "Room light"}
+    ask: {hi: "कमरे में धूप आती है?", mr: "खोलीत ऊन येतं का?", en: "Does the room get direct sunlight?"}
+    why: {hi: "Dhoop ho to zyada bright screen chahiye", mr: "ऊन असेल तर जास्त ब्राइट स्क्रीन हवी", en: "Sun needs a brighter screen"}
+    quick:
+      - {id: sunny, title: {hi: "Haan, dhoop", mr: "हो, ऊन येतं", en: "Yes, sunny"}}
+      - {id: moderate, title: {hi: "Thodi roshni", mr: "थोडा प्रकाश", en: "Some light"}}
+      - {id: dim, title: {hi: "Andhera rehta", mr: "अंधार असतो", en: "Mostly dark"}}
+    values: [sunny, moderate, dim]
+    value_titles:
+      sunny: {hi: "Dhoop aati hai", mr: "ऊन येतं", en: "Sunny"}
+      moderate: {hi: "Thodi roshni", mr: "थोडा प्रकाश", en: "Some light"}
+      dim: {hi: "Andhera", mr: "अंधार", en: "Mostly dark"}
+    priors: {sunny: 0.4, moderate: 0.45, dim: 0.15}
+    keywords:
+      sunny: ["dhoop", "dhup", "sunny", "sunlight", "sun aata", "sun aati", "धूप", "ऊन", "उन्ह"]
+      moderate: ["thodi roshni", "thoda light", "some light", "normal light", "थोड़ी रोशनी", "थोडा प्रकाश"]
+      dim: ["andhera", "andhere", "dark room", "dim", "अंधेरा", "अंधार"]
+  - id: content
+    multi: true
+    phase: life
+    title: {hi: "Kya dekhte hain", mr: "काय पाहतात", en: "What they watch"}
+    ask: {hi: "घर में कौन क्या देखता है — क्रिकेट, सीरियल, फ़िल्में?", mr: "घरात कोण काय पाहतं — क्रिकेट, मालिका, सिनेमे?", en: "Who watches what at home: cricket, serials, movies?"}
+    why: {hi: "Isse motion aur sound ki zaroorat pata chalti hai", mr: "यावरून मोशन आणि आवाजाची गरज कळते", en: "This tells us the motion and sound needs"}
+    quick:
+      - {id: sports, title: {hi: "Cricket/sports", mr: "क्रिकेट/खेळ", en: "Cricket/sports"}}
+      - {id: serials, title: {hi: "Serial/news", mr: "मालिका/बातम्या", en: "Serials/news"}}
+      - {id: movies, title: {hi: "Movies/OTT", mr: "सिनेमे/OTT", en: "Movies/OTT"}}
+    values: [sports, serials, movies, kids, gaming]
+    value_titles:
+      sports: {hi: "Cricket/sports", mr: "क्रिकेट/खेळ", en: "Cricket/sports"}
+      serials: {hi: "Serial/news", mr: "मालिका/बातम्या", en: "Serials/news"}
+      movies: {hi: "Movies/OTT", mr: "सिनेमे/OTT", en: "Movies/OTT"}
+      kids: {hi: "Bachche/cartoon", mr: "मुलं/कार्टून", en: "Kids/cartoons"}
+      gaming: {hi: "Gaming", mr: "गेमिंग", en: "Gaming"}
+    priors: {sports: 0.45, serials: 0.35, movies: 0.2}
+    keywords:
+      sports: ["cricket", "match", "sports", "football", "ipl", "क्रिकेट", "मैच", "खेळ"]
+      serials: ["serial", "news", "samachar", "सीरियल", "न्यूज़", "मालिका", "बातम्या"]
+      movies: ["movie", "film", "netflix", "ott", "picture", "फ़िल्म", "फिल्म", "सिनेमा"]
+      kids: ["bachche", "bacche", "cartoon", "kids", "बच्चे", "कार्टून", "मुलं"]
+      gaming: ["gaming", "game", "playstation", "ps5", "xbox", "गेम", "गेमिंग"]
+  - id: mounting
+    phase: life
+    title: {hi: "Kahan lagega", mr: "कुठे लावणार", en: "Mounting"}
+    ask: {hi: "टीवी दीवार पर लगेगा या टेबल पर रखेंगे?", mr: "टीव्ही भिंतीवर लावणार की टेबलवर ठेवणार?", en: "Will the TV go on the wall or on a stand?"}
+    why: {hi: "Isse bracket aur installation tay hoga", mr: "यावरून ब्रॅकेट आणि इन्स्टॉलेशन ठरेल", en: "This decides the bracket and installation"}
+    quick:
+      - {id: wall, title: {hi: "Deewar", mr: "भिंत", en: "Wall"}}
+      - {id: stand, title: {hi: "Table", mr: "टेबल", en: "Stand"}}
+      - {id: unknown, title: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}}
+    values: [wall, stand, unknown]
+    value_titles:
+      wall: {hi: "Deewar par", mr: "भिंतीवर", en: "On the wall"}
+      stand: {hi: "Table par", mr: "टेबलवर", en: "On a stand"}
+      unknown: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
+    priors: {wall: 0.6, stand: 0.3, unknown: 0.1}
+    keywords:
+      wall: ["deewar", "diwar", "wall mount", "on the wall", "दीवार", "भिंत", "भिंतीवर"]
+      stand: ["table par", "stand par", "tv unit", "on a stand", "टेबल", "स्टैंड", "टेबलवर"]
+      unknown: ["mounting pata nahi", "decide nahi", "not sure where", "तय नहीं", "ठरलं नाही"]
+  - id: elders
+    phase: life
+    title: {hi: "Bujurg", mr: "ज्येष्ठ", en: "Elders"}
+    ask: {hi: "घर में बुज़ुर्ग भी देखते हैं? साफ़ आवाज़ ज़रूरी है?", mr: "घरात ज्येष्ठ मंडळीही पाहतात का? आवाज स्पष्ट हवा का?", en: "Do elders watch too? Is clear dialogue important?"}
+    why: {hi: "Saaf dialogue ke liye sound feature dekhenge", mr: "स्पष्ट संवादासाठी साउंड फीचर बघू", en: "We'll check sound for clear dialogue"}
+    quick:
+      - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+    values: ["yes", "no"]
+    value_titles:
+      "yes": {hi: "Haan, bujurg hain", mr: "हो, ज्येष्ठ आहेत", en: "Yes, elders watch"}
+      "no": {hi: "Nahi", mr: "नाही", en: "No"}
+    priors: {"yes": 0.4, "no": 0.6}
+    keywords:
+      "yes": ["dadi", "dada", "nani", "nana", "elders", "grandparents", "bujurg", "बुज़ुर्ग", "आजी", "आजोबा", "ज्येष्ठ"]
+      "no": ["no elders", "bujurg nahi", "बुज़ुर्ग नहीं", "ज्येष्ठ नाहीत"]
+  - id: seating
+    phase: life
+    title: {hi: "Baithne ka tareeka", mr: "बसण्याची पद्धत", en: "Seating"}
+    ask: {hi: "सब सामने बैठते हैं या L-शेप सोफ़े से साइड से भी देखते हैं?", mr: "सगळे समोर बसतात की L-आकाराच्या सोफ्यावरून बाजूनेही पाहतात?", en: "Does everyone sit in front, or also at the side (L-shaped sofa)?"}
+    why: {hi: "Side se dekhne par picture ka farak padta hai", mr: "बाजूने पाहिल्यास चित्रात फरक पडतो", en: "Side viewing changes the picture"}
+    quick:
+      - {id: front, title: {hi: "Saamne", mr: "समोर", en: "In front"}}
+      - {id: wide, title: {hi: "Side se bhi", mr: "बाजूनेही", en: "Also from side"}}
+    values: [front, wide]
+    value_titles:
+      front: {hi: "Saamne", mr: "समोर", en: "In front"}
+      wide: {hi: "Side se bhi", mr: "बाजूनेही", en: "Also from side"}
+    priors: {front: 0.6, wide: 0.4}
+    keywords:
+      front: ["saamne baithte", "samne baithte", "in front", "सामने बैठते", "समोर बसतात"]
+      wide: ["l-shape", "l shape", "side se", "corner sofa", "साइड से", "बाजूने"]
+  - id: decider
+    phase: life
+    title: {hi: "Faisla kaun", mr: "निर्णय कोण", en: "Decider"}
+    ask: {hi: "फ़ैसला आप ही लेंगे या घर पर किसी से पूछना है?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
+    why: {hi: "Jo decide karega, use Parivaar Card bhejenge", mr: "जो निर्णय घेईल त्याला परिवार कार्ड पाठवू", en: "We'll send the family card to the decider"}
+    quick:
+      - {id: self, title: {hi: "Khud", mr: "स्वतः", en: "Myself"}}
+      - {id: family, title: {hi: "Ghar pe poochna", mr: "घरी विचारायचं", en: "Ask family"}}
+      - {id: together, title: {hi: "Saath mein", mr: "सगळे मिळून", en: "Together"}}
+    values: [self, family, together]
+    value_titles:
+      self: {hi: "Khud", mr: "स्वतः", en: "Themselves"}
+      family: {hi: "Ghar pe poochna", mr: "घरी विचारायचं", en: "Ask family"}
+      together: {hi: "Saath mein", mr: "सगळे मिळून", en: "Together"}
+    priors: {self: 0.4, family: 0.4, together: 0.2}
+    keywords:
+      self: ["khud decide", "khud lenge", "decide myself", "खुद", "स्वतः ठरवणार"]
+      family: ["ghar pe poochna", "ghar par poochenge", "husband se", "wife se", "ask family", "घर पर पूछ", "घरी विचार"]
+      together: ["saath mein decide", "milke", "together", "मिलकर", "सगळे मिळून"]
+  - id: exchange_old
+    phase: tech
+    title: {hi: "Purana TV", mr: "जुना टीव्ही", en: "Old TV exchange"}
+    ask: {hi: "पुराना टीवी एक्सचेंज करना है?", mr: "जुना टीव्ही एक्सचेंज करायचा आहे का?", en: "Would you like to exchange your old TV?"}
+    why: {hi: "Exchange se kharcha kam ho sakta hai", mr: "एक्सचेंजने खर्च कमी होऊ शकतो", en: "Exchange can lower the cost"}
+    quick:
+      - {id: yes_working, title: {hi: "Haan, chalta hai", mr: "हो, चालू आहे", en: "Yes, working"}}
+      - {id: yes_dead, title: {hi: "Haan, kharab", mr: "हो, बंद आहे", en: "Yes, not working"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+    values: [yes_working, yes_dead, "no"]
+    value_titles:
+      yes_working: {hi: "Haan, chalta hai", mr: "हो, चालू आहे", en: "Yes, working"}
+      yes_dead: {hi: "Haan, kharab", mr: "हो, बंद आहे", en: "Yes, not working"}
+      "no": {hi: "Exchange nahi", mr: "एक्सचेंज नाही", en: "No exchange"}
+    priors: {yes_working: 0.35, yes_dead: 0.15, "no": 0.5}
+    keywords:
+      yes_working: ["purana chalta", "old tv working", "exchange working", "पुराना चलता", "जुना चालू"]
+      yes_dead: ["purana kharab", "old tv dead", "not working tv", "पुराना खराब", "जुना बंद"]
+      "no": ["exchange nahi", "no exchange", "एक्सचेंज नहीं", "एक्सचेंज नाही"]
+  - id: wall_type
+    phase: site
+    ask_if: {slot: mounting, in: [wall]}
+    title: {hi: "Deewar kaisi", mr: "भिंत कशी", en: "Wall type"}
+    ask: {hi: "दीवार पक्की है या प्लाईवुड/पैनल वाली?", mr: "भिंत पक्की आहे की प्लायवूड/पॅनलची?", en: "Is the wall solid, or plywood/panel?"}
+    why: {hi: "Installer ko pehle se pata hona chahiye", mr: "इन्स्टॉलरला आधीच माहीत हवं", en: "The installer must know in advance"}
+    quick:
+      - {id: concrete, title: {hi: "Pakki deewar", mr: "पक्की भिंत", en: "Solid wall"}}
+      - {id: panel, title: {hi: "Plywood/panel", mr: "प्लायवूड/पॅनल", en: "Plywood/panel"}}
+      - {id: unknown, title: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}}
+    values: [concrete, panel, unknown]
+    value_titles:
+      concrete: {hi: "Pakki deewar", mr: "पक्की भिंत", en: "Solid wall"}
+      panel: {hi: "Plywood/panel", mr: "प्लायवूड/पॅनल", en: "Plywood/panel"}
+      unknown: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
+    priors: {concrete: 0.8, panel: 0.1, unknown: 0.1}
+    keywords:
+      concrete: ["pakki deewar", "concrete", "brick wall", "solid wall", "पक्की दीवार", "पक्की भिंत"]
+      panel: ["plywood", "panel", "wooden wall", "प्लाईवुड", "पैनल", "प्लायवूड"]
+      unknown: ["deewar pata nahi", "wall not sure", "दीवार पता नहीं"]
+  - id: socket_near
+    phase: site
+    title: {hi: "Socket paas", mr: "सॉकेट जवळ", en: "Socket nearby"}
+    ask: {hi: "टीवी की जगह के पास बिजली का सॉकेट है?", mr: "टीव्हीच्या जागेजवळ सॉकेट आहे का?", en: "Is there a power socket near the TV spot?"}
+    why: {hi: "Installation ek baar mein ho", mr: "इन्स्टॉलेशन एकदाच व्हावं", en: "So installation is done in one visit"}
+    quick:
+      - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+      - {id: unknown, title: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}}
+    values: ["yes", "no", unknown]
+    value_titles:
+      "yes": {hi: "Socket hai", mr: "सॉकेट आहे", en: "Socket there"}
+      "no": {hi: "Socket nahi", mr: "सॉकेट नाही", en: "No socket"}
+      unknown: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
+    priors: {"yes": 0.8, "no": 0.1, unknown: 0.1}
+    keywords:
+      "yes": ["socket hai", "plug hai", "socket paas", "सॉकेट है", "सॉकेट आहे"]
+      "no": ["socket nahi", "no socket", "plug nahi", "सॉकेट नहीं", "सॉकेट नाही"]
+      unknown: ["socket pata nahi", "socket not sure", "सॉकेट पता नहीं"]
+  - id: floor_lift
+    phase: site
+    title: {hi: "Manzil/lift", mr: "मजला/लिफ्ट", en: "Floor/lift"}
+    ask: {hi: "घर कौन-सी मंज़िल पर है, लिफ़्ट है?", mr: "घर कितव्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
+    why: {hi: "Delivery team ko pehle se pata ho", mr: "डिलिव्हरी टीमला आधी कळावं", en: "So the delivery team is ready"}
+    quick:
+      - {id: lift, title: {hi: "Lift hai", mr: "लिफ्ट आहे", en: "Has a lift"}}
+      - {id: stairs, title: {hi: "Seedhi se", mr: "जिन्याने", en: "Stairs only"}}
+      - {id: ground, title: {hi: "Ground floor", mr: "तळमजला", en: "Ground floor"}}
+    values: [lift, stairs, ground]
+    value_titles:
+      lift: {hi: "Lift hai", mr: "लिफ्ट आहे", en: "Has a lift"}
+      stairs: {hi: "Seedhi se", mr: "जिन्याने", en: "Stairs only"}
+      ground: {hi: "Ground floor", mr: "तळमजला", en: "Ground floor"}
+    priors: {lift: 0.7, stairs: 0.2, ground: 0.1}
+    keywords:
+      lift: ["lift hai", "elevator", "lift wali", "लिफ़्ट है", "लिफ्ट आहे"]
+      stairs: ["seedhi", "sidhi", "stairs", "lift nahi", "सीढ़ी", "जिना", "लिफ्ट नाही"]
+      ground: ["ground floor", "neeche wala", "तल मंज़िल", "तळमजला"]
+
+fit_rules:
+  - {id: size_ok, weight: 3, slot: seat_distance, kind: size_band}            # 1 in range, 0.5 adjacent size, 0 else
+  - {id: bright_ok, weight: 2, slot: room_light, when: {in: [sunny]}, spec_any: [{brightness_nits: {gte: 500}}, {anti_glare: {eq: true}}], else: 0.3}
+  - {id: motion_ok, weight: 2, slot: content, when: {has_any: [sports, gaming]}, spec_any: [{refresh_hz: {gte: 120}}], else: 0.4}
+  - {id: dialogue_ok, weight: 1, slot: elders, when: {in: ["yes"]}, spec_any: [{dialogue_enhance: {eq: true}}], else: 0.5}
+  - {id: angle_ok, weight: 1, slot: seating, when: {in: [wide]}, spec_any: [{wide_angle: {eq: true}}], else: 0.6}
+  - {id: dark_ok, weight: 1, slot: room_light, when: {in: [dim]}, spec_any: [{panel: {in: [OLED, MiniLED]}}], else: 0.6}
+reasons:
+  size_ok: {hi: "{distance} ft ke liye sahi size", mr: "{distance} ft साठी योग्य साइज", en: "Right size for {distance} ft"}
+  bright_ok: {hi: "Dhoop mein bhi saaf", mr: "उन्हातही स्पष्ट", en: "Clear even in sun"}
+  motion_ok: {hi: "Cricket smooth, ball blur nahi", mr: "क्रिकेट स्मूथ, बॉल धूसर नाही", en: "Smooth cricket, no blur"}
+  dialogue_ok: {hi: "Dialogue saaf, kam awaaz mein bhi", mr: "कमी आवाजातही संवाद स्पष्ट", en: "Clear dialogue at low volume"}
+  angle_ok: {hi: "Side se bhi rang sahi", mr: "बाजूनेही रंग योग्य", en: "True colour from the side"}
+  dark_ok: {hi: "Andhere mein asli kaala", mr: "अंधारात खरा काळा", en: "True black in the dark"}
+  value_fit: {hi: "Ghar ke liye kaafi, kam kharcha", mr: "घरासाठी पुरेसा, कमी खर्च", en: "Enough for the home, costs less"}
+  step_up: {hi: "Bada screen, 5 saal aage ka", mr: "मोठी स्क्रीन, 5 वर्षांचा विचार", en: "Bigger screen, built for 5 years"}
+
+benefits:
+  - id: b_motion
+    weight: 2
+    when_spec: {refresh_hz: {gte: 120}}
+    when_slots: {content: {has_any: [sports, gaming]}}
+    cites: [content]
+    say: {hi: "{refresh_hz} Hz मतलब क्रिकेट में बॉल धुंधली नहीं होगी।", mr: "{refresh_hz} Hz म्हणजे क्रिकेटमध्ये बॉल धूसर दिसणार नाही.", en: "{refresh_hz} Hz means the ball stays sharp in cricket."}
+    say_who: {hi: "{refresh_hz} Hz मतलब {who} के क्रिकेट में बॉल धुंधली नहीं होगी।"}
+    card: {hi: "क्रिकेट में बॉल साफ़", mr: "क्रिकेटमध्ये बॉल स्पष्ट", en: "Sharp ball in cricket"}
+  - id: b_bright
+    weight: 2
+    when_spec_any: [{brightness_nits: {gte: 500}}, {anti_glare: {eq: true}}]
+    when_slots: {room_light: {in: [sunny]}}
+    cites: [room_light]
+    say: {hi: "दोपहर की धूप में भी तस्वीर साफ़ दिखेगी।", mr: "दुपारच्या उन्हातही चित्र स्पष्ट दिसेल.", en: "The picture stays clear even in afternoon sun."}
+    card: {hi: "धूप में भी साफ़ तस्वीर", mr: "उन्हातही स्पष्ट चित्र", en: "Clear picture in sunlight"}
+  - id: b_size
+    weight: 1.5
+    when_spec: {size_in: {in_size_band: true}}
+    when_slots: {seat_distance: {known: true}}
+    cites: [seat_distance]
+    say: {hi: "{size} इंच आपकी {distance} फ़ुट की दूरी के लिए सही है।", mr: "{size} इंच तुमच्या {distance} फूट अंतरासाठी योग्य आहे.", en: "{size} inches is right for your {distance} ft distance."}
+    card: {hi: "आपकी दूरी के लिए सही साइज़", mr: "तुमच्या अंतरासाठी योग्य साइज", en: "Right size for your distance"}
+  - id: b_dialogue
+    weight: 1
+    when_spec: {dialogue_enhance: {eq: true}}
+    when_slots: {elders: {in: ["yes"]}}
+    cites: [elders]
+    say: {hi: "बुज़ुर्गों को कम आवाज़ में भी डायलॉग साफ़ सुनाई देंगे।", mr: "ज्येष्ठांना कमी आवाजातही संवाद स्पष्ट ऐकू येतील.", en: "Elders will hear dialogue clearly even at low volume."}
+    card: {hi: "कम आवाज़ में साफ़ डायलॉग", mr: "कमी आवाजात स्पष्ट संवाद", en: "Clear dialogue, low volume"}
+  - id: b_angle
+    weight: 1
+    when_spec: {wide_angle: {eq: true}}
+    when_slots: {seating: {in: [wide]}}
+    cites: [seating]
+    say: {hi: "साइड से बैठकर भी रंग फीके नहीं पड़ेंगे।", mr: "बाजूने बसूनही रंग फिके पडणार नाहीत.", en: "Colours stay true even from the side of the sofa."}
+    card: {hi: "साइड से भी सही रंग", mr: "बाजूनेही योग्य रंग", en: "True colour from the side"}
+  - id: b_dark
+    weight: 1
+    when_spec: {panel: {in: [OLED, MiniLED]}}
+    when_slots: {room_light: {in: [dim]}, content: {has_any: [movies]}}
+    cites: [room_light, content]
+    say: {hi: "अंधेरे सीन में काला सच में काला दिखेगा — फ़िल्में थिएटर जैसी।", mr: "अंधाऱ्या दृश्यात काळा खरा काळा दिसेल — सिनेमा थिएटरसारखा.", en: "Dark scenes look truly black: movies feel like a theatre."}
+    card: {hi: "फ़िल्में थिएटर जैसी", mr: "सिनेमा थिएटरसारखा", en: "Theatre-like movies"}
+  - id: b_apps
+    weight: 0.5
+    when_spec: {apps: {nonempty: true}}
+    when_slots: {content: {has_any: [movies, kids]}}
+    cites: [content]
+    say: {hi: "{apps} सीधे टीवी पर चलेंगे — अलग डिवाइस नहीं चाहिए।", mr: "{apps} थेट टीव्हीवर चालतील — वेगळं डिव्हाइस नको.", en: "{apps} run right on the TV: no extra device needed."}
+    card: {hi: "ऐप्स सीधे टीवी पर", mr: "अ‍ॅप्स थेट टीव्हीवर", en: "Apps built in"}
+
+demos:
+  - id: distance_demo
+    title: {hi: "Doori demo", mr: "अंतर डेमो", en: "Distance demo"}
+    when_slots: {seat_distance: {known: true}}
+    differs_on: size_in
+    steps: {hi: "Customer ko {steps} kadam door khada kariye; dono size saamne", mr: "ग्राहकाला {steps} पावलं लांब उभं करा; दोन्ही साइज समोर", en: "Stand the customer {steps} steps away; both sizes in front"}
+    say: {hi: "अपने सोफ़े जितनी दूरी से दोनों देखिए — कौन-सा आराम से दिखता है?", mr: "तुमच्या सोफ्याइतक्या अंतरावरून दोन्ही पाहा — कोणता आरामात दिसतो?", en: "Look from your sofa distance: which one feels comfortable?"}
+  - id: glare_test
+    title: {hi: "Glare test", mr: "चमक टेस्ट", en: "Glare test"}
+    when_slots: {room_light: {in: [sunny]}}
+    differs_on: brightness_nits
+    steps: {hi: "{best} aur {other} saath; bright din wala scene; store light ki chamak dikhaiye", mr: "{best} आणि {other} शेजारी; उजेडाचं दृश्य; दुकानातल्या लाइटची चमक दाखवा", en: "{best} next to {other}; a bright daytime scene; point at the glare"}
+    say: {hi: "धूप जैसी रोशनी में {best} साफ़ दिखता है — आपके कमरे में धूप आती है।", mr: "उन्हासारख्या प्रकाशात {best} स्पष्ट दिसतो — तुमच्या खोलीत ऊन येतं.", en: "In bright light {best} stays clear, and your room gets sun."}
+  - id: motion_cricket
+    title: {hi: "Cricket demo", mr: "क्रिकेट डेमो", en: "Cricket demo"}
+    when_slots: {content: {has_any: [sports, gaming]}}
+    differs_on: refresh_hz
+    steps: {hi: "Dono par cricket highlight chalaiye; tez shot par ball dikhaiye", mr: "दोन्हीवर क्रिकेट हायलाइट लावा; वेगवान शॉटवर बॉल दाखवा", en: "Play a cricket highlight on both; point at the ball on a fast shot"}
+    say: {hi: "तेज़ शॉट पर बॉल देखिए — {best} में साफ़ रहती है।", mr: "वेगवान शॉटवर बॉल बघा — {best} मध्ये स्पष्ट राहतो.", en: "Watch the ball on a fast shot: it stays sharp on {best}."}
+  - id: dialogue_low_volume
+    title: {hi: "Dialogue demo", mr: "संवाद डेमो", en: "Dialogue demo"}
+    when_slots: {elders: {in: ["yes"]}}
+    differs_on: dialogue_enhance
+    steps: {hi: "Volume kam; news ya serial ka dialogue dono par", mr: "आवाज कमी; बातम्या किंवा मालिकेचा संवाद दोन्हीवर", en: "Low volume; a news or serial dialogue on both"}
+    say: {hi: "कम आवाज़ में सुनिए — {best} पर डायलॉग साफ़ है।", mr: "कमी आवाजात ऐका — {best} वर संवाद स्पष्ट आहे.", en: "Listen at low volume: dialogue is clear on {best}."}
+  - id: viewing_angle
+    title: {hi: "Side angle demo", mr: "बाजूचा डेमो", en: "Side-angle demo"}
+    when_slots: {seating: {in: [wide]}}
+    differs_on: wide_angle
+    steps: {hi: "Customer ko side se (tirchha) dikhaiye", mr: "ग्राहकाला बाजूने (तिरकं) दाखवा", en: "Show it from the side, at an angle"}
+    say: {hi: "साइड से देखिए — {best} में रंग वैसे ही रहते हैं।", mr: "बाजूने बघा — {best} मध्ये रंग तसेच राहतात.", en: "Look from the side: colours hold on {best}."}
+  - id: dark_scene
+    title: {hi: "Andhera scene", mr: "अंधार दृश्य", en: "Dark-scene demo"}
+    when_slots: {room_light: {in: [dim]}}
+    differs_on: panel
+    steps: {hi: "Andhere wala movie scene; kaale hisse ko compare kariye", mr: "अंधारातलं सिनेमा दृश्य; काळा भाग तुलना करा", en: "A dark movie scene; compare the black areas"}
+    say: {hi: "अंधेरे सीन में काला देखिए — फ़र्क़ साफ़ है।", mr: "अंधाऱ्या दृश्यात काळा बघा — फरक स्पष्ट आहे.", en: "Look at the blacks in a dark scene: the difference is clear."}
+  - id: own_content
+    title: {hi: "Apna show", mr: "आपला शो", en: "Their own show"}
+    when_slots: {}
+    differs_on: null
+    steps: {hi: "Customer ke phone se unka pasandida show cast kariye", mr: "ग्राहकाच्या फोनवरून त्यांचा आवडता शो कास्ट करा", en: "Cast their favourite show from their phone"}
+    say: {hi: "आपका पसंदीदा शो इसी पर चलाकर देखते हैं।", mr: "तुमचा आवडता शो यावरच लावून बघूया.", en: "Let's play your favourite show on it."}
+
+myths:
+  - id: tv_4k_useless
+    belief: "4K is useless because TV channels are only HD"
+    proof: own_content
+    keywords: ["4k bekaar", "4k bekar", "4k ka fayda nahi", "4k useless", "channel hd", "4k की ज़रूरत नहीं", "4k बेकार", "4k चा उपयोग नाही"]
+    line: {hi: "सही कहा, ज़्यादातर चैनल HD हैं। पर Netflix, YouTube 4K में आते हैं, और ये टीवी HD को भी साफ़ दिखाता है।",
+           mr: "बरोबर, बहुतेक चॅनेल HD आहेत. पण Netflix, YouTube 4K मध्ये येतात, आणि हा टीव्ही HD सुद्धा स्पष्ट दाखवतो.",
+           en: "True, most channels are HD. But Netflix and YouTube stream in 4K, and this TV makes HD look sharper too."}
+  - id: tv_big_screen_eyes
+    belief: "A big TV screen is bad for the eyes"
+    proof: distance_demo
+    keywords: ["aankh kharab", "aankhon ko nuksan", "bad for eyes", "eyes hurt", "आँख खराब", "आंखों को नुकसान", "डोळे खराब"]
+    line: {hi: "सही सोचा, बहुत पास बड़ा टीवी थकाता है। आपकी दूरी के हिसाब से सही साइज़ हो तो आँखों पर ज़ोर नहीं पड़ता।",
+           mr: "बरोबर विचार केला, खूप जवळून मोठा टीव्ही थकवतो. तुमच्या अंतरानुसार योग्य साइज असेल तर डोळ्यांवर ताण येत नाही.",
+           en: "Fair point: a big screen too close is tiring. Matched to your distance, the right size is easy on the eyes."}
+  - id: tv_watts
+    belief: "More speaker watts means better sound"
+    proof: dialogue_low_volume
+    keywords: ["zyada watt", "jyada watt", "more watts", "watt zyada", "ज़्यादा वॉट", "जास्त वॉट"]
+    line: {hi: "सही, वॉट से आवाज़ तेज़ होती है। पर साफ़ डायलॉग के लिए साउंड मोड ज़्यादा ज़रूरी है — सुनकर देखिए।",
+           mr: "बरोबर, वॉटने आवाज मोठा होतो. पण स्पष्ट संवादासाठी साउंड मोड जास्त महत्त्वाचा — ऐकून बघा.",
+           en: "True, watts make it louder. For clear dialogue the sound mode matters more: have a listen."}
+site_needs: [wall_type, socket_near, floor_lift]
+quiz:
+  - id: tv_q1
+    step: translate
+    q: {hi: "Customer ka kamra dhoop wala hai. Kaunsa feature batayenge?", mr: "ग्राहकाची खोली उन्हाची आहे. कोणतं फीचर सांगाल?", en: "The customer's room is sunny. Which feature do you explain?"}
+    answers:
+      - {id: a, title: {hi: "Brightness", mr: "ब्राइटनेस", en: "Brightness"}}
+      - {id: b, title: {hi: "Speaker watt", mr: "स्पीकर वॉट", en: "Speaker watts"}}
+      - {id: c, title: {hi: "HDMI ports", mr: "HDMI पोर्ट", en: "HDMI ports"}}
+    correct: a
+    explain: {hi: "Dhoop mein bright screen hi saaf dikhti hai — 'dhoop mein bhi saaf' boliye.", mr: "उन्हात ब्राइट स्क्रीनच स्पष्ट दिसते — 'उन्हातही स्पष्ट' सांगा.", en: "In sun only a bright screen stays clear: say 'clear even in sun'."}
+  - id: tv_q2
+    step: close
+    q: {hi: "Customer pehle hi daam pooch le to?", mr: "ग्राहकाने आधीच किंमत विचारली तर?", en: "The customer asks the price first. You…"}
+    answers:
+      - {id: a, title: {hi: "Seedha daam bolo", mr: "थेट किंमत सांगा", en: "Say the price"}}
+      - {id: b, title: {hi: "Range + 2 sawaal", mr: "रेंज + 2 प्रश्न", en: "Range + 2 questions"}}
+      - {id: c, title: {hi: "Offer batao", mr: "ऑफर सांगा", en: "Mention the offer"}}
+    correct: b
+    explain: {hi: "Imaandari se range boliye, phir kamre ke 2 sawaal — sahi TV milega.", mr: "प्रामाणिकपणे रेंज सांगा, मग खोलीचे 2 प्रश्न — योग्य टीव्ही मिळेल.", en: "Give an honest range, then 2 room questions: you'll find the right TV."}
+  - id: tv_q3
+    step: assess
+    q: {hi: "TV ka sahi size kis sawaal se tay hota hai?", mr: "टीव्हीची योग्य साइज कोणत्या प्रश्नावरून ठरते?", en: "Which question decides the right TV size?"}
+    answers:
+      - {id: a, title: {hi: "Budget kitna", mr: "बजेट किती", en: "What budget"}}
+      - {id: b, title: {hi: "Sofa se doori", mr: "सोफ्यापासून अंतर", en: "Sofa distance"}}
+      - {id: c, title: {hi: "Kaunsa brand", mr: "कोणता ब्रँड", en: "Which brand"}}
+    correct: b
+    explain: {hi: "Pehle poochiye: 'Sofa se TV kitne kadam door hoga?' — size wahi tay karta hai.", mr: "आधी विचारा: 'सोफ्यापासून टीव्ही किती पावलं लांब?' — साइज तेच ठरवतं.", en: "Ask first: 'How many steps from the sofa to the TV?' That decides the size."}

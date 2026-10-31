@@ -1,0 +1,19 @@
+{
+ "language": "hi",
+ "customer_language": null,
+ "category": null,
+ "customer_name": null,
+ "sports_viewer": null,
+ "slots": [],
+ "numbers": [],
+ "intents": [
+  "other"
+ ],
+ "claim_id": null,
+ "objection": null,
+ "option_choice": null,
+ "library_id": null,
+ "question_for_expert": null,
+ "customer_request": null,
+ "transcript": "customer ameer lag rahe hain, sabse mehenga dikhao"
+}

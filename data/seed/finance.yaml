@@ -1,0 +1,7 @@
+# TEST DATA ONLY — finance plans
+- {id: FIN-NCE-6, kind: no_cost, months: 6, apr_pct: 0, fee_flat: 199, min_amount: 10000, banks: [], categories: [tv, ac, wm, laptop],
+   title: {hi: "6 महीने नो-कॉस्ट EMI", mr: "6 महिने नो-कॉस्ट EMI", en: "6-month no-cost EMI"}, test_data: true}
+- {id: FIN-NCE-12, kind: no_cost, months: 12, apr_pct: 0, fee_flat: 299, min_amount: 25000, banks: [HDFC, ICICI], categories: [tv, ac, wm],
+   title: {hi: "12 महीने नो-कॉस्ट EMI", mr: "12 महिने नो-कॉस्ट EMI", en: "12-month no-cost EMI"}, test_data: true}
+- {id: FIN-STD-18, kind: standard, months: 18, apr_pct: 15, fee_pct: 1, fee_min: 199, min_amount: 15000, banks: [], categories: [tv, ac, wm, laptop],
+   title: {hi: "18 महीने EMI (ब्याज सहित)", mr: "18 महिने EMI (व्याजासह)", en: "18-month EMI (with interest)"}, test_data: true}

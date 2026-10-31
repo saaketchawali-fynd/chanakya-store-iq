@@ -1,0 +1,93 @@
+"""i18n: t(key, lang, **vars) over strings.yaml (+ strings_extra.yaml); script detection."""
+
+from __future__ import annotations
+
+import re
+from functools import lru_cache
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+import yaml
+
+if TYPE_CHECKING:
+    from chanakya.truth.firewall import NumberRegistry
+
+HERE = Path(__file__).resolve().parent
+LANGS = ("hi", "mr", "en")
+
+
+class _SafeDict(dict):
+    def __missing__(self, key):  # leave unknown placeholders visible in tests rather than crashing
+        return "{" + key + "}"
+
+
+@lru_cache
+def strings() -> dict[str, dict[str, str]]:
+    out: dict[str, dict[str, str]] = {}
+    for name in ("strings.yaml", "strings_extra.yaml"):
+        p = HERE / name
+        if p.exists():
+            data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+            out.update(data)
+    return out
+
+
+def reload_strings() -> None:
+    strings.cache_clear()
+
+
+def has(key: str) -> bool:
+    return key in strings()
+
+
+def raw(key: str, lang: str) -> str:
+    entry = strings().get(key)
+    if entry is None:
+        raise KeyError(f"missing i18n key: {key}")
+    return entry.get(lang) or entry.get("hi") or entry.get("en") or ""
+
+
+def fill(template: str, **vars) -> str:
+    return template.format_map(_SafeDict(**{k: ("" if v is None else v) for k, v in vars.items()}))
+
+
+def t(key: str, lang: str, reg: NumberRegistry | None = None, **vars) -> str:
+    """Localised string. If reg is given, the template's literal numerals are registered as static text
+    (variables must already be registry-formatted)."""
+    tpl = raw(key, lang)
+    if reg is not None:
+        reg.static(tpl)
+    return fill(tpl, **vars)
+
+
+def pick(d: dict | None, lang: str, reg: NumberRegistry | None = None) -> str:
+    """Pick a language from an inline {hi, mr, en} dict (packs, seed titles)."""
+    if not d:
+        return ""
+    if isinstance(d, str):
+        s = d
+    else:
+        s = d.get(lang) or d.get("hi") or d.get("en") or next(iter(d.values()), "")
+    if reg is not None:
+        reg.static(s)
+    return s
+
+
+_DEVANAGARI = re.compile(r"[ऀ-ॿ]")
+_MR_MARKERS = re.compile(r"(आहे|नाही|आहेत|करा|पाहिजे|हवा|हवी|किती|खोली|घरात|ळ)")
+
+
+def detect_script_lang(text: str) -> str | None:
+    """Rough language guess from script and markers (used only as a hint)."""
+    if not text:
+        return None
+    if _DEVANAGARI.search(text):
+        return "mr" if _MR_MARKERS.search(text) else "hi"
+    return None
+
+
+def t_for(lang: str):
+    def _t(key: str, **vars) -> str:
+        return t(key, lang, **vars) if has(key) else key
+
+    return _t

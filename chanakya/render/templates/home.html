@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block style %}
+  .progress { height: 26px; background: #E8E2D8; border-radius: 999px; overflow: hidden; margin-top: 12px; }
+  .progress .fill { height: 100%; background: var(--green); border-radius: 999px; }
+  .pct { display: flex; justify-content: space-between; font-size: 28px; }
+  .missing span { display: inline-block; background: var(--pale-orange); color: #B4611F; font-size: 26px;
+                  padding: 6px 16px; border-radius: 999px; margin: 0 10px 10px 0; }
+{% endblock %}
+{% block band %}
+  <div class="kicker">{{ L.title }}{% if category_label %} · {{ category_label }}{% endif %}</div>
+  <h1>{{ name|default('Customer', true) }}</h1>
+{% endblock %}
+{% block content %}
+  {% set k = known|default(0) %}{% set tot = total|default(0) %}
+  <div class="pct"><span class="muted">{{ L.progress }}</span><b>{{ k }}/{{ tot }}</b></div>
+  <div class="progress"><div class="fill" style="width: {{ ((k / tot * 100) if tot else 0)|round|int }}%"></div></div>
+
+  {% if rows %}
+  <div class="label">{{ L.facts }}</div>
+  <div class="panel">
+    {% for r in rows %}
+    <div class="row"><span class="k">{{ r.label }}</span><span class="v">{{ r.value }}</span></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="label">{{ L.start_level }}</div>
+  <div class="panel">{{ start_level_text|default('—', true) }}</div>
+
+  {% if missing %}
+  <div class="label">{{ L.missing }}</div>
+  <div class="missing">{% for m in missing %}<span>{{ m }}</span>{% endfor %}</div>
+  {% endif %}
+{% endblock %}

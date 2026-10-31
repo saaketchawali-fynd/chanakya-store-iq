@@ -1,0 +1,6 @@
+# TEST DATA ONLY — shift-brief content: clips (optional mp4 in data/clips/<step>.mp4) and tips
+- {id: CLIP-ASSESS, kind: clip, step: assess, lang: all, payload: {file: assess.mp4}}
+- {id: CLIP-TRANSLATE, kind: clip, step: translate, lang: all, payload: {file: translate.mp4}}
+- {id: CLIP-DEMONSTRATE, kind: clip, step: demonstrate, lang: all, payload: {file: demonstrate.mp4}}
+- {id: CLIP-COMPLETE, kind: clip, step: complete, lang: all, payload: {file: complete.mp4}}
+- {id: CLIP-CLOSE, kind: clip, step: close, lang: all, payload: {file: close.mp4}}

@@ -1,0 +1,37 @@
+[project]
+name = "chanakya"
+version = "0.1.0"
+description = "Chanakya — Store IQ: AI sales partner for Reliance Digital store associates on WhatsApp (TEST DATA)"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi", "uvicorn[standard]", "httpx", "pydantic>=2", "pydantic-settings",
+  "sqlalchemy[asyncio]>=2", "asyncpg", "aiosqlite", "jinja2", "playwright", "pillow", "numpy",
+  "qrcode[pil]", "rapidfuzz", "pyyaml", "python-multipart", "tzdata",
+]
+
+[dependency-groups]
+dev = ["pytest", "pytest-asyncio", "respx", "ruff"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["chanakya*"]
+
+[tool.setuptools.package-data]
+chanakya = ["brain/packs/*.yaml", "i18n/*.yaml", "render/templates/*.html", "render/static/**/*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501", "B008"]

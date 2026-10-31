@@ -1,0 +1,19 @@
+{
+ "language": "hi",
+ "customer_language": null,
+ "category": "tv",
+ "customer_name": null,
+ "sports_viewer": null,
+ "slots": [],
+ "numbers": [],
+ "intents": [
+  "ask_question"
+ ],
+ "claim_id": null,
+ "objection": null,
+ "option_choice": null,
+ "library_id": null,
+ "question_for_expert": "Does Meru 55 QLED Pro support Dolby Vision?",
+ "customer_request": null,
+ "transcript": "Kya Meru 55 QLED Pro Dolby Vision support karta hai?"
+}

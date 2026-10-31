@@ -1,0 +1,16 @@
+# TEST DATA ONLY — offers (dates in 2026; update before the live test)
+- {id: OFF-HDFC-10, kind: bank, bank: HDFC, pct: 10, max_discount: 5000, min_amount: 30000, categories: [tv, ac, wm, laptop],
+   stack_group: bank, valid_from: 2026-10-25, valid_to: 2026-11-15, with_emi: true,
+   title: {hi: "HDFC कार्ड पर 10% छूट", mr: "HDFC कार्डवर 10% सूट", en: "10% off on HDFC cards"}, test_data: true}
+- {id: OFF-SBI-7, kind: bank, bank: SBI, pct: 7.5, max_discount: 4000, min_amount: 25000, categories: [tv, ac, wm],
+   stack_group: bank, valid_from: 2026-10-25, valid_to: 2026-11-10, with_emi: true,
+   title: {hi: "SBI कार्ड पर 7.5% छूट", mr: "SBI कार्डवर 7.5% सूट", en: "7.5% off on SBI cards"}, test_data: true}
+- {id: OFF-EXCH-TV, kind: exchange_bonus, flat: 2000, min_amount: 0, categories: [tv], filter: {size_in_min: 55}, stack_group: exchange,
+   valid_from: 2026-10-25, valid_to: 2026-11-12, requires: {slot: exchange_old, in: [yes_working, yes_dead]}, with_emi: true,
+   title: {hi: "एक्सचेंज पर ₹2,000 बोनस", mr: "एक्सचेंजवर ₹2,000 बोनस", en: "₹2,000 exchange bonus"}, test_data: true}
+- {id: OFF-BUNDLE-SB, kind: bundle, flat: 3000, categories: [soundbar], filter: {with_tv_panel_in: [QLED, OLED, MiniLED], with_tv_size_min: 55},
+   stack_group: bundle, valid_from: 2026-10-25, valid_to: 2026-11-30, with_emi: true,
+   title: {hi: "TV के साथ साउंडबार पर ₹3,000 छूट", mr: "TV सोबत साउंडबारवर ₹3,000 सूट", en: "₹3,000 off a soundbar with the TV"}, test_data: true}
+- {id: OFF-ICICI-LAP, kind: cashback, bank: ICICI, flat: 2500, min_amount: 50000, categories: [laptop], stack_group: bank,
+   valid_from: 2026-10-25, valid_to: 2026-11-20, with_emi: true,
+   title: {hi: "ICICI कार्ड पर ₹2,500 कैशबैक", mr: "ICICI कार्डवर ₹2,500 कॅशबॅक", en: "₹2,500 cashback on ICICI cards"}, test_data: true}

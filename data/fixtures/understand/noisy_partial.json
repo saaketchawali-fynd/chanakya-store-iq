@@ -1,0 +1,24 @@
+{
+ "language": "hi",
+ "customer_language": null,
+ "category": "tv",
+ "customer_name": null,
+ "sports_viewer": null,
+ "slots": [
+  {
+   "slot": "mounting",
+   "value": "wall"
+  }
+ ],
+ "numbers": [],
+ "intents": [
+  "customer_info"
+ ],
+ "claim_id": null,
+ "objection": null,
+ "option_choice": null,
+ "library_id": null,
+ "question_for_expert": null,
+ "customer_request": null,
+ "transcript": "... haan ... TV ... deewar pe lagega ... [shor] ..."
+}

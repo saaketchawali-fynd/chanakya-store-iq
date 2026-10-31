@@ -1,0 +1,17 @@
+# TEST DATA ONLY — sizing guides
+size_tv:      # seat distance (ft, upper bound inclusive) → recommended size range (in)
+  - {max_ft: 6,  min_in: 32, max_in: 43}
+  - {max_ft: 8,  min_in: 43, max_in: 55}
+  - {max_ft: 10, min_in: 55, max_in: 65}
+  - {max_ft: 12, min_in: 65, max_in: 75}
+  - {max_ft: 99, min_in: 75, max_in: 85}
+tonnage_ac:   # room size sqft (upper bound inclusive) → tons; +0.5 if top_floor or sun_wall (cap 2.0)
+  - {max_sqft: 120, ton: 1.0}
+  - {max_sqft: 180, ton: 1.5}
+  - {max_sqft: 250, ton: 2.0}
+  - {max_sqft: 9999, ton: 2.0, note: two_units}
+capacity_wm:  # family size → kg range; +1 kg if heavy weekly bedsheets
+  - {max_people: 2, min_kg: 6, max_kg: 7}
+  - {max_people: 4, min_kg: 7, max_kg: 8}
+  - {max_people: 99, min_kg: 8, max_kg: 10}
+tariff: {region: Mumbai, rupees_per_unit: 9.5}

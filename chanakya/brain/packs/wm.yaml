@@ -1,0 +1,396 @@
+category: wm
+label: {hi: "Washing machine", mr: "वॉशिंग मशीन", en: "Washing machine"}
+required_slots: [family_size, wash_load, space, load_pref, elders_back, decider]
+gate_min_slots: 4
+cost_slots: [space]
+budget_bands:
+  - {id: b1, inr: 27000, title: {hi: "27k tak", mr: "27k पर्यंत", en: "Up to 27k"}}
+  - {id: b2, inr: 35000, title: {hi: "27k–40k", mr: "27k–40k", en: "27k–40k"}}
+  - {id: b3, inr: 48000, title: {hi: "40k se upar", mr: "40k पेक्षा जास्त", en: "Above 40k"}}
+  - {id: none, inr: null, title: {hi: "Nahi bataya", mr: "सांगितलं नाही", en: "Not told"}}
+slots:
+  - id: family_size
+    phase: life
+    number: family_size
+    title: {hi: "Parivaar", mr: "कुटुंब", en: "Family size"}
+    ask: {hi: "घर में कितने लोग हैं?", mr: "घरात किती लोक आहेत?", en: "How many people live at home?"}
+    why: {hi: "Logon se sahi kilo tay hota hai", mr: "लोकांवरून योग्य किलो ठरतं", en: "Family size decides the right kg"}
+    quick:
+      - {id: f1_2, number: 2, title: {hi: "1–2 log", mr: "1–2 लोक", en: "1–2 people"}}
+      - {id: f3_4, number: 4, title: {hi: "3–4 log", mr: "3–4 लोक", en: "3–4 people"}}
+      - {id: f5plus, number: 6, title: {hi: "5+ log", mr: "5+ लोक", en: "5+ people"}}
+    values: [f1_2, f3_4, f5plus]
+    value_titles:
+      f1_2: {hi: "1–2 log", mr: "1–2 लोक", en: "1–2 people"}
+      f3_4: {hi: "3–4 log", mr: "3–4 लोक", en: "3–4 people"}
+      f5plus: {hi: "5+ log", mr: "5+ लोक", en: "5+ people"}
+    bands: [{max: 2, value: f1_2}, {max: 4, value: f3_4}, {max: 99, value: f5plus}]
+    priors: {f1_2: 0.25, f3_4: 0.5, f5plus: 0.25}
+    keywords:
+      f1_2: ["do log", "akele", "couple", "दो लोग", "दोघं"]
+      f3_4: ["teen log", "chaar log", "family of four", "तीन लोग", "चार लोग", "चार जण"]
+      f5plus: ["paanch log", "bada parivaar", "joint family", "पाँच लोग", "संयुक्त कुटुंब", "मोठं कुटुंब"]
+  - id: wash_load
+    multi: true
+    phase: life
+    title: {hi: "Dhulai kitni", mr: "धुलाई किती", en: "Wash load"}
+    ask: {hi: "कपड़े कितनी बार धुलते हैं — रोज़, एक दिन छोड़कर, या हफ़्ते में?", mr: "कपडे किती वेळा धुता — रोज, एक दिवसाआड, की आठवड्याला?", en: "How often do you wash: daily, every other day, or weekly?"}
+    why: {hi: "Isse kilo aur programme tay hota hai", mr: "यावरून किलो आणि प्रोग्राम ठरतो", en: "This decides kg and programmes"}
+    quick:
+      - {id: daily, title: {hi: "Roz", mr: "रोज", en: "Daily"}}
+      - {id: alternate, title: {hi: "Ek din chhodkar", mr: "एक दिवसाआड", en: "Every other day"}}
+      - {id: weekly, title: {hi: "Hafte mein", mr: "आठवड्याला", en: "Weekly"}}
+    values: [daily, alternate, weekly, bedsheets, uniforms]
+    value_titles:
+      daily: {hi: "Roz", mr: "रोज", en: "Daily"}
+      alternate: {hi: "Ek din chhodkar", mr: "एक दिवसाआड", en: "Every other day"}
+      weekly: {hi: "Hafte mein", mr: "आठवड्याला", en: "Weekly"}
+      bedsheets: {hi: "Bedsheet/parde", mr: "बेडशीट/पडदे", en: "Bedsheets/curtains"}
+      uniforms: {hi: "School uniform", mr: "शाळेचा गणवेश", en: "School uniforms"}
+    priors: {daily: 0.45, alternate: 0.35, weekly: 0.2}
+    keywords:
+      daily: ["roz dhulai", "roz kapde", "daily wash", "every day", "रोज़ धुलाई", "रोज धुलाई"]
+      alternate: ["ek din chhod", "alternate day", "do din mein", "एक दिन छोड़", "एक दिवसाआड"]
+      weekly: ["hafte mein", "weekly", "sunday ko", "हफ़्ते में", "आठवड्याला"]
+      bedsheets: ["bedsheet", "chadar", "parde", "blanket", "बेडशीट", "चादर", "पडदे"]
+      uniforms: ["uniform", "school ke kapde", "यूनिफॉर्म", "गणवेश"]
+  - id: space
+    phase: life
+    title: {hi: "Kahan rakhenge", mr: "कुठे ठेवणार", en: "Where it goes"}
+    ask: {hi: "मशीन कहाँ रखेंगे — बाथरूम, बालकनी या किचन?", mr: "मशीन कुठे ठेवणार — बाथरूम, बाल्कनी की किचन?", en: "Where will the machine go: bathroom, balcony or kitchen?"}
+    why: {hi: "Geela farsh ho to stand sujhav", mr: "ओला फरशी असेल तर स्टँड सुचवू", en: "A wet floor means we suggest a stand"}
+    quick:
+      - {id: bathroom, title: {hi: "Bathroom", mr: "बाथरूम", en: "Bathroom"}}
+      - {id: balcony, title: {hi: "Balcony", mr: "बाल्कनी", en: "Balcony"}}
+      - {id: kitchen, title: {hi: "Kitchen", mr: "किचन", en: "Kitchen"}}
+    values: [bathroom, balcony, kitchen]
+    value_titles:
+      bathroom: {hi: "Bathroom", mr: "बाथरूम", en: "Bathroom"}
+      balcony: {hi: "Balcony", mr: "बाल्कनी", en: "Balcony"}
+      kitchen: {hi: "Kitchen", mr: "किचन", en: "Kitchen"}
+    priors: {bathroom: 0.45, balcony: 0.35, kitchen: 0.2}
+    keywords:
+      bathroom: ["bathroom", "washroom", "bathroom mein", "बाथरूम", "बाथरूममध्ये"]
+      balcony: ["balcony", "gallery", "बालकनी", "बाल्कनी", "गॅलरी"]
+      kitchen: ["kitchen", "rasoi", "किचन", "रसोई", "स्वयंपाकघर"]
+  - id: niche_width_cm
+    phase: tech
+    number: niche_width_cm
+    title: {hi: "Jagah ki chaudai", mr: "जागेची रुंदी", en: "Space width"}
+    ask: {hi: "जहाँ मशीन रखेंगे, वो जगह कितनी चौड़ी है?", mr: "जिथे मशीन ठेवणार, ती जागा किती रुंद आहे?", en: "How wide is the space where the machine will go?"}
+    why: {hi: "Jagah mein fit ho, wahi model dikhayenge", mr: "जागेत बसेल तेच मॉडेल दाखवू", en: "We only show models that fit the space"}
+    quick:
+      - {id: n_lt60, number: 55, title: {hi: "60 cm se kam", mr: "60 cm पेक्षा कमी", en: "Under 60 cm"}}
+      - {id: n60_65, number: 62, title: {hi: "60–65 cm", mr: "60–65 cm", en: "60–65 cm"}}
+      - {id: n_gt65, number: 70, title: {hi: "65 cm se zyada", mr: "65 cm पेक्षा जास्त", en: "Over 65 cm"}}
+    values: [n_lt60, n60_65, n_gt65]
+    value_titles:
+      n_lt60: {hi: "60 cm se kam", mr: "60 cm पेक्षा कमी", en: "Under 60 cm"}
+      n60_65: {hi: "60–65 cm", mr: "60–65 cm", en: "60–65 cm"}
+      n_gt65: {hi: "65 cm se zyada", mr: "65 cm पेक्षा जास्त", en: "Over 65 cm"}
+    bands: [{max: 59.9, value: n_lt60}, {max: 65, value: n60_65}, {max: 999, value: n_gt65}]
+    priors: {n_lt60: 0.3, n60_65: 0.4, n_gt65: 0.3}
+    keywords:
+      n_lt60: ["jagah kam", "tight space", "chhoti jagah", "जगह कम", "जागा कमी"]
+      n60_65: ["normal jagah", "medium space", "सामान्य जगह"]
+      n_gt65: ["kaafi jagah", "badi jagah", "plenty of space", "काफ़ी जगह", "भरपूर जागा"]
+  - id: water
+    phase: tech
+    title: {hi: "Paani", mr: "पाणी", en: "Water"}
+    ask: {hi: "आपके यहाँ पानी खारा/भारी है?", mr: "तुमच्याकडे पाणी खारट/जड आहे का?", en: "Is the water hard or salty where you live?"}
+    why: {hi: "Bhari paani mein heater wali machine behtar", mr: "जड पाण्यात हीटरची मशीन चांगली", en: "Hard water needs a heater"}
+    quick:
+      - {id: hard, title: {hi: "Haan, khara", mr: "हो, खारट", en: "Yes, hard"}}
+      - {id: normal, title: {hi: "Normal", mr: "साधं", en: "Normal"}}
+      - {id: unknown, title: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}}
+    values: [hard, normal, unknown]
+    value_titles:
+      hard: {hi: "Khara paani", mr: "खारट पाणी", en: "Hard water"}
+      normal: {hi: "Normal paani", mr: "साधं पाणी", en: "Normal water"}
+      unknown: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
+    priors: {hard: 0.35, normal: 0.5, unknown: 0.15}
+    keywords:
+      hard: ["khara paani", "hard water", "bhari paani", "borewell", "खारा पानी", "खारट पाणी", "जड पाणी"]
+      normal: ["normal paani", "meetha paani", "soft water", "सामान्य पानी", "साधं पाणी"]
+      unknown: ["paani pata nahi", "water not sure", "पानी पता नहीं"]
+  - id: load_pref
+    phase: life
+    title: {hi: "Top/front load", mr: "टॉप/फ्रंट लोड", en: "Top/front load"}
+    ask: {hi: "ऊपर से कपड़े डालने वाली पसंद है या सामने से?", mr: "वरून कपडे घालायची आवडते की समोरून?", en: "Do you prefer loading from the top or the front?"}
+    why: {hi: "Pasand aur jagah dono dekhni hai", mr: "आवड आणि जागा दोन्ही बघायची", en: "Both preference and space matter"}
+    quick:
+      - {id: top, title: {hi: "Top load", mr: "टॉप लोड", en: "Top load"}}
+      - {id: front, title: {hi: "Front load", mr: "फ्रंट लोड", en: "Front load"}}
+      - {id: open, title: {hi: "Koi bhi", mr: "कोणतीही", en: "Either"}}
+    values: [top, front, open]
+    value_titles:
+      top: {hi: "Top load", mr: "टॉप लोड", en: "Top load"}
+      front: {hi: "Front load", mr: "फ्रंट लोड", en: "Front load"}
+      open: {hi: "Koi bhi", mr: "कोणतीही", en: "Either"}
+    priors: {top: 0.45, front: 0.35, open: 0.2}
+    keywords:
+      top: ["top load", "upar se", "टॉप लोड", "ऊपर से", "वरून"]
+      front: ["front load", "saamne se", "फ्रंट लोड", "सामने से", "समोरून"]
+      open: ["koi bhi chalega", "either", "कोई भी", "कोणतीही"]
+  - id: elders_back
+    phase: life
+    title: {hi: "Jhukna mushkil", mr: "वाकणं कठीण", en: "Bending is hard"}
+    ask: {hi: "कपड़े डालने वाले को झुकने में तकलीफ़ होती है?", mr: "कपडे घालणाऱ्याला वाकायला त्रास होतो का?", en: "Does the person loading clothes find bending hard?"}
+    why: {hi: "Jhukna mushkil ho to top load aasaan", mr: "वाकणं कठीण असेल तर टॉप लोड सोपं", en: "If bending is hard, top load is easier"}
+    quick:
+      - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+    values: ["yes", "no"]
+    value_titles:
+      "yes": {hi: "Jhukna mushkil", mr: "वाकणं कठीण", en: "Bending is hard"}
+      "no": {hi: "Koi dikkat nahi", mr: "काही त्रास नाही", en: "No trouble"}
+    priors: {"yes": 0.35, "no": 0.65}
+    keywords:
+      "yes": ["kamar dard", "back pain", "jhukna mushkil", "jhuk nahi", "कमर दर्द", "झुकना मुश्किल", "पाठदुखी", "वाकता येत नाही"]
+      "no": ["jhukne mein dikkat nahi", "no back pain", "झुकने में दिक्कत नहीं", "वाकायला त्रास नाही"]
+  - id: drying
+    phase: life
+    title: {hi: "Monsoon sukhana", mr: "पावसात वाळवणं", en: "Monsoon drying"}
+    ask: {hi: "बारिश में कपड़े सुखाने की दिक्कत होती है?", mr: "पावसात कपडे वाळवायचा त्रास होतो का?", en: "Is drying clothes in the monsoon a problem?"}
+    why: {hi: "Zyada RPM se kapde jaldi sukhte hain", mr: "जास्त RPM ने कपडे लवकर वाळतात", en: "Higher RPM dries clothes faster"}
+    quick:
+      - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+    values: ["yes", "no"]
+    value_titles:
+      "yes": {hi: "Sukhana mushkil", mr: "वाळवणं कठीण", en: "Drying is hard"}
+      "no": {hi: "Dikkat nahi", mr: "त्रास नाही", en: "No problem"}
+    priors: {"yes": 0.55, "no": 0.45}
+    keywords:
+      "yes": ["sukhte nahi", "sukhane ki dikkat", "drying problem", "baarish mein geele", "सूखते नहीं", "वाळत नाहीत"]
+      "no": ["sukh jaate", "drying theek", "सूख जाते", "वाळतात"]
+  - id: decider
+    phase: life
+    title: {hi: "Faisla kaun", mr: "निर्णय कोण", en: "Decider"}
+    ask: {hi: "फ़ैसला आप ही लेंगे या घर पर किसी से पूछना है?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
+    why: {hi: "Jo decide karega, use Parivaar Card bhejenge", mr: "जो निर्णय घेईल त्याला परिवार कार्ड पाठवू", en: "We'll send the family card to the decider"}
+    quick:
+      - {id: self, title: {hi: "Khud", mr: "स्वतः", en: "Myself"}}
+      - {id: family, title: {hi: "Ghar pe poochna", mr: "घरी विचारायचं", en: "Ask family"}}
+      - {id: together, title: {hi: "Saath mein", mr: "सगळे मिळून", en: "Together"}}
+    values: [self, family, together]
+    value_titles:
+      self: {hi: "Khud", mr: "स्वतः", en: "Themselves"}
+      family: {hi: "Ghar pe poochna", mr: "घरी विचारायचं", en: "Ask family"}
+      together: {hi: "Saath mein", mr: "सगळे मिळून", en: "Together"}
+    priors: {self: 0.4, family: 0.4, together: 0.2}
+    keywords:
+      self: ["khud decide", "khud lenge", "decide myself", "खुद", "स्वतः ठरवणार"]
+      family: ["ghar pe poochna", "ghar par poochenge", "husband se", "wife se", "ask family", "घर पर पूछ", "घरी विचार"]
+      together: ["saath mein decide", "milke", "together", "मिलकर", "सगळे मिळून"]
+  - id: exchange_old
+    phase: tech
+    title: {hi: "Purani machine", mr: "जुनी मशीन", en: "Old machine"}
+    ask: {hi: "पुरानी मशीन एक्सचेंज करनी है?", mr: "जुनी मशीन एक्सचेंज करायची आहे का?", en: "Would you like to exchange your old machine?"}
+    why: {hi: "Exchange se kharcha kam ho sakta hai", mr: "एक्सचेंजने खर्च कमी होऊ शकतो", en: "Exchange can lower the cost"}
+    quick:
+      - {id: yes_working, title: {hi: "Haan, chalti hai", mr: "हो, चालू आहे", en: "Yes, working"}}
+      - {id: yes_dead, title: {hi: "Haan, kharab", mr: "हो, बंद आहे", en: "Yes, not working"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+    values: [yes_working, yes_dead, "no"]
+    value_titles:
+      yes_working: {hi: "Haan, chalti hai", mr: "हो, चालू आहे", en: "Yes, working"}
+      yes_dead: {hi: "Haan, kharab", mr: "हो, बंद आहे", en: "Yes, not working"}
+      "no": {hi: "Exchange nahi", mr: "एक्सचेंज नाही", en: "No exchange"}
+    priors: {yes_working: 0.3, yes_dead: 0.2, "no": 0.5}
+    keywords:
+      yes_working: ["purani chalti", "old machine working", "पुरानी चलती", "जुनी चालू"]
+      yes_dead: ["purani kharab", "old machine dead", "पुरानी खराब", "जुनी बंद"]
+      "no": ["exchange nahi", "no exchange", "एक्सचेंज नहीं", "एक्सचेंज नाही"]
+  - id: tap_near
+    phase: site
+    title: {hi: "Nal paas", mr: "नळ जवळ", en: "Tap nearby"}
+    ask: {hi: "मशीन की जगह के पास नल है?", mr: "मशीनच्या जागेजवळ नळ आहे का?", en: "Is there a tap near the machine spot?"}
+    why: {hi: "Installer inlet pipe ki lambai jaane", mr: "इन्स्टॉलरला इनलेट पाइपची लांबी कळावी", en: "The installer must know the inlet pipe length"}
+    quick:
+      - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+      - {id: unknown, title: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}}
+    values: ["yes", "no", unknown]
+    value_titles:
+      "yes": {hi: "Nal hai", mr: "नळ आहे", en: "Tap there"}
+      "no": {hi: "Nal nahi", mr: "नळ नाही", en: "No tap"}
+      unknown: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
+    priors: {"yes": 0.75, "no": 0.15, unknown: 0.1}
+    keywords:
+      "yes": ["nal hai", "tap hai", "नल है", "नळ आहे"]
+      "no": ["nal nahi", "tap nahi", "no tap", "नल नहीं", "नळ नाही"]
+      unknown: ["nal pata nahi", "tap not sure", "नल पता नहीं"]
+  - id: drain_near
+    phase: site
+    title: {hi: "Drain paas", mr: "ड्रेन जवळ", en: "Drain nearby"}
+    ask: {hi: "पानी निकलने की नाली पास में है?", mr: "पाणी जाण्याची मोरी जवळ आहे का?", en: "Is there a drain nearby for the outlet?"}
+    why: {hi: "Drain door ho to extra pipe", mr: "ड्रेन लांब असेल तर जास्त पाइप", en: "A far drain needs extra pipe"}
+    quick:
+      - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+      - {id: unknown, title: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}}
+    values: ["yes", "no", unknown]
+    value_titles:
+      "yes": {hi: "Drain hai", mr: "ड्रेन आहे", en: "Drain there"}
+      "no": {hi: "Drain door", mr: "ड्रेन लांब", en: "Drain far"}
+      unknown: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
+    priors: {"yes": 0.75, "no": 0.15, unknown: 0.1}
+    keywords:
+      "yes": ["nali hai", "drain hai", "नाली है", "मोरी आहे"]
+      "no": ["nali door", "drain nahi", "नाली दूर", "मोरी लांब"]
+      unknown: ["nali pata nahi", "drain not sure", "नाली पता नहीं"]
+  - id: floor_lift
+    phase: site
+    title: {hi: "Manzil/lift", mr: "मजला/लिफ्ट", en: "Floor/lift"}
+    ask: {hi: "घर कौन-सी मंज़िल पर है, लिफ़्ट है?", mr: "घर कितव्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
+    why: {hi: "Delivery team ko pehle se pata ho", mr: "डिलिव्हरी टीमला आधी कळावं", en: "So the delivery team is ready"}
+    quick:
+      - {id: lift, title: {hi: "Lift hai", mr: "लिफ्ट आहे", en: "Has a lift"}}
+      - {id: stairs, title: {hi: "Seedhi se", mr: "जिन्याने", en: "Stairs only"}}
+      - {id: ground, title: {hi: "Ground floor", mr: "तळमजला", en: "Ground floor"}}
+    values: [lift, stairs, ground]
+    value_titles:
+      lift: {hi: "Lift hai", mr: "लिफ्ट आहे", en: "Has a lift"}
+      stairs: {hi: "Seedhi se", mr: "जिन्याने", en: "Stairs only"}
+      ground: {hi: "Ground floor", mr: "तळमजला", en: "Ground floor"}
+    priors: {lift: 0.7, stairs: 0.2, ground: 0.1}
+    keywords:
+      lift: ["lift hai", "elevator", "lift wali", "लिफ़्ट है", "लिफ्ट आहे"]
+      stairs: ["seedhi", "sidhi", "stairs", "lift nahi", "सीढ़ी", "जिना", "लिफ्ट नाही"]
+      ground: ["ground floor", "neeche wala", "तल मंज़िल", "तळमजला"]
+
+fit_rules:
+  - {id: capacity_ok, weight: 3, slot: family_size, kind: capacity_band}
+  - {id: width_fit, weight: 1, slot: niche_width_cm, kind: width_fit, hard: true}
+  - {id: bend_ok, weight: 1.5, slot: elders_back, when: {in: ["yes"]}, spec_any: [{load: {eq: top}}], else: 0.5}
+  - {id: top_pref, weight: 1.5, slot: load_pref, when: {in: [top]}, spec_any: [{load: {eq: top}}], else: 0.2}
+  - {id: front_pref, weight: 1.5, slot: load_pref, when: {in: [front]}, spec_any: [{load: {eq: front}}], else: 0.2}
+  - {id: hard_water_ok, weight: 1, slot: water, when: {in: [hard]}, spec_any: [{heater: {eq: true}}], else: 0.4}
+  - {id: dry_ok, weight: 1, slot: drying, when: {in: ["yes"]}, spec_any: [{rpm: {gte: 1000}}], else: 0.4}
+reasons:
+  capacity_ok: {hi: "{people} logon ke liye sahi kilo", mr: "{people} लोकांसाठी योग्य किलो", en: "Right kg for {people} people"}
+  width_fit: {hi: "Aapki jagah mein fit", mr: "तुमच्या जागेत बसते", en: "Fits your space"}
+  bend_ok: {hi: "Jhukna nahi padega", mr: "वाकावं लागणार नाही", en: "No bending needed"}
+  top_pref: {hi: "Aapki pasand: top load", mr: "तुमची आवड: टॉप लोड", en: "Your pick: top load"}
+  front_pref: {hi: "Aapki pasand: front load", mr: "तुमची आवड: फ्रंट लोड", en: "Your pick: front load"}
+  hard_water_ok: {hi: "Khare paani mein bhi saaf", mr: "खारट पाण्यातही स्वच्छ", en: "Clean even in hard water"}
+  dry_ok: {hi: "Baarish mein jaldi sukhe", mr: "पावसात लवकर वाळतात", en: "Dries faster in monsoon"}
+  value_fit: {hi: "Ghar ke liye kaafi, kam kharcha", mr: "घरासाठी पुरेसा, कमी खर्च", en: "Enough for the home, costs less"}
+  step_up: {hi: "Zyada kilo, bada parivaar", mr: "जास्त किलो, वाढत्या कुटुंबासाठी", en: "More kg for a growing family"}
+
+benefits:
+  - id: b_kg_big
+    weight: 3
+    when_spec: {capacity_kg: {gte: 8}}
+    when_slots: {family_size: {known: true}}
+    cites: [family_size]
+    say: {hi: "{kg} किलो मतलब एक बार में 2 जींस और 2 बेडशीट।", mr: "{kg} किलो म्हणजे एका वेळी 2 जीन्स आणि 2 बेडशीट.", en: "{kg} kg: two pairs of jeans and two bedsheets in one wash."}
+    card: {hi: "एक बार में 2 जींस + 2 बेडशीट", mr: "एका वेळी 2 जीन्स + 2 बेडशीट", en: "2 jeans + 2 bedsheets per wash"}
+  - id: b_kg_mid
+    weight: 3
+    when_spec: {capacity_kg: {in: [7, 7.5]}}
+    when_slots: {family_size: {known: true}}
+    cites: [family_size]
+    say: {hi: "{kg} किलो मतलब एक बार में 1 बेडशीट और 6 शर्ट।", mr: "{kg} किलो म्हणजे एका वेळी 1 बेडशीट आणि 6 शर्ट.", en: "{kg} kg: one bedsheet and six shirts in one wash."}
+    card: {hi: "एक बार में 1 बेडशीट + 6 शर्ट", mr: "एका वेळी 1 बेडशीट + 6 शर्ट", en: "1 bedsheet + 6 shirts per wash"}
+  - id: b_kg_small
+    weight: 3
+    when_spec: {capacity_kg: {lt: 7}}
+    when_slots: {family_size: {known: true}}
+    cites: [family_size]
+    say: {hi: "{kg} किलो मतलब दो लोगों के रोज़ के कपड़े एक बार में।", mr: "{kg} किलो म्हणजे दोघांचे रोजचे कपडे एका वेळी.", en: "{kg} kg: a day's clothes for two in one wash."}
+    card: {hi: "दो लोगों के कपड़े एक बार में", mr: "दोघांचे कपडे एका वेळी", en: "Clothes for two per wash"}
+  - id: b_bend
+    weight: 1.5
+    when_spec: {load: {eq: top}}
+    when_slots: {elders_back: {in: ["yes"]}}
+    cites: [elders_back]
+    say: {hi: "ऊपर से कपड़े डालिए — झुकना नहीं पड़ेगा।", mr: "वरून कपडे घाला — वाकावं लागणार नाही.", en: "Load from the top: no bending needed."}
+    card: {hi: "झुकना नहीं पड़ेगा", mr: "वाकावं लागणार नाही", en: "No bending"}
+  - id: b_heater
+    weight: 1
+    when_spec: {heater: {eq: true}}
+    when_slots: {water: {in: [hard]}}
+    cites: [water]
+    say: {hi: "गर्म पानी की धुलाई — खारे पानी में भी कपड़े साफ़।", mr: "गरम पाण्याची धुलाई — खारट पाण्यातही कपडे स्वच्छ.", en: "Hot-water wash: clothes come clean even in hard water."}
+    card: {hi: "खारे पानी में भी साफ़", mr: "खारट पाण्यातही स्वच्छ", en: "Clean in hard water"}
+  - id: b_rpm
+    weight: 1
+    when_spec: {rpm: {gte: 1000}}
+    when_slots: {drying: {in: ["yes"]}}
+    cites: [drying]
+    say: {hi: "{rpm} RPM — बारिश में भी कपड़े जल्दी सूखेंगे।", mr: "{rpm} RPM — पावसातही कपडे लवकर वाळतील.", en: "{rpm} RPM: clothes dry faster even in the monsoon."}
+    card: {hi: "बारिश में जल्दी सूखें", mr: "पावसात लवकर वाळतात", en: "Faster drying in monsoon"}
+  - id: b_quick
+    weight: 0.5
+    when_spec: {quick_wash: {eq: true}}
+    when_slots: {wash_load: {has_any: [daily, uniforms]}}
+    cites: [wash_load]
+    say: {hi: "रोज़ के कपड़े क्विक वॉश में जल्दी धुल जाएँगे।", mr: "रोजचे कपडे क्विक वॉशमध्ये लवकर धुतील.", en: "Daily clothes wash fast on the quick-wash programme."}
+    card: {hi: "क्विक वॉश रोज़ के लिए", mr: "रोजसाठी क्विक वॉश", en: "Quick wash for daily loads"}
+
+demos:
+  - id: drum_bedsheet
+    title: {hi: "Bedsheet demo", mr: "बेडशीट डेमो", en: "Bedsheet demo"}
+    when_slots: {family_size: {known: true}}
+    differs_on: capacity_kg
+    steps: {hi: "Ek bedsheet tah karke {best} aur {other} ke drum mein rakh kar dikhaiye", mr: "एक बेडशीट घडी करून {best} आणि {other} च्या ड्रममध्ये ठेवून दाखवा", en: "Fold a bedsheet into the drums of {best} and {other}"}
+    say: {hi: "देखिए, {best} में बेडशीट आराम से घूमेगी।", mr: "बघा, {best} मध्ये बेडशीट आरामात फिरेल.", en: "See how the bedsheet has room to turn in {best}."}
+  - id: bend_test
+    title: {hi: "Jhukne ka test", mr: "वाकण्याची टेस्ट", en: "Bend test"}
+    when_slots: {elders_back: {in: ["yes"]}}
+    differs_on: load
+    steps: {hi: "Customer se dono machine mein kapde daal kar dekhne kahiye", mr: "ग्राहकाला दोन्ही मशीनमध्ये कपडे घालून बघायला सांगा", en: "Ask the customer to load clothes into both machines"}
+    say: {hi: "खुद डालकर देखिए — {best} में झुकना कम पड़ता है।", mr: "स्वतः घालून बघा — {best} मध्ये कमी वाकावं लागतं.", en: "Try loading both: {best} needs less bending."}
+  - id: quick_wash
+    title: {hi: "Quick wash", mr: "क्विक वॉश", en: "Quick wash"}
+    when_slots: {wash_load: {known: true}}
+    differs_on: null
+    steps: {hi: "Control panel par quick wash programme aur time dikhaiye", mr: "कंट्रोल पॅनलवर क्विक वॉश प्रोग्राम आणि वेळ दाखवा", en: "Show the quick-wash programme and its time on the panel"}
+    say: {hi: "रोज़ के कपड़ों के लिए ये बटन — जल्दी धुलाई।", mr: "रोजच्या कपड्यांसाठी हे बटण — लवकर धुलाई.", en: "This button is for daily clothes: a fast wash."}
+
+myths:
+  - id: wm_front_always_better
+    belief: "A front-load machine is always better than a top-load"
+    proof: bend_test
+    keywords: ["front load hi achha", "front load best", "front load better", "फ्रंट लोड ही अच्छा", "फ्रंट लोडच चांगलं"]
+    line: {hi: "सही, फ्रंट लोड कपड़े अच्छे धोता है। पर झुकना और जगह भी मायने रखते हैं — आपके घर के हिसाब से देखते हैं।",
+           mr: "बरोबर, फ्रंट लोड कपडे छान धुतो. पण वाकणं आणि जागाही महत्त्वाची — तुमच्या घरानुसार बघू.",
+           en: "True, front loads wash well. Bending and space matter too, so let's match it to your home."}
+  - id: wm_bigger_kg_better
+    belief: "A bigger kg machine is always better"
+    proof: drum_bedsheet
+    keywords: ["sabse bada kilo", "zyada kilo achha", "bigger kg better", "ज़्यादा किलो", "जास्त किलो"]
+    line: {hi: "सही सोचा, बड़ी मशीन में ज़्यादा कपड़े आते हैं। पर परिवार के हिसाब से सही किलो लें तो पानी-बिजली कम लगती है।",
+           mr: "बरोबर विचार, मोठ्या मशीनमध्ये जास्त कपडे बसतात. पण कुटुंबानुसार योग्य किलो घेतल्यास पाणी-वीज कमी लागते.",
+           en: "Fair thought: bigger holds more. The right kg for your family uses less water and power."}
+site_needs: [tap_near, drain_near, floor_lift]
+quiz:
+  - id: wm_q1
+    step: translate
+    q: {hi: "8 kg ko customer ki zindagi mein kaise samjhayenge?", mr: "8 kg ग्राहकाच्या रोजच्या जगण्यात कसं समजवाल?", en: "How do you explain 8 kg in daily-life terms?"}
+    answers:
+      - {id: a, title: {hi: "Drum ka size", mr: "ड्रमचा आकार", en: "Drum size"}}
+      - {id: b, title: {hi: "2 jeans+2 bedsheet", mr: "2 जीन्स+2 बेडशीट", en: "2 jeans+2 sheets"}}
+      - {id: c, title: {hi: "Motor power", mr: "मोटर पॉवर", en: "Motor power"}}
+    correct: b
+    explain: {hi: "Kapdon mein boliye: '8 kg = ek baar mein 2 jeans aur 2 bedsheet'.", mr: "कपड्यांत सांगा: '8 kg = एका वेळी 2 जीन्स आणि 2 बेडशीट'.", en: "Say it in clothes: '8 kg = 2 jeans and 2 bedsheets in one wash'."}
+  - id: wm_q2
+    step: assess
+    q: {hi: "Machine ka kilo kis sawaal se tay hota hai?", mr: "मशीनचं किलो कोणत्या प्रश्नावरून ठरतं?", en: "Which question decides the machine's kg?"}
+    answers:
+      - {id: a, title: {hi: "Ghar mein kitne log", mr: "घरात किती लोक", en: "People at home"}}
+      - {id: b, title: {hi: "Brand", mr: "ब्रँड", en: "Brand"}}
+      - {id: c, title: {hi: "Rang", mr: "रंग", en: "Colour"}}
+    correct: a
+    explain: {hi: "Log aur dhulai poochiye — kilo wahi tay karta hai.", mr: "लोक आणि धुलाई विचारा — किलो तेच ठरवतं.", en: "Ask people and wash load: that decides the kg."}
+  - id: wm_q3
+    step: close
+    q: {hi: "Customer 'online sasta hai' bole to?", mr: "ग्राहक 'ऑनलाइन स्वस्त आहे' म्हणाले तर?", en: "The customer says 'it's cheaper online'. You…"}
+    answers:
+      - {id: a, title: {hi: "Bahas karo", mr: "वाद घाला", en: "Argue"}}
+      - {id: b, title: {hi: "Poora kharcha dikhao", mr: "पूर्ण खर्च दाखवा", en: "Show full cost"}}
+      - {id: c, title: {hi: "Discount do", mr: "सूट द्या", en: "Give discount"}}
+    correct: b
+    explain: {hi: "Pehle maaniye, phir poora kharcha card dikhaiye — installation, warranty sab.", mr: "आधी मान्य करा, मग पूर्ण खर्चाचं कार्ड दाखवा — इन्स्टॉलेशन, वॉरंटी सगळं.", en: "Agree first, then show the full-cost card: installation, warranty, all of it."}

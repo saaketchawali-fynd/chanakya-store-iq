@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block style %}
+  .niti { background: #FFF9F3; border-left: 10px solid var(--saffron); border-radius: 18px; padding: 20px 26px;
+          font-size: 34px; font-weight: 600; color: var(--indigo); }
+  .focus { background: var(--pale-green); color: var(--green); font-weight: 800; border-radius: 22px;
+           padding: 22px 28px; font-size: 34px; }
+{% endblock %}
+{% block band %}
+  <div class="kicker">{{ L.title }}</div>
+  <h1>{{ greeting|default('Namaste!', true) }}</h1>
+{% endblock %}
+{% block content %}
+  {% if niti_line %}<div class="niti">{{ niti_line }}</div>{% endif %}
+  {% if changes %}
+  <div class="label">{{ L.changes }}</div>
+  <div class="panel">
+    {% for c in changes %}<div class="list-item"><span class="icon">{{ c.icon|default('•', true) }}</span><span>{{ c.text }}</span></div>{% endfor %}
+  </div>
+  {% endif %}
+  {% if offers %}
+  <div class="label">{{ L.offers }}</div>
+  <div class="panel">
+    {% for o in offers %}<div class="list-item"><span class="icon">🏷</span><span>{{ o.text }}</span></div>{% endfor %}
+  </div>
+  {% endif %}
+  {% if followups_text %}
+  <div class="label">{{ L.followups }}</div>
+  <div class="panel">{{ followups_text }}</div>
+  {% endif %}
+  {% if focus_text %}
+  <div class="label">{{ L.focus }}</div>
+  <div class="focus">🎯 {{ focus_text }}</div>
+  {% endif %}
+{% endblock %}

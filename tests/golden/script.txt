@@ -1,0 +1,33 @@
+# Golden path (TV): associate hi, customer mr — spec 18.3
+say namaste
+tap g:new
+tap s:C1:lang:mr
+voice assess_1
+tap s:C1:slot:mounting:wall
+tap s:C1:photo
+photo room_living.jpg
+voice assess_2_claim
+photo label_meru55.jpg
+tap s:C1:benefit_next
+say offers
+tap s:C1:options
+tap s:C1:shown
+tap s:C1:opt:B
+tap s:C1:offers
+tap s:C1:bank:HDFC
+tap s:C1:parivaar
+tap s:C1:qr
+as customer
+say CHANAKYA {token}
+as associate
+tap s:C1:task
+tap s:C1:task_when:today_evening
+tap s:C1:khatam
+tap s:C1:outcome:sold
+tap s:C1:islot:t1
+clock +1d
+clock install
+as customer
+tap u:{s8}:working
+as associate
+dump score

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block style %}
+  .line { display: flex; align-items: center; gap: 20px; padding: 16px 0; border-bottom: 2px solid #EFEAE2; }
+  .line:last-child { border-bottom: none; }
+  .line .t { flex: 1; min-width: 0; }
+  .line .t .reason { font-size: 24px; color: #B4611F; margin-top: 2px; }
+  .line .a { font-weight: 700; white-space: nowrap; }
+  .line.sujhav { background: var(--pale-orange); margin: 0 -30px; padding: 16px 30px; }
+  .line.optional .a, .line.optional .t { color: var(--muted); }
+  .total { display: flex; justify-content: space-between; align-items: center; border-radius: 22px;
+           padding: 24px 30px; margin-top: 18px; font-size: 38px; font-weight: 800; }
+  .total.z { background: var(--pale-green); color: var(--green); }
+  .total.s { background: var(--pale-orange); color: #B4611F; font-size: 32px; }
+  .extra { margin-top: 18px; font-size: 28px; background: #fff; border-radius: 22px; padding: 18px 28px; }
+  .stamp { margin-top: 22px; font-size: 24px; color: var(--muted); text-align: center; }
+{% endblock %}
+{% block band %}
+  <div class="kicker">{{ L.title }}</div>
+  <h1>{{ product_title|default('', true) }}</h1>
+  {% if customer_name %}<div class="sub">{{ customer_name }}</div>{% endif %}
+{% endblock %}
+{% block content %}
+  <div class="panel">
+    {% for ln in lines|default([]) %}
+    <div class="line {{ ln.tag }}">
+      <span class="pill {{ ln.tag }}">{{ L[ln.tag]|default(ln.tag) }}</span>
+      <div class="t">{{ ln.title }}{% if ln.reason %}<div class="reason">↳ {{ ln.reason }}</div>{% endif %}</div>
+      <span class="a">{{ ln.amount_str }}</span>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="total z"><span>{{ L.zaroori_total }}</span><span>{{ zaroori_total_str|default('', true) }}</span></div>
+  {% if with_suggestions_total_str %}
+  <div class="total s"><span>{{ L.with_suggestions_total }}</span><span>{{ with_suggestions_total_str }}</span></div>
+  {% endif %}
+  {% if exchange_text %}<div class="extra">🔁 <b>{{ L.exchange }}:</b> {{ exchange_text }}</div>{% endif %}
+  {% if lifetime_text %}<div class="extra">⚡ <b>{{ L.lifetime }}:</b> {{ lifetime_text }}</div>{% endif %}
+  <div class="stamp">{{ L.note }}{% if stamp %} · {{ stamp }}{% endif %}</div>
+{% endblock %}

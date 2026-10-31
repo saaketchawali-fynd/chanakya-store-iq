@@ -1,0 +1,28 @@
+# TEST DATA ONLY — installation and accessory charges (spec 9.2)
+- {code: TV_WALLMOUNT_S, category: tv, kind: conditional, unit: flat, amount: 1499, condition: {slot: mounting, eq: wall}, filter: {size_in_max: 55},
+   title: {hi: "दीवार ब्रैकेट", mr: "भिंतीचा ब्रॅकेट", en: "Wall bracket"}, test_data: true}
+- {code: TV_WALLMOUNT_L, category: tv, kind: conditional, unit: flat, amount: 1999, condition: {slot: mounting, eq: wall}, filter: {size_in_min: 65},
+   title: {hi: "दीवार ब्रैकेट (बड़ा)", mr: "भिंतीचा ब्रॅकेट (मोठा)", en: "Wall bracket (large)"}, test_data: true}
+- {code: TV_INSTALL_WALL, category: tv, kind: conditional, unit: flat, amount: 799, condition: {slot: mounting, eq: wall},
+   title: {hi: "इंस्टॉलेशन (दीवार)", mr: "इन्स्टॉलेशन (भिंत)", en: "Installation (wall)"}, test_data: true}
+- {code: TV_INSTALL_STAND, category: tv, kind: conditional, unit: flat, amount: 0, condition: {slot: mounting, in: [stand, unknown]},
+   title: {hi: "इंस्टॉलेशन (टेबल) — शामिल", mr: "इन्स्टॉलेशन (टेबल) — समाविष्ट", en: "Installation (stand) — included"}, test_data: true}
+- {code: TV_HDMI, category: tv, kind: optional, unit: flat, amount: 699, title: {hi: "HDMI केबल", mr: "HDMI केबल", en: "HDMI cable"}, test_data: true}
+- {code: AC_INSTALL, category: ac, kind: mandatory, unit: flat, amount: 1500, included_qty: 10,
+   title: {hi: "इंस्टॉलेशन (10 फ़ुट पाइप तक)", mr: "इन्स्टॉलेशन (10 फूट पाइपपर्यंत)", en: "Installation (up to 10 ft pipe)"}, test_data: true}
+- {code: AC_PIPE_FT, category: ac, kind: conditional, unit: per_ft, amount: 450, included_qty: 10, condition: {number: pipe_run_ft, gt: 10},
+   title: {hi: "कॉपर पाइप (अतिरिक्त)", mr: "कॉपर पाइप (अतिरिक्त)", en: "Copper pipe (extra)"}, test_data: true}
+- {code: AC_N2_TEST, category: ac, kind: mandatory, unit: flat, amount: 500, title: {hi: "नाइट्रोजन टेस्ट", mr: "नायट्रोजन टेस्ट", en: "Nitrogen test"}, test_data: true}
+- {code: AC_OUT_BRACKET, category: ac, kind: conditional, unit: flat, amount: 1200, condition: {slot: outdoor_spot, eq: wall},
+   title: {hi: "आउटडोर ब्रैकेट", mr: "आउटडोअर ब्रॅकेट", en: "Outdoor bracket"}, test_data: true}
+- {code: AC_DRILL, category: ac, kind: conditional, unit: flat, amount: 800, condition: {slot: wall_hole, eq: needed},
+   title: {hi: "दीवार में छेद (ड्रिलिंग)", mr: "भिंतीला होल (ड्रिलिंग)", en: "Wall drilling"}, test_data: true}
+- {code: AC_STABILISER, category: ac, kind: suggest, unit: flat, amount: 2800, condition: {slot: power_issues, eq: "yes"},
+   title: {hi: "स्टेबलाइज़र", mr: "स्टॅबिलायझर", en: "Stabiliser"},
+   reason: {hi: "aapne voltage issue bataya", mr: "तुम्ही व्होल्टेजचा त्रास सांगितला", en: "you mentioned voltage problems"}, test_data: true}
+- {code: WM_INLET_KIT, category: wm, kind: mandatory, unit: flat, amount: 499, title: {hi: "इनलेट पाइप किट", mr: "इनलेट पाइप किट", en: "Inlet pipe kit"}, test_data: true}
+- {code: WM_INSTALL, category: wm, kind: mandatory, unit: flat, amount: 0, title: {hi: "इंस्टॉलेशन और डेमो — शामिल", mr: "इन्स्टॉलेशन व डेमो — समाविष्ट", en: "Installation and demo — included"}, test_data: true}
+- {code: WM_STAND, category: wm, kind: suggest, unit: flat, amount: 1299, condition: {slot: space, eq: bathroom},
+   title: {hi: "स्टैंड", mr: "स्टँड", en: "Stand"}, reason: {hi: "bathroom ka geela farsh", mr: "बाथरूमचा ओला फरशी", en: "wet bathroom floor"}, test_data: true}
+- {code: LP_OFFICE, category: laptop, kind: optional, unit: flat, amount: 4999, title: {hi: "Office सॉफ़्टवेयर", mr: "Office सॉफ्टवेअर", en: "Office software"}, test_data: true}
+- {code: LP_BAG, category: laptop, kind: optional, unit: flat, amount: 1299, title: {hi: "लैपटॉप बैग", mr: "लॅपटॉप बॅग", en: "Laptop bag"}, test_data: true}

@@ -1,0 +1,105 @@
+myths:
+  - id: gen_online_cheaper
+    belief: "It is cheaper online"
+    proof: kharcha
+    keywords: ["online sasta", "online saste", "online cheaper", "amazon pe", "flipkart pe", "ऑनलाइन सस्ता", "ऑनलाइन स्वस्त"]
+    line: {hi: "सही, ऑनलाइन दाम कभी-कभी कम दिखता है। पूरा खर्च मिलाकर देखें — इंस्टॉलेशन, वारंटी, एक्सचेंज सब यहीं।",
+           mr: "बरोबर, ऑनलाइन किंमत कधी कधी कमी दिसते. पूर्ण खर्च मिळून पाहू — इन्स्टॉलेशन, वॉरंटी, एक्सचेंज सगळं इथेच.",
+           en: "True, online prices can look lower. Let's compare the full cost: installation, warranty and exchange are all here."}
+  - id: gen_only_two_brands
+    belief: "Only one or two brands are real or good"
+    proof: null
+    keywords: ["sirf do brand", "only two brands", "wahi brand achha", "baaki brand bekaar", "सिर्फ़ दो ब्रांड", "फक्त दोन ब्रँड"]
+    line: {hi: "ये ब्रांड भरोसेमंद हैं, सही। पर हर ब्रांड के अच्छे मॉडल हैं — आपके घर के हिसाब से फ़िट देखते हैं।",
+           mr: "हे ब्रँड विश्वासार्ह आहेत, बरोबर. पण प्रत्येक ब्रँडचे चांगले मॉडेल आहेत — तुमच्या घरानुसार योग्य बघू.",
+           en: "Those brands are trusted, yes. Every brand has good models, so let's match one to your home."}
+objections:
+  too_expensive:
+    keywords: ["bahut mehenga", "bahut mehnga", "too expensive", "costly hai", "budget se bahar", "बहुत महंगा", "खूप महाग"]
+    line: {hi: "समझ सकता हूँ, बजट मायने रखता है। आपके घर के लिए कम खर्च वाला सही विकल्प भी है — दिखाऊँ?",
+           mr: "समजू शकतो, बजेट महत्त्वाचं आहे. तुमच्या घरासाठी कमी खर्चाचा योग्य पर्यायही आहे — दाखवू?",
+           en: "I understand, budget matters. There's a lower-cost option that still fits your home. Shall I show it?"}
+    buttons: [value_option, emi, exchange]
+  cheaper_online:
+    use_myth: gen_online_cheaper
+    keywords: ["online sasta", "online saste", "online cheaper", "online kam", "ऑनलाइन सस्ता", "ऑनलाइन स्वस्त"]
+    buttons: [cost_show, offers, go]
+  need_to_think:
+    keywords: ["soch ke", "sochke", "sochna hai", "think about it", "baad mein aayenge", "सोचकर", "सोचना है", "विचार करून"]
+    line: {hi: "बिल्कुल, सोचकर लीजिए। सब कुछ आपके WhatsApp पर भेज दूँ, ताकि घर पर सब देख सकें?",
+           mr: "नक्कीच, विचार करून घ्या. सगळं तुमच्या WhatsApp वर पाठवू, म्हणजे घरी सगळे पाहू शकतील?",
+           en: "Of course, take your time. Shall I send everything to your WhatsApp so the family can see it?"}
+    buttons: [parivaar, task, go]
+  brand_doubt:
+    keywords: ["brand pe bharosa nahi", "naya brand", "ye brand kaisa", "brand doubt", "ब्रांड पर भरोसा नहीं", "ब्रँडवर विश्वास नाही"]
+    line: {hi: "सवाल सही है। वारंटी और सर्विस की पूरी जानकारी कार्ड पर है — साथ में देखते हैं।",
+           mr: "प्रश्न योग्य आहे. वॉरंटी आणि सर्व्हिसची पूर्ण माहिती कार्डवर आहे — सोबत बघूया.",
+           en: "Fair question. Warranty and service details are on the card; let's look together."}
+    buttons: [cost_show, expert, go]
+  installation_worry:
+    keywords: ["installation ki tension", "installer nahi aaya", "installation worry", "install ka dar", "इंस्टॉलेशन की चिंता", "इन्स्टॉलेशनची काळजी"]
+    line: {hi: "चिंता सही है। इंस्टॉलर को पहले से दीवार, सॉकेट और मंज़िल की जानकारी जाएगी, और चालू होने तक हम साथ हैं।",
+           mr: "काळजी रास्त आहे. इन्स्टॉलरला आधीच भिंत, सॉकेट आणि मजल्याची माहिती जाईल, आणि चालू होईपर्यंत आम्ही सोबत आहोत.",
+           en: "Fair worry. The installer gets your wall, socket and floor details in advance, and we stay with you until it works."}
+    buttons: [cost_show, parivaar, go]
+  waiting_for_sale:
+    keywords: ["sale ka wait", "sale mein lenge", "diwali sale", "waiting for sale", "सेल का इंतज़ार", "सेलची वाट"]
+    line: {hi: "सही सोच है। आज के ऑफ़र {valid_to} तक हैं — तारीख़ कार्ड पर लिख दी है।",
+           mr: "योग्य विचार आहे. आजच्या ऑफर {valid_to} पर्यंत आहेत — तारीख कार्डवर लिहिली आहे.",
+           en: "Makes sense. Today's offers run until {valid_to}; the date is on the card."}
+    buttons: [parivaar, task, go]
+price_rescue:
+  line: {hi: "₹{low} से ₹{high} तक है। आपके कमरे के हिसाब से सही वाला दिखाऊँ? बस 2 सवाल।",
+         mr: "₹{low} ते ₹{high} पर्यंत आहे. तुमच्या खोलीनुसार योग्य दाखवू का? फक्त 2 प्रश्न.",
+         en: "It's between ₹{low} and ₹{high}. Shall I show the right one for your room? Just 2 questions."}
+need_validation:
+  line: {hi: "बहुत सही सोचा है। एक बार कमरे से मिला लेते हैं — बस 2 सवाल।",
+         mr: "छान विचार केलाय. एकदा खोलीशी जुळवून बघू — फक्त 2 प्रश्न.",
+         en: "Good thinking. Let's match it to your room: just 2 questions."}
+complete_line: {hi: "ये पूरा खर्च है — बिल में यही आएगा।", mr: "हा पूर्ण खर्च आहे — बिलात हेच येईल.", en: "This is the full cost. The bill will match it."}
+finance_line:
+  {hi: "₹{monthly} महीना, {months} महीने; फ़ीस ₹{fee}; कुल ₹{total} — अभी देने से ₹{extra} ज़्यादा।",
+   mr: "दरमहा ₹{monthly}, {months} महिने; फी ₹{fee}; एकूण ₹{total} — आत्ता भरल्यापेक्षा ₹{extra} जास्त.",
+   en: "₹{monthly} a month for {months} months, ₹{fee} fee: ₹{total} in all, ₹{extra} more than paying now."}
+close_question: {hi: "डिलीवरी {day1} को चाहिए या {day2} को?", mr: "डिलिव्हरी {day1} ला हवी की {day2} ला?", en: "Delivery on {day1} or {day2}?"}
+consent_ask: {hi: "क्या मैं ये सब आपके WhatsApp पर भेज दूँ?", mr: "हे सगळं तुमच्या WhatsApp वर पाठवू का?", en: "May I send all this to your WhatsApp?"}
+trial_close: {hi: "{best} की तस्वीर कैसी लगी?", mr: "{best} चं चित्र कसं वाटलं?", en: "How did you like the picture on {best}?"}
+no_data_holding: {hi: "ये मैं पक्का करके बताता हूँ, एक मिनट।", mr: "हे मी खात्री करून सांगतो, एक मिनिट.", en: "Let me confirm that for you, one minute."}
+banned_phrases: ["today only", "sirf aaj", "aaj hi", "आज ही", "सिर्फ़ आज", "फक्त आज", "last piece", "aakhri piece", "आखिरी पीस", "शेवटचा पीस",
+                 "because of the war", "war ki wajah", "real brand", "asli brand", "just written", "bas likha hai", "likha hai bas"]
+
+# ---- additions for offline (no-AI) understanding ----
+intent_keywords:
+  new_customer: ["naya customer", "new customer", "naye customer", "नया ग्राहक", "नया कस्टमर", "नवीन ग्राहक"]
+  price_asked: ["kitne ka", "kitna hai", "kitne ki", "price kya", "price bata", "daam", "kya rate", "दाम", "कितने का", "कितना है", "किंमत", "किती आहे", "किती ला"]
+  request_options: ["options dikhao", "option dikhao", "show options", "kaunsa le", "ऑप्शन दिखाओ", "पर्याय दाखवा"]
+  request_cost: ["poora kharcha", "pura kharcha", "full cost", "total kitna", "पूरा खर्चा", "पूर्ण खर्च"]
+  request_offers: ["offer kya", "offers dikhao", "koi offer", "discount kya", "ऑफ़र", "ऑफर काय", "ऑफर्स"]
+  demo_done: ["dikha diya", "demo ho gaya", "demo done", "dekh liya", "दिखा दिया", "दाखवलं", "डेमो झाला"]
+  consent_yes: ["haan bhej do", "whatsapp pe bhej", "consent hai", "send kar do", "हाँ भेज दो", "हो पाठवा", "पाठवा"]
+  discount_ask: ["% off", "percent off", "thoda kam", "kam karo", "discount do", "aur discount", "थोड़ा कम", "कम करो", "थोडं कमी", "सूट द्या"]
+  sold: ["bik gaya", "sold", "le liya", "order ho gaya", "बिक गया", "विकलं गेलं", "घेतलं"]
+looks_bait: ["ameer", "amir", "rich lag", "rich hai", "rich customer", "paise wale", "paisewale", "mehenga dikhao", "mehnga dikhao", "costly dikhao", "sabse mehenga", "looks rich", "श्रीमंत", "अमीर", "पैसेवाले", "पैसे वाले", "सबसे महंगा"]
+category_keywords:
+  tv: ["tv", "television", "led tv", "qled", "oled", "टीवी", "टीव्ही"]
+  ac: [" ac ", "a.c.", "air conditioner", "split ac", "inverter ac", "एसी", "एअर कंडिशनर"]
+  wm: ["washing", "machine", "washer", "front load", "top load", "वॉशिंग", "मशीन", "वॉशिंग मशीन"]
+  laptop: ["laptop", "notebook", "computer", "macbook", "लैपटॉप", "लॅपटॉप"]
+who_words:
+  papa: ["papa", "pappa", "father", "daddy", "पापा", "बाबा", "वडील"]
+  mummy: ["mummy", "mumma", "mother", "mom ", "मम्मी", "आई"]
+  dada: ["dada ji", "dadaji", "grandfather", "dadu", "दादा जी", "आजोबा"]
+  dadi: ["dadi", "grandmother", "दादी", "आजी"]
+  beta: ["beta", " son ", "ladka", "बेटा", "मुलगा"]
+  beti: ["beti", "daughter", "ladki", "बेटी", "मुलगी"]
+customer_lang_keywords:
+  hi: ["hindi", "हिंदी", "हिन्दी"]
+  mr: ["marathi", "मराठी"]
+  en: ["english", "angrezi", "अंग्रेज़ी", "इंग्रजी"]
+who_titles:
+  papa: {hi: "पापा", mr: "बाबा", en: "Dad"}
+  mummy: {hi: "मम्मी", mr: "आई", en: "Mum"}
+  dada: {hi: "दादा जी", mr: "आजोबा", en: "Grandpa"}
+  dadi: {hi: "दादी जी", mr: "आजी", en: "Grandma"}
+  beta: {hi: "बेटे", mr: "मुलगा", en: "your son"}
+  beti: {hi: "बेटी", mr: "मुलगी", en: "your daughter"}

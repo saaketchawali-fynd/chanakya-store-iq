@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="{{ lang|default('hi') }}">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --indigo: #1B2A4A; --saffron: #E8833A; --green: #2E8B57; --pale-green: #E8F5EC;
+    --pale-orange: #FDF0E4; --pink: #FDECEC; --bg: #FAF8F4; --text: #333333; --muted: #6E6E6E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #ffffff; width: 1080px; }
+  body {
+    font-family: "Noto Sans", "Noto Sans Devanagari", "Kohinoor Devanagari", "Devanagari Sangam MN",
+                 "Helvetica Neue", Arial, sans-serif, "Noto Color Emoji", "Apple Color Emoji";
+    color: var(--text); font-size: 34px; line-height: 1.32;
+    -webkit-font-smoothing: antialiased;
+  }
+  #card {
+    width: 1080px; max-height: 1350px; overflow: hidden; background: var(--bg);
+    border-radius: 28px; position: relative;
+  }
+  .band { background: var(--indigo); color: #fff; padding: 48px 56px 40px 56px; position: relative; }
+  .band .kicker { font-size: 26px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+                  color: var(--saffron); margin-bottom: 8px; }
+  .band h1 { font-size: 52px; font-weight: 700; line-height: 1.2; padding-right: 230px; }
+  .band .sub { font-size: 30px; color: #D6DCE8; margin-top: 10px; }
+  .badge { position: absolute; top: 32px; right: 40px; background: var(--pink); color: #B03A3A;
+           font-size: 22px; font-weight: 800; letter-spacing: 1px; padding: 8px 18px; border-radius: 999px; }
+  .content { padding: 40px 56px 56px 56px; }
+  .label { font-size: 26px; font-weight: 900; color: var(--saffron); text-transform: uppercase;
+           letter-spacing: 1.5px; margin: 28px 0 14px 0; }
+  .label:first-child { margin-top: 0; }
+  .small { font-size: 26px; color: var(--muted); }
+  .muted { color: var(--muted); }
+  .panel { background: #fff; border-radius: 22px; padding: 26px 30px; box-shadow: 0 2px 0 rgba(27,42,74,0.06); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; gap: 24px;
+         padding: 14px 0; border-bottom: 2px solid #EFEAE2; }
+  .row:last-child { border-bottom: none; }
+  .row .k { color: var(--muted); font-size: 30px; flex: 0 0 auto; max-width: 45%; }
+  .row .v { font-weight: 600; text-align: right; }
+  .pill { display: inline-block; font-size: 22px; font-weight: 800; padding: 6px 14px; border-radius: 999px;
+          text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+  .pill.product { background: #E6EAF2; color: var(--indigo); }
+  .pill.zaroori { background: var(--pale-green); color: var(--green); }
+  .pill.sujhav { background: var(--pale-orange); color: #B4611F; }
+  .pill.optional { background: #EFEFEF; color: var(--muted); }
+  .list-item { display: flex; gap: 20px; align-items: flex-start; padding: 12px 0; }
+  .list-item .icon { font-size: 40px; line-height: 1.1; width: 52px; text-align: center; flex: 0 0 52px; }
+  .footer { font-size: 22px; color: var(--muted); padding: 0 56px 36px 56px; display: flex;
+            justify-content: space-between; }
+  .accent-bar { height: 8px; background: var(--saffron); }
+  img.product { max-width: 100%; max-height: 300px; object-fit: contain; display: block; margin: 0 auto; }
+  {% block style %}{% endblock %}
+</style>
+</head>
+<body>
+<div id="card">
+  <div class="band">
+    <span class="badge">{{ L.test_data|default('TEST DATA') }}</span>
+    {% block band %}{% endblock %}
+  </div>
+  <div class="content">
+    {% block content %}{% endblock %}
+  </div>
+  {% block footer %}<div class="footer"><span>Chanakya · Store IQ</span><span>{{ L.test_data|default('TEST DATA') }}</span></div>{% endblock %}
+  <div class="accent-bar"></div>
+</div>
+</body>
+</html>

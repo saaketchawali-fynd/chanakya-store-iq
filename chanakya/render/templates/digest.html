@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block style %}
+  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .kpi { background: #fff; border-radius: 20px; padding: 20px 24px; }
+  .kpi .v { font-size: 48px; font-weight: 800; color: var(--indigo); }
+  .kpi .k { font-size: 24px; color: var(--muted); }
+  table.hm { width: 100%; border-collapse: separate; border-spacing: 6px; font-size: 26px; }
+  table.hm th { font-weight: 700; color: var(--muted); font-size: 22px; text-align: center; }
+  table.hm th.name { text-align: left; }
+  table.hm td { height: 56px; border-radius: 10px; text-align: center; font-weight: 700; color: #fff; }
+  table.hm td.name { background: none; color: var(--text); text-align: left; font-weight: 600; }
+  .gap { background: var(--pale-orange); border-radius: 22px; padding: 22px 28px; font-size: 30px; }
+{% endblock %}
+{% block band %}
+  <div class="kicker">Sabha</div>
+  <h1>{{ L.title }}</h1>
+{% endblock %}
+{% block content %}
+  {% if kpis %}
+  <div class="kpis">
+    {% for k in kpis %}<div class="kpi"><div class="v">{{ k.value_str }}</div><div class="k">{{ k.label }}</div></div>{% endfor %}
+  </div>
+  {% endif %}
+  {% set hm = heatmap|default({}, true) %}
+  {% if hm and hm.associates %}
+  <div class="label">{{ L.heatmap }}</div>
+  <div class="panel">
+    <table class="hm">
+      <tr><th class="name"></th>{% for s in hm.steps|default([]) %}<th>{{ s }}</th>{% endfor %}</tr>
+      {% for a in hm.associates %}
+      {% set row = (hm.cells|default([]))[loop.index0] if loop.index0 < (hm.cells|default([]))|length else [] %}
+      <tr><td class="name">{{ a }}</td>
+        {% for s in hm.steps|default([]) %}
+        {% set c = row[loop.index0] if loop.index0 < row|length else None %}
+        {% if c is none %}<td style="background:#D9D6D0">–</td>
+        {% else %}
+          {% set v = c|float %}
+          {% if v >= 1.5 %}{% set col = '#2E8B57' %}{% elif v >= 0.75 %}{% set col = '#E8833A' %}{% else %}{% set col = '#C94A4A' %}{% endif %}
+          <td style="background: {{ col }}">{{ c }}</td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+  {% if gaps_text %}
+  <div class="label">{{ L.gaps }}</div>
+  <div class="gap">{{ gaps_text }}</div>
+  {% endif %}
+{% endblock %}

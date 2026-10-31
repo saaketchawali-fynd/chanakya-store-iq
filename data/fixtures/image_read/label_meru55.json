@@ -1,0 +1,20 @@
+{
+  "kind": "label",
+  "brand": "Meru",
+  "model_text": "Meru 55 QLED Pro",
+  "category": "tv",
+  "size_in": 55,
+  "specs": [
+    {
+      "name": "refresh_rate",
+      "value": "120",
+      "unit": "Hz"
+    },
+    {
+      "name": "brightness",
+      "value": "600",
+      "unit": "nits"
+    }
+  ],
+  "confidence": 0.95
+}

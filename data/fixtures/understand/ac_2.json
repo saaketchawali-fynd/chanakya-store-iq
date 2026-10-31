@@ -1,0 +1,37 @@
+{
+ "language": "hi",
+ "customer_language": null,
+ "category": "ac",
+ "customer_name": "Joshi ji",
+ "sports_viewer": null,
+ "slots": [
+  {
+   "slot": "sun_exposure",
+   "value": "no"
+  },
+  {
+   "slot": "power_issues",
+   "value": "yes"
+  }
+ ],
+ "numbers": [
+  {
+   "name": "room_size_sqft",
+   "value": 150
+  },
+  {
+   "name": "hours_per_day",
+   "value": 10
+  }
+ ],
+ "intents": [
+  "customer_info"
+ ],
+ "claim_id": null,
+ "objection": null,
+ "option_choice": null,
+ "library_id": null,
+ "question_for_expert": null,
+ "customer_request": null,
+ "transcript": "Joshi ji ka bedroom 150 square feet, dhoop seedhi nahi aati, roz das ghante AC chalega, voltage upar neeche hota hai"
+}
