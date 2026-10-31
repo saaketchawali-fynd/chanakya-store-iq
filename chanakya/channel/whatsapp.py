@@ -149,7 +149,14 @@ class WhatsAppChannel:
         raise ValueError(f"unknown kind {m.kind}")
 
     async def send(self, msg: OutMessage) -> str:
-        data = await self._post(f"{self.s.wa_phone_number_id}/messages", json=self.payload(msg))
+        try:
+            data = await self._post(f"{self.s.wa_phone_number_id}/messages", json=self.payload(msg))
+        except SendError:
+            t = msg.to or ""
+            err = dict(diag.snapshot().get("last_send_error") or {})
+            err["to"] = f"{t[:2]}{'*' * max(0, len(t) - 4)}{t[-2:]}"
+            diag.mark("last_send_error", err)
+            raise
         diag.bump("sent_ok")
         diag.mark("last_send_ok_at")
         return (data.get("messages") or [{}])[0].get("id", "")

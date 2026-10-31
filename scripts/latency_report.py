@@ -16,7 +16,10 @@ from chanakya.log import setup_logging
 from chanakya.sim.harness import Harness
 
 NOTES = [
-    ("fixture", "assess_1"), ("fixture", "noisy_partial"), ("fixture", "price_ask"), ("fixture", "assess_2_claim"),
+    ("fixture", "assess_1"),
+    ("fixture", "noisy_partial"),
+    ("fixture", "price_ask"),
+    ("fixture", "assess_2_claim"),
     ("rules", "Shah ji ka living room, sofa se das feet, dhoop aati hai, papa cricket dekhte hain"),
     ("rules", "खोलीत ऊन येतं, टीव्ही भिंतीवर लावणार, सोफ्यापासून 10 फूट"),
     ("rules", "customer pooch rahe hain ye TV kitne ka hai"),

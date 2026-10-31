@@ -3,6 +3,7 @@ WA_TOKEN / WA_BUSINESS_ACCOUNT_ID / WA_PHONE_NUMBER_ID env vars) and never print
 
     python scripts/wa_check.py               # read-only checks
     python scripts/wa_check.py --subscribe   # also link the WhatsApp Business Account to this app
+    python scripts/wa_check.py --send 91XXXXXXXXXX   # send Meta's hello_world template with this token
 
 Checks: the token works; the phone number ID is the number you are messaging; the WABA is subscribed to an app
 (needed for message webhooks); and what the live Chanakya service has received (/health)."""
@@ -45,6 +46,12 @@ def main() -> None:
     h = {"Authorization": f"Bearer {token}"}
     with httpx.Client(timeout=20) as c:
         show("Token belongs to", c.get(f"{GRAPH}/me", headers=h))
+        r = c.get(f"{GRAPH}/debug_token", headers=h, params={"input_token": token})
+        td = r.json().get("data", {}) if r.status_code < 400 else {}
+        print(
+            f"\nToken was issued for app: {td.get('application')} (app id {td.get('app_id')})"
+            "  ← must be the app whose webhook points at Chanakya"
+        )
         if not waba:  # find the WhatsApp Business Account(s) this token was granted
             r = c.get(f"{GRAPH}/debug_token", headers=h, params={"input_token": token})
             dbg = r.json().get("data", {}) if r.status_code < 400 else {}
@@ -80,6 +87,24 @@ def main() -> None:
                 show("Subscribing this WABA to the app", c.post(f"{GRAPH}/{waba}/subscribed_apps", headers=h))
             elif subs.get("data") == []:
                 print("\n→ No app is subscribed. Re-run with --subscribe to link it.")
+        if "--send" in sys.argv:
+            i = sys.argv.index("--send")
+            to = "".join(ch for ch in (sys.argv[i + 1] if len(sys.argv) > i + 1 else "") if ch.isdigit())
+            if len(to) == 10:
+                to = "91" + to
+            show(
+                f"Sending the hello_world template to {to} with THIS token",
+                c.post(
+                    f"{GRAPH}/{phone_id}/messages",
+                    headers=h,
+                    json={
+                        "messaging_product": "whatsapp",
+                        "to": to,
+                        "type": "template",
+                        "template": {"name": "hello_world", "language": {"code": "en_US"}},
+                    },
+                ),
+            )
         d = c.get(f"{SERVICE}/health").json().get("delivery", {})
         print("\nChanakya has received:", {k: v for k, v in d.items() if v} or "nothing yet")
         if p.get("display_phone_number"):

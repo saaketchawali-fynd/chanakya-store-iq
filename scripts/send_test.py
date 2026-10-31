@@ -11,9 +11,14 @@ from chanakya.core.contracts import Button, OutMessage
 async def main(to: str, text: str) -> None:
     ch = WhatsAppChannel(get_settings())
     try:
-        wamid = await ch.send(OutMessage(to=to, kind="buttons", body=text,
-                                         buttons=[Button(id="g:new", title="Naya customer"),
-                                                  Button(id="g:help", title="Madad")]))
+        wamid = await ch.send(
+            OutMessage(
+                to=to,
+                kind="buttons",
+                body=text,
+                buttons=[Button(id="g:new", title="Naya customer"), Button(id="g:help", title="Madad")],
+            )
+        )
         print("sent", wamid)
     finally:
         await ch.close()
