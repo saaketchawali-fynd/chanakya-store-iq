@@ -49,6 +49,7 @@ class ProductWithStock:
     nearby_store_id: str | None
     nearby_qty: int
     delivery_days: int
+    info: dict = field(default_factory=dict)  # series, year, colours, warranty, in_box, features, model_number
 
     @property
     def price_source(self) -> str:
@@ -132,6 +133,7 @@ class FactsService:
             nearby_store_id=st.nearby_store_id,
             nearby_qty=st.nearby_qty or 0,
             delivery_days=st.delivery_days or 1,
+            info=p.info or {},
         )
 
     def product_sync(self, sku: str, store_id: str | None = None) -> ProductWithStock | None:

@@ -48,6 +48,10 @@ def eligible(o: Offer, product, home: HomeCard, bank: str | None, emi: bool, tod
         return False
     if any(k.startswith("with_tv") for k in flt):  # bundle offers need a TV in the same bill (not modelled)
         return False
+    if flt.get("skus") and product.sku not in flt["skus"]:
+        return False
+    if flt.get("brands") and product.brand not in flt["brands"]:
+        return False
     if (o.min_amount or 0) > product.price:
         return False
     req = o.requires or {}

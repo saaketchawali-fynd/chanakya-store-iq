@@ -37,6 +37,7 @@ class TryonRequest:
     products: list[TryonProduct]  # 1–2
     wall_width_ft: float | None = None
     niche_width_cm: float | None = None
+    existing_tv_size_in: float | None = None  # size of the TV already on that wall, if the associate stated it
     distance_text: str | None = None  # e.g. 'Sofa se 10 ft' (pre-formatted)
     footer_text: str = DEFAULT_FOOTER
 

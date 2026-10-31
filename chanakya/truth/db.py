@@ -28,11 +28,25 @@ def session() -> AsyncSession:
     return _factory()
 
 
+# Columns added after the first deploy (create_all never alters an existing table).
+_ADDED_COLUMNS = [("products", "info", "JSONB", "JSON", "'{}'")]
+
+
 async def create_all(drop: bool = False) -> None:
     async with engine().begin() as conn:
         if drop:
             await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
+        pg = conn.dialect.name == "postgresql"
+        for table, col, pg_type, lite_type, default in _ADDED_COLUMNS:
+            if pg:
+                await conn.exec_driver_sql(
+                    f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col} {pg_type} DEFAULT {default}"
+                )
+            else:
+                cols = [r[1] for r in (await conn.exec_driver_sql(f"PRAGMA table_info({table})")).fetchall()]
+                if col not in cols:
+                    await conn.exec_driver_sql(f"ALTER TABLE {table} ADD COLUMN {col} {lite_type} DEFAULT {default}")
 
 
 async def dispose() -> None:

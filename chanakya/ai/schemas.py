@@ -86,6 +86,11 @@ class Box(BaseModel):
     box_2d: list[int]  # [ymin, xmin, ymax, xmax], normalised 0–1000
 
 
+class Point(BaseModel):
+    x: int  # normalised 0-1000
+    y: int  # normalised 0-1000
+
+
 class ImageRead(BaseModel):
     kind: Literal["label", "room", "other"]
     # label fields
@@ -101,6 +106,9 @@ class ImageRead(BaseModel):
     light: Literal["sunny", "moderate", "dim"] | None = None
     frontal: bool | None = None  # photo taken roughly facing the wall
     people_present: bool = False
+    wall_corners: list[Point] = []  # main free wall: top-left, top-right, bottom-right, bottom-left (0-1000)
+    floor_y: int | None = None  # where the main wall meets the floor, at the wall's centre (0-1000)
+    ceiling_y: int | None = None  # where the main wall meets the ceiling, at the wall's centre (0-1000)
 
 
 # ---------- 8.5 Visit log ----------

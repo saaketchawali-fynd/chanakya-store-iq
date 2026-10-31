@@ -67,6 +67,7 @@ class Product(_Ts, Base):
     dims: Mapped[dict] = mapped_column(J, default=dict)
     energy: Mapped[dict] = mapped_column(J, default=dict)
     image: Mapped[str | None] = mapped_column(Text, nullable=True)
+    info: Mapped[dict] = mapped_column(J, default=dict)  # series, year, colours, warranty, in_box, features, ...
     test_data: Mapped[bool] = mapped_column(Boolean, default=True)
 
 

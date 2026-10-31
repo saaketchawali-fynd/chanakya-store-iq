@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from datetime import date
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from sqlalchemy import func, select
 from chanakya.config import ROOT, Settings
 from chanakya.truth import db
 from chanakya.truth.models import (
+    AppSetting,
     Charge,
     Content,
     ExchangeValue,
@@ -40,12 +42,25 @@ def _clean(row: dict, model) -> dict:
     return {k: v for k, v in row.items() if k in cols}
 
 
+def seed_hash(seed_dir: Path = SEED_DIR) -> str:
+    h = hashlib.sha256()
+    for f in sorted(seed_dir.glob("*.yaml")):
+        h.update(f.name.encode())
+        h.update(f.read_bytes())
+    return h.hexdigest()[:16]
+
+
 async def load(force: bool = False, seed_dir: Path = SEED_DIR) -> bool:
-    """Load seed rows if the products table is empty (or force). Returns True if loaded."""
+    """Load the catalogue if the products table is empty, the seed files changed since the last load, or force.
+    Only truth tables are replaced; sessions, events, tasks and scores are kept. Returns True if loaded."""
+    digest = seed_hash(seed_dir)
     async with db.session() as s:
         n = (await s.execute(select(func.count()).select_from(Product))).scalar_one()
-        if n and not force:
+        row = await s.get(AppSetting, "seed_hash")
+        same = bool(row and (row.value or {}).get("v") == digest)
+        if n and same and not force:
             return False
+        force = force or bool(n)
         if force:
             for m in (
                 PriceStock,
@@ -83,6 +98,10 @@ async def load(force: bool = False, seed_dir: Path = SEED_DIR) -> bool:
             s.add(Guide(id=kind, kind=kind, rows=rows))
         for r in _load("content.yaml", seed_dir):
             s.add(Content(**_clean(r, Content)))
+        if row is None:
+            s.add(AppSetting(key="seed_hash", value={"v": digest}))
+        else:
+            row.value = {"v": digest}
         await s.commit()
     return True
 
