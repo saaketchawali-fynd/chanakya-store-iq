@@ -6,6 +6,7 @@ import asyncio
 import time
 from datetime import UTC, datetime
 
+from chanakya.app import diag
 from chanakya.core import clock, fallback, locks, repo, router
 from chanakya.core.contracts import Event, InboundMessage, OutMessage, Reply, Step
 from chanakya.log import get_log
@@ -46,6 +47,11 @@ class Orchestrator:
             ctx = None
             try:
                 ctx = await router.build_context(msg, self.svc)
+                w = msg.from_wa_id
+                diag.mark(
+                    "last_inbound",
+                    {"role": ctx.role, "type": msg.type, "from": f"{w[:2]}{'*' * max(0, len(w) - 4)}{w[-2:]}"},
+                )
                 reply = await router.dispatch(ctx)
             except Exception:
                 log.exception("skill_failed", wa_id=msg.from_wa_id, type=msg.type)

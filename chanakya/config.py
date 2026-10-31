@@ -65,13 +65,20 @@ class Settings(BaseSettings):
     )
     @classmethod
     def _digits_only(cls, v: str) -> str:
-        """'+91 98765-43210' → '919876543210' (WhatsApp sends senders as digits only)."""
+        """'+91 98765-43210' / '09876543210' / '9876543210' → '919876543210' (WhatsApp sends senders as
+        country code + number, digits only). A bare 10-digit number is taken as Indian."""
         d = "".join(ch for ch in (v or "") if ch.isdigit())
-        return d[2:] if d.startswith("00") else d
+        if d.startswith("00"):
+            d = d[2:]
+        if len(d) == 11 and d.startswith("0"):
+            d = d[1:]
+        if len(d) == 10:
+            d = "91" + d
+        return d
 
     @property
     def role_switch_phones(self) -> set[str]:
-        return {"".join(c for c in p if c.isdigit()) for p in self.demo_role_switch_allowed.split(",") if p.strip()}
+        return {self._digits_only(p) for p in self.demo_role_switch_allowed.split(",") if p.strip()}
 
     @property
     def is_postgres(self) -> bool:
