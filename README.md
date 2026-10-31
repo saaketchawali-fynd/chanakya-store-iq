@@ -22,7 +22,16 @@ uvicorn chanakya.app.main:app --reload --port 8000
 ngrok http --url=<your-static-domain> 8000 # set https://<domain>/webhook + WA_VERIFY_TOKEN in Meta
 # send "Namaste" from the associate phone
 ```
-SQLite is the default locally. For Railway, set `DATABASE_URL=postgresql://…`; it is converted to `postgresql+asyncpg://`. Tables are created at startup and the seed loads if `products` is empty. Set `TEST_DATABASE_URL` to run the tests on Postgres.
+SQLite is the default locally. In production, set `DATABASE_URL=postgresql://…`; it is converted to `postgresql+asyncpg://`. Tables are created at startup and the seed loads if `products` is empty. Set `TEST_DATABASE_URL` to run the tests on Postgres.
+
+## Deploy on Render
+`render.yaml` describes one always-on Docker web service (Starter plan) and a managed Postgres 16, both in Singapore.
+1. In the Render dashboard, choose **New → Blueprint** and pick this GitHub repo.
+2. When asked, type the `sync: false` values yourself: `WA_TOKEN`, `WA_PHONE_NUMBER_ID`, `WA_APP_SECRET`, `WA_TEST_NUMBER` and the test phones. `WA_VERIFY_TOKEN` and `ADMIN_TOKEN` are generated for you.
+3. Once the deploy is live, open `https://<service>.onrender.com/health`. It should show `"ok": true`.
+4. In Meta → WhatsApp → Configuration → Webhook, set the callback URL to `https://<service>.onrender.com/webhook`. Use the generated `WA_VERIFY_TOKEN` (from the service's Environment page) and subscribe to `messages`.
+
+Every push to `main` redeploys automatically.
 
 ## Simulator
 `python -m chanakya.sim` starts an interactive session. The commands are `as <role>`, `say`, `voice <fixture>`, `photo`, `tap`, `pick`, `clock`, `dump` and `quit`. Add `--rules` to use the offline understanding instead of fixtures, and `--render` to save card images.

@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 TZ=Asia/Kolkata
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ffmpeg fonts-noto-core fonts-noto-color-emoji libraqm0 curl && rm -rf /var/lib/apt/lists/*

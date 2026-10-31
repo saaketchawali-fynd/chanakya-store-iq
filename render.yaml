@@ -1,0 +1,57 @@
+# Render Blueprint: one always-on web service (Docker) + managed Postgres, Singapore (nearest to India).
+# Render dashboard → New → Blueprint → pick this repo. Keys marked `sync: false` are asked for in the
+# dashboard; type the WhatsApp secrets there yourself (they are never stored in this repo).
+services:
+  - type: web
+    name: chanakya
+    runtime: docker
+    plan: starter            # always on; the free plan sleeps and the first WhatsApp reply would take ~1 min
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chanakya-db
+          property: connectionString
+      - key: WA_TOKEN
+        sync: false
+      - key: WA_PHONE_NUMBER_ID
+        sync: false
+      - key: WA_APP_SECRET
+        sync: false
+      - key: WA_TEST_NUMBER
+        sync: false
+      - key: ASSOCIATE_PHONE
+        sync: false
+      - key: CUSTOMER_PHONE
+        sync: false
+      - key: MANAGER_PHONE
+        sync: false
+      - key: EXPERT_PHONE
+        sync: false
+      - key: WA_VERIFY_TOKEN
+        generateValue: true
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: WA_API_VERSION
+        value: v23.0
+      - key: AI_MODE
+        value: rules
+      - key: STORE_ID
+        value: RD-JUHU
+      - key: DEMO_MODE
+        value: "true"
+      - key: TZ_NAME
+        value: Asia/Kolkata
+      - key: LOG_LEVEL
+        value: INFO
+
+databases:
+  - name: chanakya-db
+    plan: basic-256mb
+    region: singapore
+    databaseName: chanakya
+    user: chanakya
+    postgresMajorVersion: "16"
