@@ -48,6 +48,7 @@ async def health(request: Request):
     }
     return {
         "ok": bool(rt) and db_ok,
+        "version": (__import__("os").environ.get("RENDER_GIT_COMMIT") or "local")[:7],
         "db": db_ok,
         "renderer": bool(rt and rt.renderer and getattr(rt.renderer, "ready", False)),
         "packs": len(rt.packs.packs) if rt else 0,
