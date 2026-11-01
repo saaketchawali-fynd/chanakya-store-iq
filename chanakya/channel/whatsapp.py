@@ -171,7 +171,10 @@ class WhatsAppChannel:
             data={"messaging_product": "whatsapp", "type": mime},
             files={"file": (filename, data, mime)},
         )
-        self._media_cache[key] = (res["id"], time.time())
+        now = time.time()
+        if len(self._media_cache) > 500:  # uploads are valid for a day; forget older ones
+            self._media_cache = {k: v for k, v in self._media_cache.items() if now - v[1] < 24 * 3600}
+        self._media_cache[key] = (res["id"], now)
         return res["id"]
 
     async def download_media(self, media_id: str) -> tuple[bytes, str]:

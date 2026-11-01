@@ -19,7 +19,7 @@ from chanakya.log import get_log
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
-from chanakya.tryon import TryonProduct, TryonRequest, run
+from chanakya.tryon import TryonProduct, TryonRequest, relabel, run
 
 log = get_log("tryon_flow")
 OLD_TV_SIZES = (24, 32, 40, 43, 50, 55, 65)
@@ -304,12 +304,15 @@ async def job(ctx: SkillContext) -> Reply:
         drawn.append([p.sku for p, _ in pl])
         copy = None
         if ctx.alang != "en":  # the associate's copy: same drawing, the words in their language
-            rc = await run(replace(req, distance_text=dist_text(ctx.alang), footer_text=ctx.t("tryon_footer", ctx.alang)),
-                           editor=None, harmonise=False, timeout=8)
-            copy = rc.image
+            copy = await relabel(replace(req, distance_text=dist_text(ctx.alang),
+                                         footer_text=ctx.t("tryon_footer", ctx.alang)), res)
+        res.prepared = res.final = None  # the full-size drawing is not needed any more
         msgs.append(C.with_copy(ctx, _tryon_message(ctx, pl, res.image), copy))
     ms = int((time.perf_counter() - t0) * 1000)
-    diag.mark("tryon_last", {"mode": req_spec.get("mode"), "images": len(msgs), "read_ms": t_read, "total_ms": ms})
+    from chanakya.app import memory
+
+    diag.mark("tryon_last", {"mode": req_spec.get("mode"), "images": len(msgs), "read_ms": t_read, "total_ms": ms,
+                             "mem_mb": memory.used_mb()})
     if not msgs:
         btns = [ctx.b("b_other_wall", ctx.sid("photo_yes")), ctx.b("b_go", ctx.sid("go"))]
         return ctx.reply(info_reply(ctx, ctx.t("tryon_failed"), btns))

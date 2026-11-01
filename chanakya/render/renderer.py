@@ -1472,15 +1472,37 @@ def make_env() -> Environment:
     return env
 
 
+# Chromium keeps part of every card it draws (pictures included) for as long as its page process lives, so the
+# page process is replaced every RECYCLE_AFTER cards, and sooner when the instance nears its memory limit.
+RECYCLE_AFTER = 25
+MEMORY_HIGH = 0.8  # share of the instance's memory limit
+CHROMIUM_ARGS = [
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--disable-extensions",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--no-first-run",
+    "--mute-audio",
+    "--renderer-process-limit=1",
+    "--js-flags=--max-old-space-size=128",
+]
+
+
 class Renderer:
-    def __init__(self, pool_size: int = 2):
+    """One Chromium page behind a lock (cards are drawn one at a time, ~0.3 s each)."""
+
+    def __init__(self):
         self.env = make_env()
-        self.pool_size = pool_size
         self.ready = False
         self.pw = None
         self.browser = None
         self.ctx = None
-        self.pages: asyncio.Queue | None = None
+        self.page = None
+        self._lock = asyncio.Lock()
+        self.renders = 0  # cards drawn by the current page process
+        self.fresh_starts = 0
         self.last_ms: dict[str, int] = {}
         self.start_attempted = False
 
@@ -1490,13 +1512,8 @@ class Renderer:
             from playwright.async_api import async_playwright
 
             self.pw = await async_playwright().start()
-            self.browser = await self.pw.chromium.launch(args=["--no-sandbox", "--disable-dev-shm-usage"])
-            self.ctx = await self.browser.new_context(
-                viewport={"width": WIDTH, "height": MAX_HEIGHT}, device_scale_factor=1
-            )
-            self.pages = asyncio.Queue()
-            for _ in range(self.pool_size):
-                await self.pages.put(await self.ctx.new_page())
+            self.browser = await self.pw.chromium.launch(args=CHROMIUM_ARGS)
+            await self._fresh()
             self.ready = True
         except Exception:
             self.ready = False
@@ -1510,6 +1527,23 @@ class Renderer:
                     )
                 except Exception:
                     pass
+            async with self._lock:
+                await self._fresh()  # fonts and templates are warm; start serving from a clean page process
+
+    async def _fresh(self) -> None:
+        """A new context and page; closing the old context ends its page process and everything it kept."""
+        if not self.browser.is_connected():  # Chromium itself died (e.g. killed under memory pressure)
+            self.browser, self.ctx = await self.pw.chromium.launch(args=CHROMIUM_ARGS), None
+        old = self.ctx
+        self.ctx = await self.browser.new_context(viewport={"width": WIDTH, "height": MAX_HEIGHT}, device_scale_factor=1)
+        self.page = await self.ctx.new_page()
+        self.renders = 0
+        if old is not None:
+            self.fresh_starts += 1
+            try:
+                await old.close()
+            except Exception:
+                pass
 
     async def _close_quietly(self) -> None:
         for obj in (self.ctx, self.browser):
@@ -1523,7 +1557,7 @@ class Renderer:
                 await self.pw.stop()
         except Exception:
             pass
-        self.pw = self.browser = self.ctx = None
+        self.pw = self.browser = self.ctx = self.page = None
 
     async def stop(self) -> None:
         self.ready = False
@@ -1538,18 +1572,36 @@ class Renderer:
             **data, d=data, lang=card.lang, L=lb, t=t_for(card.lang), template=card.template
         )
 
+    def _needs_fresh(self) -> bool:
+        if self.page is None or self.page.is_closed() or self.renders >= RECYCLE_AFTER:
+            return True
+        from chanakya.app import memory
+
+        used = memory.used_fraction()
+        if used is not None and used > MEMORY_HIGH and self.renders > 0:
+            from chanakya.log import get_log
+
+            get_log("renderer").warning("memory_high_fresh_chromium", renders=self.renders, **memory.snapshot())
+            return True
+        return False
+
     async def _render_html(self, card: Card) -> bytes:
         html = self.html(card)
-        page = await self.pages.get()
-        try:
-            await page.set_content(html, wait_until="load")
-            await page.evaluate("document.fonts.ready")
-            # scale slightly-too-tall content to ≤ 1350 px (down to MIN_FIT_SCALE); beyond that CSS clips
-            await page.evaluate(_FIT_JS, [MAX_HEIGHT, MIN_FIT_SCALE, WIDTH])
-            el = await page.query_selector("#card")
-            return await el.screenshot(type="jpeg", quality=88)
-        finally:
-            await self.pages.put(page)
+        async with self._lock:
+            if self._needs_fresh():
+                await self._fresh()
+            self.renders += 1
+            page = self.page
+            try:
+                await page.set_content(html, wait_until="load")
+                await page.evaluate("document.fonts.ready")
+                # scale slightly-too-tall content to ≤ 1350 px (down to MIN_FIT_SCALE); beyond that CSS clips
+                await page.evaluate(_FIT_JS, [MAX_HEIGHT, MIN_FIT_SCALE, WIDTH])
+                # a locator, not query_selector: an element handle is never freed and keeps the whole card alive
+                return await page.locator("#card").screenshot(type="jpeg", quality=88)
+            except BaseException:
+                self.renders = RECYCLE_AFTER  # a failed or timed-out page is replaced before the next card
+                raise
 
     async def render(self, card: Card) -> bytes:
         t0 = time.perf_counter()
@@ -1562,6 +1614,9 @@ class Renderer:
                 return render_pillow(card)
         finally:
             self.last_ms[card.template] = int((time.perf_counter() - t0) * 1000)
+
+    def stats(self) -> dict:
+        return {"ready": self.ready, "cards_on_page": self.renders, "fresh_starts": self.fresh_starts}
 
 
 _singleton: Renderer | None = None

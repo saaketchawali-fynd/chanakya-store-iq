@@ -32,7 +32,7 @@ async def health(request: Request):
         await repo.setting_get("health")
     except Exception:
         db_ok = False
-    from chanakya.app import diag
+    from chanakya.app import diag, memory
 
     s = get_settings()
     phones = {
@@ -62,6 +62,8 @@ async def health(request: Request):
         "renderer": bool(rt and rt.renderer and getattr(rt.renderer, "ready", False)),
         "packs": len(rt.packs.packs) if rt else 0,
         "tryon_fonts": _fonts(),
+        "memory": memory.snapshot(),
+        "chromium": rt.renderer.stats() if rt and rt.renderer and hasattr(rt.renderer, "stats") else None,
         "config": config,
         "delivery": diag.snapshot(),
     }

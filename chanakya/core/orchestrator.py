@@ -117,6 +117,13 @@ class Orchestrator:
                 )
         except Exception:
             log.exception("persist_failed")
+        from chanakya.app import memory
+
+        wid = ctx.inbound.wa_message_id if ctx.inbound else ""
+        step = ctx.session.step if ctx.session else None
+        log.info("handled", what=wid.split(":")[1] if wid.startswith("job:") else (ctx.inbound.type if ctx.inbound else None),
+                 step=getattr(step, "value", step), out=len(reply.messages),
+                 mem_mb=memory.used_mb())  # one line per handled message: what ran, and memory after it
         for job in reply.background:
             if ctx.session:
                 self.spawn(self.run_job(job, ctx.session.id, ctx.session.associate_wa_id))

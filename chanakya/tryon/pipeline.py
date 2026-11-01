@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import io
+import threading
 import time
 from dataclasses import dataclass, field
 
@@ -19,6 +20,9 @@ from chanakya.tryon import annotate, harmonise, place, privacy, read_room, rende
 MAX_WIDTH = 1080
 JPEG_QUALITY = 88
 DEFAULT_FOOTER = "Approx. preview · to scale · TEST DATA"
+# One drawing at a time: each needs ~120 MB at its peak, and a timed-out thread keeps running, so two at once
+# could take the instance over its memory limit.
+_HEAVY = threading.Lock()
 
 
 @dataclass
@@ -62,6 +66,8 @@ class TryonResult:
     perspective: bool = False  # True when the wall corners gave a homography
     quads: list[tuple[str, tuple[tuple[float, float], ...]]] = field(default_factory=list)  # (sku, TL TR BR BL)
     label_boxes: list[tuple[str, tuple[int, int, int, int]]] = field(default_factory=list)
+    prepared: _Prepared | None = field(default=None, repr=False)  # kept for relabel(); dropped by the caller
+    final: Image.Image | None = field(default=None, repr=False)
 
 
 def _jpeg(img: Image.Image) -> bytes:
@@ -117,6 +123,11 @@ def _prepare(req: TryonRequest, res: TryonResult) -> _Prepared | None:
     return _Prepared(category, placed, composite, sc, room)
 
 
+def _heavy(fn, *args):
+    with _HEAVY:
+        return fn(*args)
+
+
 def _annotated(req: TryonRequest, prep: _Prepared, img: Image.Image, res: TryonResult) -> bytes:
     out, boxes = annotate.annotate(img, prep.placed, req.distance_text, req.footer_text, prep.sc.wall, prep.room)
     res.label_boxes = boxes
@@ -124,22 +135,24 @@ def _annotated(req: TryonRequest, prep: _Prepared, img: Image.Image, res: TryonR
 
 
 async def _run(req: TryonRequest, editor, do_harmonise: bool, res: TryonResult) -> None:
-    prep = await asyncio.to_thread(_prepare, req, res)
+    prep = await asyncio.to_thread(_heavy, _prepare, req, res)
     if prep is None:
         return
     # keep a usable image from here on, even if a later step fails or times out
-    res.image = await asyncio.to_thread(_annotated, req, prep, prep.composite, res)
+    res.image = await asyncio.to_thread(_heavy, _annotated, req, prep, prep.composite, res)
+    res.prepared, res.final = prep, prep.composite
     final = prep.composite
     if do_harmonise and editor is not None and prep.category == "tv":
         edited = await harmonise.run(editor, prep.composite)
         primary = next((p for p in prep.placed if p.solid), prep.placed[0] if prep.placed else None)
         if edited is not None and primary is not None:
-            ok = await asyncio.to_thread(verify.check, prep.composite, edited, primary.box, primary.quad)
+            ok = await asyncio.to_thread(_heavy, verify.check, prep.composite, edited, primary.box, primary.quad)
             if ok:
                 final = edited.resize(prep.composite.size) if edited.size != prep.composite.size else edited
                 res.harmonised = res.verified = True
     if final is not prep.composite:
-        res.image = await asyncio.to_thread(_annotated, req, prep, final, res)
+        res.image = await asyncio.to_thread(_heavy, _annotated, req, prep, final, res)
+        res.final = final
 
 
 async def run(req: TryonRequest, editor=None, harmonise: bool = False, timeout: float = 30) -> TryonResult:
@@ -154,4 +167,19 @@ async def run(req: TryonRequest, editor=None, harmonise: bool = False, timeout: 
     except Exception as e:  # never block the conversation
         res.error = f"{type(e).__name__}: {e}"
     res.ms = round((time.perf_counter() - t0) * 1000)
+    from chanakya.app import memory
+
+    memory.trim()
     return res
+
+
+async def relabel(req: TryonRequest, res: TryonResult, timeout: float = 8) -> bytes | None:
+    """The same drawing with other words (the associate's-language copy): only the labels are drawn again."""
+    if res.prepared is None or res.final is None:
+        return None
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(_heavy, _annotated, req, res.prepared, res.final, TryonResult()), timeout
+        )
+    except Exception:
+        return None

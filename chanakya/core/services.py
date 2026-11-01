@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from collections import deque
+
 from chanakya.channel.base import Channel, SendError
 from chanakya.config import Settings
 from chanakya.core import fallback, validator
@@ -24,7 +26,7 @@ class Services:
         self.ai = ai
         self.sessions = SessionRepo()
         self._render = render  # async (Card) -> bytes
-        self.violations: list[validator.Violation] = []
+        self.violations: deque[validator.Violation] = deque(maxlen=200)  # recent ones only, for debugging
         self.orchestrator = None  # set by Orchestrator
 
     def media_name(self, media_id: str | None) -> str | None:
