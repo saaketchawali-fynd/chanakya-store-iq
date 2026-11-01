@@ -57,6 +57,9 @@ class ListSection(BaseModel):
     rows: list[ListRow]
 
 
+CUSTOMER_PHONE_LANG = "en"  # every message and visual on the customer's own phone (the user's rule)
+
+
 class Card(BaseModel):
     template: Literal["home", "benefit", "options", "kharcha", "parivaar", "score", "brief", "digest", "catalog", "product", "compare", "offer"]
     lang: Lang  # language of the card text
@@ -73,6 +76,11 @@ class OutMessage(BaseModel):
     sections: list[ListSection] = []  # ≤ 10 rows total
     card: Card | None = None  # rendered to an image (standalone image, or header of a buttons message)
     image_bytes: bytes | None = None  # e.g. try-on output, QR
+    # Customer-facing visuals are in English; the associate also gets one copy in their own language, sent
+    # just before this message (so the buttons stay last). None when the associate's language is English.
+    card_copy: Card | None = None
+    image_copy: bytes | None = None
+    copy_caption: str | None = None
     media_id: str | None = None  # pre-uploaded media
     caption: str | None = None  # image/video/document caption (≤ 3 lines)
     filename: str | None = None  # document

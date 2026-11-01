@@ -92,7 +92,7 @@ slots:
     phase: life
     title: {hi: "Poore din battery", mr: "दिवसभर बॅटरी", en: "All-day battery"}
     ask: {hi: "पूरे दिन बिना चार्जर के चलना चाहिए?", mr: "दिवसभर चार्जरशिवाय चालायला हवा का?", en: "Should it last the whole day without a charger?"}
-    why: {hi: "Poore din ke liye zyada battery ghante", mr: "दिवसभरासाठी जास्त बॅटरी तास", en: "All-day use needs more battery hours"}
+    why: {hi: "Poore din ke liye zyada battery hours", mr: "दिवसभरासाठी जास्त बॅटरी hours", en: "All-day use needs more battery hours"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
       - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
@@ -197,14 +197,14 @@ benefits:
     when_spec: {weight_kg: {lte: 1.6}}
     when_slots: {carry: {in: [daily]}}
     cites: [carry]
-    say: {hi: "{weight_kg} किलो — रोज़ बैग में हल्का।", mr: "{weight_kg} किलो — रोज बॅगेत हलका.", en: "{weight_kg} kg: light in the bag every day."}
+    say: {hi: "{weight_kg} kg — रोज़ बैग में हल्का।", mr: "{weight_kg} kg — रोज बॅगेत हलका.", en: "{weight_kg} kg: light in the bag every day."}
     card: {hi: "रोज़ बैग में हल्का", mr: "रोज बॅगेत हलका", en: "Light for daily carry"}
   - id: b_battery
     weight: 2
     when_spec: {battery_h: {gte: 10}}
     when_slots: {battery_need: {in: ["yes"]}}
     cites: [battery_need]
-    say: {hi: "{battery_h} घंटे — पूरा कॉलेज दिन बिना चार्जर।", mr: "{battery_h} तास — पूर्ण कॉलेज दिवस चार्जरशिवाय.", en: "{battery_h} hours: a full college day without a charger."}
+    say: {hi: "{battery_h} h — पूरा कॉलेज दिन बिना चार्जर।", mr: "{battery_h} h — पूर्ण कॉलेज दिवस चार्जरशिवाय.", en: "{battery_h} hours: a full college day without a charger."}
     card: {hi: "पूरा दिन बिना चार्जर", mr: "दिवसभर चार्जरशिवाय", en: "All day, no charger"}
   - id: b_gpu_design
     weight: 2
@@ -245,7 +245,7 @@ demos:
     title: {hi: "Screen demo", mr: "स्क्रीन डेमो", en: "Screen demo"}
     when_slots: {carry: {in: [daily]}}
     differs_on: null
-    steps: {hi: "Laptop ko khidki ke paas le jaakar brightness poori kariye", mr: "लॅपटॉप खिडकीजवळ नेऊन ब्राइटनेस पूर्ण करा", en: "Take the laptop near the window and turn brightness up"}
+    steps: {hi: "Laptop ko khidki ke paas le jaakar brightness poori kariye", mr: "लॅपटॉप खिडकीजवळ नेऊन brightness पूर्ण करा", en: "Take the laptop near the window and turn brightness up"}
     say: {hi: "खिड़की की रोशनी में भी स्क्रीन देखिए।", mr: "खिडकीच्या प्रकाशातही स्क्रीन बघा.", en: "Check the screen even in window light."}
 
 myths:
@@ -294,3 +294,10 @@ quiz:
       - {id: c, title: {hi: "Baad mein", mr: "नंतर", en: "Later"}}
     correct: b
     explain: {hi: "EMI ka poora kharcha ek line mein: mahina, fees, kul aur kitna zyada.", mr: "EMI चा पूर्ण खर्च एका ओळीत: महिना, फी, एकूण आणि किती जास्त.", en: "The full EMI cost in one line: monthly, fee, total and the extra."}
+
+needs:
+  perf_ok: {hi: "Design software", mr: "Design software", en: "Design software"}
+  coding_ok: {hi: "Coding", mr: "Coding", en: "Coding"}
+  carry_ok: {hi: "रोज़ बैग में", mr: "रोज बॅगेत", en: "Carried every day"}
+  battery_ok: {hi: "पूरे दिन की battery", mr: "दिवसभराची battery", en: "All-day battery"}
+  gaming_ok: {hi: "Gaming", mr: "Gaming", en: "Gaming"}

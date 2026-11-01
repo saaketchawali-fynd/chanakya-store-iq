@@ -10,7 +10,7 @@ from chanakya.core import repo, state
 from chanakya.core.buttons import encode
 from chanakya.core.clock import today
 from chanakya.core.coach import coach_reply, info_reply
-from chanakya.core.contracts import Button, OutMessage, Reply, Step
+from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, OutMessage, Reply, Step
 from chanakya.i18n.lang import fill
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -148,14 +148,22 @@ async def quote(ctx: SkillContext, alt: bool = False) -> Reply:
                     payable=res.payable_str)
     else:
         why = ctx.t("kyun_no_offer", payable=res.payable_str)
-    card = offer_card(ctx, p, res, q, extras, total_str, pay, bank)
+    async def build():  # offer names, dates and the EMI sentence in the card's language (same numbers)
+        r = await offers_engine.best_stack(sku, s.home, ctx.facts, ctx.reg, today(), bank=bank, emi=emi, lang=ctx.clang)
+        fq = None
+        if emi:
+            b1, b2 = await finance.best_plan(p.category, r.payable, bank, ctx.facts, ctx.reg, lang=ctx.clang)
+            fq = b2 if (alt and b2) else b1
+        return offer_card(ctx, p, r, fq, extras, total_str, pay, bank)
+
+    card, copy = await C.dual_async(ctx, build)
     cites = C.known_cites(ctx, ["exchange_old", "mounting", "outdoor_spot", "family_size", "power_cuts", "carry"])
     btns = [
         ctx.b("b_book_delivery", ctx.sid("delivery")),
         ctx.b("b_not_today", ctx.sid("nottoday")),
         ctx.b("b_send_customer", ctx.sid("sendoffer")),
     ]
-    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+    return ctx.reply(C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy))
 
 
 def _also(ctx: SkillContext, p, applied_ids: set[str], pay: str) -> list[dict]:
@@ -227,7 +235,7 @@ async def send_to_customer(ctx: SkillContext) -> Reply:
     os_ = s.offer_snapshot or {}
     sku = os_.get("sku") or _sku(ctx)
     p = ctx.facts.product_sync(sku)
-    lang = s.home.customer_lang
+    lang = CUSTOMER_PHONE_LANG
     lines = [C.product_title(ctx, p, lang)]
     if s.cost_snapshot:
         lines[0] += " · " + ctx.t(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Protocol
@@ -36,14 +37,31 @@ class SkillContext:
     asking: set[str] = field(default_factory=set)  # slots being asked about (allowed Kyun cites)
     events: list[Event] = field(default_factory=list)
     scratch: dict[str, Any] = field(default_factory=dict)
+    lang_override: str | None = None  # set by as_lang() while a customer-facing visual is built
 
     @property
-    def lang(self) -> str:
+    def alang(self) -> str:
+        """The associate's chosen language (never overridden)."""
         return self.staff.lang if self.staff and self.staff.lang else "en"
 
     @property
+    def lang(self) -> str:
+        return self.lang_override or self.alang
+
+    @property
     def clang(self) -> str:
+        if self.lang_override:
+            return self.lang_override
         return self.session.home.customer_lang if self.session else self.lang
+
+    @contextmanager
+    def as_lang(self, lang: str):
+        """Build a visual in one language: every string inside (associate and customer) comes out in `lang`."""
+        prev, self.lang_override = self.lang_override, lang
+        try:
+            yield self
+        finally:
+            self.lang_override = prev
 
     @property
     def pack(self) -> Pack | None:

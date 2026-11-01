@@ -15,11 +15,11 @@ list_product: {hi: "Product chuniye", mr: "उत्पादन निवडा
 cat_tv: {hi: "TV", mr: "टीव्ही", en: "TV"}
 cat_tv_d: {hi: "Size, picture aur awaaz, kamre ke hisaab se", mr: "खोलीनुसार साइज, पिक्चर आणि आवाज", en: "Size, picture and sound for the room"}
 cat_ac: {hi: "AC", mr: "AC", en: "AC"}
-cat_ac_d: {hi: "Ton, bijli ka bill, voltage aur installation", mr: "टन, वीज बिल, व्होल्टेज आणि इन्स्टॉलेशन", en: "Tonnage, power bill, voltage and installation"}
+cat_ac_d: {hi: "Ton, bijli ka bill, voltage aur installation", mr: "ton, वीज बिल, व्होल्टेज आणि इन्स्टॉलेशन", en: "Tonnage, power bill, voltage and installation"}
 cat_wm: {hi: "Washing machine", mr: "वॉशिंग मशीन", en: "Washing machine"}
-cat_wm_d: {hi: "Kilo, paani, jagah aur parivaar", mr: "किलो, पाणी, जागा आणि कुटुंब", en: "Kg, water, space and family"}
+cat_wm_d: {hi: "Kg, paani, jagah aur parivaar", mr: "kg, पाणी, जागा आणि कुटुंब", en: "Kg, water, space and family"}
 cat_fridge: {hi: "Fridge", mr: "फ्रिज", en: "Fridge"}
-cat_fridge_d: {hi: "Litre, freezer, jagah aur bijli", mr: "लिटर, फ्रीझर, जागा आणि वीज", en: "Litres, freezer, space and power cuts"}
+cat_fridge_d: {hi: "Litre, freezer, jagah aur bijli", mr: "litre, फ्रीझर, जागा आणि वीज", en: "Litres, freezer, space and power cuts"}
 cat_laptop: {hi: "Laptop", mr: "लॅपटॉप", en: "Laptop"}
 cat_laptop_d: {hi: "Padhai ya kaam, software, battery", mr: "अभ्यास की काम, सॉफ्टवेअर, बॅटरी", en: "Study or work, software, battery"}
 ask_category: {hi: "Customer kaunsa product dekh rahe hain?", mr: "ग्राहक कोणतं उत्पादन बघत आहेत?", en: "Which product is the customer looking at?"}
@@ -175,3 +175,10 @@ parivaar_sent_presale: {hi: "{name} ko poori jaankari bhej di. Ek follow-up task
 kyun_consent_note: {hi: "{note} · Bina consent kuch nahi bhejte", mr: "{note} · संमतीशिवाय काहीही पाठवत नाही", en: "{note} · Nothing is sent without consent"}
 row_payable: {hi: "आज का कुल खर्च", mr: "आजचा एकूण खर्च", en: "Total today"}
 bolo_readback_laptop: {hi: "तो आपके लिए: {facts}। सही समझा?", mr: "तर तुमच्यासाठी: {facts}. बरोबर समजलो का?", en: "So, for you: {facts}. Did I get that right?"}
+footer_shown_customer: {hi: "Customer ko dikhaya · unka jawab tap kijiye", mr: "ग्राहकाला दाखवलं · त्यांचं उत्तर टॅप करा", en: "Shown to the customer · tap their answer"}
+stock_in_store_c: {hi: "स्टोर में {qty}", mr: "स्टोअरमध्ये {qty}", en: "{qty} in store"}
+stock_nearby_c: {hi: "{days} दिन में डिलीवरी ({store} से)", mr: "{days} दिवसांत डिलिव्हरी ({store} मधून)", en: "Delivery in {days} days (from {store})"}
+footer_photo_saved: {hi: "Photo save hui · options isi jagah dikhenge", mr: "फोटो सेव्ह झाला · पर्याय याच जागी दिसतील", en: "Photo saved · the picks will show in this spot"}
+tryon_drawing: {hi: "Jagah naap rahe hain, product laga rahe hain — kuch second.", mr: "जागा मोजतोय, उत्पादन लावतोय — काही सेकंद.", en: "Measuring the spot and placing it: a few seconds."}
+tryon_footer: {hi: "अनुमानित झलक · सही अनुपात में · TEST DATA", mr: "अंदाजे झलक · योग्य प्रमाणात · TEST DATA", en: "Approx. preview · to scale · TEST DATA"}
+copy_caption: {hi: "Aapki copy (Hindi) · customer ko English wali dikhaiye", mr: "तुमची प्रत (मराठी) · ग्राहकाला English वाली दाखवा", en: "Your copy"}

@@ -66,18 +66,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         ctx.x["pending_cost"] = True
         return ctx.reply(C.question_reply(ctx, site))
     ctx.x.pop("pending_cost", None)
-    include_sug = not ctx.x.get("suggestions_off")
-    sheet = await hisaab.compute(
-        s.chosen_sku,
-        s.home,
-        ctx.facts,
-        pack,
-        ctx.reg,
-        lang=ctx.clang,
-        include_suggestions=include_sug,
-        include_optional=bool(ctx.x.get("optional_on")),
-        exclude_codes=tuple(ctx.x.get("dropped_codes") or ()),
-    )
+    sheet = await _sheet(ctx, "en")  # the customer's bill is in English; the associate gets a copy in theirs
     s.cost_snapshot = sheet.model_dump(mode="json")
     state.advance(s, Step.COMPLETE)
     first_price = "first_price_event" not in ctx.x
@@ -93,7 +82,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
 
         who = ctx.x.get("price_first_by") or ("none" if s.demo_done else "associate")
         mark_first_price(ctx, who)
-    card = kharcha_card(ctx, sheet)
+    card, copy = await _cards(ctx, sheet)
     used_site = [sid for sid in pack.cost_slots if P.known(s.home, sid)]
     why = ctx.t("kyun_complete")
     site_reason = _site_reason(ctx, sheet)
@@ -106,7 +95,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         ctx.b("b_show_customer", ctx.sid("cost_show")),
     ]
     say = ctx.pick(ctx.packs.common_line("complete_line"), ctx.clang)
-    msg = coach_reply(ctx, say, why, cites, btns, card=card)
+    msg = C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy)
     if ctx.x.pop("removed_note", None):
         msg.footer = ctx.x.pop("removed_footer", None) or msg.footer
     return ctx.reply(msg)
@@ -164,6 +153,32 @@ def _site_reason(ctx: SkillContext, sheet: hisaab.CostSheet) -> str | None:
         if line.code == "AC_PIPE_FT" and line.qty:
             return ctx.t("site_reason_pipe", ft=ctx.reg.num(line.qty, "card:pipe_run_ft", "ft"))
     return None
+
+
+async def _sheet(ctx: SkillContext, lang: str) -> hisaab.CostSheet:
+    s = ctx.session
+    return await hisaab.compute(
+        s.chosen_sku,
+        s.home,
+        ctx.facts,
+        ctx.pack,
+        ctx.reg,
+        lang=lang,
+        include_suggestions=not ctx.x.get("suggestions_off"),
+        include_optional=bool(ctx.x.get("optional_on")),
+        exclude_codes=tuple(ctx.x.get("dropped_codes") or ()),
+    )
+
+
+async def _cards(ctx: SkillContext, sheet: hisaab.CostSheet) -> tuple[Card, Card | None]:
+    """The English bill card + the associate's-language copy (same sheet, line names in their language)."""
+    with ctx.as_lang("en"):
+        en = kharcha_card(ctx, sheet)
+    if ctx.alang == "en":
+        return en, None
+    local = await _sheet(ctx, ctx.alang)
+    with ctx.as_lang(ctx.alang):
+        return en, kharcha_card(ctx, local)
 
 
 def kharcha_card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
@@ -231,13 +246,14 @@ async def resend_card(ctx: SkillContext) -> Reply:
         if isinstance(v, str):
             ctx.reg.raw(v, "snapshot:lifetime")
     say = ctx.pick(ctx.packs.common_line("complete_line"), ctx.clang)
-    msg = OutMessage(
-        to=ctx.actor_wa_id,
-        kind="image",
-        card=kharcha_card(ctx, sheet),
-        body=f'"{say}"',
-        allowed_numbers=ctx.reg.allowed(),
-    )
+    btns = [  # the customer has seen it: what next (never a dead end)
+        ctx.b("b_looks_good", ctx.sid("offers")),
+        ctx.b("b_remove_item", ctx.sid("cost_rm")),
+        ctx.b("b_not_today", ctx.sid("nottoday")),
+    ]
+    card, copy = await _cards(ctx, sheet)
+    msg = C.with_copy(ctx, info_reply(ctx, f'"{say}"', btns, card=card), copy)
+    msg.footer = ctx.t("footer_shown_customer")
     return ctx.reply(msg)
 
 

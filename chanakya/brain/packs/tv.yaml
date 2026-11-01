@@ -35,17 +35,17 @@ slots:
     number: old_tv_in
     ask_if: {slot: trigger, in: [replace]}
     title: {hi: "Purana TV", mr: "जुना टीव्ही", en: "Old TV"}
-    ask: {hi: "अभी वाला टीवी कितने इंच का है?", mr: "सध्याचा टीव्ही किती इंचाचा आहे?", en: "How big is the TV you have now?"}
+    ask: {hi: "अभी वाला टीवी कितने inch का है?", mr: "सध्याचा टीव्ही किती inch चा आहे?", en: "How big is the TV you have now?"}
     why: {hi: "Zyada-tar parivaar purane se ek size bada lekar khush rehte hain", mr: "बहुतेक कुटुंबं जुन्यापेक्षा एक साइज मोठा घेऊन समाधानी असतात", en: "Most families are happiest one size up from the old TV"}
     quick:
-      - {id: o32, number: 32, title: {hi: "32 inch tak", mr: "32 इंचपर्यंत", en: "Up to 32 inch"}}
-      - {id: o43, number: 43, title: {hi: "40-43 inch", mr: "40-43 इंच", en: "40-43 inch"}}
-      - {id: o50, number: 55, title: {hi: "50 inch ya bada", mr: "50 इंच किंवा मोठा", en: "50 inch or bigger"}}
+      - {id: o32, number: 32, title: {hi: "32 inch tak", mr: "32 inch पर्यंत", en: "Up to 32 inch"}}
+      - {id: o43, number: 43, title: {hi: "40-43 inch", mr: "40-43 inch", en: "40-43 inch"}}
+      - {id: o50, number: 55, title: {hi: "50 inch ya bada", mr: "50 inch किंवा मोठा", en: "50 inch or bigger"}}
     values: [o32, o43, o50]
     value_titles:
-      o32: {hi: "Purana TV 32 inch tak", mr: "जुना टीव्ही 32 इंचपर्यंत", en: "old TV up to 32 inch"}
-      o43: {hi: "Purana TV 40-43 inch", mr: "जुना टीव्ही 40-43 इंच", en: "old TV 40-43 inch"}
-      o50: {hi: "Purana TV 50 inch+", mr: "जुना टीव्ही 50 इंच+", en: "old TV 50 inch or bigger"}
+      o32: {hi: "Purana TV 32 inch tak", mr: "जुना टीव्ही 32 inch पर्यंत", en: "old TV up to 32 inch"}
+      o43: {hi: "Purana TV 40-43 inch", mr: "जुना टीव्ही 40-43 inch", en: "old TV 40-43 inch"}
+      o50: {hi: "Purana TV 50 inch+", mr: "जुना टीव्ही 50 inch+", en: "old TV 50 inch or bigger"}
     bands: [{max: 34, value: o32}, {max: 46, value: o43}, {max: 99, value: o50}]
   - id: room
     phase: life
@@ -125,23 +125,28 @@ slots:
   - id: content
     multi: true
     phase: life
-    title: {hi: "Kya dekhte hain", mr: "काय पाहतात", en: "What they watch"}
-    ask: {hi: "घर में कौन क्या देखता है — क्रिकेट, सीरियल, फ़िल्में?", mr: "घरात कोण काय पाहतं — क्रिकेट, मालिका, सिनेमे?", en: "Who watches what at home: cricket, serials, movies?"}
-    why: {hi: "Isse motion aur sound ki zaroorat pata chalti hai", mr: "यावरून मोशन आणि आवाजाची गरज कळते", en: "This tells us the motion and sound needs"}
+    title: {hi: "Live match", mr: "लाइव्ह मॅच", en: "Live sports"}
+    ask: {hi: "घर में लाइव क्रिकेट या मैच कितनी बार देखते हैं?", mr: "घरात लाइव्ह क्रिकेट किंवा मॅच किती वेळा पाहता?", en: "How often is live cricket or sports on at home?"}
+    why: {hi: "Tez shot par basic screen mein ball dhundhli hoti hai; isse pata chalta hai motion kitna zaroori", mr: "वेगवान शॉटवर साध्या स्क्रीनमध्ये बॉल धूसर दिसतो; यावरून मोशन किती महत्त्वाचं ते कळतं", en: "On a basic screen the ball blurs on fast shots; this tells us how much motion matters"}
     quick:
-      - {id: sports, title: {hi: "Cricket/sports", mr: "क्रिकेट/खेळ", en: "Cricket/sports"}}
-      - {id: movies, title: {hi: "Movies/OTT", mr: "सिनेमे/OTT", en: "Movies/OTT"}}
-      - {id: serials, title: {hi: "Serial/news", mr: "मालिका/बातम्या", en: "Serials/news"}}
-    values: [sports, serials, movies, kids, gaming]
+      - {id: sports, title: {hi: "Har match", mr: "प्रत्येक मॅच", en: "Every match"}}
+      - {id: sports_some, title: {hi: "Kabhi-kabhi", mr: "कधी कधी", en: "Sometimes"}}
+      - {id: few_sports, title: {hi: "Kam hi", mr: "क्वचितच", en: "Rarely"}}
+    values: [sports, sports_some, few_sports, serials, movies, kids, gaming]
+    exclusive: [[sports, sports_some, few_sports]]
     value_titles:
-      sports: {hi: "Cricket/sports", mr: "क्रिकेट/खेळ", en: "Cricket/sports"}
+      sports: {hi: "Har match dekhte", mr: "प्रत्येक मॅच पाहतात", en: "Watches every match"}
+      sports_some: {hi: "Kabhi-kabhi match", mr: "कधी कधी मॅच", en: "Sports sometimes"}
+      few_sports: {hi: "Match kam hi", mr: "मॅच क्वचितच", en: "Rarely sports"}
       serials: {hi: "Serial/news", mr: "मालिका/बातम्या", en: "Serials/news"}
       movies: {hi: "Movies/OTT", mr: "सिनेमे/OTT", en: "Movies/OTT"}
       kids: {hi: "Bachche/cartoon", mr: "मुलं/कार्टून", en: "Kids/cartoons"}
       gaming: {hi: "Gaming", mr: "गेमिंग", en: "Gaming"}
-    priors: {sports: 0.45, serials: 0.35, movies: 0.2}
+    priors: {sports: 0.4, sports_some: 0.4, few_sports: 0.2}
     keywords:
-      sports: ["cricket", "match", "sports", "football", "ipl", "क्रिकेट", "मैच", "खेळ"]
+      sports: ["cricket", "match", "sports", "football", "ipl", "har match", "every match", "क्रिकेट", "मैच", "खेळ", "हर मैच", "प्रत्येक मॅच"]
+      sports_some: ["kabhi kabhi match", "kabhi-kabhi match", "sometimes cricket", "match kabhi kabhi", "कभी कभी मैच", "कधी कधी मॅच"]
+      few_sports: ["match kam", "cricket nahi", "sports nahi", "rarely sports", "मैच कम", "क्रिकेट नहीं", "मॅच क्वचित"]
       serials: ["serial", "news", "samachar", "सीरियल", "न्यूज़", "मालिका", "बातम्या"]
       movies: ["movie", "movies", "film", "films", "netflix", "ott", "picture", "फ़िल्म", "फिल्म", "फिल्में", "सिनेमा", "सिनेमे"]
       kids: ["bachche", "bacche", "cartoon", "kids", "बच्चे", "कार्टून", "मुलं"]
@@ -298,6 +303,7 @@ fit_rules:
   - {id: size_ok, weight: 3, slot: seat_distance, kind: size_band}            # 1 in range, 0.5 adjacent size, 0 else
   - {id: bright_ok, weight: 2, slot: room_light, when: {in: [sunny]}, spec_any: [{brightness_nits: {gte: 500}}, {anti_glare: {eq: true}}], else: 0.3}
   - {id: motion_ok, weight: 2, slot: content, when: {has_any: [sports, gaming]}, spec_any: [{refresh_hz: {gte: 120}}], else: 0.4}
+  - {id: motion_some, weight: 1, slot: content, when: {has_any: [sports_some]}, spec_any: [{refresh_hz: {gte: 120}}], else: 0.7}
   - {id: dialogue_ok, weight: 1, slot: elders, when: {in: ["yes"]}, spec_any: [{dialogue_enhance: {eq: true}}], else: 0.5}
   - {id: angle_ok, weight: 1, slot: seating, when: {in: [wide]}, spec_any: [{wide_angle: {eq: true}}], else: 0.6}
   - {id: dark_ok, weight: 1, slot: room_light, when: {in: [dim]}, spec_any: [{panel: {in: [OLED, MiniLED]}}], else: 0.6}
@@ -305,6 +311,7 @@ reasons:
   size_ok: {hi: "{distance} ft ke liye sahi size", mr: "{distance} ft साठी योग्य साइज", en: "Right size for {distance} ft"}
   bright_ok: {hi: "Dhoop mein bhi saaf", mr: "उन्हातही स्पष्ट", en: "Clear even in sun"}
   motion_ok: {hi: "Cricket smooth, ball blur nahi", mr: "क्रिकेट स्मूथ, बॉल धूसर नाही", en: "Smooth cricket, no blur"}
+  motion_some: {hi: "Match ke din bhi smooth", mr: "मॅचच्या दिवशीही स्मूथ", en: "Smooth on match days too"}
   dialogue_ok: {hi: "Dialogue saaf, kam awaaz mein bhi", mr: "कमी आवाजातही संवाद स्पष्ट", en: "Clear dialogue at low volume"}
   angle_ok: {hi: "Side se bhi rang sahi", mr: "बाजूनेही रंग योग्य", en: "True colour from the side"}
   dark_ok: {hi: "Andhere mein asli kaala", mr: "अंधारात खरा काळा", en: "True black in the dark"}
@@ -315,7 +322,7 @@ benefits:
   - id: b_motion
     weight: 2
     when_spec: {refresh_hz: {gte: 120}}
-    when_slots: {content: {has_any: [sports, gaming]}}
+    when_slots: {content: {has_any: [sports, sports_some, gaming]}}
     cites: [content]
     say: {hi: "{refresh_hz} Hz मतलब क्रिकेट में बॉल धुंधली नहीं होगी।", mr: "{refresh_hz} Hz म्हणजे क्रिकेटमध्ये बॉल धूसर दिसणार नाही.", en: "{refresh_hz} Hz means the ball stays sharp in cricket."}
     say_who: {hi: "{refresh_hz} Hz मतलब {who} के क्रिकेट में बॉल धुंधली नहीं होगी।"}
@@ -332,7 +339,7 @@ benefits:
     when_spec: {size_in: {in_size_band: true}}
     when_slots: {seat_distance: {known: true}}
     cites: [seat_distance]
-    say: {hi: "{size} इंच आपकी {distance} फ़ुट की दूरी के लिए सही है।", mr: "{size} इंच तुमच्या {distance} फूट अंतरासाठी योग्य आहे.", en: "{size} inches is right for your {distance} ft distance."}
+    say: {hi: "{size} inch आपकी {distance} ft की दूरी के लिए सही है।", mr: "{size} inch तुमच्या {distance} ft अंतरासाठी योग्य आहे.", en: "{size} inches is right for your {distance} ft distance."}
     card: {hi: "आपकी दूरी के लिए सही साइज़", mr: "तुमच्या अंतरासाठी योग्य साइज", en: "Right size for your distance"}
   - id: b_dialogue
     weight: 1
@@ -378,7 +385,7 @@ demos:
     say: {hi: "धूप जैसी रोशनी में {best} साफ़ दिखता है — आपके कमरे में धूप आती है।", mr: "उन्हासारख्या प्रकाशात {best} स्पष्ट दिसतो — तुमच्या खोलीत ऊन येतं.", en: "In bright light {best} stays clear, and your room gets sun."}
   - id: motion_cricket
     title: {hi: "Cricket demo", mr: "क्रिकेट डेमो", en: "Cricket demo"}
-    when_slots: {content: {has_any: [sports, gaming]}}
+    when_slots: {content: {has_any: [sports, sports_some, gaming]}}
     differs_on: refresh_hz
     steps: {hi: "Dono par cricket highlight chalaiye; tez shot par ball dikhaiye", mr: "दोन्हीवर क्रिकेट हायलाइट लावा; वेगवान शॉटवर बॉल दाखवा", en: "Play a cricket highlight on both; point at the ball on a fast shot"}
     say: {hi: "तेज़ शॉट पर बॉल देखिए — {best} में साफ़ रहती है।", mr: "वेगवान शॉटवर बॉल बघा — {best} मध्ये स्पष्ट राहतो.", en: "Watch the ball on a fast shot: it stays sharp on {best}."}
@@ -425,12 +432,12 @@ myths:
            mr: "बरोबर विचार केला, खूप जवळून मोठा टीव्ही थकवतो. तुमच्या अंतरानुसार योग्य साइज असेल तर डोळ्यांवर ताण येत नाही.",
            en: "Fair point: a big screen too close is tiring. Matched to your distance, the right size is easy on the eyes."}
   - id: tv_watts
-    short: {hi: "Zyada watt, achhi awaaz", mr: "जास्त वॉट, चांगला आवाज", en: "More watts, better sound"}
+    short: {hi: "Zyada watt, achhi awaaz", mr: "जास्त watts, चांगला आवाज", en: "More watts, better sound"}
     belief: "More speaker watts means better sound"
     proof: dialogue_low_volume
     keywords: ["zyada watt", "jyada watt", "more watts", "watt zyada", "ज़्यादा वॉट", "जास्त वॉट"]
-    line: {hi: "सही, वॉट से आवाज़ तेज़ होती है। पर साफ़ डायलॉग के लिए साउंड मोड ज़्यादा ज़रूरी है — सुनकर देखिए।",
-           mr: "बरोबर, वॉटने आवाज मोठा होतो. पण स्पष्ट संवादासाठी साउंड मोड जास्त महत्त्वाचा — ऐकून बघा.",
+    line: {hi: "सही, watts से आवाज़ तेज़ होती है। पर साफ़ डायलॉग के लिए साउंड मोड ज़्यादा ज़रूरी है — सुनकर देखिए।",
+           mr: "बरोबर, watts ने आवाज मोठा होतो. पण स्पष्ट संवादासाठी साउंड मोड जास्त महत्त्वाचा — ऐकून बघा.",
            en: "True, watts make it louder. For clear dialogue the sound mode matters more: have a listen."}
 site_needs: [wall_type, socket_near, floor_lift]
 quiz:
@@ -438,8 +445,8 @@ quiz:
     step: translate
     q: {hi: "Customer ka kamra dhoop wala hai. Kaunsa feature batayenge?", mr: "ग्राहकाची खोली उन्हाची आहे. कोणतं फीचर सांगाल?", en: "The customer's room is sunny. Which feature do you explain?"}
     answers:
-      - {id: a, title: {hi: "Brightness", mr: "ब्राइटनेस", en: "Brightness"}}
-      - {id: b, title: {hi: "Speaker watt", mr: "स्पीकर वॉट", en: "Speaker watts"}}
+      - {id: a, title: {hi: "Brightness", mr: "brightness", en: "Brightness"}}
+      - {id: b, title: {hi: "Speaker watts", mr: "speaker watts", en: "Speaker watts"}}
       - {id: c, title: {hi: "HDMI ports", mr: "HDMI पोर्ट", en: "HDMI ports"}}
     correct: a
     explain: {hi: "Dhoop mein bright screen hi saaf dikhti hai — 'dhoop mein bhi saaf' boliye.", mr: "उन्हात ब्राइट स्क्रीनच स्पष्ट दिसते — 'उन्हातही स्पष्ट' सांगा.", en: "In sun only a bright screen stays clear: say 'clear even in sun'."}
@@ -461,3 +468,14 @@ quiz:
       - {id: c, title: {hi: "Kaunsa brand", mr: "कोणता ब्रँड", en: "Which brand"}}
     correct: b
     explain: {hi: "Pehle poochiye: 'Sofa se TV kitne kadam door hoga?' — size wahi tay karta hai.", mr: "आधी विचारा: 'सोफ्यापासून टीव्ही किती पावलं लांब?' — साइज तेच ठरवतं.", en: "Ask first: 'How many steps from the sofa to the TV?' That decides the size."}
+
+# Customer-facing names of each fit rule (the rows of "How each fits your home" on the options card)
+needs:
+  size_ok: {hi: "{distance} ft दूरी के लिए size", mr: "{distance} ft अंतरासाठी size", en: "Size for {distance} ft away"}
+  size_ok_plain: {hi: "आपकी दूरी के लिए size", mr: "तुमच्या अंतरासाठी size", en: "Size for your distance"}
+  bright_ok: {hi: "धूप वाला कमरा", mr: "उन्हाची खोली", en: "Sunny room"}
+  motion_ok: {hi: "हर मैच स्मूथ", mr: "प्रत्येक मॅच स्मूथ", en: "Every match, smooth"}
+  motion_some: {hi: "मैच के दिन स्मूथ", mr: "मॅचच्या दिवशी स्मूथ", en: "Smooth on match days"}
+  dialogue_ok: {hi: "बुज़ुर्गों के लिए साफ़ डायलॉग", mr: "ज्येष्ठांसाठी स्पष्ट संवाद", en: "Clear dialogue for elders"}
+  angle_ok: {hi: "साइड से देखना", mr: "बाजूने पाहणं", en: "Viewing from the side"}
+  dark_ok: {hi: "अंधेरे कमरे में फ़िल्में", mr: "अंधाऱ्या खोलीत सिनेमा", en: "Movies in a dark room"}

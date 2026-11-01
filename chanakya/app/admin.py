@@ -15,6 +15,15 @@ def _auth(token: str | None) -> None:
         raise HTTPException(401)
 
 
+def _fonts() -> dict:
+    try:
+        from chanakya.tryon.fonts import describe
+
+        return describe()
+    except Exception as e:  # noqa: BLE001
+        return {"error": str(e)[:80]}
+
+
 @router.get("/health")
 async def health(request: Request):
     rt = getattr(request.app.state, "rt", None)
@@ -52,6 +61,7 @@ async def health(request: Request):
         "db": db_ok,
         "renderer": bool(rt and rt.renderer and getattr(rt.renderer, "ready", False)),
         "packs": len(rt.packs.packs) if rt else 0,
+        "tryon_fonts": _fonts(),
         "config": config,
         "delivery": diag.snapshot(),
     }

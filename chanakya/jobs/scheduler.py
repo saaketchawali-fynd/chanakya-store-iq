@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from chanakya.core import clock, repo
 from chanakya.core.buttons import encode
-from chanakya.core.contracts import Button, OutMessage
+from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, OutMessage
 from chanakya.core.events import ev
 from chanakya.i18n.lang import t
 from chanakya.log import get_log
@@ -99,7 +99,7 @@ class Scheduler:
             d_minus_1 = day - timedelta(days=1) + timedelta(hours=18)
             slot_end = day + timedelta(hours=end_h)
             cust = s.customer_wa_id
-            lang = s.home.customer_lang
+            lang = CUSTOMER_PHONE_LANG
             p = self.svc.facts.product_sync(job.sku)
             product = p.model if p else job.sku
             changed = False

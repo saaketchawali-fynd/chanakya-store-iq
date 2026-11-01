@@ -85,6 +85,8 @@ async def test_old_tv_on_wall_asks_its_size_then_draws(h):
     await h.tap("s:C1:slot:trigger:new_home")
     await h.tap("s:C1:photo_yes")
     out = await h.photo("wall_with_tv.jpg")
+    assert not any(m.image_bytes for m in out)  # during the questions the photo is only read
+    out = await h.tap("s:C1:tryon")
     ask = next(m for m in out if m.kind == "list")
     rows = [r.id for sec in ask.sections for r in sec.rows]
     assert "s:C1:oldtv:32" in rows and "s:C1:oldtv:none" in rows

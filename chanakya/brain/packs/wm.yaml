@@ -35,7 +35,7 @@ slots:
     number: family_size
     title: {hi: "Parivaar", mr: "कुटुंब", en: "Family size"}
     ask: {hi: "घर में कितने लोग हैं?", mr: "घरात किती लोक आहेत?", en: "How many people live at home?"}
-    why: {hi: "Logon se sahi kilo tay hota hai", mr: "लोकांवरून योग्य किलो ठरतं", en: "Family size decides the right kg"}
+    why: {hi: "Logon se sahi kg tay hota hai", mr: "लोकांवरून योग्य kg ठरतं", en: "Family size decides the right kg"}
     quick:
       - {id: f1_2, number: 2, title: {hi: "1–2 log", mr: "1–2 लोक", en: "1–2 people"}}
       - {id: f3_4, number: 4, title: {hi: "3–4 log", mr: "3–4 लोक", en: "3–4 people"}}
@@ -56,7 +56,7 @@ slots:
     phase: life
     title: {hi: "Dhulai kitni", mr: "धुलाई किती", en: "Wash load"}
     ask: {hi: "कपड़े कितनी बार धुलते हैं — रोज़, एक दिन छोड़कर, या हफ़्ते में?", mr: "कपडे किती वेळा धुता — रोज, एक दिवसाआड, की आठवड्याला?", en: "How often do you wash: daily, every other day, or weekly?"}
-    why: {hi: "Isse kilo aur programme tay hota hai", mr: "यावरून किलो आणि प्रोग्राम ठरतो", en: "This decides kg and programmes"}
+    why: {hi: "Isse kg aur programme tay hota hai", mr: "यावरून kg आणि प्रोग्राम ठरतो", en: "This decides kg and programmes"}
     quick:
       - {id: daily, title: {hi: "Roz", mr: "रोज", en: "Daily"}}
       - {id: alternate, title: {hi: "Ek din chhodkar", mr: "एक दिवसाआड", en: "Every other day"}}
@@ -290,7 +290,7 @@ fit_rules:
   - {id: hard_water_ok, weight: 1, slot: water, when: {in: [hard]}, spec_any: [{heater: {eq: true}}], else: 0.4}
   - {id: dry_ok, weight: 1, slot: drying, when: {in: ["yes"]}, spec_any: [{rpm: {gte: 1000}}], else: 0.4}
 reasons:
-  capacity_ok: {hi: "{people} logon ke liye sahi kilo", mr: "{people} लोकांसाठी योग्य किलो", en: "Right kg for {people} people"}
+  capacity_ok: {hi: "{people} logon ke liye sahi kg", mr: "{people} लोकांसाठी योग्य kg", en: "Right kg for {people} people"}
   width_fit: {hi: "Aapki jagah mein fit", mr: "तुमच्या जागेत बसते", en: "Fits your space"}
   bend_ok: {hi: "Jhukna nahi padega", mr: "वाकावं लागणार नाही", en: "No bending needed"}
   top_pref: {hi: "Aapki pasand: top load", mr: "तुमची आवड: टॉप लोड", en: "Your pick: top load"}
@@ -298,7 +298,7 @@ reasons:
   hard_water_ok: {hi: "Khare paani mein bhi saaf", mr: "खारट पाण्यातही स्वच्छ", en: "Clean even in hard water"}
   dry_ok: {hi: "Baarish mein jaldi sukhe", mr: "पावसात लवकर वाळतात", en: "Dries faster in monsoon"}
   value_fit: {hi: "Ghar ke liye kaafi, kam kharcha", mr: "घरासाठी पुरेसा, कमी खर्च", en: "Enough for the home, costs less"}
-  step_up: {hi: "Zyada kilo, bada parivaar", mr: "जास्त किलो, वाढत्या कुटुंबासाठी", en: "More kg for a growing family"}
+  step_up: {hi: "Zyada kg, bada parivaar", mr: "जास्त kg, वाढत्या कुटुंबासाठी", en: "More kg for a growing family"}
 
 benefits:
   - id: b_kg_big
@@ -306,21 +306,21 @@ benefits:
     when_spec: {capacity_kg: {gte: 8}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "{kg} किलो मतलब एक बार में 2 जींस और 2 बेडशीट।", mr: "{kg} किलो म्हणजे एका वेळी 2 जीन्स आणि 2 बेडशीट.", en: "{kg} kg: two pairs of jeans and two bedsheets in one wash."}
+    say: {hi: "{kg} kg मतलब एक बार में 2 जींस और 2 बेडशीट।", mr: "{kg} kg म्हणजे एका वेळी 2 जीन्स आणि 2 बेडशीट.", en: "{kg} kg: two pairs of jeans and two bedsheets in one wash."}
     card: {hi: "एक बार में 2 जींस + 2 बेडशीट", mr: "एका वेळी 2 जीन्स + 2 बेडशीट", en: "2 jeans + 2 bedsheets per wash"}
   - id: b_kg_mid
     weight: 3
     when_spec: {capacity_kg: {in: [7, 7.5]}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "{kg} किलो मतलब एक बार में 1 बेडशीट और 6 शर्ट।", mr: "{kg} किलो म्हणजे एका वेळी 1 बेडशीट आणि 6 शर्ट.", en: "{kg} kg: one bedsheet and six shirts in one wash."}
+    say: {hi: "{kg} kg मतलब एक बार में 1 बेडशीट और 6 शर्ट।", mr: "{kg} kg म्हणजे एका वेळी 1 बेडशीट आणि 6 शर्ट.", en: "{kg} kg: one bedsheet and six shirts in one wash."}
     card: {hi: "एक बार में 1 बेडशीट + 6 शर्ट", mr: "एका वेळी 1 बेडशीट + 6 शर्ट", en: "1 bedsheet + 6 shirts per wash"}
   - id: b_kg_small
     weight: 3
     when_spec: {capacity_kg: {lt: 7}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "{kg} किलो मतलब दो लोगों के रोज़ के कपड़े एक बार में।", mr: "{kg} किलो म्हणजे दोघांचे रोजचे कपडे एका वेळी.", en: "{kg} kg: a day's clothes for two in one wash."}
+    say: {hi: "{kg} kg मतलब दो लोगों के रोज़ के कपड़े एक बार में।", mr: "{kg} kg म्हणजे दोघांचे रोजचे कपडे एका वेळी.", en: "{kg} kg: a day's clothes for two in one wash."}
     card: {hi: "दो लोगों के कपड़े एक बार में", mr: "दोघांचे कपडे एका वेळी", en: "Clothes for two per wash"}
   - id: b_bend
     weight: 1.5
@@ -381,12 +381,12 @@ myths:
            mr: "बरोबर, फ्रंट लोड कपडे छान धुतो. पण वाकणं आणि जागाही महत्त्वाची — तुमच्या घरानुसार बघू.",
            en: "True, front loads wash well. Bending and space matter too, so let's match it to your home."}
   - id: wm_bigger_kg_better
-    short: {hi: "Zyada kilo, behtar", mr: "जास्त किलो, चांगलं", en: "Bigger kg is better"}
+    short: {hi: "Zyada kg, behtar", mr: "जास्त kg, चांगलं", en: "Bigger kg is better"}
     belief: "A bigger kg machine is always better"
     proof: drum_bedsheet
     keywords: ["sabse bada kilo", "zyada kilo achha", "bigger kg better", "ज़्यादा किलो", "जास्त किलो"]
-    line: {hi: "सही सोचा, बड़ी मशीन में ज़्यादा कपड़े आते हैं। पर परिवार के हिसाब से सही किलो लें तो पानी-बिजली कम लगती है।",
-           mr: "बरोबर विचार, मोठ्या मशीनमध्ये जास्त कपडे बसतात. पण कुटुंबानुसार योग्य किलो घेतल्यास पाणी-वीज कमी लागते.",
+    line: {hi: "सही सोचा, बड़ी मशीन में ज़्यादा कपड़े आते हैं। पर परिवार के हिसाब से सही kg लें तो पानी-बिजली कम लगती है।",
+           mr: "बरोबर विचार, मोठ्या मशीनमध्ये जास्त कपडे बसतात. पण कुटुंबानुसार योग्य kg घेतल्यास पाणी-वीज कमी लागते.",
            en: "Fair thought: bigger holds more. The right kg for your family uses less water and power."}
 site_needs: [tap_near, drain_near, floor_lift]
 quiz:
@@ -401,13 +401,13 @@ quiz:
     explain: {hi: "Kapdon mein boliye: '8 kg = ek baar mein 2 jeans aur 2 bedsheet'.", mr: "कपड्यांत सांगा: '8 kg = एका वेळी 2 जीन्स आणि 2 बेडशीट'.", en: "Say it in clothes: '8 kg = 2 jeans and 2 bedsheets in one wash'."}
   - id: wm_q2
     step: assess
-    q: {hi: "Machine ka kilo kis sawaal se tay hota hai?", mr: "मशीनचं किलो कोणत्या प्रश्नावरून ठरतं?", en: "Which question decides the machine's kg?"}
+    q: {hi: "Machine ka kg kis sawaal se tay hota hai?", mr: "मशीनचं kg कोणत्या प्रश्नावरून ठरतं?", en: "Which question decides the machine's kg?"}
     answers:
       - {id: a, title: {hi: "Ghar mein kitne log", mr: "घरात किती लोक", en: "People at home"}}
       - {id: b, title: {hi: "Brand", mr: "ब्रँड", en: "Brand"}}
       - {id: c, title: {hi: "Rang", mr: "रंग", en: "Colour"}}
     correct: a
-    explain: {hi: "Log aur dhulai poochiye — kilo wahi tay karta hai.", mr: "लोक आणि धुलाई विचारा — किलो तेच ठरवतं.", en: "Ask people and wash load: that decides the kg."}
+    explain: {hi: "Log aur dhulai poochiye — kg wahi tay karta hai.", mr: "लोक आणि धुलाई विचारा — kg तेच ठरवतं.", en: "Ask people and wash load: that decides the kg."}
   - id: wm_q3
     step: close
     q: {hi: "Customer 'online sasta hai' bole to?", mr: "ग्राहक 'ऑनलाइन स्वस्त आहे' म्हणाले तर?", en: "The customer says 'it's cheaper online'. You…"}
@@ -417,3 +417,12 @@ quiz:
       - {id: c, title: {hi: "Discount do", mr: "सूट द्या", en: "Give discount"}}
     correct: b
     explain: {hi: "Pehle maaniye, phir poora kharcha card dikhaiye — installation, warranty sab.", mr: "आधी मान्य करा, मग पूर्ण खर्चाचं कार्ड दाखवा — इन्स्टॉलेशन, वॉरंटी सगळं.", en: "Agree first, then show the full-cost card: installation, warranty, all of it."}
+
+needs:
+  capacity_ok: {hi: "परिवार के कपड़ों के लिए क्षमता", mr: "कुटुंबाच्या कपड्यांसाठी क्षमता", en: "Load for your family"}
+  width_fit: {hi: "आपकी जगह में फ़िट", mr: "तुमच्या जागेत बसतं", en: "Fits your space"}
+  bend_ok: {hi: "झुकना नहीं पड़ेगा", mr: "वाकावं लागणार नाही", en: "No bending"}
+  top_pref: {hi: "Top load पसंद", mr: "Top load पसंत", en: "Top load preferred"}
+  front_pref: {hi: "Front load पसंद", mr: "Front load पसंत", en: "Front load preferred"}
+  hard_water_ok: {hi: "Hard water (खारा पानी)", mr: "Hard water (क्षारयुक्त पाणी)", en: "Hard water"}
+  dry_ok: {hi: "बारिश में जल्दी सूखे", mr: "पावसाळ्यात लवकर वाळतं", en: "Faster drying in monsoon"}

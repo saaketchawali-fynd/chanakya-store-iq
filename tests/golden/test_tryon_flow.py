@@ -25,17 +25,30 @@ async def to_options_without_photo(h):
     await h.tap("s:C1:options")
 
 
-async def test_ghar_mein_dekho_asks_photo_then_menu(h):
+async def test_ghar_mein_dekho_asks_photo_then_draws(h):
     await to_options_without_photo(h)
     out = await h.tap("s:C1:tryon")
     assert button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"]  # only the photo question
     await h.tap("s:C1:photo_yes")
     out = await h.photo("room_living.jpg")
-    m = out[0]
-    assert m.kind == "list"
-    r = rows(m)
+    assert out[0].kind == "text" and not out[0].buttons  # one short note while the wall is read
+    imgs = [x for x in out if x.image_bytes]
+    assert len(imgs) == 1 and "s:C1:tmenu" in button_ids(imgs)  # then the picture; more choices one tap away
+    out = await h.tap("s:C1:tmenu")
+    r = rows(out[0])
     assert r[0] == "s:C1:tmode:best" and "s:C1:tmode:size" in r and "s:C1:tmode:all" in r
-    assert not any(x.image_bytes for x in out)  # the menu first, nothing drawn yet
+
+
+async def test_photo_during_questions_never_interrupts(h):
+    await h.tap("g:new")
+    await h.tap("s:C1:lang:en")
+    await h.voice("assess_1")
+    await h.tap("s:C1:slot:trigger:new_home")
+    await h.tap("s:C1:photo_yes")
+    out = await h.photo("room_living.jpg")
+    assert len(out) == 1 and not out[0].image_bytes and out[0].footer  # the next step + 'Photo saved'
+    s = await h.rt.svc.sessions.by_code("919000000001", "C1")
+    assert s.extra.get("room_read")  # read in the background: the picture is instant at the options
 
 
 async def test_size_compare_one_picture_fast(h):
@@ -71,7 +84,8 @@ async def test_tv_and_ac_together(h):
     await h.photo(LABELS / "AC-MER-15-5S.jpg")  # the customer also likes an AC (label scanned)
     await h.tap("s:C1:tryon")
     await h.tap("s:C1:photo_yes")
-    out = await h.photo("room_living.jpg")
+    await h.photo("room_living.jpg")
+    out = await h.tap("s:C1:tmenu")
     assert "s:C1:tmode:combo" in rows(out[0])
     out = await h.pick("s:C1:tmode:combo")
     check_floor(out)

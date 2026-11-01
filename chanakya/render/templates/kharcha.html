@@ -1,40 +1,54 @@
 {% extends "base.html" %}
-{# Full cost sheet for the customer: every line tagged product / zaroori / sujhav / optional, totals, extras. #}
+{# Full cost for the customer, grouped: the product → what installation needs (required) → the total to pay
+   (product + required) → suggestions for this home, each with its reason, and the total with them → optional
+   extras → exchange / running cost. Every line and amount comes from the cost sheet (data). #}
 {% set ls = lines|aslist %}
+{% set prod = ls|selectattr('tag', 'equalto', 'product')|list %}
+{% set req = ls|selectattr('tag', 'equalto', 'zaroori')|list %}
+{% set sug = ls|selectattr('tag', 'equalto', 'sujhav')|list %}
+{% set opt = ls|selectattr('tag', 'equalto', 'optional')|list %}
 {% block style %}
   .thumb { width: 230px; height: 158px; flex: none; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
   .thumb img { max-width: 88%; max-height: 86%; }
   .sub .ic { color: #F4A86F; margin-right: 10px; vertical-align: -4px; }
-  .sheet { padding: 12px 34px 26px; }
-  .ln { display: flex; align-items: center; gap: 20px; padding: 16px 0; border-bottom: 2px solid var(--line); }
-  .ln.sujhav { background: var(--saffron-tint); margin: 0 -34px; padding: 16px 34px; border-bottom-color: #F6E4D2; }
-  .ln .tag { flex: none; min-width: 132px; text-align: center; font-size: 21px; font-weight: 800; padding: 7px 12px;
-             border-radius: 12px; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
-  .ln .tag.dv { font-size: 22px; font-weight: 700; }
-  .tag.product { background: #E8ECF5; color: var(--indigo); }
-  .tag.zaroori { background: var(--green-pale); color: var(--green-deep); }
-  .tag.sujhav { background: #FBE3CF; color: var(--saffron-deep); }
-  .tag.optional { background: #EFEDE9; color: var(--muted); }
-  .ln .t { flex: 1; min-width: 0; font-size: 29px; line-height: 1.32; color: var(--text); }
-  .ln.product .t { font-weight: 800; color: var(--ink); font-size: 31px; }
-  .ln .why { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 23px; color: var(--saffron-deep); font-weight: 600; }
-  .ln .a { flex: none; font-size: 30px; font-weight: 700; color: var(--ink); white-space: nowrap; }
-  .ln.product .a { font-size: 33px; font-weight: 800; }
-  .ln.optional .t, .ln.optional .a { color: var(--muted); font-weight: 500; }
-  .totals { margin-top: 6px; }
-  .total { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-radius: 22px;
-           background: var(--green-pale); color: var(--green-deep); padding: 20px 26px; margin: 18px -12px 0; }
-  .total .k { display: flex; align-items: center; gap: 12px; font-size: 31px; font-weight: 800; }
-  .total .v { font-size: 50px; font-weight: 800; letter-spacing: -.5px; }
-  .total2 { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 14px 14px 0;
-            font-size: 27px; color: var(--saffron-deep); font-weight: 700; }
-  .total2 .v { font-size: 32px; font-weight: 800; }
+  .sheet { padding: 16px 34px 26px; }
+  .r { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 14px 0; font-size: 29px; }
+  .r + .r { border-top: 2px solid var(--line); }
+  .r .t { flex: 1; min-width: 0; color: var(--text); line-height: 1.3; }
+  .r .a { flex: none; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .r.prod { padding: 10px 0 16px; }
+  .r.prod .t { font-size: 32px; font-weight: 800; color: var(--ink); }
+  .r.prod .a { font-size: 36px; font-weight: 800; }
+  .grp { margin-top: 6px; font-size: 21px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase;
+         color: var(--muted); display: flex; align-items: center; gap: 10px; padding-top: 14px; border-top: 2px solid var(--line); }
+  .grp.dv { font-size: 24px; letter-spacing: 0; text-transform: none; }
+  .grp .ic { color: var(--green); }
+  .total { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-radius: 24px;
+           background: var(--indigo); color: #fff; padding: 22px 28px; margin: 18px -14px 0; }
+  .total .k { font-size: 30px; font-weight: 800; }
+  .total .k small { display: block; font-size: 22px; font-weight: 600; color: #C6CFE2; margin-top: 2px; }
+  .total .v { font-size: 54px; font-weight: 800; letter-spacing: -.5px; }
+  .sugs { margin-top: 20px; padding: 18px 30px 20px; background: var(--saffron-tint); border: 2px solid #F6E4D2; box-shadow: none; }
+  .sugs .grp { border-top: none; padding-top: 0; margin-top: 0; color: var(--saffron-deep); }
+  .sugs .grp .ic { color: var(--saffron); }
+  .sg { display: flex; align-items: flex-start; gap: 18px; padding: 14px 0; }
+  .sg + .sg { border-top: 2px solid #F6E4D2; }
+  .sg .t { flex: 1; min-width: 0; font-size: 29px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+  .sg .why { display: block; margin-top: 4px; font-size: 24px; font-weight: 600; color: var(--saffron-deep); }
+  .sg .a { flex: none; font-size: 30px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+  .t2 { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 8px; padding-top: 14px;
+        border-top: 2px dashed #EBCDB1; font-size: 27px; font-weight: 700; color: var(--saffron-deep); }
+  .t2 .v { font-size: 34px; font-weight: 800; }
+  .opts { margin-top: 18px; padding: 14px 30px; }
+  .opts .r { font-size: 26px; padding: 10px 0; }
+  .opts .r .t, .opts .r .a { color: var(--muted); font-weight: 500; }
+  .opts .grp { border-top: none; margin-top: 0; padding-top: 4px; }
   .extras { margin-top: 18px; padding: 10px 34px; }
   .ex { display: flex; align-items: flex-start; gap: 18px; padding: 14px 0; }
   .ex + .ex { border-top: 2px solid var(--line); }
   .ex .bubble { width: 46px; height: 46px; background: var(--saffron-pale); color: var(--saffron-deep); }
-  .ex .k { display: block; font-size: 22px; font-weight: 800; color: var(--muted); letter-spacing: .4px; }
-  .ex .k.dv { font-size: 24px; font-weight: 700; }
+  .ex .k { display: block; font-size: 22px; font-weight: 800; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; }
+  .ex .k.dv { font-size: 24px; font-weight: 700; text-transform: none; }
   .ex .v { font-size: 27px; line-height: 1.36; color: var(--text); }
   .stamp { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 22px 56px 30px;
            font-size: 23px; color: var(--muted); font-weight: 600; }
@@ -54,21 +68,26 @@
 {% endblock %}
 {% block content %}
   <section class="card sheet">
-    {% for ln in ls %}
-    {% set tag = ln.tag if ln.tag in ('product', 'zaroori', 'sujhav', 'optional') else 'optional' %}
-    <div class="ln {{ tag }}">
-      <span class="tag {{ tag }}{{ L[tag]|default(tag)|dv }}">{{ L[tag]|default(tag) }}</span>
-      <div class="t">{{ ln.title }}{% if ln.reason %}<div class="why">{{ icon('sparkle', 22) }}<span>{{ ln.reason }}</span></div>{% endif %}</div>
-      <span class="a num">{{ ln.amount_str }}</span>
-    </div>
-    {% endfor %}
-    <div class="totals">
-      <div class="total num"><span class="k{{ L.zaroori_total|dv }}">{{ icon('check-circle', 34, '', 2.4) }}{{ L.zaroori_total }}</span><span class="v">{{ zaroori_total_str or '—' }}</span></div>
-      {% if with_suggestions_total_str %}
-      <div class="total2 num"><span class="{{ L.with_suggestions_total|dv }}">{{ L.with_suggestions_total }}</span><span class="v">{{ with_suggestions_total_str }}</span></div>
-      {% endif %}
-    </div>
+    {% for ln in prod %}<div class="r prod num"><span class="t{{ ln.title|dv }}">{{ ln.title }}</span><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
+    {% if req %}
+    <div class="grp{{ L.req_group|dv }}">{{ icon('check-circle', 24, '', 2.4) }}{{ L.req_group }}</div>
+    {% for ln in req %}<div class="r num"><span class="t{{ ln.title|dv }}">{{ ln.title }}</span><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
+    {% endif %}
+    <div class="total num"><span class="k{{ L.zaroori_total|dv }}">{{ L.zaroori_total }}{% if req %}<small>{{ L.total_note }}</small>{% endif %}</span><span class="v">{{ zaroori_total_str or '—' }}</span></div>
   </section>
+  {% if sug %}
+  <section class="card sugs">
+    <div class="grp{{ L.sug_group|dv }}">{{ icon('sparkle', 24) }}{{ L.sug_group }}</div>
+    {% for ln in sug %}<div class="sg num"><div class="t{{ ln.title|dv }}">{{ ln.title }}{% if ln.reason %}<span class="why">{{ ln.reason }}</span>{% endif %}</div><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
+    {% if with_suggestions_total_str %}<div class="t2 num"><span class="{{ L.with_suggestions_total|dv }}">{{ L.with_suggestions_total }}</span><span class="v">{{ with_suggestions_total_str }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+  {% if opt %}
+  <section class="card opts">
+    <div class="grp{{ L.optional|dv }}">{{ L.optional }}</div>
+    {% for ln in opt %}<div class="r num"><span class="t{{ ln.title|dv }}">{{ ln.title }}</span><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
+  </section>
+  {% endif %}
   {% if exchange_text or lifetime_text %}
   <section class="card extras">
     {% if exchange_text %}<div class="ex"><span class="bubble">{{ icon('refresh', 24) }}</span><div><span class="k{{ L.exchange|dv }}">{{ L.exchange }}</span><div class="v">{{ exchange_text }}</div></div></div>{% endif %}

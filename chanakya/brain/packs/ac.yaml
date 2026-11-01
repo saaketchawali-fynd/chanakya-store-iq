@@ -35,7 +35,7 @@ slots:
     number: room_size_sqft
     title: {hi: "Kamre ka size", mr: "खोलीचा आकार", en: "Room size"}
     ask: {hi: "AC किस कमरे में लगेगा, और कमरा लगभग कितना बड़ा है — 10×10, 10×12 या बड़ा?", mr: "AC कोणत्या खोलीत लागेल, आणि खोली साधारण किती मोठी आहे — 10×10, 10×12 की मोठी?", en: "Which room is it for, and roughly how big: 10×10, 10×12 or bigger?"}
-    why: {hi: "Kamre se sahi ton tay hota hai", mr: "खोलीवरून योग्य टन ठरतो", en: "Room size decides the right tonnage"}
+    why: {hi: "Kamre se sahi ton tay hota hai", mr: "खोलीवरून योग्य ton ठरतो", en: "Room size decides the right tonnage"}
     quick:
       - {id: r_le120, number: 100, title: {hi: "10×10 tak", mr: "10×10 पर्यंत", en: "Up to 10×10"}}
       - {id: r120_180, number: 150, title: {hi: "10×12 – 12×14", mr: "10×12 – 12×14", en: "10×12 – 12×14"}}
@@ -57,7 +57,7 @@ slots:
     phase: life
     title: {hi: "Top floor/dhoop", mr: "वरचा मजला/ऊन", en: "Top floor/sun"}
     ask: {hi: "कमरा सबसे ऊपर की मंज़िल पर है, या दोपहर की धूप किसी दीवार पर आती है?", mr: "खोली वरच्या मजल्यावर आहे का, किंवा दुपारचं ऊन एखाद्या भिंतीवर येतं का?", en: "Is it on the top floor, or does afternoon sun hit a wall?"}
-    why: {hi: "Garam kamre ko aadha ton zyada chahiye", mr: "गरम खोलीला अर्धा टन जास्त लागतो", en: "A hot room needs half a ton more"}
+    why: {hi: "Garam kamre ko aadha ton zyada chahiye", mr: "गरम खोलीला अर्धा ton जास्त लागतो", en: "A hot room needs half a ton more"}
     quick:
       - {id: "yes", title: {hi: "Haan, top/dhoop", mr: "हो, वरचा/ऊन", en: "Yes, top/sun"}}
       - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
@@ -72,18 +72,18 @@ slots:
   - id: hours_per_day
     phase: life
     number: hours_per_day
-    title: {hi: "Roz kitne ghante", mr: "रोज किती तास", en: "Hours per day"}
-    ask: {hi: "AC रोज़ लगभग कितने घंटे चलेगा?", mr: "AC रोज साधारण किती तास चालेल?", en: "About how many hours a day will the AC run?"}
-    why: {hi: "Ghante se star rating aur bill tay hota hai", mr: "तासांवरून स्टार रेटिंग आणि बिल ठरतं", en: "Hours decide the star rating and the bill"}
+    title: {hi: "Roz kitne hours", mr: "रोज किती hours", en: "Hours per day"}
+    ask: {hi: "AC रोज़ लगभग कितने hours चलेगा?", mr: "AC रोज साधारण किती hours चालेल?", en: "About how many hours a day will the AC run?"}
+    why: {hi: "Hours se star rating aur bill tay hota hai", mr: "hours वरून star rating आणि बिल ठरतं", en: "Hours decide the star rating and the bill"}
     quick:
-      - {id: h_le4, number: 3, title: {hi: "4 ghante tak", mr: "4 तासांपर्यंत", en: "Up to 4 hours"}}
-      - {id: h4_8, number: 6, title: {hi: "4–8 ghante", mr: "4–8 तास", en: "4–8 hours"}}
-      - {id: h_gt8, number: 10, title: {hi: "8+ ghante", mr: "8+ तास", en: "8+ hours"}}
+      - {id: h_le4, number: 3, title: {hi: "4 h tak", mr: "4 h पर्यंत", en: "Up to 4 hours"}}
+      - {id: h4_8, number: 6, title: {hi: "4–8 h", mr: "4–8 h", en: "4–8 hours"}}
+      - {id: h_gt8, number: 10, title: {hi: "8+ h", mr: "8+ h", en: "8+ hours"}}
     values: [h_le4, h4_8, h_gt8]
     value_titles:
-      h_le4: {hi: "4 ghante tak", mr: "4 तासांपर्यंत", en: "Up to 4 hours"}
-      h4_8: {hi: "4–8 ghante", mr: "4–8 तास", en: "4–8 hours"}
-      h_gt8: {hi: "8+ ghante", mr: "8+ तास", en: "8+ hours"}
+      h_le4: {hi: "4 h tak", mr: "4 h पर्यंत", en: "Up to 4 hours"}
+      h4_8: {hi: "4–8 h", mr: "4–8 h", en: "4–8 hours"}
+      h_gt8: {hi: "8+ h", mr: "8+ h", en: "8+ hours"}
     bands: [{max: 4, value: h_le4}, {max: 7.9, value: h4_8}, {max: 24, value: h_gt8}]
     priors: {h_le4: 0.2, h4_8: 0.45, h_gt8: 0.35}
     keywords:
@@ -282,8 +282,8 @@ fit_rules:
   - {id: star_ok, weight: 2, slot: hours_per_day, when: {gte: 8}, spec_any: [{star: {gte: 5}}], else: 0.4}
   - {id: wifi_ok, weight: 0.5, slot: app_control, when: {in: ["yes"]}, spec_any: [{wifi: {eq: true}}], else: 0.3}
 reasons:
-  ton_ok: {hi: "Kamre ke hisaab se sahi ton", mr: "खोलीनुसार योग्य टन", en: "Right tonnage for the room"}
-  star_ok: {hi: "Roz lambe ghante, bill kam", mr: "रोज जास्त तास, बिल कमी", en: "Long daily use, lower bill"}
+  ton_ok: {hi: "Kamre ke hisaab se sahi ton", mr: "खोलीनुसार योग्य ton", en: "Right tonnage for the room"}
+  star_ok: {hi: "Roz lambe hours, bill kam", mr: "रोज जास्त hours, बिल कमी", en: "Long daily use, lower bill"}
   wifi_ok: {hi: "Phone se bahar se chalu", mr: "फोनवरून बाहेरून चालू", en: "Start it from your phone"}
   value_fit: {hi: "Kamre ke liye kaafi, kam kharcha", mr: "खोलीसाठी पुरेसा, कमी खर्च", en: "Enough for the room, costs less"}
   step_up: {hi: "Zyada bachat, lambe saal", mr: "जास्त बचत, अनेक वर्षं", en: "More savings over the years"}
@@ -294,28 +294,28 @@ benefits:
     when_spec: {ton: {in_band: true}}
     when_slots: {room_size: {known: true}}
     cites: [room_size]
-    say: {hi: "{ton} टन मतलब आपके {sqft} sq ft कमरे के लिए सही ठंडक।", mr: "{ton} टन म्हणजे तुमच्या {sqft} sq ft खोलीसाठी योग्य थंडावा.", en: "{ton} ton means the right cooling for your {sqft} sq ft room."}
+    say: {hi: "{ton} ton मतलब आपके {sqft} sq ft कमरे के लिए सही ठंडक।", mr: "{ton} ton म्हणजे तुमच्या {sqft} sq ft खोलीसाठी योग्य थंडावा.", en: "{ton} ton means the right cooling for your {sqft} sq ft room."}
     card: {hi: "कमरे के लिए सही ठंडक", mr: "खोलीसाठी योग्य थंडावा", en: "Right cooling for the room"}
   - id: b_star_bill
     weight: 2
     when_spec: {star: {gte: 5}}
     when_slots: {hours_per_day: {gte: 8}}
     cites: [hours_per_day]
-    say: {hi: "{star}-स्टार: रोज़ {hours} घंटे चलाकर भी बिल लगभग {monthly_bill} महीना।", mr: "{star}-स्टार: रोज {hours} तास चालवूनही बिल साधारण {monthly_bill} महिना.", en: "{star}-star: even {hours} hours a day, the bill is about {monthly_bill} a month."}
+    say: {hi: "{star}-star: रोज़ {hours} h चलाकर भी बिल लगभग {monthly_bill} महीना।", mr: "{star}-star: रोज {hours} h चालवूनही बिल साधारण {monthly_bill} महिना.", en: "{star}-star: even {hours} hours a day, the bill is about {monthly_bill} a month."}
     card: {hi: "रोज़ चलाओ, बिल कम", mr: "रोज चालवा, बिल कमी", en: "Daily use, lower bill"}
   - id: b_saving
     weight: 2
     when_spec: {star: {gte: 5}}
     when_slots: {hours_per_day: {known: true}}
     cites: [hours_per_day]
-    say: {hi: "3-स्टार से 5 साल में लगभग {five_year_saving} की बिजली बचत।", mr: "3-स्टारपेक्षा 5 वर्षांत साधारण {five_year_saving} वीज बचत.", en: "About {five_year_saving} saved on electricity over 5 years versus 3-star."}
+    say: {hi: "3-star से 5 साल में लगभग {five_year_saving} की बिजली बचत।", mr: "3-star पेक्षा 5 वर्षांत साधारण {five_year_saving} वीज बचत.", en: "About {five_year_saving} saved on electricity over 5 years versus 3-star."}
     card: {hi: "5 साल में बिजली बचत", mr: "5 वर्षांत वीज बचत", en: "Electricity savings in 5 years"}
   - id: b_sun
     weight: 1.5
     when_spec: {ton: {in_band: true}}
     when_slots: {sun_exposure: {in: ["yes"]}}
     cites: [sun_exposure]
-    say: {hi: "ऊपर की मंज़िल की गर्मी के लिए आधा टन ज़्यादा रखा है।", mr: "वरच्या मजल्याच्या उष्णतेसाठी अर्धा टन जास्त ठेवला आहे.", en: "We added half a ton for the top-floor heat."}
+    say: {hi: "ऊपर की मंज़िल की गर्मी के लिए आधा ton ज़्यादा रखा है।", mr: "वरच्या मजल्याच्या उष्णतेसाठी अर्धा ton जास्त ठेवला आहे.", en: "We added half a ton for the top-floor heat."}
     card: {hi: "गर्म कमरे में भी ठंडक", mr: "गरम खोलीतही थंडावा", en: "Cool even in a hot room"}
   - id: b_quiet
     weight: 1
@@ -368,41 +368,41 @@ myths:
            mr: "बरोबर, इन्व्हर्टर वीज वाचवतो — किती, ते लेबलवरून पाहू: या मॉडेलचं महिन्याचं बिल {monthly_bill}.",
            en: "True, inverters save power. How much? The label says this model's monthly bill is {monthly_bill}."}
   - id: ac_bigger_ton_better
-    short: {hi: "Zyada ton, zyada thanda", mr: "जास्त टन, जास्त थंड", en: "Bigger ton is better"}
+    short: {hi: "Zyada ton, zyada thanda", mr: "जास्त ton, जास्त थंड", en: "Bigger ton is better"}
     belief: "A bigger tonnage AC is always better"
     proof: null
     keywords: ["bada ton", "zyada ton", "bigger ton", "2 ton lena", "ज़्यादा टन", "जास्त टन", "बड़ा टन"]
-    line: {hi: "ठंडक ज़रूरी है, सही। कमरे के हिसाब से सही टन लीजिए; ज़रूरत से बड़ा AC बिजली ज़्यादा खाता है।",
-           mr: "थंडावा महत्त्वाचा, बरोबर. खोलीनुसार योग्य टन घ्या; गरजेपेक्षा मोठा AC जास्त वीज खातो.",
+    line: {hi: "ठंडक ज़रूरी है, सही। कमरे के हिसाब से सही ton लीजिए; ज़रूरत से बड़ा AC बिजली ज़्यादा खाता है।",
+           mr: "थंडावा महत्त्वाचा, बरोबर. खोलीनुसार योग्य ton घ्या; गरजेपेक्षा मोठा AC जास्त वीज खातो.",
            en: "Cooling matters, yes. Pick the right tonnage for the room; an oversized AC eats more power."}
   - id: ac_5star_always
-    short: {hi: "5 star hi lena chahiye", mr: "5 स्टारच घ्यावा", en: "Always buy 5 star"}
+    short: {hi: "5 star hi lena chahiye", mr: "5 star च घ्यावा", en: "Always buy 5 star"}
     belief: "A 5-star AC is always the right choice"
     proof: label_compare
     keywords: ["5 star hi", "5-star hi", "hamesha 5 star", "always 5 star", "5 स्टार ही", "फक्त 5 स्टार"]
-    line: {hi: "5-स्टार चलाने में सस्ता, ख़रीदने में थोड़ा महंगा — आप रोज़ कितने घंटे चलाते हैं, उस हिसाब से।",
-           mr: "5-स्टार चालवायला स्वस्त, घ्यायला थोडा महाग — तुम्ही रोज किती तास चालवता त्यानुसार.",
+    line: {hi: "5-star चलाने में सस्ता, ख़रीदने में थोड़ा महंगा — आप रोज़ कितने hours चलाते हैं, उस हिसाब से।",
+           mr: "5-star चालवायला स्वस्त, घ्यायला थोडा महाग — तुम्ही रोज किती hours चालवता त्यानुसार.",
            en: "5-star costs less to run but a bit more to buy; it depends on your daily hours."}
 site_needs: [outdoor_spot, pipe_run_ft, wall_hole, socket_15a, floor_lift]
 quiz:
   - id: ac_q1
     step: assess
-    q: {hi: "AC ka ton kis sawaal se tay hota hai?", mr: "AC चा टन कोणत्या प्रश्नावरून ठरतो?", en: "Which question decides the AC tonnage?"}
+    q: {hi: "AC ka ton kis sawaal se tay hota hai?", mr: "AC चा ton कोणत्या प्रश्नावरून ठरतो?", en: "Which question decides the AC tonnage?"}
     answers:
       - {id: a, title: {hi: "Kamre ka size", mr: "खोलीचा आकार", en: "Room size"}}
       - {id: b, title: {hi: "Brand", mr: "ब्रँड", en: "Brand"}}
       - {id: c, title: {hi: "Remote", mr: "रिमोट", en: "Remote"}}
     correct: a
-    explain: {hi: "Kamra aur top floor poochiye — ton wahi tay karta hai.", mr: "खोली आणि वरचा मजला विचारा — टन तेच ठरवतं.", en: "Ask room size and top floor: that decides the tonnage."}
+    explain: {hi: "Kamra aur top floor poochiye — ton wahi tay karta hai.", mr: "खोली आणि वरचा मजला विचारा — ton तेच ठरवतं.", en: "Ask room size and top floor: that decides the tonnage."}
   - id: ac_q2
     step: translate
-    q: {hi: "Customer roz 10 ghante AC chalayenge. Kya batayenge?", mr: "ग्राहक रोज 10 तास AC चालवणार. काय सांगाल?", en: "The customer runs the AC 10 hours a day. What do you explain?"}
+    q: {hi: "Customer roz 10 h AC chalayenge. Kya batayenge?", mr: "ग्राहक रोज 10 h AC चालवणार. काय सांगाल?", en: "The customer runs the AC 10 hours a day. What do you explain?"}
     answers:
       - {id: a, title: {hi: "Wifi", mr: "WiFi", en: "WiFi"}}
       - {id: b, title: {hi: "Mahine ka bill", mr: "महिन्याचं बिल", en: "Monthly bill"}}
       - {id: c, title: {hi: "Rang", mr: "रंग", en: "Colour"}}
     correct: b
-    explain: {hi: "Label se mahine ka bill boliye — lambe ghante mein star rating hi faayda hai.", mr: "लेबलवरून महिन्याचं बिल सांगा — जास्त तासांत स्टार रेटिंगच फायदा.", en: "Say the monthly bill from the label: for long hours the star rating pays."}
+    explain: {hi: "Label se mahine ka bill boliye — lambe hours mein star rating hi faayda hai.", mr: "लेबलवरून महिन्याचं बिल सांगा — जास्त hours मध्ये star ratingच फायदा.", en: "Say the monthly bill from the label: for long hours the star rating pays."}
   - id: ac_q3
     step: complete
     q: {hi: "AC ka poora kharcha kab batayenge?", mr: "AC चा पूर्ण खर्च केव्हा सांगाल?", en: "When do you give the AC's full cost?"}
@@ -421,3 +421,8 @@ quiz:
       - {id: c, title: {hi: "Kuch nahi", mr: "काही नाही", en: "Nothing"}}
     correct: b
     explain: {hi: "EMI ka poora kharcha ek line mein: mahina, fees, kul aur kitna zyada.", mr: "EMI चा पूर्ण खर्च एका ओळीत: महिना, फी, एकूण आणि किती जास्त.", en: "The full EMI cost in one line: monthly, fee, total and the extra."}
+
+needs:
+  ton_ok: {hi: "कमरे के लिए सही ton", mr: "खोलीसाठी योग्य ton", en: "Right tonnage for the room"}
+  star_ok: {hi: "रोज़ लंबा चलना, कम बिल", mr: "रोज जास्त वेळ, कमी बिल", en: "Long daily use, lower bill"}
+  wifi_ok: {hi: "फ़ोन से चालू करना", mr: "फोनवरून सुरू करणं", en: "Start from your phone"}

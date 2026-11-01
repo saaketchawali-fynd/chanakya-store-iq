@@ -8,8 +8,7 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-from chanakya.tryon import render
-from chanakya.tryon.fonts import font
+from chanakya.tryon import fonts, render
 from chanakya.tryon.geometry import Wall
 from chanakya.tryon.place import SAFFRON, Placed
 from chanakya.tryon.read_room import Room
@@ -32,18 +31,15 @@ class _Pill:
 def _pill(lines: list[str], size: int, fill, fg, fg2=None, outline=None, shadow: bool = True) -> _Pill:
     """Rounded label (one or two lines) rendered at 2× and downsampled for smooth edges."""
     lines = [s for s in lines if s]
-    f1 = font(size * SS, bold=True)
-    f2 = font(max(10, round(size * 0.8)) * SS)
-    probe = ImageDraw.Draw(Image.new("L", (4, 4)))
+    s1, s2 = size * SS, max(10, round(size * 0.8)) * SS
     metrics = []
     for i, text in enumerate(lines):
-        f = f1 if i == 0 else f2
-        bl, bt, br, bb = probe.textbbox((0, 0), text, font=f)
-        asc, desc = f.getmetrics() if hasattr(f, "getmetrics") else (bb, 0)
-        metrics.append((text, f, bl, br - bl, asc + desc, asc))
+        sz, bold = (s1, True) if i == 0 else (s2, False)
+        bl, tw_, lh = fonts.measure(text, sz, bold)
+        metrics.append((text, sz, bold, bl, tw_, lh))
     padx, pady, lgap = round(0.6 * size * SS), round(0.3 * size * SS), round(0.06 * size * SS)
-    tw = max(m[3] for m in metrics)
-    th = sum(m[4] for m in metrics) + lgap * (len(metrics) - 1)
+    tw = max(m[4] for m in metrics)
+    th = sum(m[5] for m in metrics) + lgap * (len(metrics) - 1)
     pw, ph = tw + 2 * padx, th + 2 * pady
     sp = round(0.35 * size * SS) if shadow else 0
     im = Image.new("RGBA", (pw + 2 * sp, ph + 2 * sp), (0, 0, 0, 0))
@@ -62,9 +58,9 @@ def _pill(lines: list[str], size: int, fill, fg, fg2=None, outline=None, shadow:
         width=round(1.6 * SS) if outline else 0,
     )
     y = sp + pady
-    for i, (text, f, bl, _w, lh, _asc) in enumerate(metrics):
+    for i, (text, sz, bold, bl, _w, lh) in enumerate(metrics):
         col = fg if i == 0 or fg2 is None else fg2
-        d.text((sp + padx - bl, y), text, font=f, fill=tuple(col) + (255,))
+        fonts.draw(d, (sp + padx - bl, y), text, sz, bold, fill=tuple(col) + (255,))
         y += lh + lgap
     out = im.resize((max(1, im.width // SS), max(1, im.height // SS)), Image.Resampling.LANCZOS)
     return _Pill(out, (sp // SS, sp // SS), pw // SS, ph // SS)

@@ -83,6 +83,33 @@ class GeminiClient:
         diag.mark(f"ai_last_{kind}", {"ok": False, "error": last_err})
         raise AIUnavailable(last_err)
 
+    async def transcribe(self, parts: list, system: str, timeout: float) -> str:
+        """Plain text out (no schema): the safety net when the structured read of a voice note fails."""
+        deadline = time.perf_counter() + timeout
+        last_err = ""
+        for model in dict.fromkeys((self.fallback, self.fast, LATEST)):
+            t = deadline - time.perf_counter()
+            if t < 1.0:
+                break
+            try:
+                r = await asyncio.wait_for(
+                    self.client.aio.models.generate_content(
+                        model=model, contents=parts, config=self._config(model, system, None, thinking=False)
+                    ),
+                    t,
+                )
+                text = (r.text or "").strip()
+                if text:
+                    diag.mark("ai_last_transcribe", {"ok": True, "model": model, "chars": len(text)})
+                    return text
+                last_err = "empty"
+            except TimeoutError:
+                last_err = "timeout"
+            except Exception as e:  # noqa: BLE001
+                last_err = str(e)[:160]
+        diag.mark("ai_last_transcribe", {"ok": False, "error": last_err})
+        raise AIUnavailable(last_err)
+
     async def edit_image(self, image_bytes: bytes, prompt: str, timeout: float = 25) -> bytes | None:
         from google.genai import types
 

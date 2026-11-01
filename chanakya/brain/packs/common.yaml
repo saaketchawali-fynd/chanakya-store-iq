@@ -116,14 +116,14 @@ who_titles:
 # Fit pros / cons per fit rule (customer-facing; used on the product and compare cards). Placeholders are
 # filled from data / the Home Card only: {size} {distance} {ton} {sqft} {kg} {people}.
 fit_pros:
-  size_ok: {hi: "{size} इंच — आपकी {distance} फ़ुट दूरी के लिए सही", mr: "{size} इंच — तुमच्या {distance} फूट अंतरासाठी योग्य", en: "{size} inch suits your {distance} ft distance"}
+  size_ok: {hi: "{size} inch — आपकी {distance} ft दूरी के लिए सही", mr: "{size} inch — तुमच्या {distance} ft अंतरासाठी योग्य", en: "{size} inch suits your {distance} ft distance"}
   bright_ok: {hi: "धूप वाले कमरे में भी साफ़ तस्वीर", mr: "उन्हाच्या खोलीतही स्पष्ट चित्र", en: "Clear picture even in your sunny room"}
   motion_ok: {hi: "तेज़ क्रिकेट में भी बॉल साफ़", mr: "वेगवान क्रिकेटमध्येही बॉल स्पष्ट", en: "Fast cricket stays sharp"}
   dialogue_ok: {hi: "बुज़ुर्गों के लिए साफ़ डायलॉग", mr: "ज्येष्ठांसाठी स्पष्ट संवाद", en: "Clear dialogue for elders"}
   angle_ok: {hi: "साइड से बैठकर भी सही रंग", mr: "बाजूने बसूनही योग्य रंग", en: "True colours from the side seats"}
   dark_ok: {hi: "अंधेरे कमरे में असली काला", mr: "अंधाऱ्या खोलीत खरा काळा", en: "Deep blacks in your dark room"}
-  ton_ok: {hi: "{sqft} sq ft कमरे के लिए सही टन", mr: "{sqft} sq ft खोलीसाठी योग्य टन", en: "Right tonnage for a {sqft} sq ft room"}
-  star_ok: {hi: "रोज़ लंबे घंटे — कम बिजली बिल", mr: "रोज जास्त तास — कमी वीज बिल", en: "Long daily use, lower power bill"}
+  ton_ok: {hi: "{sqft} sq ft कमरे के लिए सही ton", mr: "{sqft} sq ft खोलीसाठी योग्य ton", en: "Right tonnage for a {sqft} sq ft room"}
+  star_ok: {hi: "रोज़ लंबे hours — कम बिजली बिल", mr: "रोज जास्त hours — कमी वीज बिल", en: "Long daily use, lower power bill"}
   wifi_ok: {hi: "फ़ोन से चालू-बंद", mr: "फोनवरून चालू-बंद", en: "Control from the phone"}
   capacity_ok: {hi: "{people} लोगों के परिवार के लिए सही क्षमता", mr: "{people} जणांच्या कुटुंबासाठी योग्य क्षमता", en: "Right capacity for a family of {people}"}
   width_fit: {hi: "आपकी जगह में फ़िट होती है", mr: "तुमच्या जागेत बसते", en: "Fits your space"}
@@ -138,14 +138,14 @@ fit_pros:
   battery_ok: {hi: "पूरे दिन की बैटरी", mr: "पूर्ण दिवसाची बॅटरी", en: "Battery lasts the whole day"}
   gaming_ok: {hi: "गेमिंग के लिए अलग ग्राफ़िक्स", mr: "गेमिंगसाठी वेगळे ग्राफिक्स", en: "Dedicated graphics for gaming"}
 fit_cons:
-  size_ok: {hi: "{size} इंच — आपकी {distance} फ़ुट दूरी के लिए सही साइज़ नहीं", mr: "{size} इंच — तुमच्या {distance} फूट अंतरासाठी योग्य साइज नाही", en: "{size} inch is not ideal for your {distance} ft distance"}
+  size_ok: {hi: "{size} inch — आपकी {distance} ft दूरी के लिए सही साइज़ नहीं", mr: "{size} inch — तुमच्या {distance} ft अंतरासाठी योग्य साइज नाही", en: "{size} inch is not ideal for your {distance} ft distance"}
   bright_ok: {hi: "धूप में तस्वीर थोड़ी फीकी लग सकती है", mr: "उन्हात चित्र थोडं फिकं वाटू शकतं", en: "May look washed out in your sunny room"}
   motion_ok: {hi: "तेज़ क्रिकेट शॉट पर बॉल थोड़ी धुंधली", mr: "वेगवान शॉटवर बॉल थोडा धूसर", en: "Fast cricket shots may blur a little"}
   dialogue_ok: {hi: "डायलॉग के लिए अलग साउंड मोड नहीं", mr: "संवादासाठी वेगळा साउंड मोड नाही", en: "No dialogue-enhance mode for elders"}
   angle_ok: {hi: "साइड से रंग थोड़े फीके", mr: "बाजूने रंग थोडे फिके", en: "Colours fade a little from the side"}
   dark_ok: {hi: "अंधेरे में काला पूरा गहरा नहीं", mr: "अंधारात काळा पूर्ण गडद नाही", en: "Blacks are not as deep in a dark room"}
-  ton_ok: {hi: "{sqft} sq ft के लिए टन सही नहीं", mr: "{sqft} sq ft साठी टन योग्य नाही", en: "Tonnage does not suit a {sqft} sq ft room"}
-  star_ok: {hi: "रोज़ लंबे घंटे — बिजली बिल ज़्यादा", mr: "रोज जास्त तास — वीज बिल जास्त", en: "Long daily use means a higher bill"}
+  ton_ok: {hi: "{sqft} sq ft के लिए ton सही नहीं", mr: "{sqft} sq ft साठी ton योग्य नाही", en: "Tonnage does not suit a {sqft} sq ft room"}
+  star_ok: {hi: "रोज़ लंबे hours — बिजली बिल ज़्यादा", mr: "रोज जास्त hours — वीज बिल जास्त", en: "Long daily use means a higher bill"}
   wifi_ok: {hi: "फ़ोन से कंट्रोल नहीं", mr: "फोनवरून कंट्रोल नाही", en: "No phone control"}
   capacity_ok: {hi: "{people} लोगों के लिए क्षमता कम/ज़्यादा", mr: "{people} जणांसाठी क्षमता कमी/जास्त", en: "Capacity does not suit a family of {people}"}
   width_fit: {hi: "आपकी जगह में फ़िट नहीं होगी", mr: "तुमच्या जागेत बसणार नाही", en: "Will not fit your space"}

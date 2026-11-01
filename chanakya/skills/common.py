@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 from chanakya.brain import packs as P
 from chanakya.brain.next_question import next_slot, ordered_next
 from chanakya.channel.limits import truncate, truncate_title
@@ -199,7 +201,7 @@ def readback_facts(ctx: SkillContext, lang: str) -> str:
                     "old_tv_in": "inch"}.get(sd.number, "")
             parts.append(ctx.reg.num(sv.number, f"card:{sid}", unit))
         else:
-            parts.append(ctx.reg.static(", ".join(sd.value_title(v, lang) for v in vals)))
+            parts.append(ctx.reg.static(", ".join(value_title(sd, v, lang) for v in vals)))
     return ", ".join(parts)
 
 
@@ -210,7 +212,8 @@ def readback(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     say = ctx.tc(key if i18n.has(key) else "bolo_readback", facts=readback_facts(ctx, ctx.clang))
     btns = [ctx.b("b_readback_ok", ctx.sid("readback_ok")), ctx.b("b_readback_edit", ctx.sid("readback_edit"))]
     cites = [s for s in ctx.pack.required_slots if P.known(ctx.session.home, s)] or known_cites(ctx)
-    return coach_reply(ctx, say, ctx.t("kyun_readback"), cites, btns, card=home_card(ctx), footer=footer)
+    en, cp = dual(ctx, lambda: home_card(ctx))
+    return with_copy(ctx, coach_reply(ctx, say, ctx.t("kyun_readback"), cites, btns, card=en, footer=footer), cp)
 
 
 def doubts(ctx: SkillContext, footer: str | None = None) -> OutMessage:
@@ -284,7 +287,7 @@ def home_card(ctx: SkillContext) -> Card:
         vals = P.values(home, sid)
         if not sd or not vals:
             continue
-        txt = ctx.reg.static(", ".join(sd.value_title(v, ctx.lang) for v in vals))
+        txt = ctx.reg.static(", ".join(value_title(sd, v, ctx.lang) for v in vals))
         n = P.number(home, sid, pack)
         sv = home.slots[sid][-1]
         if sv.number is not None and sv.source in ("voice", "text") and sd.number:
@@ -352,10 +355,12 @@ def home_card_message(ctx: SkillContext, force: bool = False) -> OutMessage | No
         btns = [ctx.b("b_photo", ctx.sid("photo"))]
         if state.options_gate_open(s, pack) and not s.shortlist:
             btns.append(ctx.b("b_options", ctx.sid("options")))
-        return info_reply(ctx, body, btns, card=home_card(ctx))
+        en, cp = dual(ctx, lambda: home_card(ctx))
+        return with_copy(ctx, info_reply(ctx, body, btns, card=en), cp)
     body = ctx.t("home_card_caption", known=k, total=tt)
     btns = [ctx.b("b_options", ctx.sid("options"))] if state.options_gate_open(s, pack) and not s.shortlist else None
-    return info_reply(ctx, body, btns, card=home_card(ctx))
+    en, cp = dual(ctx, lambda: home_card(ctx))
+    return with_copy(ctx, info_reply(ctx, body, btns, card=en), cp)
 
 
 def budget_list(ctx: SkillContext, body: str | None = None) -> OutMessage:
@@ -395,3 +400,53 @@ def who_title(ctx: SkillContext, lang: str) -> str | None:
         return None
     d = (ctx.packs.common.get("who_titles") or {}).get(w)
     return ctx.pick(d, lang) if d else None
+
+
+# ---------------------------------------------------------------- customer-facing visuals: English + one copy
+def dual(ctx: SkillContext, build) -> tuple:
+    """(English visual, copy in the associate's language or None). `build()` reads ctx.lang / ctx.clang."""
+    with ctx.as_lang("en"):
+        en = build()
+    if ctx.alang == "en":
+        return en, None
+    with ctx.as_lang(ctx.alang):
+        return en, build()
+
+
+async def dual_async(ctx: SkillContext, build) -> tuple:
+    with ctx.as_lang("en"):
+        en = await build()
+    if ctx.alang == "en":
+        return en, None
+    with ctx.as_lang(ctx.alang):
+        return en, await build()
+
+
+def with_copy(ctx: SkillContext, msg: OutMessage, copy) -> OutMessage:
+    """Attach the associate's-language copy (a Card or image bytes) to a message carrying the English visual."""
+    if copy is None:
+        return msg
+    if isinstance(copy, (bytes, bytearray)):
+        msg.image_copy = bytes(copy)
+    else:
+        msg.card_copy = copy
+    msg.copy_caption = ctx.t("copy_caption", ctx.alang)
+    return msg
+
+
+@lru_cache
+def _values_hi() -> dict[str, str]:
+    import yaml
+
+    from chanakya.config import ROOT
+
+    path = ROOT / "chanakya" / "i18n" / "values_hi.yaml"
+    if not path.exists():
+        return {}
+    return yaml.safe_load(path.read_text()) or {}
+
+
+def value_title(sd, value: str, lang: str) -> str:
+    """A slot value as the customer reads it: Hindi in Devanagari (packs keep Roman Hinglish for the associate)."""
+    t = sd.value_title(value, lang)
+    return _values_hi().get(t, t) if lang == "hi" else t

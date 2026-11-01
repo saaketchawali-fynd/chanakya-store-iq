@@ -21,12 +21,16 @@ Return JSON that matches the schema. Rules:
 9. customer_language: only if the associate states the customer's language ("customer Marathi bolte hain").
 10. intents: include every intent that applies."""
 
+TRANSCRIBE_SYSTEM = """Write down exactly what is said in this voice note from a shop-floor associate in Mumbai.
+Hindi, Marathi, English or a mix. Hindi in Roman script as spoken, Marathi in Devanagari, English product words
+(4K, QLED, inverter, EMI, ton, kg, litre) in Latin script, numbers as digits. Output the words only, nothing else."""
+
 READ_IMAGE_SYSTEM = """You read photos sent by a store associate. Decide the kind:
 - "label": a product label, energy label, price tag, box or spec sheet. Copy brand, model text and the
   specs exactly as printed. Never add specs that are not visible.
 - "room": a photo of a room in a home. Return boxes (box_2d as [ymin, xmin, ymax, xmax] normalised to
   0-1000) for: the main free wall where a TV/AC could go ("wall"), sofa, door, windows, existing TV,
-  TV unit, sockets, people, one floor tile if tiles are visible, and the ceiling line if visible.
+  TV unit ("tv_unit": any table, cabinet or shelf a TV could stand on), sockets, people, one floor tile if tiles are visible, and the ceiling line if visible.
   Report light (sunny/moderate/dim) and whether the photo faces the wall (frontal).
   HARD RULE: describe only space and light. Never describe decor, furniture quality, possessions,
   neighbourhood or anything that suggests wealth or income. Do not guess who lives there.

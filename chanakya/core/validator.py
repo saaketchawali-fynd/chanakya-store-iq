@@ -46,8 +46,9 @@ def _visible_texts(m: OutMessage) -> list[str]:
     out += [b.title for b in m.buttons]
     for sec in m.sections:
         out += [sec.title or ""] + [r.title for r in sec.rows] + [r.description or "" for r in sec.rows]
-    if m.card:
-        out += [s for k, s in _card_strings(m.card.data)]
+    for c in (m.card, m.card_copy):
+        if c:
+            out += [s for k, s in _card_strings(c.data)]
     return out
 
 

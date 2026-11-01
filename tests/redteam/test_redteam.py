@@ -273,7 +273,12 @@ async def test_languages(h, assoc, cust):
     check_floor(out)
     await h.tap("s:C1:shown")
     out = await pick(h)
-    assert out[-1].card.lang == cust and out[-1].card.data["zaroori_total_str"] == "₹65,288"
+    k = out[-1]  # the customer's bill is in English; the associate gets one copy in their own language
+    assert k.card.lang == "en" and k.card.data["zaroori_total_str"] == "₹65,288"
+    if assoc == "en":
+        assert k.card_copy is None
+    else:
+        assert k.card_copy.lang == assoc and k.card_copy.data["zaroori_total_str"] == "₹65,288"
 
 
 async def test_language_picker_then_single_language(tmp_path):

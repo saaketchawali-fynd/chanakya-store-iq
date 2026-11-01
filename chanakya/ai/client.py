@@ -75,7 +75,7 @@ class AIClient:
                     [part, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)],
                     Understanding,
                     prompts.UNDERSTAND_SYSTEM,
-                    timeout=12.0 if audio is not None else 8.0,
+                    timeout=14.0 if audio is not None else 8.0,
                     kind="understand_audio" if audio is not None else "understand_text",
                 )
                 if not u.transcript and text:
@@ -88,13 +88,19 @@ class AIClient:
                     "intents": u.intents, "transcript_chars": len(u.transcript or "")})
                 return u
             except AIUnavailable:
-                if audio is not None:
-                    raise
+                if audio is not None:  # safety net: plain transcript, then the offline rules on it
+                    heard = await self.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=9.0)
+                    u = self._rules(heard, ctx)
+                    u.transcript = heard
+                    return u
         if audio is not None:
             raise AIUnavailable("voice")
+        return self._rules(text or "", ctx)
+
+    def _rules(self, text: str, ctx: dict) -> Understanding:
         myths = [m["id"] for m in ctx.get("myths", [])] or None
         return rules.understand_text(
-            text or "", self.packs, ctx.get("category"), myths, options_shown=bool(ctx.get("options_shown"))
+            text, self.packs, ctx.get("category"), myths, options_shown=bool(ctx.get("options_shown"))
         )
 
     # ---------- 8.3 ----------

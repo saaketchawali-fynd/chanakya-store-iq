@@ -15,7 +15,7 @@ from chanakya.brain import packs as P
 from chanakya.core import repo, state
 from chanakya.core.buttons import encode
 from chanakya.core.coach import coach_reply, info_reply
-from chanakya.core.contracts import Button, Card, OutMessage, Reply, Step
+from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, Card, OutMessage, Reply, Step
 from chanakya.core.status import short_name
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
@@ -119,8 +119,8 @@ async def record_consent(ctx: SkillContext, customer_wa_id: str, method: str) ->
     # to the customer
     cust_body = "\n".join(
         [
-            ctx.t("cust_welcome", s.home.customer_lang, associate=staff.name if staff else "Chanakya"),
-            ctx.t("cust_photo_hint", s.home.customer_lang),
+            ctx.t("cust_welcome", CUSTOMER_PHONE_LANG, associate=staff.name if staff else "Chanakya"),
+            ctx.t("cust_photo_hint", CUSTOMER_PHONE_LANG),
         ]
     )
     msgs.append(OutMessage(to=customer_wa_id, kind="text", body=cust_body))
@@ -169,93 +169,98 @@ def _reasons(ctx: SkillContext, sku: str, lang: str) -> list[str]:
 
 async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Reply:
     s = ctx.session
-    lang = s.home.customer_lang
-    alang = assoc_lang or ctx.lang
+    lang = "en"  # the message to the customer's phone is in English, like every customer-facing visual
+    alang = assoc_lang or ctx.alang
     sku = s.chosen_sku or s.option_labels.get("B")
     if not sku:
         return ctx.reply(info_reply(ctx, ctx.t("parivaar_need_product", alang)))
     p = ctx.facts.product_sync(sku)
     name = s.home.customer_name or ""
     presale = bool(s.extra.get("presale_parivaar")) and s.extra.get("outcome") != "sold"
-    title = ctx.t("parivaar_title_presale" if presale else "parivaar_title", lang, name=short_name(name) if name else "")
     image: str | bytes | None = p.image
     tryon = await repo.media_latest(s.id, "tryon")
     if tryon:
         image = "data:image/jpeg;base64," + base64.b64encode(tryon.data).decode()
-    cost_text = offer_text = finance_text = delivery_text = None
-    if s.cost_snapshot:
-        cs = s.cost_snapshot
-        ctx.reg.raw(cs["zaroori_total_str"] + " " + cs["with_suggestions_total_str"], f"snapshot:hisaab:{sku}")
-        cost_text = ctx.t("parivaar_cost", lang, total=cs["zaroori_total_str"])
-        if cs["with_suggestions_total"] != cs["zaroori_total"] and not s.extra.get("suggestions_off"):
-            cost_text += " · " + ctx.t("parivaar_cost_sug", lang, total=cs["with_suggestions_total_str"])
-    if s.offer_snapshot:
-        os_ = s.offer_snapshot
-        if os_.get("applied"):
-            a = os_["applied"][0]
+    staff = await repo.staff_by_wa(s.associate_wa_id)
+
+    def card_in(lang: str) -> Card:
+        title = ctx.t("parivaar_title_presale" if presale else "parivaar_title", lang, name=short_name(name) if name else "")
+        cost_text = offer_text = finance_text = delivery_text = None
+        if s.cost_snapshot:
+            cs = s.cost_snapshot
+            ctx.reg.raw(cs["zaroori_total_str"] + " " + cs["with_suggestions_total_str"], f"snapshot:hisaab:{sku}")
+            cost_text = ctx.t("parivaar_cost", lang, total=cs["zaroori_total_str"])
+            if cs["with_suggestions_total"] != cs["zaroori_total"] and not s.extra.get("suggestions_off"):
+                cost_text += " · " + ctx.t("parivaar_cost_sug", lang, total=cs["with_suggestions_total_str"])
+        if s.offer_snapshot:
+            os_ = s.offer_snapshot
+            if os_.get("applied"):
+                a = os_["applied"][0]
+                from datetime import date
+
+                vt = date.fromisoformat(a["valid_to"])
+                offer_text = ctx.t(
+                    "parivaar_offer",
+                    lang,
+                    offer=ctx.reg.static(_offer_title(ctx, a["id"], lang)),
+                    amount=ctx.reg.raw(a["amount_str"], f"offer:{a['id']}"),
+                    date=ctx.reg.raw(fmt.date_short(vt, lang), f"offer:{a['id']}"),
+                    payable=ctx.reg.raw(os_["payable_str"], "snapshot:payable"),
+                )
+            if os_.get("finance"):
+                from chanakya.skills.close import finance_sentence
+                from chanakya.truth.finance import FinanceQuote
+
+                q = FinanceQuote.model_validate(os_["finance"])
+                for v in (q.monthly_str, q.fee_str, q.total_str, q.extra_str, q.months_str):
+                    ctx.reg.raw(v, f"snapshot:finance:{q.plan_id}")
+                finance_text = finance_sentence(ctx, q, lang)
+        cost_rows = []
+        if s.cost_snapshot:
+            cs = s.cost_snapshot
+            cost_rows.append({"label": ctx.t("row_full_cost", lang), "value": cs["zaroori_total_str"], "strong": True})
+            if cs["with_suggestions_total"] != cs["zaroori_total"] and not s.extra.get("suggestions_off"):
+                cost_rows.append(
+                    {"label": ctx.t("row_with_sug", lang), "value": cs["with_suggestions_total_str"], "strong": False}
+                )
+        if s.offer_snapshot and s.offer_snapshot.get("applied"):
+            os_ = s.offer_snapshot
+            for a in os_["applied"][:2]:
+                ctx.reg.raw(a["amount_str"], f"offer:{a['id']}")
+                cost_rows.append({"label": ctx.t("row_offer", lang), "value": "−" + a["amount_str"], "strong": False})
+            final = os_.get("total_today_str") or os_["payable_str"]
+            ctx.reg.raw(final, "snapshot:total_today")
+            cost_rows.append({"label": ctx.t("row_payable", lang), "value": final, "strong": True})
+        if s.extra.get("delivery_choice"):
             from datetime import date
 
-            vt = date.fromisoformat(a["valid_to"])
-            offer_text = ctx.t(
-                "parivaar_offer",
+            d = date.fromisoformat(s.extra["delivery_choice"])
+            delivery_text = ctx.t(
+                "parivaar_delivery",
                 lang,
-                offer=ctx.reg.static(_offer_title(ctx, a["id"], lang)),
-                amount=ctx.reg.raw(a["amount_str"], f"offer:{a['id']}"),
-                date=ctx.reg.raw(fmt.date_short(vt, lang), f"offer:{a['id']}"),
-                payable=ctx.reg.raw(os_["payable_str"], "snapshot:payable"),
+                day=ctx.reg.raw(f"{fmt.day_name(d, lang)} {fmt.date_short(d, lang)}", "choice:delivery"),
             )
-        if os_.get("finance"):
-            from chanakya.skills.close import finance_sentence
-            from chanakya.truth.finance import FinanceQuote
-
-            q = FinanceQuote.model_validate(os_["finance"])
-            for v in (q.monthly_str, q.fee_str, q.total_str, q.extra_str, q.months_str):
-                ctx.reg.raw(v, f"snapshot:finance:{q.plan_id}")
-            finance_text = finance_sentence(ctx, q, lang)
-    cost_rows = []
-    if s.cost_snapshot:
-        cs = s.cost_snapshot
-        cost_rows.append({"label": ctx.t("row_full_cost", lang), "value": cs["zaroori_total_str"], "strong": True})
-        if cs["with_suggestions_total"] != cs["zaroori_total"] and not s.extra.get("suggestions_off"):
-            cost_rows.append(
-                {"label": ctx.t("row_with_sug", lang), "value": cs["with_suggestions_total_str"], "strong": False}
-            )
-    if s.offer_snapshot and s.offer_snapshot.get("applied"):
-        os_ = s.offer_snapshot
-        for a in os_["applied"][:2]:
-            ctx.reg.raw(a["amount_str"], f"offer:{a['id']}")
-            cost_rows.append({"label": ctx.t("row_offer", lang), "value": "−" + a["amount_str"], "strong": False})
-        final = os_.get("total_today_str") or os_["payable_str"]
-        ctx.reg.raw(final, "snapshot:total_today")
-        cost_rows.append({"label": ctx.t("row_payable", lang), "value": final, "strong": True})
-    if s.extra.get("delivery_choice"):
-        from datetime import date
-
-        d = date.fromisoformat(s.extra["delivery_choice"])
-        delivery_text = ctx.t(
-            "parivaar_delivery",
-            lang,
-            day=ctx.reg.raw(f"{fmt.day_name(d, lang)} {fmt.date_short(d, lang)}", "choice:delivery"),
+        return Card(
+            template="parivaar",
+            lang=lang,
+            data={  # type: ignore[arg-type]
+                "title": title,
+                "image": image,
+                "product_title": C.product_title(ctx, p, lang),
+                "reasons": _reasons(ctx, sku, lang),
+                "cost_text": cost_text,
+                "cost_rows": cost_rows,
+                "key_specs": PV.key_specs(ctx, p, lang, 4),
+                "offer_text": offer_text,
+                "finance_text": finance_text,
+                "delivery_text": delivery_text,
+                "associate_name": staff.name if staff else "",
+                "store_name": ctx.facts.store_name(staff.store_id if staff else None),
+            },
         )
-    staff = await repo.staff_by_wa(s.associate_wa_id)
-    card = Card(
-        template="parivaar",
-        lang=lang,
-        data={  # type: ignore[arg-type]
-            "title": title,
-            "image": image,
-            "product_title": C.product_title(ctx, p, lang),
-            "reasons": _reasons(ctx, sku, lang),
-            "cost_text": cost_text,
-            "cost_rows": cost_rows,
-            "key_specs": PV.key_specs(ctx, p, lang, 4),
-            "offer_text": offer_text,
-            "finance_text": finance_text,
-            "delivery_text": delivery_text,
-            "associate_name": staff.name if staff else "",
-            "store_name": ctx.facts.store_name(staff.store_id if staff else None),
-        },
-    )
+
+    card = card_in("en")  # what the family sees: English (the user's rule for every customer-facing visual)
+    copy = card_in(alang) if alang != "en" else None
     s8 = s.id[:8]
     aname = staff.name if staff else "Chanakya"
     from chanakya.channel.limits import truncate_title
@@ -286,6 +291,8 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
                  Button(id=ctx.sid("khatam"), title=ctx.t("b_khatam", alang))]
         body = ctx.t("parivaar_sent", alang, name=nm)
     to_assoc = OutMessage(to=s.associate_wa_id, kind="buttons", body=body, buttons=abtns)
+    if copy is not None:  # the associate sees what was sent, in their language
+        to_assoc.card_copy, to_assoc.copy_caption = copy, ctx.t("copy_caption", alang)
     return ctx.reply(to_customer, to_assoc)
 
 
@@ -432,7 +439,7 @@ async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
                 to=s.customer_wa_id,
                 kind="text",
                 body=ctx.t(
-                    "cust_install_booked", s.home.customer_lang, slot=ctx.reg.static(ctx.t(key, s.home.customer_lang))
+                    "cust_install_booked", CUSTOMER_PHONE_LANG, slot=ctx.reg.static(ctx.t(key, CUSTOMER_PHONE_LANG))
                 ),
             )
         )

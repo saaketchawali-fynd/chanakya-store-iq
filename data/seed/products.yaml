@@ -50,11 +50,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
-    - {hi: 300 निट्स ब्राइटनेस, mr: 300 निट्स ब्राइटनेस, en: 300 nits brightness}
-    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
-    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K LED, 60 Hz refresh rate', mr: '4K LED, 60 Hz refresh rate', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 300 nits brightness, mr: 300 nits brightness, en: 300 nits brightness}
+    - {hi: "20 W speakers", mr: "20 W speakers", en: "20 W speakers"}
+    - {hi: "YouTube, Netflix apps", mr: "YouTube, Netflix apps", en: "YouTube, Netflix apps"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-ARK-50-4K60
   category: tv
@@ -106,11 +106,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
-    - {hi: 350 निट्स ब्राइटनेस, mr: 350 निट्स ब्राइटनेस, en: 350 nits brightness}
-    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
-    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K LED, 60 Hz refresh rate', mr: '4K LED, 60 Hz refresh rate', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 350 nits brightness, mr: 350 nits brightness, en: 350 nits brightness}
+    - {hi: "20 W speakers", mr: "20 W speakers", en: "20 W speakers"}
+    - {hi: "YouTube, Netflix apps", mr: "YouTube, Netflix apps", en: "YouTube, Netflix apps"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-ARK-55-4K60
   category: tv
@@ -162,11 +162,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
-    - {hi: 350 निट्स ब्राइटनेस, mr: 350 निट्स ब्राइटनेस, en: 350 nits brightness}
-    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
-    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K LED, 60 Hz refresh rate', mr: '4K LED, 60 Hz refresh rate', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 350 nits brightness, mr: 350 nits brightness, en: 350 nits brightness}
+    - {hi: "20 W speakers", mr: "20 W speakers", en: "20 W speakers"}
+    - {hi: "YouTube, Netflix apps", mr: "YouTube, Netflix apps", en: "YouTube, Netflix apps"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-MER-55-QL60
   category: tv
@@ -219,11 +219,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
-    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
-    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K QLED, 60 Hz refresh rate', mr: '4K QLED, 60 Hz refresh rate', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 400 nits brightness, mr: 400 nits brightness, en: 400 nits brightness}
+    - {hi: "30 W speakers", mr: "30 W speakers", en: "30 W speakers"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-MER-55-QL120
   category: tv
@@ -275,11 +275,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 120 Hz रिफ्रेश रेट', mr: '4K QLED, 120 Hz रिफ्रेश रेट', en: '4K QLED, 120 Hz refresh rate'}
-    - {hi: '600 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '600 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '600 nits brightness, anti-glare'}
-    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', mr: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', en: '3 HDMI + 2 USB ports, Wi-Fi, Bluetooth'}
+    - {hi: '4K QLED, 120 Hz refresh rate', mr: '4K QLED, 120 Hz refresh rate', en: '4K QLED, 120 Hz refresh rate'}
+    - {hi: "600 nits brightness, anti-glare", mr: "600 nits brightness, anti-glare", en: "600 nits brightness, anti-glare"}
+    - {hi: "40 W speakers, Dolby Atmos", mr: "40 W speakers, Dolby Atmos", en: "40 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth", mr: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth", en: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth"}
   test_data: true
 - sku: TV-NOV-55-OL120
   category: tv
@@ -332,11 +332,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K OLED, 120 Hz रिफ्रेश रेट', mr: '4K OLED, 120 Hz रिफ्रेश रेट', en: '4K OLED, 120 Hz refresh rate'}
-    - {hi: 450 निट्स ब्राइटनेस, mr: 450 निट्स ब्राइटनेस, en: 450 nits brightness}
-    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG, Dolby Vision सपोर्ट', mr: 'HDR10, HLG, Dolby Vision सपोर्ट', en: 'HDR10, HLG, Dolby Vision support'}
+    - {hi: '4K OLED, 120 Hz refresh rate', mr: '4K OLED, 120 Hz refresh rate', en: '4K OLED, 120 Hz refresh rate'}
+    - {hi: 450 nits brightness, mr: 450 nits brightness, en: 450 nits brightness}
+    - {hi: "40 W speakers, Dolby Atmos", mr: "40 W speakers, Dolby Atmos", en: "40 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG, Dolby Vision support", mr: "HDR10, HLG, Dolby Vision support", en: "HDR10, HLG, Dolby Vision support"}
   test_data: true
 - sku: TV-ARK-65-4K60
   category: tv
@@ -388,11 +388,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
-    - {hi: 380 निट्स ब्राइटनेस, mr: 380 निट्स ब्राइटनेस, en: 380 nits brightness}
-    - {hi: 24 W स्पीकर, mr: 24 W स्पीकर, en: 24 W speakers}
-    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K LED, 60 Hz refresh rate', mr: '4K LED, 60 Hz refresh rate', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 380 nits brightness, mr: 380 nits brightness, en: 380 nits brightness}
+    - {hi: "24 W speakers", mr: "24 W speakers", en: "24 W speakers"}
+    - {hi: "YouTube, Netflix apps", mr: "YouTube, Netflix apps", en: "YouTube, Netflix apps"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-MER-65-QL120
   category: tv
@@ -444,11 +444,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 120 Hz रिफ्रेश रेट', mr: '4K QLED, 120 Hz रिफ्रेश रेट', en: '4K QLED, 120 Hz refresh rate'}
-    - {hi: '650 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '650 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '650 nits brightness, anti-glare'}
-    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', mr: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', en: '3 HDMI + 2 USB ports, Wi-Fi, Bluetooth'}
+    - {hi: '4K QLED, 120 Hz refresh rate', mr: '4K QLED, 120 Hz refresh rate', en: '4K QLED, 120 Hz refresh rate'}
+    - {hi: "650 nits brightness, anti-glare", mr: "650 nits brightness, anti-glare", en: "650 nits brightness, anti-glare"}
+    - {hi: "40 W speakers, Dolby Atmos", mr: "40 W speakers, Dolby Atmos", en: "40 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth", mr: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth", en: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth"}
   test_data: true
 - sku: TV-NOV-65-ML120
   category: tv
@@ -501,11 +501,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K Mini LED, 120 Hz रिफ्रेश रेट', mr: '4K Mini LED, 120 Hz रिफ्रेश रेट', en: '4K Mini LED, 120 Hz refresh rate'}
-    - {hi: '1000 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '1000 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '1000 nits brightness, anti-glare'}
-    - {hi: '60 W स्पीकर, Dolby Atmos', mr: '60 W स्पीकर, Dolby Atmos', en: '60 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10+, HLG, Dolby Vision सपोर्ट', mr: 'HDR10+, HLG, Dolby Vision सपोर्ट', en: 'HDR10+, HLG, Dolby Vision support'}
+    - {hi: '4K Mini LED, 120 Hz refresh rate', mr: '4K Mini LED, 120 Hz refresh rate', en: '4K Mini LED, 120 Hz refresh rate'}
+    - {hi: "1000 nits brightness, anti-glare", mr: "1000 nits brightness, anti-glare", en: "1000 nits brightness, anti-glare"}
+    - {hi: "60 W speakers, Dolby Atmos", mr: "60 W speakers, Dolby Atmos", en: "60 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10+, HLG, Dolby Vision support", mr: "HDR10+, HLG, Dolby Vision support", en: "HDR10+, HLG, Dolby Vision support"}
   test_data: true
 - sku: TV-MER-75-QL120
   category: tv
@@ -557,11 +557,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 120 Hz रिफ्रेश रेट', mr: '4K QLED, 120 Hz रिफ्रेश रेट', en: '4K QLED, 120 Hz refresh rate'}
-    - {hi: '700 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '700 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '700 nits brightness, anti-glare'}
-    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', mr: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', en: '3 HDMI + 2 USB ports, Wi-Fi, Bluetooth'}
+    - {hi: '4K QLED, 120 Hz refresh rate', mr: '4K QLED, 120 Hz refresh rate', en: '4K QLED, 120 Hz refresh rate'}
+    - {hi: "700 nits brightness, anti-glare", mr: "700 nits brightness, anti-glare", en: "700 nits brightness, anti-glare"}
+    - {hi: "40 W speakers, Dolby Atmos", mr: "40 W speakers, Dolby Atmos", en: "40 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth", mr: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth", en: "3 HDMI + 2 USB ports, Wi-Fi, Bluetooth"}
   test_data: true
 - sku: TV-ARK-32-HD60
   category: tv
@@ -612,11 +612,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: 'HD LED, 60 Hz रिफ्रेश रेट', mr: 'HD LED, 60 Hz रिफ्रेश रेट', en: 'HD LED, 60 Hz refresh rate'}
-    - {hi: 250 निट्स ब्राइटनेस, mr: 250 निट्स ब्राइटनेस, en: 250 nits brightness}
-    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
-    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
-    - {hi: '2 HDMI + 1 USB पोर्ट, Wi-Fi', mr: '2 HDMI + 1 USB पोर्ट, Wi-Fi', en: '2 HDMI + 1 USB ports, Wi-Fi'}
+    - {hi: 'HD LED, 60 Hz refresh rate', mr: 'HD LED, 60 Hz refresh rate', en: 'HD LED, 60 Hz refresh rate'}
+    - {hi: 250 nits brightness, mr: 250 nits brightness, en: 250 nits brightness}
+    - {hi: "20 W speakers", mr: "20 W speakers", en: "20 W speakers"}
+    - {hi: "YouTube, Netflix apps", mr: "YouTube, Netflix apps", en: "YouTube, Netflix apps"}
+    - {hi: "2 HDMI + 1 USB ports, Wi-Fi", mr: "2 HDMI + 1 USB ports, Wi-Fi", en: "2 HDMI + 1 USB ports, Wi-Fi"}
   test_data: true
 - sku: TV-ARK-40-FHD60
   category: tv
@@ -669,11 +669,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: 'Full HD LED, 60 Hz रिफ्रेश रेट', mr: 'Full HD LED, 60 Hz रिफ्रेश रेट', en: 'Full HD LED, 60 Hz refresh rate'}
-    - {hi: 280 निट्स ब्राइटनेस, mr: 280 निट्स ब्राइटनेस, en: 280 nits brightness}
-    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
-    - {hi: 'YouTube, Netflix, Prime Video ऐप्स', mr: 'YouTube, Netflix, Prime Video अ‍ॅप्स', en: 'YouTube, Netflix, Prime Video apps'}
-    - {hi: HDR10 सपोर्ट, mr: HDR10 सपोर्ट, en: HDR10 support}
+    - {hi: 'Full HD LED, 60 Hz refresh rate', mr: 'Full HD LED, 60 Hz refresh rate', en: 'Full HD LED, 60 Hz refresh rate'}
+    - {hi: 280 nits brightness, mr: 280 nits brightness, en: 280 nits brightness}
+    - {hi: "20 W speakers", mr: "20 W speakers", en: "20 W speakers"}
+    - {hi: "YouTube, Netflix, Prime Video apps", mr: "YouTube, Netflix, Prime Video apps", en: "YouTube, Netflix, Prime Video apps"}
+    - {hi: "HDR10 support", mr: "HDR10 support", en: "HDR10 support"}
   test_data: true
 - sku: TV-MER-43-QL60
   category: tv
@@ -726,11 +726,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
-    - {hi: 350 निट्स ब्राइटनेस, mr: 350 निट्स ब्राइटनेस, en: 350 nits brightness}
-    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K QLED, 60 Hz refresh rate', mr: '4K QLED, 60 Hz refresh rate', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 350 nits brightness, mr: 350 nits brightness, en: 350 nits brightness}
+    - {hi: "20 W speakers", mr: "20 W speakers", en: "20 W speakers"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-MER-50-QL60
   category: tv
@@ -783,11 +783,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
-    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
-    - {hi: 24 W स्पीकर, mr: 24 W स्पीकर, en: 24 W speakers}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K QLED, 60 Hz refresh rate', mr: '4K QLED, 60 Hz refresh rate', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 400 nits brightness, mr: 400 nits brightness, en: 400 nits brightness}
+    - {hi: "24 W speakers", mr: "24 W speakers", en: "24 W speakers"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-ARK-55-QL60
   category: tv
@@ -840,11 +840,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
-    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
-    - {hi: 24 W स्पीकर, mr: 24 W स्पीकर, en: 24 W speakers}
-    - {hi: 'YouTube, Netflix, Prime Video ऐप्स', mr: 'YouTube, Netflix, Prime Video अ‍ॅप्स', en: 'YouTube, Netflix, Prime Video apps'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K QLED, 60 Hz refresh rate', mr: '4K QLED, 60 Hz refresh rate', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 400 nits brightness, mr: 400 nits brightness, en: 400 nits brightness}
+    - {hi: "24 W speakers", mr: "24 W speakers", en: "24 W speakers"}
+    - {hi: "YouTube, Netflix, Prime Video apps", mr: "YouTube, Netflix, Prime Video apps", en: "YouTube, Netflix, Prime Video apps"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-MER-65-QL60
   category: tv
@@ -897,11 +897,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
-    - {hi: 420 निट्स ब्राइटनेस, mr: 420 निट्स ब्राइटनेस, en: 420 nits brightness}
-    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K QLED, 60 Hz refresh rate', mr: '4K QLED, 60 Hz refresh rate', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 420 nits brightness, mr: 420 nits brightness, en: 420 nits brightness}
+    - {hi: "30 W speakers", mr: "30 W speakers", en: "30 W speakers"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-ARK-75-4K60
   category: tv
@@ -954,11 +954,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
-    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
-    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
-    - {hi: 'YouTube, Netflix, Prime Video ऐप्स', mr: 'YouTube, Netflix, Prime Video अ‍ॅप्स', en: 'YouTube, Netflix, Prime Video apps'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K LED, 60 Hz refresh rate', mr: '4K LED, 60 Hz refresh rate', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 400 nits brightness, mr: 400 nits brightness, en: 400 nits brightness}
+    - {hi: "30 W speakers", mr: "30 W speakers", en: "30 W speakers"}
+    - {hi: "YouTube, Netflix, Prime Video apps", mr: "YouTube, Netflix, Prime Video apps", en: "YouTube, Netflix, Prime Video apps"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-NOV-48-OL120
   category: tv
@@ -1011,11 +1011,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K OLED, 120 Hz रिफ्रेश रेट', mr: '4K OLED, 120 Hz रिफ्रेश रेट', en: '4K OLED, 120 Hz refresh rate'}
-    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
-    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG, Dolby Vision सपोर्ट', mr: 'HDR10, HLG, Dolby Vision सपोर्ट', en: 'HDR10, HLG, Dolby Vision support'}
+    - {hi: '4K OLED, 120 Hz refresh rate', mr: '4K OLED, 120 Hz refresh rate', en: '4K OLED, 120 Hz refresh rate'}
+    - {hi: 400 nits brightness, mr: 400 nits brightness, en: 400 nits brightness}
+    - {hi: "40 W speakers, Dolby Atmos", mr: "40 W speakers, Dolby Atmos", en: "40 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG, Dolby Vision support", mr: "HDR10, HLG, Dolby Vision support", en: "HDR10, HLG, Dolby Vision support"}
   test_data: true
 - sku: TV-MER-75-QL60
   category: tv
@@ -1068,11 +1068,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
-    - {hi: 450 निट्स ब्राइटनेस, mr: 450 निट्स ब्राइटनेस, en: 450 nits brightness}
-    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+    - {hi: '4K QLED, 60 Hz refresh rate', mr: '4K QLED, 60 Hz refresh rate', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 450 nits brightness, mr: 450 nits brightness, en: 450 nits brightness}
+    - {hi: "30 W speakers", mr: "30 W speakers", en: "30 W speakers"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG support", mr: "HDR10, HLG support", en: "HDR10, HLG support"}
   test_data: true
 - sku: TV-NOV-55-ML144
   category: tv
@@ -1125,11 +1125,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K Mini LED, 144 Hz रिफ्रेश रेट', mr: '4K Mini LED, 144 Hz रिफ्रेश रेट', en: '4K Mini LED, 144 Hz refresh rate'}
-    - {hi: '1500 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '1500 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '1500 nits brightness, anti-glare'}
-    - {hi: '50 W स्पीकर, Dolby Atmos', mr: '50 W स्पीकर, Dolby Atmos', en: '50 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10+, HLG, Dolby Vision सपोर्ट', mr: 'HDR10+, HLG, Dolby Vision सपोर्ट', en: 'HDR10+, HLG, Dolby Vision support'}
+    - {hi: '4K Mini LED, 144 Hz refresh rate', mr: '4K Mini LED, 144 Hz refresh rate', en: '4K Mini LED, 144 Hz refresh rate'}
+    - {hi: "1500 nits brightness, anti-glare", mr: "1500 nits brightness, anti-glare", en: "1500 nits brightness, anti-glare"}
+    - {hi: "50 W speakers, Dolby Atmos", mr: "50 W speakers, Dolby Atmos", en: "50 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10+, HLG, Dolby Vision support", mr: "HDR10+, HLG, Dolby Vision support", en: "HDR10+, HLG, Dolby Vision support"}
   test_data: true
 - sku: TV-NOV-65-OL120
   category: tv
@@ -1182,11 +1182,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K OLED, 120 Hz रिफ्रेश रेट', mr: '4K OLED, 120 Hz रिफ्रेश रेट', en: '4K OLED, 120 Hz refresh rate'}
-    - {hi: 450 निट्स ब्राइटनेस, mr: 450 निट्स ब्राइटनेस, en: 450 nits brightness}
-    - {hi: '60 W स्पीकर, Dolby Atmos', mr: '60 W स्पीकर, Dolby Atmos', en: '60 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10, HLG, Dolby Vision सपोर्ट', mr: 'HDR10, HLG, Dolby Vision सपोर्ट', en: 'HDR10, HLG, Dolby Vision support'}
+    - {hi: '4K OLED, 120 Hz refresh rate', mr: '4K OLED, 120 Hz refresh rate', en: '4K OLED, 120 Hz refresh rate'}
+    - {hi: 450 nits brightness, mr: 450 nits brightness, en: 450 nits brightness}
+    - {hi: "60 W speakers, Dolby Atmos", mr: "60 W speakers, Dolby Atmos", en: "60 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10, HLG, Dolby Vision support", mr: "HDR10, HLG, Dolby Vision support", en: "HDR10, HLG, Dolby Vision support"}
   test_data: true
 - sku: TV-NOV-85-ML144
   category: tv
@@ -1239,11 +1239,11 @@
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '4K Mini LED, 144 Hz रिफ्रेश रेट', mr: '4K Mini LED, 144 Hz रिफ्रेश रेट', en: '4K Mini LED, 144 Hz refresh rate'}
-    - {hi: '1600 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '1600 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '1600 nits brightness, anti-glare'}
-    - {hi: '70 W स्पीकर, Dolby Atmos', mr: '70 W स्पीकर, Dolby Atmos', en: '70 W speakers, Dolby Atmos'}
-    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
-    - {hi: 'HDR10+, HLG, Dolby Vision सपोर्ट', mr: 'HDR10+, HLG, Dolby Vision सपोर्ट', en: 'HDR10+, HLG, Dolby Vision support'}
+    - {hi: '4K Mini LED, 144 Hz refresh rate', mr: '4K Mini LED, 144 Hz refresh rate', en: '4K Mini LED, 144 Hz refresh rate'}
+    - {hi: "1600 nits brightness, anti-glare", mr: "1600 nits brightness, anti-glare", en: "1600 nits brightness, anti-glare"}
+    - {hi: "70 W speakers, Dolby Atmos", mr: "70 W speakers, Dolby Atmos", en: "70 W speakers, Dolby Atmos"}
+    - {hi: "Dialogue enhance, wide viewing angle", mr: "Dialogue enhance, wide viewing angle", en: "Dialogue enhance, wide viewing angle"}
+    - {hi: "HDR10+, HLG, Dolby Vision support", mr: "HDR10+, HLG, Dolby Vision support", en: "HDR10+, HLG, Dolby Vision support"}
   test_data: true
 - sku: SB-MER-21
   category: soundbar
@@ -1282,11 +1282,11 @@
     - {hi: HDMI केबल, mr: HDMI केबल, en: HDMI cable}
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     features:
-    - {hi: '120 W आउटपुट, 2.1 चैनल', mr: '120 W आउटपुट, 2.1 चॅनेल', en: '120 W output, 2.1 channel'}
-    - {hi: डायलॉग एन्हांस मोड, mr: डायलॉग एन्हान्स मोड, en: Dialogue enhance mode}
-    - {hi: अलग सबवूफ़र, mr: वेगळा सबवूफर, en: Separate subwoofer}
-    - {hi: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', en: 'Bluetooth, HDMI ARC, optical in'}
-    - {hi: 4 साउंड मोड, mr: 4 साउंड मोड, en: 4 sound modes}
+    - {hi: "120 W output, 2.1 channel", mr: "120 W output, 2.1 channel", en: "120 W output, 2.1 channel"}
+    - {hi: "Dialogue enhance mode", mr: "Dialogue enhance mode", en: "Dialogue enhance mode"}
+    - {hi: "Separate subwoofer", mr: "Separate subwoofer", en: "Separate subwoofer"}
+    - {hi: "Bluetooth, HDMI ARC, optical in", mr: "Bluetooth, HDMI ARC, optical in", en: "Bluetooth, HDMI ARC, optical in"}
+    - {hi: "4 sound modes", mr: "4 sound modes", en: "4 sound modes"}
   test_data: true
 - sku: SB-ARK-20
   category: soundbar
@@ -1323,9 +1323,9 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     features:
-    - {hi: '60 W आउटपुट, 2.0 चैनल', mr: '60 W आउटपुट, 2.0 चॅनेल', en: '60 W output, 2.0 channel'}
-    - {hi: 'ब्लूटूथ, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, ऑप्टिकल इनपुट', en: 'Bluetooth, optical in'}
-    - {hi: 3 साउंड मोड, mr: 3 साउंड मोड, en: 3 sound modes}
+    - {hi: "60 W output, 2.0 channel", mr: "60 W output, 2.0 channel", en: "60 W output, 2.0 channel"}
+    - {hi: "Bluetooth, optical in", mr: "Bluetooth, optical in", en: "Bluetooth, optical in"}
+    - {hi: "3 sound modes", mr: "3 sound modes", en: "3 sound modes"}
   test_data: true
 - sku: SB-MER-31
   category: soundbar
@@ -1364,11 +1364,11 @@
     - {hi: HDMI केबल, mr: HDMI केबल, en: HDMI cable}
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     features:
-    - {hi: '240 W आउटपुट, 3.1 चैनल', mr: '240 W आउटपुट, 3.1 चॅनेल', en: '240 W output, 3.1 channel'}
-    - {hi: डायलॉग एन्हांस मोड, mr: डायलॉग एन्हान्स मोड, en: Dialogue enhance mode}
-    - {hi: अलग सबवूफ़र, mr: वेगळा सबवूफर, en: Separate subwoofer}
-    - {hi: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', en: 'Bluetooth, HDMI ARC, optical in'}
-    - {hi: 5 साउंड मोड, mr: 5 साउंड मोड, en: 5 sound modes}
+    - {hi: "240 W output, 3.1 channel", mr: "240 W output, 3.1 channel", en: "240 W output, 3.1 channel"}
+    - {hi: "Dialogue enhance mode", mr: "Dialogue enhance mode", en: "Dialogue enhance mode"}
+    - {hi: "Separate subwoofer", mr: "Separate subwoofer", en: "Separate subwoofer"}
+    - {hi: "Bluetooth, HDMI ARC, optical in", mr: "Bluetooth, HDMI ARC, optical in", en: "Bluetooth, HDMI ARC, optical in"}
+    - {hi: "5 sound modes", mr: "5 sound modes", en: "5 sound modes"}
   test_data: true
 - sku: SB-NOV-512
   category: soundbar
@@ -1407,11 +1407,11 @@
     - {hi: HDMI केबल, mr: HDMI केबल, en: HDMI cable}
     - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
     features:
-    - {hi: '450 W आउटपुट, 5.1.2 चैनल', mr: '450 W आउटपुट, 5.1.2 चॅनेल', en: '450 W output, 5.1.2 channel'}
-    - {hi: Dolby Atmos साउंड, mr: Dolby Atmos साउंड, en: Dolby Atmos sound}
-    - {hi: डायलॉग एन्हांस मोड, mr: डायलॉग एन्हान्स मोड, en: Dialogue enhance mode}
-    - {hi: अलग सबवूफ़र, mr: वेगळा सबवूफर, en: Separate subwoofer}
-    - {hi: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', en: 'Bluetooth, HDMI ARC, optical in'}
+    - {hi: "450 W output, 5.1.2 channel", mr: "450 W output, 5.1.2 channel", en: "450 W output, 5.1.2 channel"}
+    - {hi: "Dolby Atmos sound", mr: "Dolby Atmos sound", en: "Dolby Atmos sound"}
+    - {hi: "Dialogue enhance mode", mr: "Dialogue enhance mode", en: "Dialogue enhance mode"}
+    - {hi: "Separate subwoofer", mr: "Separate subwoofer", en: "Separate subwoofer"}
+    - {hi: "Bluetooth, HDMI ARC, optical in", mr: "Bluetooth, HDMI ARC, optical in", en: "Bluetooth, HDMI ARC, optical in"}
   test_data: true
 - sku: AC-ARK-10-3S
   category: ac
@@ -1453,11 +1453,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.0 टन, 3-स्टार, इन्वर्टर', mr: '1.0 टन, 3-स्टार, इन्व्हर्टर', en: '1.0 ton, 3-star, inverter'}
-    - {hi: '3450 W कूलिंग, ISEER 4.1', mr: '3450 W कूलिंग, ISEER 4.1', en: '3450 W cooling, ISEER 4.1'}
-    - {hi: 820 kWh/साल बिजली खपत, mr: 820 kWh/वर्ष वीज वापर, en: 820 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 42 dB, mr: आवाजाची पातळी 42 dB, en: Noise level 42 dB}
-    - {hi: 'एंटी-डस्ट फ़िल्टर, R32 गैस', mr: 'अँटी-डस्ट फिल्टर, R32 गॅस', en: 'Anti-dust filter, R32 gas'}
+    - {hi: "1.0 ton, 3-star, inverter", mr: "1.0 ton, 3-star, inverter", en: "1.0 ton, 3-star, inverter"}
+    - {hi: "3450 W cooling, ISEER 4.1", mr: "3450 W cooling, ISEER 4.1", en: "3450 W cooling, ISEER 4.1"}
+    - {hi: "820 kWh/year energy use", mr: "820 kWh/year energy use", en: "820 kWh/year energy use"}
+    - {hi: "Noise level 42 dB", mr: "Noise level 42 dB", en: "Noise level 42 dB"}
+    - {hi: "Anti-dust filter, R32 gas", mr: "Anti-dust filter, R32 gas", en: "Anti-dust filter, R32 gas"}
   test_data: true
 - sku: AC-MER-15-3S
   category: ac
@@ -1499,11 +1499,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.5 टन, 3-स्टार, इन्वर्टर', mr: '1.5 टन, 3-स्टार, इन्व्हर्टर', en: '1.5 ton, 3-star, inverter'}
-    - {hi: '5050 W कूलिंग, ISEER 4.1', mr: '5050 W कूलिंग, ISEER 4.1', en: '5050 W cooling, ISEER 4.1'}
-    - {hi: 1050 kWh/साल बिजली खपत, mr: 1050 kWh/वर्ष वीज वापर, en: 1050 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 42 dB, mr: आवाजाची पातळी 42 dB, en: Noise level 42 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "1.5 ton, 3-star, inverter", mr: "1.5 ton, 3-star, inverter", en: "1.5 ton, 3-star, inverter"}
+    - {hi: "5050 W cooling, ISEER 4.1", mr: "5050 W cooling, ISEER 4.1", en: "5050 W cooling, ISEER 4.1"}
+    - {hi: "1050 kWh/year energy use", mr: "1050 kWh/year energy use", en: "1050 kWh/year energy use"}
+    - {hi: "Noise level 42 dB", mr: "Noise level 42 dB", en: "Noise level 42 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-MER-15-5S
   category: ac
@@ -1545,11 +1545,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
-    - {hi: '5150 W कूलिंग, ISEER 5.2', mr: '5150 W कूलिंग, ISEER 5.2', en: '5150 W cooling, ISEER 5.2'}
-    - {hi: 820 kWh/साल बिजली खपत, mr: 820 kWh/वर्ष वीज वापर, en: 820 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "1.5 ton, 5-star, inverter", mr: "1.5 ton, 5-star, inverter", en: "1.5 ton, 5-star, inverter"}
+    - {hi: "5150 W cooling, ISEER 5.2", mr: "5150 W cooling, ISEER 5.2", en: "5150 W cooling, ISEER 5.2"}
+    - {hi: "820 kWh/year energy use", mr: "820 kWh/year energy use", en: "820 kWh/year energy use"}
+    - {hi: "Noise level 38 dB", mr: "Noise level 38 dB", en: "Noise level 38 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-NOV-15-5S
   category: ac
@@ -1591,11 +1591,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
-    - {hi: '5200 W कूलिंग, ISEER 5.4', mr: '5200 W कूलिंग, ISEER 5.4', en: '5200 W cooling, ISEER 5.4'}
-    - {hi: 790 kWh/साल बिजली खपत, mr: 790 kWh/वर्ष वीज वापर, en: 790 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
-    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+    - {hi: "1.5 ton, 5-star, inverter", mr: "1.5 ton, 5-star, inverter", en: "1.5 ton, 5-star, inverter"}
+    - {hi: "5200 W cooling, ISEER 5.4", mr: "5200 W cooling, ISEER 5.4", en: "5200 W cooling, ISEER 5.4"}
+    - {hi: "790 kWh/year energy use", mr: "790 kWh/year energy use", en: "790 kWh/year energy use"}
+    - {hi: "Noise level 38 dB", mr: "Noise level 38 dB", en: "Noise level 38 dB"}
+    - {hi: "Wi-Fi control from your phone", mr: "Wi-Fi control from your phone", en: "Wi-Fi control from your phone"}
   test_data: true
 - sku: AC-ARK-20-3S
   category: ac
@@ -1637,11 +1637,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '2.0 टन, 3-स्टार, इन्वर्टर', mr: '2.0 टन, 3-स्टार, इन्व्हर्टर', en: '2.0 ton, 3-star, inverter'}
-    - {hi: '6700 W कूलिंग, ISEER 4.1', mr: '6700 W कूलिंग, ISEER 4.1', en: '6700 W cooling, ISEER 4.1'}
-    - {hi: 1450 kWh/साल बिजली खपत, mr: 1450 kWh/वर्ष वीज वापर, en: 1450 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 42 dB, mr: आवाजाची पातळी 42 dB, en: Noise level 42 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "2.0 ton, 3-star, inverter", mr: "2.0 ton, 3-star, inverter", en: "2.0 ton, 3-star, inverter"}
+    - {hi: "6700 W cooling, ISEER 4.1", mr: "6700 W cooling, ISEER 4.1", en: "6700 W cooling, ISEER 4.1"}
+    - {hi: "1450 kWh/year energy use", mr: "1450 kWh/year energy use", en: "1450 kWh/year energy use"}
+    - {hi: "Noise level 42 dB", mr: "Noise level 42 dB", en: "Noise level 42 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-MER-20-5S
   category: ac
@@ -1683,11 +1683,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '2.0 टन, 5-स्टार, इन्वर्टर', mr: '2.0 टन, 5-स्टार, इन्व्हर्टर', en: '2.0 ton, 5-star, inverter'}
-    - {hi: '6800 W कूलिंग, ISEER 5.2', mr: '6800 W कूलिंग, ISEER 5.2', en: '6800 W cooling, ISEER 5.2'}
-    - {hi: 1150 kWh/साल बिजली खपत, mr: 1150 kWh/वर्ष वीज वापर, en: 1150 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "2.0 ton, 5-star, inverter", mr: "2.0 ton, 5-star, inverter", en: "2.0 ton, 5-star, inverter"}
+    - {hi: "6800 W cooling, ISEER 5.2", mr: "6800 W cooling, ISEER 5.2", en: "6800 W cooling, ISEER 5.2"}
+    - {hi: "1150 kWh/year energy use", mr: "1150 kWh/year energy use", en: "1150 kWh/year energy use"}
+    - {hi: "Noise level 38 dB", mr: "Noise level 38 dB", en: "Noise level 38 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-MER-10-3S
   category: ac
@@ -1729,11 +1729,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.0 टन, 3-स्टार, इन्वर्टर', mr: '1.0 टन, 3-स्टार, इन्व्हर्टर', en: '1.0 ton, 3-star, inverter'}
-    - {hi: '3500 W कूलिंग, ISEER 4.2', mr: '3500 W कूलिंग, ISEER 4.2', en: '3500 W cooling, ISEER 4.2'}
-    - {hi: 800 kWh/साल बिजली खपत, mr: 800 kWh/वर्ष वीज वापर, en: 800 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 40 dB, mr: आवाजाची पातळी 40 dB, en: Noise level 40 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "1.0 ton, 3-star, inverter", mr: "1.0 ton, 3-star, inverter", en: "1.0 ton, 3-star, inverter"}
+    - {hi: "3500 W cooling, ISEER 4.2", mr: "3500 W cooling, ISEER 4.2", en: "3500 W cooling, ISEER 4.2"}
+    - {hi: "800 kWh/year energy use", mr: "800 kWh/year energy use", en: "800 kWh/year energy use"}
+    - {hi: "Noise level 40 dB", mr: "Noise level 40 dB", en: "Noise level 40 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-ARK-15-3S
   category: ac
@@ -1775,11 +1775,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.5 टन, 3-स्टार, इन्वर्टर', mr: '1.5 टन, 3-स्टार, इन्व्हर्टर', en: '1.5 ton, 3-star, inverter'}
-    - {hi: '5000 W कूलिंग, ISEER 4.1', mr: '5000 W कूलिंग, ISEER 4.1', en: '5000 W cooling, ISEER 4.1'}
-    - {hi: 1060 kWh/साल बिजली खपत, mr: 1060 kWh/वर्ष वीज वापर, en: 1060 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 44 dB, mr: आवाजाची पातळी 44 dB, en: Noise level 44 dB}
-    - {hi: 'एंटी-डस्ट फ़िल्टर, R32 गैस', mr: 'अँटी-डस्ट फिल्टर, R32 गॅस', en: 'Anti-dust filter, R32 gas'}
+    - {hi: "1.5 ton, 3-star, inverter", mr: "1.5 ton, 3-star, inverter", en: "1.5 ton, 3-star, inverter"}
+    - {hi: "5000 W cooling, ISEER 4.1", mr: "5000 W cooling, ISEER 4.1", en: "5000 W cooling, ISEER 4.1"}
+    - {hi: "1060 kWh/year energy use", mr: "1060 kWh/year energy use", en: "1060 kWh/year energy use"}
+    - {hi: "Noise level 44 dB", mr: "Noise level 44 dB", en: "Noise level 44 dB"}
+    - {hi: "Anti-dust filter, R32 gas", mr: "Anti-dust filter, R32 gas", en: "Anti-dust filter, R32 gas"}
   test_data: true
 - sku: AC-ARK-10-5S
   category: ac
@@ -1821,11 +1821,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.0 टन, 5-स्टार, इन्वर्टर', mr: '1.0 टन, 5-स्टार, इन्व्हर्टर', en: '1.0 ton, 5-star, inverter'}
-    - {hi: '3400 W कूलिंग, ISEER 5.1', mr: '3400 W कूलिंग, ISEER 5.1', en: '3400 W cooling, ISEER 5.1'}
-    - {hi: 660 kWh/साल बिजली खपत, mr: 660 kWh/वर्ष वीज वापर, en: 660 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "1.0 ton, 5-star, inverter", mr: "1.0 ton, 5-star, inverter", en: "1.0 ton, 5-star, inverter"}
+    - {hi: "3400 W cooling, ISEER 5.1", mr: "3400 W cooling, ISEER 5.1", en: "3400 W cooling, ISEER 5.1"}
+    - {hi: "660 kWh/year energy use", mr: "660 kWh/year energy use", en: "660 kWh/year energy use"}
+    - {hi: "Noise level 38 dB", mr: "Noise level 38 dB", en: "Noise level 38 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-MER-10-5S
   category: ac
@@ -1867,11 +1867,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.0 टन, 5-स्टार, इन्वर्टर', mr: '1.0 टन, 5-स्टार, इन्व्हर्टर', en: '1.0 ton, 5-star, inverter'}
-    - {hi: '3500 W कूलिंग, ISEER 5.3', mr: '3500 W कूलिंग, ISEER 5.3', en: '3500 W cooling, ISEER 5.3'}
-    - {hi: 635 kWh/साल बिजली खपत, mr: 635 kWh/वर्ष वीज वापर, en: 635 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 36 dB, mr: आवाजाची पातळी 36 dB, en: Noise level 36 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "1.0 ton, 5-star, inverter", mr: "1.0 ton, 5-star, inverter", en: "1.0 ton, 5-star, inverter"}
+    - {hi: "3500 W cooling, ISEER 5.3", mr: "3500 W cooling, ISEER 5.3", en: "3500 W cooling, ISEER 5.3"}
+    - {hi: "635 kWh/year energy use", mr: "635 kWh/year energy use", en: "635 kWh/year energy use"}
+    - {hi: "Noise level 36 dB", mr: "Noise level 36 dB", en: "Noise level 36 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-ARK-15-4S
   category: ac
@@ -1913,11 +1913,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.5 टन, 4-स्टार, इन्वर्टर', mr: '1.5 टन, 4-स्टार, इन्व्हर्टर', en: '1.5 ton, 4-star, inverter'}
-    - {hi: '5100 W कूलिंग, ISEER 4.7', mr: '5100 W कूलिंग, ISEER 4.7', en: '5100 W cooling, ISEER 4.7'}
-    - {hi: 915 kWh/साल बिजली खपत, mr: 915 kWh/वर्ष वीज वापर, en: 915 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 41 dB, mr: आवाजाची पातळी 41 dB, en: Noise level 41 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "1.5 ton, 4-star, inverter", mr: "1.5 ton, 4-star, inverter", en: "1.5 ton, 4-star, inverter"}
+    - {hi: "5100 W cooling, ISEER 4.7", mr: "5100 W cooling, ISEER 4.7", en: "5100 W cooling, ISEER 4.7"}
+    - {hi: "915 kWh/year energy use", mr: "915 kWh/year energy use", en: "915 kWh/year energy use"}
+    - {hi: "Noise level 41 dB", mr: "Noise level 41 dB", en: "Noise level 41 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-NOV-10-5S
   category: ac
@@ -1959,11 +1959,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.0 टन, 5-स्टार, इन्वर्टर', mr: '1.0 टन, 5-स्टार, इन्व्हर्टर', en: '1.0 ton, 5-star, inverter'}
-    - {hi: '3550 W कूलिंग, ISEER 5.5', mr: '3550 W कूलिंग, ISEER 5.5', en: '3550 W cooling, ISEER 5.5'}
-    - {hi: 610 kWh/साल बिजली खपत, mr: 610 kWh/वर्ष वीज वापर, en: 610 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 34 dB, mr: आवाजाची पातळी 34 dB, en: Noise level 34 dB}
-    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+    - {hi: "1.0 ton, 5-star, inverter", mr: "1.0 ton, 5-star, inverter", en: "1.0 ton, 5-star, inverter"}
+    - {hi: "3550 W cooling, ISEER 5.5", mr: "3550 W cooling, ISEER 5.5", en: "3550 W cooling, ISEER 5.5"}
+    - {hi: "610 kWh/year energy use", mr: "610 kWh/year energy use", en: "610 kWh/year energy use"}
+    - {hi: "Noise level 34 dB", mr: "Noise level 34 dB", en: "Noise level 34 dB"}
+    - {hi: "Wi-Fi control from your phone", mr: "Wi-Fi control from your phone", en: "Wi-Fi control from your phone"}
   test_data: true
 - sku: AC-MER-15-5SW
   category: ac
@@ -2005,11 +2005,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
-    - {hi: '5200 W कूलिंग, ISEER 5.3', mr: '5200 W कूलिंग, ISEER 5.3', en: '5200 W cooling, ISEER 5.3'}
-    - {hi: 810 kWh/साल बिजली खपत, mr: 810 kWh/वर्ष वीज वापर, en: 810 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 37 dB, mr: आवाजाची पातळी 37 dB, en: Noise level 37 dB}
-    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+    - {hi: "1.5 ton, 5-star, inverter", mr: "1.5 ton, 5-star, inverter", en: "1.5 ton, 5-star, inverter"}
+    - {hi: "5200 W cooling, ISEER 5.3", mr: "5200 W cooling, ISEER 5.3", en: "5200 W cooling, ISEER 5.3"}
+    - {hi: "810 kWh/year energy use", mr: "810 kWh/year energy use", en: "810 kWh/year energy use"}
+    - {hi: "Noise level 37 dB", mr: "Noise level 37 dB", en: "Noise level 37 dB"}
+    - {hi: "Wi-Fi control from your phone", mr: "Wi-Fi control from your phone", en: "Wi-Fi control from your phone"}
   test_data: true
 - sku: AC-ARK-20-5S
   category: ac
@@ -2051,11 +2051,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '2.0 टन, 5-स्टार, इन्वर्टर', mr: '2.0 टन, 5-स्टार, इन्व्हर्टर', en: '2.0 ton, 5-star, inverter'}
-    - {hi: '6600 W कूलिंग, ISEER 5.1', mr: '6600 W कूलिंग, ISEER 5.1', en: '6600 W cooling, ISEER 5.1'}
-    - {hi: 1165 kWh/साल बिजली खपत, mr: 1165 kWh/वर्ष वीज वापर, en: 1165 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 40 dB, mr: आवाजाची पातळी 40 dB, en: Noise level 40 dB}
-    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+    - {hi: "2.0 ton, 5-star, inverter", mr: "2.0 ton, 5-star, inverter", en: "2.0 ton, 5-star, inverter"}
+    - {hi: "6600 W cooling, ISEER 5.1", mr: "6600 W cooling, ISEER 5.1", en: "6600 W cooling, ISEER 5.1"}
+    - {hi: "1165 kWh/year energy use", mr: "1165 kWh/year energy use", en: "1165 kWh/year energy use"}
+    - {hi: "Noise level 40 dB", mr: "Noise level 40 dB", en: "Noise level 40 dB"}
+    - {hi: "Copper condenser, R32 gas", mr: "Copper condenser, R32 gas", en: "Copper condenser, R32 gas"}
   test_data: true
 - sku: AC-NOV-15-5SP
   category: ac
@@ -2097,11 +2097,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
-    - {hi: '5280 W कूलिंग, ISEER 5.6', mr: '5280 W कूलिंग, ISEER 5.6', en: '5280 W cooling, ISEER 5.6'}
-    - {hi: 770 kWh/साल बिजली खपत, mr: 770 kWh/वर्ष वीज वापर, en: 770 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 32 dB, mr: आवाजाची पातळी 32 dB, en: Noise level 32 dB}
-    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+    - {hi: "1.5 ton, 5-star, inverter", mr: "1.5 ton, 5-star, inverter", en: "1.5 ton, 5-star, inverter"}
+    - {hi: "5280 W cooling, ISEER 5.6", mr: "5280 W cooling, ISEER 5.6", en: "5280 W cooling, ISEER 5.6"}
+    - {hi: "770 kWh/year energy use", mr: "770 kWh/year energy use", en: "770 kWh/year energy use"}
+    - {hi: "Noise level 32 dB", mr: "Noise level 32 dB", en: "Noise level 32 dB"}
+    - {hi: "Wi-Fi control from your phone", mr: "Wi-Fi control from your phone", en: "Wi-Fi control from your phone"}
   test_data: true
 - sku: AC-NOV-20-5S
   category: ac
@@ -2143,11 +2143,11 @@
     - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '2.0 टन, 5-स्टार, इन्वर्टर', mr: '2.0 टन, 5-स्टार, इन्व्हर्टर', en: '2.0 ton, 5-star, inverter'}
-    - {hi: '7000 W कूलिंग, ISEER 5.4', mr: '7000 W कूलिंग, ISEER 5.4', en: '7000 W cooling, ISEER 5.4'}
-    - {hi: 1100 kWh/साल बिजली खपत, mr: 1100 kWh/वर्ष वीज वापर, en: 1100 kWh/year energy use}
-    - {hi: आवाज़ का स्तर 37 dB, mr: आवाजाची पातळी 37 dB, en: Noise level 37 dB}
-    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+    - {hi: "2.0 ton, 5-star, inverter", mr: "2.0 ton, 5-star, inverter", en: "2.0 ton, 5-star, inverter"}
+    - {hi: "7000 W cooling, ISEER 5.4", mr: "7000 W cooling, ISEER 5.4", en: "7000 W cooling, ISEER 5.4"}
+    - {hi: "1100 kWh/year energy use", mr: "1100 kWh/year energy use", en: "1100 kWh/year energy use"}
+    - {hi: "Noise level 37 dB", mr: "Noise level 37 dB", en: "Noise level 37 dB"}
+    - {hi: "Wi-Fi control from your phone", mr: "Wi-Fi control from your phone", en: "Wi-Fi control from your phone"}
   test_data: true
 - sku: WM-ARK-65-TL
   category: wm
@@ -2186,10 +2186,10 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: 6.5 किलो टॉप लोड, mr: 6.5 किलो टॉप लोड, en: 6.5 kg top load}
-    - {hi: 700 RPM स्पिन स्पीड, mr: 700 RPM स्पिन स्पीड, en: 700 RPM spin speed}
-    - {hi: '8 वॉश प्रोग्राम, क्विक वॉश', mr: '8 वॉश प्रोग्राम, क्विक वॉश', en: '8 wash programmes, quick wash'}
-    - {hi: 120 kWh/साल बिजली खपत, mr: 120 kWh/वर्ष वीज वापर, en: 120 kWh/year energy use}
+    - {hi: "6.5 kg top load", mr: "6.5 kg top load", en: "6.5 kg top load"}
+    - {hi: "700 RPM spin speed", mr: "700 RPM spin speed", en: "700 RPM spin speed"}
+    - {hi: "8 wash programmes, quick wash", mr: "8 wash programmes, quick wash", en: "8 wash programmes, quick wash"}
+    - {hi: "120 kWh/year energy use", mr: "120 kWh/year energy use", en: "120 kWh/year energy use"}
   test_data: true
 - sku: WM-MER-7-TL
   category: wm
@@ -2228,10 +2228,10 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '7 किलो टॉप लोड, इन्वर्टर मोटर', mr: '7 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '7 kg top load, inverter motor'}
-    - {hi: 740 RPM स्पिन स्पीड, mr: 740 RPM स्पिन स्पीड, en: 740 RPM spin speed}
-    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
-    - {hi: 125 kWh/साल बिजली खपत, mr: 125 kWh/वर्ष वीज वापर, en: 125 kWh/year energy use}
+    - {hi: "7 kg top load, inverter motor", mr: "7 kg top load, inverter motor", en: "7 kg top load, inverter motor"}
+    - {hi: "740 RPM spin speed", mr: "740 RPM spin speed", en: "740 RPM spin speed"}
+    - {hi: "10 wash programmes, quick wash", mr: "10 wash programmes, quick wash", en: "10 wash programmes, quick wash"}
+    - {hi: "125 kWh/year energy use", mr: "125 kWh/year energy use", en: "125 kWh/year energy use"}
   test_data: true
 - sku: WM-ARK-7-FL
   category: wm
@@ -2270,11 +2270,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '7 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '7 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '7 kg front load, inverter motor'}
-    - {hi: 1000 RPM स्पिन स्पीड, mr: 1000 RPM स्पिन स्पीड, en: 1000 RPM spin speed}
-    - {hi: इन-बिल्ट हीटर, mr: इन-बिल्ट हीटर, en: In-built heater}
-    - {hi: '15 वॉश प्रोग्राम, क्विक वॉश', mr: '15 वॉश प्रोग्राम, क्विक वॉश', en: '15 wash programmes, quick wash'}
-    - {hi: 100 kWh/साल बिजली खपत, mr: 100 kWh/वर्ष वीज वापर, en: 100 kWh/year energy use}
+    - {hi: "7 kg front load, inverter motor", mr: "7 kg front load, inverter motor", en: "7 kg front load, inverter motor"}
+    - {hi: "1000 RPM spin speed", mr: "1000 RPM spin speed", en: "1000 RPM spin speed"}
+    - {hi: "In-built heater", mr: "In-built heater", en: "In-built heater"}
+    - {hi: "15 wash programmes, quick wash", mr: "15 wash programmes, quick wash", en: "15 wash programmes, quick wash"}
+    - {hi: "100 kWh/year energy use", mr: "100 kWh/year energy use", en: "100 kWh/year energy use"}
   test_data: true
 - sku: WM-MER-8-FL
   category: wm
@@ -2313,11 +2313,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '8 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '8 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '8 kg front load, inverter motor'}
-    - {hi: 1200 RPM स्पिन स्पीड, mr: 1200 RPM स्पिन स्पीड, en: 1200 RPM spin speed}
-    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
-    - {hi: '15 वॉश प्रोग्राम, क्विक वॉश', mr: '15 वॉश प्रोग्राम, क्विक वॉश', en: '15 wash programmes, quick wash'}
-    - {hi: 105 kWh/साल बिजली खपत, mr: 105 kWh/वर्ष वीज वापर, en: 105 kWh/year energy use}
+    - {hi: "8 kg front load, inverter motor", mr: "8 kg front load, inverter motor", en: "8 kg front load, inverter motor"}
+    - {hi: "1200 RPM spin speed", mr: "1200 RPM spin speed", en: "1200 RPM spin speed"}
+    - {hi: "Steam wash, in-built heater", mr: "Steam wash, in-built heater", en: "Steam wash, in-built heater"}
+    - {hi: "15 wash programmes, quick wash", mr: "15 wash programmes, quick wash", en: "15 wash programmes, quick wash"}
+    - {hi: "105 kWh/year energy use", mr: "105 kWh/year energy use", en: "105 kWh/year energy use"}
   test_data: true
 - sku: WM-MER-10-TL
   category: wm
@@ -2356,10 +2356,10 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '10 किलो टॉप लोड, इन्वर्टर मोटर', mr: '10 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '10 kg top load, inverter motor'}
-    - {hi: 780 RPM स्पिन स्पीड, mr: 780 RPM स्पिन स्पीड, en: 780 RPM spin speed}
-    - {hi: '12 वॉश प्रोग्राम, क्विक वॉश', mr: '12 वॉश प्रोग्राम, क्विक वॉश', en: '12 wash programmes, quick wash'}
-    - {hi: 160 kWh/साल बिजली खपत, mr: 160 kWh/वर्ष वीज वापर, en: 160 kWh/year energy use}
+    - {hi: "10 kg top load, inverter motor", mr: "10 kg top load, inverter motor", en: "10 kg top load, inverter motor"}
+    - {hi: "780 RPM spin speed", mr: "780 RPM spin speed", en: "780 RPM spin speed"}
+    - {hi: "12 wash programmes, quick wash", mr: "12 wash programmes, quick wash", en: "12 wash programmes, quick wash"}
+    - {hi: "160 kWh/year energy use", mr: "160 kWh/year energy use", en: "160 kWh/year energy use"}
   test_data: true
 - sku: WM-NOV-9-FL
   category: wm
@@ -2398,11 +2398,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '9 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '9 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '9 kg front load, inverter motor'}
-    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
-    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
-    - {hi: '16 वॉश प्रोग्राम, क्विक वॉश', mr: '16 वॉश प्रोग्राम, क्विक वॉश', en: '16 wash programmes, quick wash'}
-    - {hi: 110 kWh/साल बिजली खपत, mr: 110 kWh/वर्ष वीज वापर, en: 110 kWh/year energy use}
+    - {hi: "9 kg front load, inverter motor", mr: "9 kg front load, inverter motor", en: "9 kg front load, inverter motor"}
+    - {hi: "1400 RPM spin speed", mr: "1400 RPM spin speed", en: "1400 RPM spin speed"}
+    - {hi: "Steam wash, in-built heater", mr: "Steam wash, in-built heater", en: "Steam wash, in-built heater"}
+    - {hi: "16 wash programmes, quick wash", mr: "16 wash programmes, quick wash", en: "16 wash programmes, quick wash"}
+    - {hi: "110 kWh/year energy use", mr: "110 kWh/year energy use", en: "110 kWh/year energy use"}
   test_data: true
 - sku: WM-ARK-7-TL
   category: wm
@@ -2441,10 +2441,10 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: 7 किलो टॉप लोड, mr: 7 किलो टॉप लोड, en: 7 kg top load}
-    - {hi: 720 RPM स्पिन स्पीड, mr: 720 RPM स्पिन स्पीड, en: 720 RPM spin speed}
-    - {hi: '8 वॉश प्रोग्राम, क्विक वॉश', mr: '8 वॉश प्रोग्राम, क्विक वॉश', en: '8 wash programmes, quick wash'}
-    - {hi: 128 kWh/साल बिजली खपत, mr: 128 kWh/वर्ष वीज वापर, en: 128 kWh/year energy use}
+    - {hi: "7 kg top load", mr: "7 kg top load", en: "7 kg top load"}
+    - {hi: "720 RPM spin speed", mr: "720 RPM spin speed", en: "720 RPM spin speed"}
+    - {hi: "8 wash programmes, quick wash", mr: "8 wash programmes, quick wash", en: "8 wash programmes, quick wash"}
+    - {hi: "128 kWh/year energy use", mr: "128 kWh/year energy use", en: "128 kWh/year energy use"}
   test_data: true
 - sku: WM-ARK-6-FL
   category: wm
@@ -2483,11 +2483,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: 6 किलो फ्रंट लोड, mr: 6 किलो फ्रंट लोड, en: 6 kg front load}
-    - {hi: 1000 RPM स्पिन स्पीड, mr: 1000 RPM स्पिन स्पीड, en: 1000 RPM spin speed}
-    - {hi: इन-बिल्ट हीटर, mr: इन-बिल्ट हीटर, en: In-built heater}
-    - {hi: '12 वॉश प्रोग्राम, क्विक वॉश', mr: '12 वॉश प्रोग्राम, क्विक वॉश', en: '12 wash programmes, quick wash'}
-    - {hi: 92 kWh/साल बिजली खपत, mr: 92 kWh/वर्ष वीज वापर, en: 92 kWh/year energy use}
+    - {hi: "6 kg front load", mr: "6 kg front load", en: "6 kg front load"}
+    - {hi: "1000 RPM spin speed", mr: "1000 RPM spin speed", en: "1000 RPM spin speed"}
+    - {hi: "In-built heater", mr: "In-built heater", en: "In-built heater"}
+    - {hi: "12 wash programmes, quick wash", mr: "12 wash programmes, quick wash", en: "12 wash programmes, quick wash"}
+    - {hi: "92 kWh/year energy use", mr: "92 kWh/year energy use", en: "92 kWh/year energy use"}
   test_data: true
 - sku: WM-ARK-8-TL
   category: wm
@@ -2526,10 +2526,10 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '8 किलो टॉप लोड, इन्वर्टर मोटर', mr: '8 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '8 kg top load, inverter motor'}
-    - {hi: 740 RPM स्पिन स्पीड, mr: 740 RPM स्पिन स्पीड, en: 740 RPM spin speed}
-    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
-    - {hi: 140 kWh/साल बिजली खपत, mr: 140 kWh/वर्ष वीज वापर, en: 140 kWh/year energy use}
+    - {hi: "8 kg top load, inverter motor", mr: "8 kg top load, inverter motor", en: "8 kg top load, inverter motor"}
+    - {hi: "740 RPM spin speed", mr: "740 RPM spin speed", en: "740 RPM spin speed"}
+    - {hi: "10 wash programmes, quick wash", mr: "10 wash programmes, quick wash", en: "10 wash programmes, quick wash"}
+    - {hi: "140 kWh/year energy use", mr: "140 kWh/year energy use", en: "140 kWh/year energy use"}
   test_data: true
 - sku: WM-MER-75-TL
   category: wm
@@ -2568,10 +2568,10 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '7.5 किलो टॉप लोड, इन्वर्टर मोटर', mr: '7.5 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '7.5 kg top load, inverter motor'}
-    - {hi: 760 RPM स्पिन स्पीड, mr: 760 RPM स्पिन स्पीड, en: 760 RPM spin speed}
-    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
-    - {hi: 132 kWh/साल बिजली खपत, mr: 132 kWh/वर्ष वीज वापर, en: 132 kWh/year energy use}
+    - {hi: "7.5 kg top load, inverter motor", mr: "7.5 kg top load, inverter motor", en: "7.5 kg top load, inverter motor"}
+    - {hi: "760 RPM spin speed", mr: "760 RPM spin speed", en: "760 RPM spin speed"}
+    - {hi: "10 wash programmes, quick wash", mr: "10 wash programmes, quick wash", en: "10 wash programmes, quick wash"}
+    - {hi: "132 kWh/year energy use", mr: "132 kWh/year energy use", en: "132 kWh/year energy use"}
   test_data: true
 - sku: WM-ARK-9-TL
   category: wm
@@ -2610,10 +2610,10 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '9 किलो टॉप लोड, इन्वर्टर मोटर', mr: '9 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '9 kg top load, inverter motor'}
-    - {hi: 760 RPM स्पिन स्पीड, mr: 760 RPM स्पिन स्पीड, en: 760 RPM spin speed}
-    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
-    - {hi: 152 kWh/साल बिजली खपत, mr: 152 kWh/वर्ष वीज वापर, en: 152 kWh/year energy use}
+    - {hi: "9 kg top load, inverter motor", mr: "9 kg top load, inverter motor", en: "9 kg top load, inverter motor"}
+    - {hi: "760 RPM spin speed", mr: "760 RPM spin speed", en: "760 RPM spin speed"}
+    - {hi: "10 wash programmes, quick wash", mr: "10 wash programmes, quick wash", en: "10 wash programmes, quick wash"}
+    - {hi: "152 kWh/year energy use", mr: "152 kWh/year energy use", en: "152 kWh/year energy use"}
   test_data: true
 - sku: WM-MER-7-FL
   category: wm
@@ -2652,11 +2652,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '7 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '7 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '7 kg front load, inverter motor'}
-    - {hi: 1200 RPM स्पिन स्पीड, mr: 1200 RPM स्पिन स्पीड, en: 1200 RPM spin speed}
-    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
-    - {hi: '15 वॉश प्रोग्राम, क्विक वॉश', mr: '15 वॉश प्रोग्राम, क्विक वॉश', en: '15 wash programmes, quick wash'}
-    - {hi: 98 kWh/साल बिजली खपत, mr: 98 kWh/वर्ष वीज वापर, en: 98 kWh/year energy use}
+    - {hi: "7 kg front load, inverter motor", mr: "7 kg front load, inverter motor", en: "7 kg front load, inverter motor"}
+    - {hi: "1200 RPM spin speed", mr: "1200 RPM spin speed", en: "1200 RPM spin speed"}
+    - {hi: "Steam wash, in-built heater", mr: "Steam wash, in-built heater", en: "Steam wash, in-built heater"}
+    - {hi: "15 wash programmes, quick wash", mr: "15 wash programmes, quick wash", en: "15 wash programmes, quick wash"}
+    - {hi: "98 kWh/year energy use", mr: "98 kWh/year energy use", en: "98 kWh/year energy use"}
   test_data: true
 - sku: WM-MER-9-FL
   category: wm
@@ -2695,11 +2695,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '9 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '9 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '9 kg front load, inverter motor'}
-    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
-    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
-    - {hi: '16 वॉश प्रोग्राम, क्विक वॉश', mr: '16 वॉश प्रोग्राम, क्विक वॉश', en: '16 wash programmes, quick wash'}
-    - {hi: 112 kWh/साल बिजली खपत, mr: 112 kWh/वर्ष वीज वापर, en: 112 kWh/year energy use}
+    - {hi: "9 kg front load, inverter motor", mr: "9 kg front load, inverter motor", en: "9 kg front load, inverter motor"}
+    - {hi: "1400 RPM spin speed", mr: "1400 RPM spin speed", en: "1400 RPM spin speed"}
+    - {hi: "Steam wash, in-built heater", mr: "Steam wash, in-built heater", en: "Steam wash, in-built heater"}
+    - {hi: "16 wash programmes, quick wash", mr: "16 wash programmes, quick wash", en: "16 wash programmes, quick wash"}
+    - {hi: "112 kWh/year energy use", mr: "112 kWh/year energy use", en: "112 kWh/year energy use"}
   test_data: true
 - sku: WM-NOV-8-FL
   category: wm
@@ -2738,11 +2738,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '8 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '8 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '8 kg front load, inverter motor'}
-    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
-    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
-    - {hi: '16 वॉश प्रोग्राम, क्विक वॉश', mr: '16 वॉश प्रोग्राम, क्विक वॉश', en: '16 wash programmes, quick wash'}
-    - {hi: 102 kWh/साल बिजली खपत, mr: 102 kWh/वर्ष वीज वापर, en: 102 kWh/year energy use}
+    - {hi: "8 kg front load, inverter motor", mr: "8 kg front load, inverter motor", en: "8 kg front load, inverter motor"}
+    - {hi: "1400 RPM spin speed", mr: "1400 RPM spin speed", en: "1400 RPM spin speed"}
+    - {hi: "Steam wash, in-built heater", mr: "Steam wash, in-built heater", en: "Steam wash, in-built heater"}
+    - {hi: "16 wash programmes, quick wash", mr: "16 wash programmes, quick wash", en: "16 wash programmes, quick wash"}
+    - {hi: "102 kWh/year energy use", mr: "102 kWh/year energy use", en: "102 kWh/year energy use"}
   test_data: true
 - sku: WM-MER-12-TL
   category: wm
@@ -2781,11 +2781,11 @@
     - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '12 किलो टॉप लोड, इन्वर्टर मोटर', mr: '12 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '12 kg top load, inverter motor'}
-    - {hi: 800 RPM स्पिन स्पीड, mr: 800 RPM स्पिन स्पीड, en: 800 RPM spin speed}
-    - {hi: इन-बिल्ट हीटर, mr: इन-बिल्ट हीटर, en: In-built heater}
-    - {hi: '12 वॉश प्रोग्राम, क्विक वॉश', mr: '12 वॉश प्रोग्राम, क्विक वॉश', en: '12 wash programmes, quick wash'}
-    - {hi: 185 kWh/साल बिजली खपत, mr: 185 kWh/वर्ष वीज वापर, en: 185 kWh/year energy use}
+    - {hi: "12 kg top load, inverter motor", mr: "12 kg top load, inverter motor", en: "12 kg top load, inverter motor"}
+    - {hi: "800 RPM spin speed", mr: "800 RPM spin speed", en: "800 RPM spin speed"}
+    - {hi: "In-built heater", mr: "In-built heater", en: "In-built heater"}
+    - {hi: "12 wash programmes, quick wash", mr: "12 wash programmes, quick wash", en: "12 wash programmes, quick wash"}
+    - {hi: "185 kWh/year energy use", mr: "185 kWh/year energy use", en: "185 kWh/year energy use"}
   test_data: true
 - sku: WM-NOV-105-FL
   category: wm
@@ -2824,11 +2824,11 @@
     - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
     - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
     features:
-    - {hi: '10.5 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '10.5 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '10.5 kg front load, inverter motor'}
-    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
-    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
-    - {hi: '18 वॉश प्रोग्राम, क्विक वॉश', mr: '18 वॉश प्रोग्राम, क्विक वॉश', en: '18 wash programmes, quick wash'}
-    - {hi: 125 kWh/साल बिजली खपत, mr: 125 kWh/वर्ष वीज वापर, en: 125 kWh/year energy use}
+    - {hi: "10.5 kg front load, inverter motor", mr: "10.5 kg front load, inverter motor", en: "10.5 kg front load, inverter motor"}
+    - {hi: "1400 RPM spin speed", mr: "1400 RPM spin speed", en: "1400 RPM spin speed"}
+    - {hi: "Steam wash, in-built heater", mr: "Steam wash, in-built heater", en: "Steam wash, in-built heater"}
+    - {hi: "18 wash programmes, quick wash", mr: "18 wash programmes, quick wash", en: "18 wash programmes, quick wash"}
+    - {hi: "125 kWh/year energy use", mr: "125 kWh/year energy use", en: "125 kWh/year energy use"}
   test_data: true
 - sku: LP-ARK-E-8
   category: laptop
@@ -2869,10 +2869,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core i3-1315U प्रोसेसर, mr: Intel Core i3-1315U प्रोसेसर, en: Intel Core i3-1315U processor}
-    - {hi: '8 GB RAM, 256 GB SSD स्टोरेज', mr: '8 GB RAM, 256 GB SSD स्टोरेज', en: '8 GB RAM, 256 GB NVMe SSD'}
-    - {hi: '14 इंच IPS स्क्रीन, 60 Hz', mr: '14 इंच IPS स्क्रीन, 60 Hz', en: '14-inch IPS screen, 60 Hz'}
-    - {hi: '1.6 किलो, 9 घंटे बैटरी', mr: '1.6 किलो, 9 तास बॅटरी', en: '1.6 kg, 9 h battery'}
+    - {hi: "Intel Core i3-1315U processor", mr: "Intel Core i3-1315U processor", en: "Intel Core i3-1315U processor"}
+    - {hi: "8 GB RAM, 256 GB NVMe SSD", mr: "8 GB RAM, 256 GB NVMe SSD", en: "8 GB RAM, 256 GB NVMe SSD"}
+    - {hi: "14-inch IPS screen, 60 Hz", mr: "14-inch IPS screen, 60 Hz", en: "14-inch IPS screen, 60 Hz"}
+    - {hi: "1.6 kg, 9 h battery", mr: "1.6 kg, 9 h battery", en: "1.6 kg, 9 h battery"}
   test_data: true
 - sku: LP-ARK-M-8
   category: laptop
@@ -2913,10 +2913,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core i5-1334U प्रोसेसर, mr: Intel Core i5-1334U प्रोसेसर, en: Intel Core i5-1334U processor}
-    - {hi: '8 GB RAM, 512 GB SSD स्टोरेज', mr: '8 GB RAM, 512 GB SSD स्टोरेज', en: '8 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '15.6 इंच IPS स्क्रीन, 60 Hz', mr: '15.6 इंच IPS स्क्रीन, 60 Hz', en: '15.6-inch IPS screen, 60 Hz'}
-    - {hi: '1.7 किलो, 8 घंटे बैटरी', mr: '1.7 किलो, 8 तास बॅटरी', en: '1.7 kg, 8 h battery'}
+    - {hi: "Intel Core i5-1334U processor", mr: "Intel Core i5-1334U processor", en: "Intel Core i5-1334U processor"}
+    - {hi: "8 GB RAM, 512 GB NVMe SSD", mr: "8 GB RAM, 512 GB NVMe SSD", en: "8 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "15.6-inch IPS screen, 60 Hz", mr: "15.6-inch IPS screen, 60 Hz", en: "15.6-inch IPS screen, 60 Hz"}
+    - {hi: "1.7 kg, 8 h battery", mr: "1.7 kg, 8 h battery", en: "1.7 kg, 8 h battery"}
   test_data: true
 - sku: LP-MER-M-16
   category: laptop
@@ -2957,10 +2957,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: AMD Ryzen 5 7535U प्रोसेसर, mr: AMD Ryzen 5 7535U प्रोसेसर, en: AMD Ryzen 5 7535U processor}
-    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '14 इंच IPS स्क्रीन, 60 Hz', mr: '14 इंच IPS स्क्रीन, 60 Hz', en: '14-inch IPS screen, 60 Hz'}
-    - {hi: '1.5 किलो, 10 घंटे बैटरी', mr: '1.5 किलो, 10 तास बॅटरी', en: '1.5 kg, 10 h battery'}
+    - {hi: "AMD Ryzen 5 7535U processor", mr: "AMD Ryzen 5 7535U processor", en: "AMD Ryzen 5 7535U processor"}
+    - {hi: "16 GB RAM, 512 GB NVMe SSD", mr: "16 GB RAM, 512 GB NVMe SSD", en: "16 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "14-inch IPS screen, 60 Hz", mr: "14-inch IPS screen, 60 Hz", en: "14-inch IPS screen, 60 Hz"}
+    - {hi: "1.5 kg, 10 h battery", mr: "1.5 kg, 10 h battery", en: "1.5 kg, 10 h battery"}
   test_data: true
 - sku: LP-MER-H-16U
   category: laptop
@@ -3001,10 +3001,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core Ultra 7 258V प्रोसेसर, mr: Intel Core Ultra 7 258V प्रोसेसर, en: Intel Core Ultra 7 258V processor}
-    - {hi: '16 GB RAM, 1 TB SSD स्टोरेज', mr: '16 GB RAM, 1 TB SSD स्टोरेज', en: '16 GB RAM, 1 TB NVMe SSD'}
-    - {hi: '14 इंच OLED स्क्रीन, 120 Hz', mr: '14 इंच OLED स्क्रीन, 120 Hz', en: '14-inch OLED screen, 120 Hz'}
-    - {hi: '1.2 किलो, 14 घंटे बैटरी', mr: '1.2 किलो, 14 तास बॅटरी', en: '1.2 kg, 14 h battery'}
+    - {hi: "Intel Core Ultra 7 258V processor", mr: "Intel Core Ultra 7 258V processor", en: "Intel Core Ultra 7 258V processor"}
+    - {hi: "16 GB RAM, 1 TB NVMe SSD", mr: "16 GB RAM, 1 TB NVMe SSD", en: "16 GB RAM, 1 TB NVMe SSD"}
+    - {hi: "14-inch OLED screen, 120 Hz", mr: "14-inch OLED screen, 120 Hz", en: "14-inch OLED screen, 120 Hz"}
+    - {hi: "1.2 kg, 14 h battery", mr: "1.2 kg, 14 h battery", en: "1.2 kg, 14 h battery"}
   test_data: true
 - sku: LP-NOV-H-16G
   category: laptop
@@ -3046,11 +3046,11 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core i7-14650HX प्रोसेसर, mr: Intel Core i7-14650HX प्रोसेसर, en: Intel Core i7-14650HX processor}
-    - {hi: '16 GB RAM, 1 TB SSD स्टोरेज', mr: '16 GB RAM, 1 TB SSD स्टोरेज', en: '16 GB RAM, 1 TB NVMe SSD'}
-    - {hi: '16 इंच IPS स्क्रीन, 165 Hz', mr: '16 इंच IPS स्क्रीन, 165 Hz', en: '16-inch IPS screen, 165 Hz'}
-    - {hi: '2.1 किलो, 6 घंटे बैटरी', mr: '2.1 किलो, 6 तास बॅटरी', en: '2.1 kg, 6 h battery'}
-    - {hi: NVIDIA GeForce RTX 4060 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 4060 ग्राफिक्स, en: NVIDIA GeForce RTX 4060 graphics}
+    - {hi: "Intel Core i7-14650HX processor", mr: "Intel Core i7-14650HX processor", en: "Intel Core i7-14650HX processor"}
+    - {hi: "16 GB RAM, 1 TB NVMe SSD", mr: "16 GB RAM, 1 TB NVMe SSD", en: "16 GB RAM, 1 TB NVMe SSD"}
+    - {hi: "16-inch IPS screen, 165 Hz", mr: "16-inch IPS screen, 165 Hz", en: "16-inch IPS screen, 165 Hz"}
+    - {hi: "2.1 kg, 6 h battery", mr: "2.1 kg, 6 h battery", en: "2.1 kg, 6 h battery"}
+    - {hi: "NVIDIA GeForce RTX 4060 graphics", mr: "NVIDIA GeForce RTX 4060 graphics", en: "NVIDIA GeForce RTX 4060 graphics"}
   test_data: true
 - sku: LP-NOV-H-32G
   category: laptop
@@ -3092,11 +3092,11 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core i9-14900HX प्रोसेसर, mr: Intel Core i9-14900HX प्रोसेसर, en: Intel Core i9-14900HX processor}
-    - {hi: '32 GB RAM, 1 TB SSD स्टोरेज', mr: '32 GB RAM, 1 TB SSD स्टोरेज', en: '32 GB RAM, 1 TB NVMe SSD'}
-    - {hi: '16 इंच IPS स्क्रीन, 240 Hz', mr: '16 इंच IPS स्क्रीन, 240 Hz', en: '16-inch IPS screen, 240 Hz'}
-    - {hi: '2.3 किलो, 5 घंटे बैटरी', mr: '2.3 किलो, 5 तास बॅटरी', en: '2.3 kg, 5 h battery'}
-    - {hi: NVIDIA GeForce RTX 4070 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 4070 ग्राफिक्स, en: NVIDIA GeForce RTX 4070 graphics}
+    - {hi: "Intel Core i9-14900HX processor", mr: "Intel Core i9-14900HX processor", en: "Intel Core i9-14900HX processor"}
+    - {hi: "32 GB RAM, 1 TB NVMe SSD", mr: "32 GB RAM, 1 TB NVMe SSD", en: "32 GB RAM, 1 TB NVMe SSD"}
+    - {hi: "16-inch IPS screen, 240 Hz", mr: "16-inch IPS screen, 240 Hz", en: "16-inch IPS screen, 240 Hz"}
+    - {hi: "2.3 kg, 5 h battery", mr: "2.3 kg, 5 h battery", en: "2.3 kg, 5 h battery"}
+    - {hi: "NVIDIA GeForce RTX 4070 graphics", mr: "NVIDIA GeForce RTX 4070 graphics", en: "NVIDIA GeForce RTX 4070 graphics"}
   test_data: true
 - sku: LP-ARK-E-8L
   category: laptop
@@ -3137,10 +3137,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core 3 100U प्रोसेसर, mr: Intel Core 3 100U प्रोसेसर, en: Intel Core 3 100U processor}
-    - {hi: '8 GB RAM, 256 GB SSD स्टोरेज', mr: '8 GB RAM, 256 GB SSD स्टोरेज', en: '8 GB RAM, 256 GB NVMe SSD'}
-    - {hi: '14 इंच IPS स्क्रीन, 60 Hz', mr: '14 इंच IPS स्क्रीन, 60 Hz', en: '14-inch IPS screen, 60 Hz'}
-    - {hi: '1.45 किलो, 8 घंटे बैटरी', mr: '1.45 किलो, 8 तास बॅटरी', en: '1.45 kg, 8 h battery'}
+    - {hi: "Intel Core 3 100U processor", mr: "Intel Core 3 100U processor", en: "Intel Core 3 100U processor"}
+    - {hi: "8 GB RAM, 256 GB NVMe SSD", mr: "8 GB RAM, 256 GB NVMe SSD", en: "8 GB RAM, 256 GB NVMe SSD"}
+    - {hi: "14-inch IPS screen, 60 Hz", mr: "14-inch IPS screen, 60 Hz", en: "14-inch IPS screen, 60 Hz"}
+    - {hi: "1.45 kg, 8 h battery", mr: "1.45 kg, 8 h battery", en: "1.45 kg, 8 h battery"}
   test_data: true
 - sku: LP-MER-E-8
   category: laptop
@@ -3181,10 +3181,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core 3 100U प्रोसेसर, mr: Intel Core 3 100U प्रोसेसर, en: Intel Core 3 100U processor}
-    - {hi: '8 GB RAM, 512 GB SSD स्टोरेज', mr: '8 GB RAM, 512 GB SSD स्टोरेज', en: '8 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '13.3 इंच IPS स्क्रीन, 60 Hz', mr: '13.3 इंच IPS स्क्रीन, 60 Hz', en: '13.3-inch IPS screen, 60 Hz'}
-    - {hi: '1.25 किलो, 12 घंटे बैटरी', mr: '1.25 किलो, 12 तास बॅटरी', en: '1.25 kg, 12 h battery'}
+    - {hi: "Intel Core 3 100U processor", mr: "Intel Core 3 100U processor", en: "Intel Core 3 100U processor"}
+    - {hi: "8 GB RAM, 512 GB NVMe SSD", mr: "8 GB RAM, 512 GB NVMe SSD", en: "8 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "13.3-inch IPS screen, 60 Hz", mr: "13.3-inch IPS screen, 60 Hz", en: "13.3-inch IPS screen, 60 Hz"}
+    - {hi: "1.25 kg, 12 h battery", mr: "1.25 kg, 12 h battery", en: "1.25 kg, 12 h battery"}
   test_data: true
 - sku: LP-ARK-E-16
   category: laptop
@@ -3225,10 +3225,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: AMD Ryzen 5 7520U प्रोसेसर, mr: AMD Ryzen 5 7520U प्रोसेसर, en: AMD Ryzen 5 7520U processor}
-    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '15.6 इंच IPS स्क्रीन, 60 Hz', mr: '15.6 इंच IPS स्क्रीन, 60 Hz', en: '15.6-inch IPS screen, 60 Hz'}
-    - {hi: '1.7 किलो, 7 घंटे बैटरी', mr: '1.7 किलो, 7 तास बॅटरी', en: '1.7 kg, 7 h battery'}
+    - {hi: "AMD Ryzen 5 7520U processor", mr: "AMD Ryzen 5 7520U processor", en: "AMD Ryzen 5 7520U processor"}
+    - {hi: "16 GB RAM, 512 GB NVMe SSD", mr: "16 GB RAM, 512 GB NVMe SSD", en: "16 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "15.6-inch IPS screen, 60 Hz", mr: "15.6-inch IPS screen, 60 Hz", en: "15.6-inch IPS screen, 60 Hz"}
+    - {hi: "1.7 kg, 7 h battery", mr: "1.7 kg, 7 h battery", en: "1.7 kg, 7 h battery"}
   test_data: true
 - sku: LP-ARK-M-16
   category: laptop
@@ -3269,10 +3269,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core 5 120U प्रोसेसर, mr: Intel Core 5 120U प्रोसेसर, en: Intel Core 5 120U processor}
-    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '15.6 इंच IPS स्क्रीन, 120 Hz', mr: '15.6 इंच IPS स्क्रीन, 120 Hz', en: '15.6-inch IPS screen, 120 Hz'}
-    - {hi: '1.65 किलो, 9 घंटे बैटरी', mr: '1.65 किलो, 9 तास बॅटरी', en: '1.65 kg, 9 h battery'}
+    - {hi: "Intel Core 5 120U processor", mr: "Intel Core 5 120U processor", en: "Intel Core 5 120U processor"}
+    - {hi: "16 GB RAM, 512 GB NVMe SSD", mr: "16 GB RAM, 512 GB NVMe SSD", en: "16 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "15.6-inch IPS screen, 120 Hz", mr: "15.6-inch IPS screen, 120 Hz", en: "15.6-inch IPS screen, 120 Hz"}
+    - {hi: "1.65 kg, 9 h battery", mr: "1.65 kg, 9 h battery", en: "1.65 kg, 9 h battery"}
   test_data: true
 - sku: LP-ARK-H-16G
   category: laptop
@@ -3314,11 +3314,11 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: AMD Ryzen 7 7435HS प्रोसेसर, mr: AMD Ryzen 7 7435HS प्रोसेसर, en: AMD Ryzen 7 7435HS processor}
-    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '15.6 इंच IPS स्क्रीन, 144 Hz', mr: '15.6 इंच IPS स्क्रीन, 144 Hz', en: '15.6-inch IPS screen, 144 Hz'}
-    - {hi: '2.25 किलो, 5 घंटे बैटरी', mr: '2.25 किलो, 5 तास बॅटरी', en: '2.25 kg, 5 h battery'}
-    - {hi: NVIDIA GeForce RTX 4050 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 4050 ग्राफिक्स, en: NVIDIA GeForce RTX 4050 graphics}
+    - {hi: "AMD Ryzen 7 7435HS processor", mr: "AMD Ryzen 7 7435HS processor", en: "AMD Ryzen 7 7435HS processor"}
+    - {hi: "16 GB RAM, 512 GB NVMe SSD", mr: "16 GB RAM, 512 GB NVMe SSD", en: "16 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "15.6-inch IPS screen, 144 Hz", mr: "15.6-inch IPS screen, 144 Hz", en: "15.6-inch IPS screen, 144 Hz"}
+    - {hi: "2.25 kg, 5 h battery", mr: "2.25 kg, 5 h battery", en: "2.25 kg, 5 h battery"}
+    - {hi: "NVIDIA GeForce RTX 4050 graphics", mr: "NVIDIA GeForce RTX 4050 graphics", en: "NVIDIA GeForce RTX 4050 graphics"}
   test_data: true
 - sku: LP-MER-M-16L
   category: laptop
@@ -3359,10 +3359,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core Ultra 5 225U प्रोसेसर, mr: Intel Core Ultra 5 225U प्रोसेसर, en: Intel Core Ultra 5 225U processor}
-    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '15.3 इंच IPS स्क्रीन, 120 Hz', mr: '15.3 इंच IPS स्क्रीन, 120 Hz', en: '15.3-inch IPS screen, 120 Hz'}
-    - {hi: '1.6 किलो, 11 घंटे बैटरी', mr: '1.6 किलो, 11 तास बॅटरी', en: '1.6 kg, 11 h battery'}
+    - {hi: "Intel Core Ultra 5 225U processor", mr: "Intel Core Ultra 5 225U processor", en: "Intel Core Ultra 5 225U processor"}
+    - {hi: "16 GB RAM, 512 GB NVMe SSD", mr: "16 GB RAM, 512 GB NVMe SSD", en: "16 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "15.3-inch IPS screen, 120 Hz", mr: "15.3-inch IPS screen, 120 Hz", en: "15.3-inch IPS screen, 120 Hz"}
+    - {hi: "1.6 kg, 11 h battery", mr: "1.6 kg, 11 h battery", en: "1.6 kg, 11 h battery"}
   test_data: true
 - sku: LP-NOV-M-16G
   category: laptop
@@ -3404,11 +3404,11 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: AMD Ryzen 5 8645HS प्रोसेसर, mr: AMD Ryzen 5 8645HS प्रोसेसर, en: AMD Ryzen 5 8645HS processor}
-    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
-    - {hi: '15.6 इंच IPS स्क्रीन, 144 Hz', mr: '15.6 इंच IPS स्क्रीन, 144 Hz', en: '15.6-inch IPS screen, 144 Hz'}
-    - {hi: '2.1 किलो, 6 घंटे बैटरी', mr: '2.1 किलो, 6 तास बॅटरी', en: '2.1 kg, 6 h battery'}
-    - {hi: NVIDIA GeForce RTX 5050 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 5050 ग्राफिक्स, en: NVIDIA GeForce RTX 5050 graphics}
+    - {hi: "AMD Ryzen 5 8645HS processor", mr: "AMD Ryzen 5 8645HS processor", en: "AMD Ryzen 5 8645HS processor"}
+    - {hi: "16 GB RAM, 512 GB NVMe SSD", mr: "16 GB RAM, 512 GB NVMe SSD", en: "16 GB RAM, 512 GB NVMe SSD"}
+    - {hi: "15.6-inch IPS screen, 144 Hz", mr: "15.6-inch IPS screen, 144 Hz", en: "15.6-inch IPS screen, 144 Hz"}
+    - {hi: "2.1 kg, 6 h battery", mr: "2.1 kg, 6 h battery", en: "2.1 kg, 6 h battery"}
+    - {hi: "NVIDIA GeForce RTX 5050 graphics", mr: "NVIDIA GeForce RTX 5050 graphics", en: "NVIDIA GeForce RTX 5050 graphics"}
   test_data: true
 - sku: LP-MER-H-16F
   category: laptop
@@ -3450,10 +3450,10 @@
     - {hi: स्टाइलस पेन, mr: स्टायलस पेन, en: Stylus pen}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core Ultra 7 256V प्रोसेसर, mr: Intel Core Ultra 7 256V प्रोसेसर, en: Intel Core Ultra 7 256V processor}
-    - {hi: '16 GB RAM, 1 TB SSD स्टोरेज', mr: '16 GB RAM, 1 TB SSD स्टोरेज', en: '16 GB RAM, 1 TB NVMe SSD'}
-    - {hi: '14 इंच OLED टच स्क्रीन, 60 Hz', mr: '14 इंच OLED टच स्क्रीन, 60 Hz', en: '14-inch OLED touch screen, 60 Hz'}
-    - {hi: '1.35 किलो, 12 घंटे बैटरी', mr: '1.35 किलो, 12 तास बॅटरी', en: '1.35 kg, 12 h battery'}
+    - {hi: "Intel Core Ultra 7 256V processor", mr: "Intel Core Ultra 7 256V processor", en: "Intel Core Ultra 7 256V processor"}
+    - {hi: "16 GB RAM, 1 TB NVMe SSD", mr: "16 GB RAM, 1 TB NVMe SSD", en: "16 GB RAM, 1 TB NVMe SSD"}
+    - {hi: "14-inch OLED touch screen, 60 Hz", mr: "14-inch OLED touch screen, 60 Hz", en: "14-inch OLED touch screen, 60 Hz"}
+    - {hi: "1.35 kg, 12 h battery", mr: "1.35 kg, 12 h battery", en: "1.35 kg, 12 h battery"}
   test_data: true
 - sku: LP-MER-H-32U
   category: laptop
@@ -3494,10 +3494,10 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: Intel Core Ultra 9 288V प्रोसेसर, mr: Intel Core Ultra 9 288V प्रोसेसर, en: Intel Core Ultra 9 288V processor}
-    - {hi: '32 GB RAM, 1 TB SSD स्टोरेज', mr: '32 GB RAM, 1 TB SSD स्टोरेज', en: '32 GB RAM, 1 TB NVMe SSD'}
-    - {hi: '16 इंच OLED स्क्रीन, 120 Hz', mr: '16 इंच OLED स्क्रीन, 120 Hz', en: '16-inch OLED screen, 120 Hz'}
-    - {hi: '1.5 किलो, 15 घंटे बैटरी', mr: '1.5 किलो, 15 तास बॅटरी', en: '1.5 kg, 15 h battery'}
+    - {hi: "Intel Core Ultra 9 288V processor", mr: "Intel Core Ultra 9 288V processor", en: "Intel Core Ultra 9 288V processor"}
+    - {hi: "32 GB RAM, 1 TB NVMe SSD", mr: "32 GB RAM, 1 TB NVMe SSD", en: "32 GB RAM, 1 TB NVMe SSD"}
+    - {hi: "16-inch OLED screen, 120 Hz", mr: "16-inch OLED screen, 120 Hz", en: "16-inch OLED screen, 120 Hz"}
+    - {hi: "1.5 kg, 15 h battery", mr: "1.5 kg, 15 h battery", en: "1.5 kg, 15 h battery"}
   test_data: true
 - sku: LP-NOV-H-32S
   category: laptop
@@ -3539,11 +3539,11 @@
     - {hi: चार्जर, mr: चार्जर, en: Charger}
     - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
     features:
-    - {hi: AMD Ryzen AI 9 HX 370 प्रोसेसर, mr: AMD Ryzen AI 9 HX 370 प्रोसेसर, en: AMD Ryzen AI 9 HX 370 processor}
-    - {hi: '32 GB RAM, 1 TB SSD स्टोरेज', mr: '32 GB RAM, 1 TB SSD स्टोरेज', en: '32 GB RAM, 1 TB NVMe SSD'}
-    - {hi: '14.5 इंच OLED स्क्रीन, 120 Hz', mr: '14.5 इंच OLED स्क्रीन, 120 Hz', en: '14.5-inch OLED screen, 120 Hz'}
-    - {hi: '1.7 किलो, 9 घंटे बैटरी', mr: '1.7 किलो, 9 तास बॅटरी', en: '1.7 kg, 9 h battery'}
-    - {hi: NVIDIA GeForce RTX 5060 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 5060 ग्राफिक्स, en: NVIDIA GeForce RTX 5060 graphics}
+    - {hi: "AMD Ryzen AI 9 HX 370 processor", mr: "AMD Ryzen AI 9 HX 370 processor", en: "AMD Ryzen AI 9 HX 370 processor"}
+    - {hi: "32 GB RAM, 1 TB NVMe SSD", mr: "32 GB RAM, 1 TB NVMe SSD", en: "32 GB RAM, 1 TB NVMe SSD"}
+    - {hi: "14.5-inch OLED screen, 120 Hz", mr: "14.5-inch OLED screen, 120 Hz", en: "14.5-inch OLED screen, 120 Hz"}
+    - {hi: "1.7 kg, 9 h battery", mr: "1.7 kg, 9 h battery", en: "1.7 kg, 9 h battery"}
+    - {hi: "NVIDIA GeForce RTX 5060 graphics", mr: "NVIDIA GeForce RTX 5060 graphics", en: "NVIDIA GeForce RTX 5060 graphics"}
   test_data: true
 # --- fridge category (TEST DATA): 12 fridges, single door to side-by-side; features restate the row's own specs only
 - sku: FR-ARK-190-SD
@@ -3591,14 +3591,14 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 190 लीटर, सिंगल डोर
-      mr: 190 लिटर, सिंगल डोअर
+    - hi: 190 L, सिंगल डोर
+      mr: 190 L, सिंगल डोअर
       en: 190 litres, single door
-    - hi: 3-स्टार
-      mr: 3-स्टार
+    - hi: 3-star
+      mr: 3-star
       en: 3-star
-    - hi: फ्रीज़र 18 लीटर, सब्ज़ी का डिब्बा 16 लीटर
-      mr: फ्रीझर 18 लिटर, भाजीचा डबा 16 लिटर
+    - hi: फ्रीज़र 18 L, सब्ज़ी का डिब्बा 16 L
+      mr: फ्रीझर 18 L, भाजीचा डबा 16 L
       en: 18 L freezer, 16 L vegetable box
     - hi: 160 kWh/साल बिजली खपत
       mr: 160 kWh/वर्ष वीज वापर
@@ -3649,20 +3649,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 215 लीटर, सिंगल डोर
-      mr: 215 लिटर, सिंगल डोअर
+    - hi: 215 L, सिंगल डोर
+      mr: 215 L, सिंगल डोअर
       en: 215 litres, single door
-    - hi: 4-स्टार, इन्वर्टर कंप्रेसर
-      mr: 4-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 4-star, इन्वर्टर कंप्रेसर
+      mr: 4-star, इन्व्हर्टर कंप्रेसर
       en: 4-star, inverter compressor
-    - hi: फ्रीज़र 20 लीटर, सब्ज़ी का डिब्बा 22 लीटर
-      mr: फ्रीझर 20 लिटर, भाजीचा डबा 22 लिटर
+    - hi: फ्रीज़र 20 L, सब्ज़ी का डिब्बा 22 L
+      mr: फ्रीझर 20 L, भाजीचा डबा 22 L
       en: 20 L freezer, 22 L vegetable box
     - hi: 140 kWh/साल बिजली खपत
       mr: 140 kWh/वर्ष वीज वापर
       en: 140 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 8 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 8 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 8 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 8 h थंड
       en: Stabiliser-free, 8 h cooling in a power cut
   test_data: true
 - sku: FR-NOV-240-SD
@@ -3710,20 +3710,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 240 लीटर, सिंगल डोर
-      mr: 240 लिटर, सिंगल डोअर
+    - hi: 240 L, सिंगल डोर
+      mr: 240 L, सिंगल डोअर
       en: 240 litres, single door
-    - hi: 5-स्टार, इन्वर्टर कंप्रेसर
-      mr: 5-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 5-star, इन्वर्टर कंप्रेसर
+      mr: 5-star, इन्व्हर्टर कंप्रेसर
       en: 5-star, inverter compressor
-    - hi: फ्रीज़र 22 लीटर, सब्ज़ी का डिब्बा 28 लीटर
-      mr: फ्रीझर 22 लिटर, भाजीचा डबा 28 लिटर
+    - hi: फ्रीज़र 22 L, सब्ज़ी का डिब्बा 28 L
+      mr: फ्रीझर 22 L, भाजीचा डबा 28 L
       en: 22 L freezer, 28 L vegetable box
     - hi: 118 kWh/साल बिजली खपत
       mr: 118 kWh/वर्ष वीज वापर
       en: 118 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 10 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 10 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 10 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 10 h थंड
       en: Stabiliser-free, 10 h cooling in a power cut
   test_data: true
 - sku: FR-NOV-280-DD
@@ -3771,14 +3771,14 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 280 लीटर, डबल डोर
-      mr: 280 लिटर, डबल डोअर
+    - hi: 280 L, डबल डोर
+      mr: 280 L, डबल डोअर
       en: 280 litres, double door
-    - hi: 2-स्टार
-      mr: 2-स्टार
+    - hi: 2-star
+      mr: 2-star
       en: 2-star
-    - hi: फ्रीज़र 75 लीटर, सब्ज़ी का डिब्बा 22 लीटर
-      mr: फ्रीझर 75 लिटर, भाजीचा डबा 22 लिटर
+    - hi: फ्रीज़र 75 L, सब्ज़ी का डिब्बा 22 L
+      mr: फ्रीझर 75 L, भाजीचा डबा 22 L
       en: 75 L freezer, 22 L vegetable box
     - hi: 310 kWh/साल बिजली खपत
       mr: 310 kWh/वर्ष वीज वापर
@@ -3832,20 +3832,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 253 लीटर, डबल डोर
-      mr: 253 लिटर, डबल डोअर
+    - hi: 253 L, डबल डोर
+      mr: 253 L, डबल डोअर
       en: 253 litres, double door
-    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
-      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 3-star, इन्वर्टर कंप्रेसर
+      mr: 3-star, इन्व्हर्टर कंप्रेसर
       en: 3-star, inverter compressor
-    - hi: फ्रीज़र 65 लीटर, सब्ज़ी का डिब्बा 24 लीटर
-      mr: फ्रीझर 65 लिटर, भाजीचा डबा 24 लिटर
+    - hi: फ्रीज़र 65 L, सब्ज़ी का डिब्बा 24 L
+      mr: फ्रीझर 65 L, भाजीचा डबा 24 L
       en: 65 L freezer, 24 L vegetable box
     - hi: 230 kWh/साल बिजली खपत
       mr: 230 kWh/वर्ष वीज वापर
       en: 230 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 8 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 8 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 8 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 8 h थंड
       en: Stabiliser-free, 8 h cooling in a power cut
   test_data: true
 - sku: FR-MER-265-DD
@@ -3893,20 +3893,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 265 लीटर, डबल डोर
-      mr: 265 लिटर, डबल डोअर
+    - hi: 265 L, डबल डोर
+      mr: 265 L, डबल डोअर
       en: 265 litres, double door
-    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
-      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 3-star, इन्वर्टर कंप्रेसर
+      mr: 3-star, इन्व्हर्टर कंप्रेसर
       en: 3-star, inverter compressor
-    - hi: फ्रीज़र 70 लीटर, सब्ज़ी का डिब्बा 26 लीटर
-      mr: फ्रीझर 70 लिटर, भाजीचा डबा 26 लिटर
+    - hi: फ्रीज़र 70 L, सब्ज़ी का डिब्बा 26 L
+      mr: फ्रीझर 70 L, भाजीचा डबा 26 L
       en: 70 L freezer, 26 L vegetable box
     - hi: 238 kWh/साल बिजली खपत
       mr: 238 kWh/वर्ष वीज वापर
       en: 238 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 9 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 9 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 9 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 9 h थंड
       en: Stabiliser-free, 9 h cooling in a power cut
   test_data: true
 - sku: FR-ARK-308-DD
@@ -3954,20 +3954,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 308 लीटर, डबल डोर
-      mr: 308 लिटर, डबल डोअर
+    - hi: 308 L, डबल डोर
+      mr: 308 L, डबल डोअर
       en: 308 litres, double door
-    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
-      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 3-star, इन्वर्टर कंप्रेसर
+      mr: 3-star, इन्व्हर्टर कंप्रेसर
       en: 3-star, inverter compressor
-    - hi: फ्रीज़र 80 लीटर, सब्ज़ी का डिब्बा 30 लीटर
-      mr: फ्रीझर 80 लिटर, भाजीचा डबा 30 लिटर
+    - hi: फ्रीज़र 80 L, सब्ज़ी का डिब्बा 30 L
+      mr: फ्रीझर 80 L, भाजीचा डबा 30 L
       en: 80 L freezer, 30 L vegetable box
     - hi: 255 kWh/साल बिजली खपत
       mr: 255 kWh/वर्ष वीज वापर
       en: 255 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 h थंड
       en: Stabiliser-free, 12 h cooling in a power cut
   test_data: true
 - sku: FR-MER-340-DD
@@ -4015,20 +4015,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 340 लीटर, डबल डोर
-      mr: 340 लिटर, डबल डोअर
+    - hi: 340 L, डबल डोर
+      mr: 340 L, डबल डोअर
       en: 340 litres, double door
-    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
-      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 3-star, इन्वर्टर कंप्रेसर
+      mr: 3-star, इन्व्हर्टर कंप्रेसर
       en: 3-star, inverter compressor
-    - hi: फ्रीज़र 88 लीटर, सब्ज़ी का डिब्बा 32 लीटर
-      mr: फ्रीझर 88 लिटर, भाजीचा डबा 32 लिटर
+    - hi: फ्रीज़र 88 L, सब्ज़ी का डिब्बा 32 L
+      mr: फ्रीझर 88 L, भाजीचा डबा 32 L
       en: 88 L freezer, 32 L vegetable box
     - hi: 268 kWh/साल बिजली खपत
       mr: 268 kWh/वर्ष वीज वापर
       en: 268 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 h थंड
       en: Stabiliser-free, 12 h cooling in a power cut
   test_data: true
 - sku: FR-NOV-360-BM
@@ -4076,20 +4076,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 360 लीटर, बॉटम फ्रीज़र
-      mr: 360 लिटर, बॉटम फ्रीझर
+    - hi: 360 L, बॉटम फ्रीज़र
+      mr: 360 L, बॉटम फ्रीझर
       en: 360 litres, bottom freezer
-    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
-      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 3-star, इन्वर्टर कंप्रेसर
+      mr: 3-star, इन्व्हर्टर कंप्रेसर
       en: 3-star, inverter compressor
-    - hi: फ्रीज़र 100 लीटर, सब्ज़ी का डिब्बा 35 लीटर
-      mr: फ्रीझर 100 लिटर, भाजीचा डबा 35 लिटर
+    - hi: फ्रीज़र 100 L, सब्ज़ी का डिब्बा 35 L
+      mr: फ्रीझर 100 L, भाजीचा डबा 35 L
       en: 100 L freezer, 35 L vegetable box
     - hi: 280 kWh/साल बिजली खपत
       mr: 280 kWh/वर्ष वीज वापर
       en: 280 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 14 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 14 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 14 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 14 h थंड
       en: Stabiliser-free, 14 h cooling in a power cut
   test_data: true
 - sku: FR-ARK-415-DD
@@ -4137,20 +4137,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 415 लीटर, डबल डोर
-      mr: 415 लिटर, डबल डोअर
+    - hi: 415 L, डबल डोर
+      mr: 415 L, डबल डोअर
       en: 415 litres, double door
-    - hi: 2-स्टार, इन्वर्टर कंप्रेसर
-      mr: 2-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 2-star, इन्वर्टर कंप्रेसर
+      mr: 2-star, इन्व्हर्टर कंप्रेसर
       en: 2-star, inverter compressor
-    - hi: फ्रीज़र 110 लीटर, सब्ज़ी का डिब्बा 38 लीटर
-      mr: फ्रीझर 110 लिटर, भाजीचा डबा 38 लिटर
+    - hi: फ्रीज़र 110 L, सब्ज़ी का डिब्बा 38 L
+      mr: फ्रीझर 110 L, भाजीचा डबा 38 L
       en: 110 L freezer, 38 L vegetable box
     - hi: 330 kWh/साल बिजली खपत
       mr: 330 kWh/वर्ष वीज वापर
       en: 330 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 h थंड
       en: Stabiliser-free, 12 h cooling in a power cut
   test_data: true
 - sku: FR-MER-580-SBS
@@ -4198,20 +4198,20 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 580 लीटर, साइड-बाय-साइड
-      mr: 580 लिटर, साइड-बाय-साइड
+    - hi: 580 L, साइड-बाय-साइड
+      mr: 580 L, साइड-बाय-साइड
       en: 580 litres, side-by-side
-    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
-      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 3-star, इन्वर्टर कंप्रेसर
+      mr: 3-star, इन्व्हर्टर कंप्रेसर
       en: 3-star, inverter compressor
-    - hi: फ्रीज़र 210 लीटर, सब्ज़ी का डिब्बा 40 लीटर
-      mr: फ्रीझर 210 लिटर, भाजीचा डबा 40 लिटर
+    - hi: फ्रीज़र 210 L, सब्ज़ी का डिब्बा 40 L
+      mr: फ्रीझर 210 L, भाजीचा डबा 40 L
       en: 210 L freezer, 40 L vegetable box
     - hi: 420 kWh/साल बिजली खपत
       mr: 420 kWh/वर्ष वीज वापर
       en: 420 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 10 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 10 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 10 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 10 h थंड
       en: Stabiliser-free, 10 h cooling in a power cut
   test_data: true
 - sku: FR-NOV-650-SBS
@@ -4259,19 +4259,19 @@
       mr: युजर मॅन्युअल, वॉरंटी कार्ड
       en: User manual, warranty card
     features:
-    - hi: 650 लीटर, साइड-बाय-साइड
-      mr: 650 लिटर, साइड-बाय-साइड
+    - hi: 650 L, साइड-बाय-साइड
+      mr: 650 L, साइड-बाय-साइड
       en: 650 litres, side-by-side
-    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
-      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+    - hi: 3-star, इन्वर्टर कंप्रेसर
+      mr: 3-star, इन्व्हर्टर कंप्रेसर
       en: 3-star, inverter compressor
-    - hi: फ्रीज़र 230 लीटर, सब्ज़ी का डिब्बा 45 लीटर
-      mr: फ्रीझर 230 लिटर, भाजीचा डबा 45 लिटर
+    - hi: फ्रीज़र 230 L, सब्ज़ी का डिब्बा 45 L
+      mr: फ्रीझर 230 L, भाजीचा डबा 45 L
       en: 230 L freezer, 45 L vegetable box
     - hi: 450 kWh/साल बिजली खपत
       mr: 450 kWh/वर्ष वीज वापर
       en: 450 kWh/year energy use
-    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
-      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 h ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 h थंड
       en: Stabiliser-free, 12 h cooling in a power cut
   test_data: true

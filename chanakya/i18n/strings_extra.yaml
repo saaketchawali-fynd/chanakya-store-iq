@@ -72,8 +72,8 @@ honest_offer: {hi: "ये ऑफ़र {date} तक है — तारीख
 honest_stock: {hi: "{product} अभी स्टोर में {qty} हैं।", mr: "{product} सध्या स्टोअरमध्ये {qty} आहेत.", en: "{product}: {qty} in the store right now."}
 honest_generic: {hi: "आराम से सोचिए, सारी जानकारी आपके WhatsApp पर भेज दूँगा।", mr: "निवांत विचार करा, सगळी माहिती तुमच्या WhatsApp वर पाठवतो.", en: "Take your time; I'll send everything to your WhatsApp."}
 honest_body: {hi: "Ye line mat boliye — dabaav se bharosa tootta hai.\nSach boliye: \"{honest}\"", mr: "ही ओळ सांगू नका — दबावाने विश्वास तुटतो.\nखरं सांगा: \"{honest}\"", en: "Don't say that line: pressure breaks trust.\nSay the truth: \"{honest}\""}
-tryon_bolo: {hi: "ये आपकी दीवार पर {a} और {b} इंच — सोफ़े से दोनों देखिए।", mr: "ही तुमच्या भिंतीवर {a} आणि {b} इंच — सोफ्यावरून दोन्ही पाहा.", en: "Here are {a} and {b} inches on your wall: compare from the sofa."}
-tryon_bolo_one: {hi: "ये आपकी दीवार पर {a} इंच — सोफ़े से देखिए।", mr: "ही तुमच्या भिंतीवर {a} इंच — सोफ्यावरून पाहा.", en: "Here is {a} inches on your wall: look from the sofa."}
+tryon_bolo: {hi: "ये आपकी दीवार पर {a} और {b} inch — सोफ़े से दोनों देखिए।", mr: "ही तुमच्या भिंतीवर {a} आणि {b} inch — सोफ्यावरून दोन्ही पाहा.", en: "Here are {a} and {b} inches on your wall: compare from the sofa."}
+tryon_bolo_one: {hi: "ये आपकी दीवार पर {a} inch — सोफ़े से देखिए।", mr: "ही तुमच्या भिंतीवर {a} inch — सोफ्यावरून पाहा.", en: "Here is {a} inches on your wall: look from the sofa."}
 tryon_distance: {hi: "सोफ़े से {ft} ft", mr: "सोफ्यापासून {ft} ft", en: "Sofa at {ft} ft"}
 tryon_like: {hi: "{size}\" pasand", mr: "{size}\" आवडला", en: "Like {size}\""}
 
@@ -121,7 +121,7 @@ clip_caption: {hi: "45 sec: {step}\nDekhiye, phir ek sawaal.", mr: "45 सेक
 clock_set: {hi: "Demo clock: {date} {time}", mr: "डेमो घड्याळ: {date} {time}", en: "Demo clock: {date} {time}"}
 compare_body: {hi: "{a} aur {b} mein {n} farak; is ghar ke liye sirf {k} matter karte hain: {list}", mr: "{a} आणि {b} मध्ये {n} फरक; या घरासाठी फक्त {k} महत्त्वाचे: {list}", en: "{a} and {b} differ in {n} ways; only {k} matter for this home: {list}"}
 compare_send: {hi: "Dusre model ke label ki photo bhejiye.", mr: "दुसऱ्या मॉडेलच्या लेबलचा फोटो पाठवा.", en: "Send a photo of the other model's label."}
-consent_tap_needs_qr: {hi: "Customer ka 24-ghante ka window band hai — QR scan karwaiye.", mr: "ग्राहकाचा 24 तासांचा विंडो बंद आहे — QR स्कॅन करा.", en: "The customer's 24-hour window is closed: ask them to scan the QR."}
+consent_tap_needs_qr: {hi: "Customer ka 24-hour window band hai — QR scan karwaiye.", mr: "ग्राहकाचा 24-hour विंडो बंद आहे — QR स्कॅन करा.", en: "The customer's 24-hour window is closed: ask them to scan the QR."}
 customer_word: {hi: "Customer", mr: "ग्राहक", en: "Customer"}
 delivery_set: {hi: "Delivery: {day} ✓", mr: "डिलिव्हरी: {day} ✓", en: "Delivery: {day} ✓"}
 digest_gap: {hi: "{name}: {step} sabse kam. 45-sec clip bhejein?", mr: "{name}: {step} सर्वात कमी. 45 सेकंदांची क्लिप पाठवू?", en: "{name}: {step} is lowest. Send the 45-sec clip?"}
@@ -219,7 +219,7 @@ voice_add_prompt: {hi: "Customer ke liye voice note bhejiye — main aage bhej d
 voice_sent: {hi: "Bhej diya ✓", mr: "पाठवलं ✓", en: "Sent ✓"}
 voice_unavailable: {hi: "Voice samajhne ka model is test build mein band hai. Text mein likhiye ya neeche se chuniye.", mr: "या टेस्ट बिल्डमध्ये व्हॉइस समजण्याचं मॉडेल बंद आहे. टेक्स्टमध्ये लिहा किंवा खालून निवडा.", en: "The voice model is off in this test build. Type it, or pick below."}
 which_model: {hi: "Kaunsa model?", mr: "कोणतं मॉडेल?", en: "Which model?"}
-window_closed: {hi: "Customer ka 24-ghante ka window band hai; QR dobara scan karwaiye.", mr: "ग्राहकाचा 24 तासांचा विंडो बंद आहे; QR पुन्हा स्कॅन करा.", en: "The customer's 24-hour window is closed; ask them to scan the QR again."}
+window_closed: {hi: "Customer ka 24-hour window band hai; QR dobara scan karwaiye.", mr: "ग्राहकाचा 24-hour विंडो बंद आहे; QR पुन्हा स्कॅन करा.", en: "The customer's 24-hour window is closed; ask them to scan the QR again."}
 
 # ---------- customer side ----------
 cust_ask_prompt: {hi: "अपना सवाल यहीं लिखिए या voice note भेजिए।", mr: "तुमचा प्रश्न इथेच लिहा किंवा व्हॉइस नोट पाठवा.", en: "Write your question here or send a voice note."}
@@ -256,7 +256,7 @@ row_with_sug: {hi: "सुझाव सहित", mr: "सूचनांसह
 row_offer: {hi: "आज का ऑफ़र", mr: "आजची ऑफर", en: "Today's offer"}
 row_payable: {hi: "ऑफ़र के बाद देय", mr: "ऑफरनंतर देय", en: "Payable after offer"}
 voice_retry: {hi: "Voice note saaf samajh nahi aaya — dobara boliye ya text likhiye.", mr: "व्हॉइस नोट नीट समजली नाही — पुन्हा बोला किंवा टेक्स्ट लिहा.", en: "I couldn't make out that voice note. Please say it again or type it."}
-oldtv_ask: {hi: "Photo mein jo TV laga hai, woh kitne inch ka hai? Isse naya TV ekdum sahi size mein dikhega.", mr: "फोटोतला टीव्ही किती इंचाचा आहे? त्यामुळे नवा टीव्ही अगदी योग्य आकारात दिसेल.", en: "How big is the TV already in the photo? It lets me show the new TV at exactly the right size."}
+oldtv_ask: {hi: "Photo mein jo TV laga hai, woh kitne inch ka hai? Isse naya TV ekdum sahi size mein dikhega.", mr: "फोटोतला टीव्ही किती inch चा आहे? त्यामुळे नवा टीव्ही अगदी योग्य आकारात दिसेल.", en: "How big is the TV already in the photo? It lets me show the new TV at exactly the right size."}
 oldtv_none: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
 
 # ---------- flow control: menu, end the customer, start over ----------
@@ -326,7 +326,7 @@ footer_noted: {hi: "Samjha: {facts}", mr: "समजलं: {facts}", en: "Noted
 tm_body: {hi: "Customer ke kamre mein kya dikhayein? Ek chuniye — 3-4 second mein deewar par.", mr: "ग्राहकाच्या खोलीत काय दाखवायचं? एक निवडा — 3-4 सेकंदात भिंतीवर.", en: "What should we show in the customer's room? Pick one; it appears on their wall in 3-4 seconds."}
 tm_button: {hi: "Kya dikhayein", mr: "काय दाखवायचं", en: "Choose"}
 tm_best: {hi: "Sabse sahi wala", mr: "सर्वात योग्य", en: "Best pick"}
-tm_size: {hi: "Size: {a} vs {b} inch", mr: "साइज: {a} vs {b} इंच", en: "Size: {a} vs {b} inch"}
+tm_size: {hi: "Size: {a} vs {b} inch", mr: "साइज: {a} vs {b} inch", en: "Size: {a} vs {b} inch"}
 tm_size_d: {hi: "Ek tasveer mein dono size, asli naap mein", mr: "एका फोटोत दोन्ही साइज, खऱ्या मापात", en: "Both sizes in one picture, true to scale"}
 tm_all: {hi: "Teeno options, ek-ek", mr: "तिन्ही पर्याय, एकेक", en: "All options, one by one"}
 tm_combo: {hi: "{cats} saath mein", mr: "{cats} एकत्र", en: "{cats} together"}

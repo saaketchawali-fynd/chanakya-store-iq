@@ -68,10 +68,9 @@ async def test_golden_path(tmp_path):
         assert button_ids([q]) == ["s:C1:readback_ok", "s:C1:readback_edit"]
         assert q.card and q.card.template == "home" and q.card.data["known"] == 4
         assert "हॉल" in q.body and "10 ft" in q.body  # the home said back, in the customer's Marathi
-        tryon = [m for m in out if m.image_bytes]
-        assert tryon and "55" in tryon[0].body and "65" in tryon[0].body
+        assert not [m for m in out if m.image_bytes]  # no picture dropped into the questions: it waits for the options
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
-        assert "tryon_sent" in await ev_types(s.id)
+        assert s.extra.get("room_read")  # the room was read in the background, ready for 'Ghar mein dekho'
         # 7 read-back confirmed → any doubts? → a doubt from the list → agree, then correct
         out = await step(h.tap, "s:C1:readback_ok")
         assert button_ids(out) == ["s:C1:options", "s:C1:doubt", "s:C1:pricefirst_q"]
@@ -104,6 +103,12 @@ async def test_golden_path(tmp_path):
         ]
         assert button_ids(out) == ["s:C1:demo", "s:C1:tryon", "s:C1:prefer"]
         assert "₹" not in texts(out) and "price" not in str(card.data)
+        assert card.data["grid"] and card.data["options"][1]["points"]  # built from this home's answers
+        # 10b Ghar mein dekho → straight to the picture: B solid, C as the outline
+        out = await step(h.tap, "s:C1:tryon")
+        tryon = [m for m in out if m.image_bytes]
+        assert len(tryon) == 1 and "55" in tryon[0].body and "65" in tryon[0].body
+        assert "tryon_sent" in await ev_types(s.id)
         out = await step(h.tap, "s:C1:demo")
         evs = await repo.events_for(s.id, ["demo_recipe_sent"])
         assert evs[-1].payload["recipe"] == "glare_test"

@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from chanakya.core import repo
 from chanakya.core.buttons import ButtonId
-from chanakya.core.contracts import Button, OutMessage, Reply
+from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, OutMessage, Reply
 from chanakya.core.status import short_name
 from chanakya.skills.base import SkillContext
 
@@ -33,7 +33,7 @@ async def optin(ctx: SkillContext, token: str) -> Reply:
 async def button(ctx: SkillContext, bid: ButtonId) -> Reply:
     s = ctx.session
     action = bid.get(1)
-    lang = s.home.customer_lang
+    lang = CUSTOMER_PHONE_LANG
     alang = await _assoc_lang(ctx)
     a = s.associate_wa_id
     if action == "talk":
@@ -77,7 +77,7 @@ async def install_reply(ctx: SkillContext, action: str) -> Reply:
     s = ctx.session
     job_id = s.extra.get("install_job_id")
     job = await repo.install_get(job_id) if job_id else None
-    lang = s.home.customer_lang
+    lang = CUSTOMER_PHONE_LANG
     alang = await _assoc_lang(ctx)
     a = s.associate_wa_id
     if job is None:
@@ -151,7 +151,7 @@ async def relay(ctx: SkillContext) -> Reply:
         s.customer_wa_id = None
         ctx.ev("customer_opted_out")
         return ctx.reply(
-            OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_stopped", s.home.customer_lang)),
+            OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_stopped", CUSTOMER_PHONE_LANG)),
             OutMessage(to=a, kind="text", body=ctx.t("cust_stopped_assoc", alang, name=_name(ctx))),
         )
     if inb.type == "image":

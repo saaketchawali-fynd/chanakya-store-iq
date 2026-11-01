@@ -40,6 +40,7 @@ class SlotDef(_M):
     id: str
     phase: str = "life"
     multi: bool = False
+    exclusive: list[list[str]] = []  # multi slots: values in one group replace each other (e.g. how often)
     title: dict[str, str] = {}
     ask: dict[str, str]
     why: dict[str, str]
@@ -156,6 +157,7 @@ class Pack(_M):
     slots: list[SlotDef]
     fit_rules: list[FitRule] = []
     reasons: dict[str, dict[str, str]] = {}
+    needs: dict[str, dict[str, str]] = {}  # customer-facing name of each fit rule (options card)
     benefits: list[Benefit] = []
     demos: list[Demo] = []
     myths: list[Myth] = []
@@ -350,7 +352,8 @@ def set_slot(
     if sd and sd.multi:
         if any(x.value == val for x in cur):
             return False
-        home.slots[slot] = cur + [sv]
+        rivals = {v for g in sd.exclusive if val in g for v in g if v != val}
+        home.slots[slot] = [x for x in cur if x.value not in rivals] + [sv]
         return True
     if cur and cur[-1].value == val and (num is None or cur[-1].number == num):
         return False

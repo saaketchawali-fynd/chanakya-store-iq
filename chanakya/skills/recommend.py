@@ -10,6 +10,7 @@ from chanakya.core.buttons import encode
 from chanakya.core.coach import coach_reply, info_reply
 from chanakya.core.contracts import Button, Card, OutMessage, Reply, Step
 from chanakya.skills import common as C
+from chanakya.skills import fitview as FV
 from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 
@@ -78,15 +79,62 @@ def _reason(ctx: SkillContext, key: str, lang: str) -> str:
     return fill(tpl, **vals)
 
 
-def _stock_line(ctx: SkillContext, p) -> str:
+def _diffs(ctx: SkillContext, p, best, lang: str, n: int = 2) -> list[dict]:
+    """What is different from the best pick, from the key specs (size first): facts, not adjectives."""
+    if best is None:
+        return []
+    out = []
+    for key in PV.KEY_SPECS.get(p.category, []):
+        if key == "warranty":
+            continue
+        a, b = PV.fmt_value(ctx, p, key, lang), PV.fmt_value(ctx, best, key, lang)
+        if a and a != b:
+            out.append({"label": ctx.reg.static(PV.label(key, lang)), "value": a})
+        if len(out) >= n:
+            break
+    return out
+
+
+def _stock_line(ctx: SkillContext, p, lang: str | None = None) -> str:
+    """Associate text by default; with `lang`, the customer-facing wording (cards) in that language."""
+    sfx, kw = ("_c", {"lang": lang}) if lang else ("", {})
     if p.qty > 0:
-        return ctx.t("stock_in_store", qty=ctx.reg.num(p.qty, f"stock:{p.sku}@{p.store_id}"))
+        return ctx.t("stock_in_store" + sfx, qty=ctx.reg.num(p.qty, f"stock:{p.sku}@{p.store_id}"), **kw)
     store = ctx.facts.store_name(p.nearby_store_id).replace("Reliance Digital ", "").replace(" (TEST)", "")
     return ctx.t(
-        "stock_nearby",
+        "stock_nearby" + sfx,
+        **kw,
         days=ctx.reg.num(p.delivery_days, f"stock:{p.sku}@{p.store_id}:delivery_days"),
         store=ctx.reg.raw(store, f"store:{p.nearby_store_id}"),
     )
+
+
+def options_card(ctx: SkillContext, opts) -> Card:
+    """The customer's pick card, in ctx.clang: their answers, the best pick's benefits for this home (with the
+    spec that proves each), what differs in the others, and how each meets their needs."""
+    cl = ctx.clang
+    best = opts.by_role("best")
+    best_p = best.product if best else None
+    card_opts = []
+    for o in opts.options:
+        p = o.product
+        card_opts.append(
+            {
+                "label": o.label,
+                "title": C.product_title(ctx, p, cl),
+                "role": o.role,
+                "reason": _reason(ctx, o.reason_key, cl),
+                "points": FV.points(ctx, p, cl, 3) if o.role == "best" else [],
+                "diffs": _diffs(ctx, p, best_p, cl) if o.role != "best" else [],
+                "stock_line": _stock_line(ctx, p, cl),
+                "image": p.image,
+                "is_best": o.role == "best",
+                "dims_text": PV.dims_text(ctx, p),
+            }
+        )
+    labelled = sorted(((o.label, o.product) for o in opts.options), key=lambda x: x[0])
+    data = {"options": card_opts, "grid": FV.needs_grid(ctx, labelled, cl), "home": FV.home_chips(ctx, cl)}
+    return Card(template="options", lang=cl, data=data)  # type: ignore[arg-type]
 
 
 async def show_options(ctx: SkillContext, override_checked: bool = False) -> Reply:
@@ -110,7 +158,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
         value=value.product.sku if value else None,
         stepup=step.product.sku if step else None,
     )
-    lines, card_opts, btns = [], [], []
+    lines, btns = [], []
     for o in opts.options:
         p = o.product
         name = C.product_name(ctx, p)
@@ -118,21 +166,8 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
         extra = "" if p.qty > 0 else f" ({_stock_line(ctx, p)})"
         tag = f" ({ctx.t('best_pick')})" if o.role == "best" else ""
         lines.append(f"*{o.label}* {name}{tag}: {reason_a}{extra}")
-        card_opts.append(
-            {
-                "label": o.label,
-                "title": C.product_title(ctx, p, ctx.clang),
-                "reason": _reason(ctx, o.reason_key, ctx.clang),
-                "fit_str": ctx.reg.num(o.fit.score, f"calc:fit:{p.sku}") + "%",
-                "stock_line": _stock_line(ctx, p),
-                "image": p.image,
-                "is_best": o.role == "best",
-                "features": PV.features(ctx, p, ctx.clang, 3),
-                "dims_text": PV.dims_text(ctx, p),
-            }
-        )
         btns.append(C.option_button(ctx, o.label, p))
-    card = Card(template="options", lang=ctx.lang, data={"options": card_opts})  # type: ignore[arg-type]
+    card, copy = C.dual(ctx, lambda: options_card(ctx, opts))
     demo = pick_demo(opts, s.home, pack, ctx.facts.snap.guides)
     if demo:
         d, other, _ = demo
@@ -143,7 +178,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
     if pack.placeable:
         btns.append(ctx.b("b_tryon", ctx.sid("tryon")))
     btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
-    m1 = info_reply(ctx, "\n".join(lines), btns, card=card)
+    m1 = C.with_copy(ctx, info_reply(ctx, "\n".join(lines), btns, card=card), copy)
     if ctx.x.pop("rerank_note", None):
         m1.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
     return ctx.reply(m1)

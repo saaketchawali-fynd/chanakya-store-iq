@@ -15,23 +15,24 @@ from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 
+# technical terms: English in every language
 SPEC_LABELS = {
-    "hdmi_ports": {"hi": "HDMI पोर्ट", "mr": "HDMI पोर्ट", "en": "HDMI ports"},
-    "speaker_w": {"hi": "स्पीकर वॉट", "mr": "स्पीकर वॉट", "en": "Speaker watts"},
+    "hdmi_ports": {"hi": "HDMI ports", "mr": "HDMI ports", "en": "HDMI ports"},
+    "speaker_w": {"hi": "Speaker watts", "mr": "Speaker watts", "en": "Speaker watts"},
     "dolby_atmos": {"hi": "Dolby Atmos", "mr": "Dolby Atmos", "en": "Dolby Atmos"},
-    "os": {"hi": "ऑपरेटिंग सिस्टम", "mr": "ऑपरेटिंग सिस्टम", "en": "Operating system"},
-    "resolution": {"hi": "रेज़ोल्यूशन", "mr": "रिझोल्यूशन", "en": "Resolution"},
-    "wide_angle": {"hi": "व्यूइंग एंगल", "mr": "व्ह्यूइंग अँगल", "en": "Viewing angle"},
-    "anti_glare": {"hi": "एंटी-ग्लेयर", "mr": "अँटी-ग्लेअर", "en": "Anti-glare"},
-    "panel": {"hi": "पैनल टाइप", "mr": "पॅनल प्रकार", "en": "Panel type"},
-    "refrigerant": {"hi": "रेफ्रिजरेंट गैस", "mr": "रेफ्रिजरंट गॅस", "en": "Refrigerant"},
-    "noise_db": {"hi": "आवाज़ (dB)", "mr": "आवाज (dB)", "en": "Noise (dB)"},
-    "rpm": {"hi": "स्पिन RPM", "mr": "स्पिन RPM", "en": "Spin RPM"},
-    "storage_gb": {"hi": "स्टोरेज", "mr": "स्टोरेज", "en": "Storage"},
-    "cpu_tier": {"hi": "प्रोसेसर", "mr": "प्रोसेसर", "en": "Processor"},
-    "inverter": {"hi": "इन्वर्टर", "mr": "इन्व्हर्टर", "en": "Inverter"},
-    "quick_wash": {"hi": "क्विक वॉश", "mr": "क्विक वॉश", "en": "Quick wash"},
-    "heater": {"hi": "हीटर", "mr": "हीटर", "en": "Heater"},
+    "os": {"hi": "Operating system", "mr": "Operating system", "en": "Operating system"},
+    "resolution": {"hi": "Resolution", "mr": "Resolution", "en": "Resolution"},
+    "wide_angle": {"hi": "Viewing angle", "mr": "Viewing angle", "en": "Viewing angle"},
+    "anti_glare": {"hi": "Anti-glare", "mr": "Anti-glare", "en": "Anti-glare"},
+    "panel": {"hi": "Panel type", "mr": "Panel type", "en": "Panel type"},
+    "refrigerant": {"hi": "Refrigerant", "mr": "Refrigerant", "en": "Refrigerant"},
+    "noise_db": {"hi": "Noise (dB)", "mr": "Noise (dB)", "en": "Noise (dB)"},
+    "rpm": {"hi": "Spin RPM", "mr": "Spin RPM", "en": "Spin RPM"},
+    "storage_gb": {"hi": "Storage", "mr": "Storage", "en": "Storage"},
+    "cpu_tier": {"hi": "Processor", "mr": "Processor", "en": "Processor"},
+    "inverter": {"hi": "Inverter", "mr": "Inverter", "en": "Inverter"},
+    "quick_wash": {"hi": "Quick wash", "mr": "Quick wash", "en": "Quick wash"},
+    "heater": {"hi": "Heater", "mr": "Heater", "en": "Heater"},
 }
 ICONS = {
     "b_motion": "motion",
@@ -204,7 +205,7 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     nxt = next((b for b in ms if b.id not in said), None)
     if nxt is None and first:
         # no home facts match yet: show the product from the data, and steer back to the home questions
-        card = await product_card(ctx, p)
+        card, copy = await C.dual_async(ctx, lambda: product_card(ctx, p))
         slot = C.pick_next_slot(ctx)
         btns = [ctx.b("b_next_q", ctx.sid("go")), ctx.b("b_compare", ctx.sid("compare")),
                 ctx.b("b_options", ctx.sid("options"))]
@@ -215,8 +216,8 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         if slot and not C.known_cites(ctx):
             ctx.asking.add(slot)
         if not cites:
-            return ctx.reply(info_reply(ctx, say, btns, card=card))
-        return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+            return ctx.reply(C.with_copy(ctx, info_reply(ctx, say, btns, card=card), copy))
+        return ctx.reply(C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy))
     if nxt is None or len(said) >= 2:
         return await ignore_line(ctx, p, ms)
     lang = ctx.clang
@@ -235,15 +236,15 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         ctx.b("b_not_really", ctx.sid("bt", "no", nxt.id)),
         ctx.b("b_compare", ctx.sid("compare")),
     ]
-    card = None
+    card = copy = None
     if first:
-        card = await product_card(ctx, p)
+        card, copy = await C.dual_async(ctx, lambda: product_card(ctx, p))
         if not state.options_gate_open(ctx.session, ctx.pack):  # judge the fit only once the home is understood
             n = state.missing_for_options(ctx.session, ctx.pack)
             why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
             btns = [btns[0], btns[1], ctx.b("b_next_q", ctx.sid("go"))]
     cites = [c for c in nxt.cites if P.known(ctx.session.home, c)] or nxt.cites
-    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+    return ctx.reply(C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy))
 
 
 async def benefit_reply(ctx: SkillContext, answer: str, rule_id: str | None) -> Reply:
@@ -358,34 +359,42 @@ def _better(va, vb, key: str) -> str | None:
 async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
     """Two labels → side by side from the database, with which is better for THIS home."""
     a, b = ctx.facts.product_sync(sku_a), ctx.facts.product_sync(sku_b)
-    lang = ctx.clang
     s = ctx.session
-    keys = list(dict.fromkeys(PV.KEY_SPECS.get(a.category, []) + PV.KEY_SPECS.get(b.category, [])))
-    rows, wins = [], {"a": 0, "b": 0}
-    for k in keys:
-        va, vb = PV.fmt_value(ctx, a, k, lang), PV.fmt_value(ctx, b, k, lang)
-        if va is None and vb is None:
-            continue
-        better = _better(PV.raw_value(a, k), PV.raw_value(b, k), k)
-        if better:
-            wins[better] += 1
-        rows.append({"label": ctx.reg.static(PV.label(k, lang)), "a": va or "–", "b": vb or "–", "better": better})
-    data = {"title": ctx.t("compare_title", lang),
-            "a": {"title": C.product_title(ctx, a, lang), "image": a.image},
-            "b": {"title": C.product_title(ctx, b, lang), "image": b.image}, "rows": rows[:8]}
-    gate = state.options_gate_open(s, ctx.pack) and a.category == b.category == ctx.pack.category
-    winner = None
-    if gate:
-        pa, _, sa = await pros_cons(ctx, a, lang)
-        pb, _, sb = await pros_cons(ctx, b, lang)
-        data["a"].update(fit_str=ctx.reg.num(sa, f"calc:fit:{a.sku}") + "%", badge_kind=_badge(ctx, sa, lang)[1])
-        data["b"].update(fit_str=ctx.reg.num(sb, f"calc:fit:{b.sku}") + "%", badge_kind=_badge(ctx, sb, lang)[1])
-        data["a_pros"], data["b_pros"] = pa[:3], pb[:3]
-        if sa != sb:
-            winner = a if sa > sb else b
-            data["verdict"] = ctx.t("compare_verdict", lang, name=C.product_name(ctx, winner))
-    if state.price_gate_open(s, ctx.pack):
-        data["price_a"], data["price_b"] = ctx.reg.inr(a.price, a.price_source), ctx.reg.inr(b.price, b.price_source)
+    found: dict = {}
+
+    async def build() -> Card:
+        lang = ctx.clang
+        keys = list(dict.fromkeys(PV.KEY_SPECS.get(a.category, []) + PV.KEY_SPECS.get(b.category, [])))
+        rows, wins = [], {"a": 0, "b": 0}
+        for k in keys:
+            va, vb = PV.fmt_value(ctx, a, k, lang), PV.fmt_value(ctx, b, k, lang)
+            if va is None and vb is None:
+                continue
+            better = _better(PV.raw_value(a, k), PV.raw_value(b, k), k)
+            if better:
+                wins[better] += 1
+            rows.append({"label": ctx.reg.static(PV.label(k, lang)), "a": va or "–", "b": vb or "–", "better": better})
+        data = {"title": ctx.t("compare_title", lang),
+                "a": {"title": C.product_title(ctx, a, lang), "image": a.image},
+                "b": {"title": C.product_title(ctx, b, lang), "image": b.image}, "rows": rows[:8]}
+        gate = state.options_gate_open(s, ctx.pack) and a.category == b.category == ctx.pack.category
+        winner = None
+        if gate:
+            pa, _, sa = await pros_cons(ctx, a, lang)
+            pb, _, sb = await pros_cons(ctx, b, lang)
+            data["a"].update(fit_str=ctx.reg.num(sa, f"calc:fit:{a.sku}") + "%", badge_kind=_badge(ctx, sa, lang)[1])
+            data["b"].update(fit_str=ctx.reg.num(sb, f"calc:fit:{b.sku}") + "%", badge_kind=_badge(ctx, sb, lang)[1])
+            data["a_pros"], data["b_pros"] = pa[:3], pb[:3]
+            if sa != sb:
+                winner = a if sa > sb else b
+                data["verdict"] = ctx.t("compare_verdict", lang, name=C.product_name(ctx, winner))
+        if state.price_gate_open(s, ctx.pack):
+            data["price_a"], data["price_b"] = ctx.reg.inr(a.price, a.price_source), ctx.reg.inr(b.price, b.price_source)
+        found["winner"] = winner
+        return Card(template="compare", lang=lang, data=data)  # type: ignore[arg-type]
+
+    card, copy = await C.dual_async(ctx, build)
+    winner = found.get("winner")
     ctx.ev("compare_shown", a=a.sku, b=b.sku, winner=winner.sku if winner else None)
     if winner:
         body = ctx.t("compare_body_fit", a=C.product_name(ctx, a), b=C.product_name(ctx, b),
@@ -395,8 +404,7 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
     btns = [C.option_button(ctx, "1", a), C.option_button(ctx, "2", b), ctx.b("b_tryon", ctx.sid("tryon"))]
     btns[0] = btns[0].model_copy(update={"id": ctx.sid("tpick", a.sku)})
     btns[1] = btns[1].model_copy(update={"id": ctx.sid("tpick", b.sku)})
-    card = Card(template="compare", lang=lang, data=data)  # type: ignore[arg-type]
-    return ctx.reply(info_reply(ctx, body, btns, card=card))
+    return ctx.reply(C.with_copy(ctx, info_reply(ctx, body, btns, card=card), copy))
 
 
 async def compare_prompt(ctx: SkillContext) -> Reply:

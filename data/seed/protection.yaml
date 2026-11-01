@@ -7,7 +7,7 @@
    reason: {hi: "ghar mein bachche hain, roz chalega", mr: "घरात मुलं आहेत, रोज चालेल", en: "kids at home, daily use"}, test_data: true}
 - {code: AC_CARE4, category: ac, years: 4, price: 3499, suggest_if: {number: hours_per_day, gte: 8},
    title: {hi: "resQ 4 साल कवर", mr: "resQ 4 वर्षे कव्हर", en: "resQ 4-year cover"},
-   reason: {hi: "roz lambe ghante chalega", mr: "रोज जास्त तास चालेल", en: "long daily use"}, test_data: true}
+   reason: {hi: "roz lambe hours chalega", mr: "रोज जास्त hours चालेल", en: "long daily use"}, test_data: true}
 - {code: WM_EW2, category: wm, years: 2, price: 2499, suggest_if: {number: family_size, gte: 4},
    title: {hi: "resQ 2 साल अतिरिक्त वारंटी", mr: "resQ 2 वर्षे अतिरिक्त वॉरंटी", en: "resQ 2-year extended warranty"},
    reason: {hi: "bada parivaar, roz dhulai", mr: "मोठं कुटुंब, रोज धुलाई", en: "big family, daily washing"}, test_data: true}

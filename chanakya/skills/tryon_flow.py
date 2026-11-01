@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+from dataclasses import replace
 
 from PIL import Image
 
@@ -13,7 +14,7 @@ from chanakya.brain.options import candidate_set
 from chanakya.channel.limits import truncate
 from chanakya.core import repo
 from chanakya.core.coach import coach_reply, info_reply
-from chanakya.core.contracts import Button, ListRow, ListSection, OutMessage, Reply
+from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, ListRow, ListSection, OutMessage, Reply
 from chanakya.log import get_log
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
@@ -56,20 +57,19 @@ def add_interest(ctx: SkillContext, *skus: str) -> None:
 
 # ---------------------------------------------------------------- entry points
 async def on_room_photo(ctx: SkillContext, data: bytes, filename: str | None) -> Reply:
-    """Photo in. If the associate came from 'Ghar mein dekho', show the menu; otherwise keep the questions
-    going and draw the best sizes in the background. The photo is read once, in the background, and cached."""
+    """Photo in. From 'Ghar mein dekho': draw now (one short note while the room is read). During the questions:
+    only read the room in the background and keep the questions going; the picture comes with the options, when
+    the associate taps 'Ghar mein dekho' (never an image dropped into the middle of the questions)."""
     s = ctx.session
     s.awaiting = None
     jpeg = _to_jpeg(data)
     await repo.media_put(s.id, "room_photo_raw", jpeg, "image/jpeg", ctx.now, days=1)
     s.extra["room_photo_name"] = filename
     if s.extra.pop("tryon_after_photo", False):
-        r = await menu(ctx)
-        r.background = ["room_read"]
-        return r
-    s.extra["tryon_req"] = {"mode": "auto"}
-    nxt = C.next_question_or_options(ctx, footer=ctx.t("footer_photo_got"))
-    return ctx.reply(nxt, background=["tryon"])
+        s.extra["tryon_req"] = {"mode": "auto"}
+        return ctx.reply(info_reply(ctx, ctx.t("tryon_drawing")), background=["tryon"])
+    nxt = C.next_question_or_options(ctx, footer=ctx.t("footer_photo_saved"))
+    return ctx.reply(nxt, background=["room_read"])
 
 
 def _to_jpeg(data: bytes, max_side: int = 1600) -> bytes:
@@ -95,7 +95,7 @@ async def tryon_request(ctx: SkillContext) -> Reply:
     if raw is None:
         s.extra["tryon_after_photo"] = True
         return ctx.reply(C.photo_question(ctx))
-    return await menu(ctx)
+    return await choose(ctx, "auto", None)  # straight to the picture (the best pick + the next size); more via 'Aur dikhao'
 
 
 async def menu(ctx: SkillContext) -> Reply:
@@ -277,11 +277,14 @@ async def job(ctx: SkillContext) -> Reply:
             tps.append(TryonProduct(sku=p.sku, category=p.category, width_mm=p.spec("width_mm"),
                                     height_mm=p.spec("height_mm"), label=_label(ctx, p), solid=solid, **extra))
         only_tv = all(p.category == "tv" for p, _ in pl)
-        dist_text = (ctx.t("tryon_distance", ctx.clang, ft=ctx.reg.num(dist, "card:seat_distance"))
-                     if dist and only_tv else None)
+        def dist_text(lang: str, only_tv: bool = only_tv) -> str | None:
+            return (ctx.t("tryon_distance", lang, ft=ctx.reg.num(dist, "card:seat_distance"))
+                    if dist and only_tv else None)
+
         req = TryonRequest(photo=raw.data, read=read, products=tps, wall_width_ft=P.number(s.home, "wall_width_ft"),
+                           footer_text=ctx.t("tryon_footer", "en"),
                            niche_width_cm=P.number(s.home, "niche_width_cm") or P.number(s.home, "space_width"),
-                           distance_text=dist_text,
+                           distance_text=dist_text("en"),
                            existing_tv_size_in=old_tv)
         res = await run(req, editor=None, harmonise=False, timeout=12)  # composite only: < 5 s end to end
         if res.blurred_photo and not drawn:
@@ -299,7 +302,12 @@ async def job(ctx: SkillContext) -> Reply:
             continue
         await repo.media_put(s.id, "tryon", res.image, "image/jpeg", ctx.now)
         drawn.append([p.sku for p, _ in pl])
-        msgs.append(_tryon_message(ctx, pl, res.image))
+        copy = None
+        if ctx.alang != "en":  # the associate's copy: same drawing, the words in their language
+            rc = await run(replace(req, distance_text=dist_text(ctx.alang), footer_text=ctx.t("tryon_footer", ctx.alang)),
+                           editor=None, harmonise=False, timeout=8)
+            copy = rc.image
+        msgs.append(C.with_copy(ctx, _tryon_message(ctx, pl, res.image), copy))
     ms = int((time.perf_counter() - t0) * 1000)
     diag.mark("tryon_last", {"mode": req_spec.get("mode"), "images": len(msgs), "read_ms": t_read, "total_ms": ms})
     if not msgs:
@@ -359,7 +367,7 @@ async def customer_photo(ctx: SkillContext) -> Reply:
     alang = (await repo.staff_by_wa(s.associate_wa_id)).lang
     s.extra["tryon_req"] = {"mode": "auto"}
     return ctx.reply(
-        OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_photo_thanks", s.home.customer_lang)),
+        OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_photo_thanks", CUSTOMER_PHONE_LANG)),
         OutMessage(to=s.associate_wa_id, kind="text", body=truncate(ctx.t("cust_photo_assoc", alang), 200)),
         background=["tryon"],
     )
