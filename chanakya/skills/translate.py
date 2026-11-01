@@ -135,7 +135,8 @@ def ignored_specs(ctx: SkillContext, p, used_benefits: list) -> list[str]:
 
 async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
     s = ctx.session
-    cat = s.home.category or "tv"
+    sp = ctx.facts.product_sync(read.sku) if read.sku else None
+    cat = s.home.category or (sp.category if sp else None) or (ctx.staff.dept if ctx.staff else None) or "tv"
     cands = ctx.facts.rank_label(read, cat)
     if read.raw_text:
         ctx.ev("label_text_ignored_as_instructions", text=read.raw_text[:80])
@@ -165,6 +166,10 @@ async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
 
 async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0) -> Reply:
     x = ctx.x
+    prod = ctx.facts.product_sync(sku)
+    home = ctx.session.home
+    if prod and ctx.packs.get(prod.category) and (home.category is None or (home.category != prod.category and not home.slots)):
+        home.category = prod.category  # a scanned label tells us the product
     prev = x.get("label_sku")
     prev_at = x.get("label_at")
     x["label_sku"] = sku
@@ -193,6 +198,8 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     if p is None:
         return ctx.reply(info_reply(ctx, ctx.t("label_send")))
     said = x.setdefault("benefits_said", {}).setdefault(sku, [])
+    if first:  # a (re)scan starts the benefits for this product again
+        said.clear()
     ms = matching(ctx, p)
     nxt = next((b for b in ms if b.id not in said), None)
     if nxt is None and first:
@@ -210,9 +217,8 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         if not cites:
             return ctx.reply(info_reply(ctx, say, btns, card=card))
         return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
-    if nxt is None:
-        btns = [ctx.b("b_options", ctx.sid("options")), ctx.b("b_compare", ctx.sid("compare"))]
-        return ctx.reply(info_reply(ctx, ctx.t("benefits_done"), btns))
+    if nxt is None or len(said) >= 2:
+        return await ignore_line(ctx, p, ms)
     lang = ctx.clang
     text = ctx.pick(nxt.say_who, lang) if (nxt.say_who.get(lang) and ctx.session.home.sports_viewer) else ""
     say = await fill(ctx, text or ctx.pick(nxt.say, lang), p, lang)
@@ -223,10 +229,11 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     vt = ctx.reg.static(", ".join(sd.value_title(v, ctx.lang) for v in P.values(ctx.session.home, cite))) if sd else ""
     n_ignored = len(ignored_specs(ctx, p, ms))
     why = ctx.t("kyun_benefit", value=vt, n=ctx.reg.num(n_ignored, f"calc:ignored_specs:{sku}"))
+    say = f"{say} {ctx.tc('trial_q')}"  # trial close: does this benefit matter to them?
     btns = [
-        ctx.b("b_benefit_next", ctx.sid("benefit_next")),
+        ctx.b("b_matters", ctx.sid("bt", "yes", nxt.id)),
+        ctx.b("b_not_really", ctx.sid("bt", "no", nxt.id)),
         ctx.b("b_compare", ctx.sid("compare")),
-        ctx.b("label_dikhao_btn", ctx.sid("options")),
     ]
     card = None
     if first:
@@ -234,9 +241,39 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         if not state.options_gate_open(ctx.session, ctx.pack):  # judge the fit only once the home is understood
             n = state.missing_for_options(ctx.session, ctx.pack)
             why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
-            btns = [ctx.b("b_next_q", ctx.sid("go")), btns[0], btns[1]]
+            btns = [btns[0], btns[1], ctx.b("b_next_q", ctx.sid("go"))]
     cites = [c for c in nxt.cites if P.known(ctx.session.home, c)] or nxt.cites
     return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+
+
+async def benefit_reply(ctx: SkillContext, answer: str, rule_id: str | None) -> Reply:
+    """Trial-close answer: 'matters' is remembered (it steers the options); then the next benefit, or what to ignore."""
+    x = ctx.x
+    sku = x.get("label_sku") or ctx.session.chosen_sku
+    key = "benefits_liked" if answer == "yes" else "benefits_skipped"
+    if rule_id:
+        x.setdefault(key, {}).setdefault(sku or "-", []).append(rule_id)
+    ctx.ev("benefit_trial_close", rule_id=rule_id, answer=answer, sku=sku)
+    return await benefit(ctx)
+
+
+async def ignore_line(ctx: SkillContext, p, ms: list | None = None) -> Reply:
+    """After the benefits: the specs that do not matter for this home (only specs this product really has)."""
+    ms = ms if ms is not None else matching(ctx, p)
+    keys = [k for k in ignored_specs(ctx, p, ms) if k in PV.LABELS and not isinstance(p.spec(k), bool)]
+    names = [PV.label(k, ctx.clang) for k in keys[:2]]
+    btns = [ctx.b("b_compare", ctx.sid("compare")), ctx.b("b_options", ctx.sid("options")),
+            ctx.b("b_tryon", ctx.sid("tryon"))]
+    if ctx.session.shortlist:
+        btns[1] = ctx.b("b_cost_show", ctx.sid("cost_show"))
+    if not names:
+        return ctx.reply(info_reply(ctx, ctx.t("benefits_done"), btns[:2]))
+    ctx.ev("ignore_said", sku=p.sku, specs=keys[:2])
+    say = ctx.tc("bolo_ignore", specs=ctx.reg.static(", ".join(names)))
+    cites = C.known_cites(ctx)
+    if not cites:
+        return ctx.reply(info_reply(ctx, say, btns))
+    return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_ignore"), cites, btns))
 
 
 def _badge(ctx: SkillContext, score: int, lang: str) -> tuple[str, str]:

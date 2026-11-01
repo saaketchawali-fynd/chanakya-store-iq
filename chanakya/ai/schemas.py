@@ -47,7 +47,7 @@ Intent = Literal[
     "other",
 ]
 Objection = Literal[
-    "too_expensive", "cheaper_online", "need_to_think", "brand_doubt", "installation_worry", "waiting_for_sale"
+    "too_expensive", "cheaper_online", "need_to_think", "ask_family", "brand_doubt", "installation_worry", "waiting_for_sale"
 ]
 
 
@@ -55,7 +55,7 @@ class Understanding(BaseModel):
     transcript: str = ""
     language: Literal["hi", "mr", "en", "mixed"] = "hi"
     customer_language: Literal["hi", "mr", "en"] | None = None  # only if the associate states it
-    category: Literal["tv", "ac", "wm", "laptop"] | None = None
+    category: Literal["tv", "ac", "wm", "fridge", "laptop"] | None = None
     customer_name: str | None = None  # e.g. "Shah ji"
     sports_viewer: Literal["papa", "mummy", "dada", "dadi", "beta", "beti", "self", "family"] | None = None
     slots: list[SlotPair] = []
@@ -96,7 +96,7 @@ class ImageRead(BaseModel):
     # label fields
     brand: str | None = None
     model_text: str | None = None
-    category: Literal["tv", "ac", "wm", "laptop"] | None = None
+    category: Literal["tv", "ac", "wm", "fridge", "laptop"] | None = None
     size_in: float | None = None
     specs: list[Spec] = []
     confidence: float | None = None  # optional reader confidence 0–1 (fixtures / rules mode)

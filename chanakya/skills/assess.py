@@ -6,7 +6,7 @@ from chanakya.ai.schemas import Understanding
 from chanakya.brain import packs as P
 from chanakya.core import state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import info_reply
 from chanakya.core.contracts import Button, Reply
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -15,44 +15,51 @@ LANG_TITLES = {"hi": "b_lang_hi", "mr": "b_lang_mr", "en": "b_lang_en"}
 
 
 async def new_session(ctx: SkillContext, customer_lang: str | None = None, ask_lang: bool = True) -> Reply:
+    """A new customer. The customer's language starts as the associate's (changeable from the menu); the first
+    message is the opener: the welcome line to say and the product list."""
     svc = ctx.svc
-    cat = ctx.staff.dept if ctx.staff and ctx.staff.dept in ctx.packs.packs else None
-    ctx.session = await svc.sessions.create(ctx.actor_wa_id, ctx.now, customer_lang or ctx.lang, cat)
+    ctx.session = await svc.sessions.create(ctx.actor_wa_id, ctx.now, customer_lang or ctx.lang, None)
     ctx.staff.current_session_id = ctx.session.id
-    ctx.ev("session_started", code=ctx.session.code, category=cat, lang=ctx.session.home.customer_lang)
+    ctx.session.extra["started_at"] = ctx.now.isoformat()
+    ctx.ev("session_started", code=ctx.session.code, category=None, lang=ctx.session.home.customer_lang)
     if not ask_lang:
         return ctx.reply()
-    code = ctx.reg.raw(ctx.session.code, "session:code")
-    btns = [ctx.b(LANG_TITLES[lg], ctx.sid("lang", lg)) for lg in ("hi", "mr", "en")]
-    return ctx.reply(info_reply(ctx, ctx.t("new_customer_lang", code=code), btns))
+    return ctx.reply(C.category_message(ctx))
 
 
 def category_question(ctx: SkillContext) -> Reply:
-    btns = [
-        ctx.b("b_cat_tv", ctx.sid("cat", "tv")),
-        ctx.b("b_cat_ac", ctx.sid("cat", "ac")),
-        ctx.b("b_cat_wm", ctx.sid("cat", "wm")),
-    ]
-    return ctx.reply(info_reply(ctx, ctx.t("ask_category"), btns))
+    return ctx.reply(C.category_message(ctx))
 
 
 async def set_category(ctx: SkillContext, cat: str) -> Reply:
     s = ctx.session
     if cat not in ctx.packs.packs:
         return category_question(ctx)
+    if s.home.category and s.home.category != cat:  # a different product: the home facts start over
+        s.home.slots = {}
+        for k in ("photo_asked", "budget_asked", "readback_done", "doubts_asked", "range_bands", "range_id"):
+            s.extra.pop(k, None)
     s.home.category = cat  # type: ignore[assignment]
+    ctx.ev("category_set", category=cat)
     pending = s.extra.pop("pending_u", None)
     u = Understanding.model_validate(pending) if pending else Understanding()
-    return await on_info(ctx, u, "voice")
+    return await on_info(ctx, u, "voice" if pending else "tap")
+
+
+async def customer_lang_picker(ctx: SkillContext) -> Reply:
+    btns = [ctx.b(LANG_TITLES[lg], ctx.sid("lang", lg)) for lg in ("en", "hi", "mr")]
+    return ctx.reply(info_reply(ctx, ctx.t("clang_pick_body"), btns))
 
 
 async def set_customer_lang(ctx: SkillContext, lang: str) -> Reply:
     if lang not in ("hi", "mr", "en"):
-        lang = "hi"
+        lang = ctx.lang
     ctx.session.home.customer_lang = lang  # type: ignore[assignment]
-    m = info_reply(ctx, ctx.t("speak_it_back"))
-    m.footer = ctx.t("footer_voice_first")
-    return ctx.reply(m)
+    ctx.ev("customer_lang_set", lang=lang)
+    note = ctx.t("clang_set", lang=ctx.t(f"lang_name_{lang}"))
+    msg = C.next_question_or_options(ctx)
+    msg.footer = note[:60]
+    return ctx.reply(msg)
 
 
 def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voice") -> int:
@@ -62,12 +69,9 @@ def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voic
     if u.category and (home.category is None or (home.category != u.category and not home.slots)):
         if ctx.packs.get(u.category):
             home.category = u.category
-    if home.category is None:
-        dept = ctx.staff.dept if ctx.staff else None
-        if dept not in ctx.packs.packs:  # unknown product: the router asks "Kaunsa product?" first
-            s.extra["pending_u"] = u.model_dump()
-            return 0
-        home.category = dept
+    if home.category is None:  # product not known yet: keep the note, the opener asks the product first
+        s.extra["pending_u"] = u.model_dump()
+        return 0
     pack = ctx.pack
     if u.customer_name and not home.customer_name:
         home.customer_name = u.customer_name
@@ -115,15 +119,11 @@ async def on_info(
         ctx.ev("need_validated", text=u.customer_request)
         slot = C.pick_next_slot(ctx)
         say = ctx.pick(ctx.packs.common_line("need_validation"), ctx.clang)
-        if slot:
+        if slot:  # agree with what they asked for, then the next home question in the same breath
+            say = f"{say} {ctx.pick(pack.slot(slot).ask, ctx.clang)}"
             msgs.append(C.question_reply(ctx, slot, say_override=say, why_override=ctx.t("kyun_need_validation")))
         else:
-            cites = C.known_cites(ctx)
-            msgs.append(
-                coach_reply(ctx, say, ctx.t("kyun_need_validation"), cites, [ctx.b("b_options", ctx.sid("options"))])
-                if cites
-                else None
-            )
+            msgs.append(C.next_question_or_options(ctx, footer=noted_footer(ctx, source)))
     else:
         msgs.append(C.next_question_or_options(ctx, footer=noted_footer(ctx, source)))
     return ctx.reply(*msgs)
@@ -173,18 +173,32 @@ async def tap_slot(ctx: SkillContext, slot: str, val: str) -> Reply:
     from chanakya.ai.schemas import SlotPair
 
     u.slots = [SlotPair(slot=slot, value=val)]
-    if ctx.x.get("pending_cost") and sd.phase == "site":
+    if ctx.x.get("pending_cost") and (slot in pack.complete_slots or sd.phase == "site"):
         apply_understanding(ctx, u, "tap")
         from chanakya.skills import complete
 
         return await complete.show_cost(ctx)
+    if ctx.x.get("pending_close") and slot == "exchange_old":
+        apply_understanding(ctx, u, "tap")
+        ctx.x.pop("pending_close", None)
+        from chanakya.skills import close
+
+        return await close.offers(ctx)
     return await on_info(ctx, u, "tap")
 
 
 async def set_budget(ctx: SkillContext, band_id: str) -> Reply:
     pack = ctx.pack
-    band = next((b for b in pack.budget_bands if b.id == band_id), None)
     s = ctx.session
+    rb = next((b for b in s.extra.get("range_bands") or [] if b["id"] == band_id), None)
+    if rb:  # a comfort range cut from the real prices
+        s.home.start_level_inr = int(rb["level"])
+        s.home.start_level_source = "associate_tap"
+        s.extra["range_id"] = band_id
+        s.extra["budget_asked"] = True
+        ctx.ev("comfort_range_set", band=band_id, low=rb["a"], high=rb["b"])
+        return ctx.reply(C.next_question_or_options(ctx))
+    band = next((b for b in pack.budget_bands if b.id == band_id), None)
     if band and band.inr:
         s.home.start_level_inr = int(band.inr)
         s.home.start_level_source = "associate_tap"
@@ -193,6 +207,65 @@ async def set_budget(ctx: SkillContext, band_id: str) -> Reply:
         s.home.start_level_source = "none"
     s.extra["budget_asked"] = True
     return ctx.reply(C.next_question_or_options(ctx))
+
+
+async def readback_ok(ctx: SkillContext) -> Reply:
+    ctx.x["readback_done"] = True
+    ctx.ev("readback_confirmed")
+    return ctx.reply(C.next_question_or_options(ctx))
+
+
+async def readback_edit(ctx: SkillContext) -> Reply:
+    """'Change something': the known answers as a list; the one tapped is asked again, then the read-back repeats."""
+    from chanakya.channel.limits import truncate, truncate_title
+    from chanakya.core.contracts import ListRow, ListSection, OutMessage
+
+    pack = ctx.pack
+    home = ctx.session.home
+    rows = []
+    for sid in pack.order:
+        sd = pack.slot(sid)
+        if not sd or not P.known(home, sid):
+            continue
+        val = ", ".join(sd.value_title(v, ctx.lang) for v in P.values(home, sid))
+        rows.append(ListRow(id=ctx.sid("slotask", sid), title=truncate(ctx.pick(sd.title) or sid, 24), description=truncate(val, 72)))
+    for r in rows:
+        ctx.reg.static(r.title + " " + (r.description or ""))
+    ctx.x["readback_done"] = False
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("readback_edit_body"),
+                                list_button=truncate_title(ctx.t("list_change")), sections=[ListSection(rows=rows[:10])],
+                                allowed_numbers=ctx.reg.allowed()))
+
+
+async def reask(ctx: SkillContext, slot: str) -> Reply:
+    """Ask one known question again (from 'Change something'); the new tap replaces the old answer."""
+    pack = ctx.pack
+    if not pack or not pack.slot(slot):
+        return ctx.reply(C.next_question_or_options(ctx))
+    ctx.x["readback_done"] = False
+    return ctx.reply(C.question_reply(ctx, slot))
+
+
+async def doubt_list(ctx: SkillContext) -> Reply:
+    """'Yes, a doubt': this category's common beliefs as a list (one tap → the confirm-then-correct line)."""
+    from chanakya.channel.limits import truncate, truncate_title
+    from chanakya.core.contracts import ListRow, ListSection, OutMessage
+
+    myths = ctx.packs.all_myths(ctx.session.home.category)
+    rows = [ListRow(id=ctx.sid("myth", m.id), title=truncate(ctx.pick(getattr(m, "short", None) or {"en": m.belief}), 24))
+            for m in myths if getattr(m, "short", None)][:9]
+    rows.append(ListRow(id=ctx.sid("doubt_voice"), title=ctx.t("row_other_doubt")))
+    for r in rows:
+        ctx.reg.static(r.title)
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("doubt_list_body"),
+                                list_button=truncate_title(ctx.t("list_doubt")), sections=[ListSection(rows=rows)],
+                                allowed_numbers=ctx.reg.allowed()))
+
+
+async def doubt_voice(ctx: SkillContext) -> Reply:
+    m = info_reply(ctx, ctx.t("doubt_voice_prompt"))
+    m.footer = ctx.t("footer_voice_first")
+    return ctx.reply(m)
 
 
 async def photo_yes(ctx: SkillContext) -> Reply:

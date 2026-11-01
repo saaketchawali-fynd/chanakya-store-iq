@@ -15,18 +15,7 @@ from chanakya.core.contracts import Button, InboundMessage, OutMessage
 from chanakya.sim.harness import PHONES
 from chanakya.truth.firewall import NumberRegistry
 from tests.conftest import make_harness
-from tests.helpers import button_ids, check_floor, texts
-
-
-async def to_options(h, photo=None):
-    await h.tap("g:new")
-    await h.tap("s:C1:lang:mr")
-    await h.voice("assess_1")
-    await h.tap("s:C1:slot:mounting:wall")
-    if photo:
-        await h.tap("s:C1:photo")
-        await h.photo(photo)
-    return await h.tap("s:C1:options")
+from tests.helpers import answer_complete, button_ids, check_floor, pay, pick, texts, to_options
 
 
 async def session(h):
@@ -87,9 +76,9 @@ async def test_06_override_allowed_and_logged(h):
     await to_options(h)
     out = await h.tap("s:C1:override:price:hurry")
     check_floor(out)
+    out = await answer_complete(h, out)  # the questions that change the cost come first
     assert any(m.card and m.card.template == "kharcha" for m in out)
-    await h.tap("s:C1:offers")
-    await h.tap("s:C1:bank:HDFC")
+    await pay(h, "card", "HDFC")
     s = await session(h)
     assert (await repo.events_for(s.id, ["override"]))[0].payload == {"gate": "price", "reason": "hurry"}
     await h.tap("s:C1:khatam")
@@ -100,8 +89,8 @@ async def test_06_override_allowed_and_logged(h):
 async def test_07_out_of_stock_best_shows_nearby(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:hi")
-    await h.say("customer ka kamra andhera rehta hai, movies dekhte hain, sofa se 9 feet, budget 90000")
-    await h.tap("s:C1:slot:mounting:stand")
+    await h.pick("s:C1:cat:tv")
+    await h.say("living room hai, kamra andhera rehta hai, movies dekhte hain, sofa se 9 feet, budget 90000")
     s = await session(h)
     from chanakya.brain import packs as P
 
@@ -277,11 +266,13 @@ async def test_languages(h, assoc, cust):
     from chanakya.i18n.lang import raw
 
     assert raw("label_kyun", assoc) in out[0].body
-    await h.tap("s:C1:slot:mounting:wall")
+    await h.tap("s:C1:slot:trigger:new_home")
+    await h.tap("s:C1:photo_no")
+    await h.tap("s:C1:readback_ok")
     out = await h.tap("s:C1:options")
     check_floor(out)
     await h.tap("s:C1:shown")
-    out = await h.tap("s:C1:opt:B")
+    out = await pick(h)
     assert out[-1].card.lang == cust and out[-1].card.data["zaroori_total_str"] == "₹65,288"
 
 
@@ -298,7 +289,7 @@ async def test_language_picker_then_single_language(tmp_path):
         out = await hh.voice("assess_1")
         body = out[0].body
         assert "*बोला*" in body and "*का*" in body  # associate labels stay Marathi
-        assert "दीवार" in body  # the line to say is in the customer's Hindi
+        assert "पुराना टीवी" in body  # the line to say (why now?) is in the customer's Hindi
         await hh.say("language")
         assert [b.id for b in hh.ch.sent[-1].msg.buttons] == ["g:alang:en", "g:alang:hi", "g:alang:mr"]
     finally:

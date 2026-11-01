@@ -1,6 +1,9 @@
 category: tv
 label: {hi: "TV", mr: "टीव्ही", en: "TV"}
-required_slots: [seat_distance, room_light, content, mounting, elders, seating, decider]
+required_slots: [room, seat_distance, room_light, content]
+ask_order: [trigger, old_size, room, seat_distance, room_light, content]
+complete_slots: [mounting, wall_type, soundbar]
+placeable: true
 gate_min_slots: 4
 cost_slots: [mounting, exchange_old]
 budget_bands:
@@ -9,6 +12,72 @@ budget_bands:
   - {id: b3, inr: 90000, title: {hi: "70k se upar", mr: "70k पेक्षा जास्त", en: "Above 70k"}}
   - {id: none, inr: null, title: {hi: "Nahi bataya", mr: "सांगितलं नाही", en: "Not told"}}
 slots:
+  - id: trigger
+    phase: open
+    title: {hi: "Kyun abhi", mr: "आत्ता का", en: "Why now"}
+    ask: {hi: "पुराना टीवी बदलना है, या नया ले रहे हैं?", mr: "जुना टीव्ही बदलायचा आहे, की नवीन घेताय?", en: "Is this replacing an old TV, or a new one?"}
+    why: {hi: "Purana ho to wahi anchor hai: size, exchange aur jagah pehle se pata", mr: "जुनं असेल तर तेच माप: साइज, एक्सचेंज आणि जागा आधीच माहीत", en: "A replacement tells us the size, the exchange and the space already"}
+    quick:
+      - {id: replace, title: {hi: "Purana badalna", mr: "जुना बदलायचा", en: "Replacing old"}}
+      - {id: new_home, title: {hi: "Naya ghar", mr: "नवीन घर", en: "New home"}}
+      - {id: second, title: {hi: "Doosra TV", mr: "दुसरा टीव्ही", en: "Second TV"}}
+    values: [replace, new_home, second]
+    value_titles:
+      replace: {hi: "Purana badalna", mr: "जुना बदलायचा", en: "Replacing old"}
+      new_home: {hi: "Naya ghar", mr: "नवीन घर", en: "New home"}
+      second: {hi: "Doosra TV", mr: "दुसरा टीव्ही", en: "Second TV"}
+    keywords:
+      replace: ["purana", "badalna", "replace", "old tv", "पुराना", "जुना", "बदलना"]
+      new_home: ["naya ghar", "new home", "new flat", "shift", "नया घर", "नवीन घर"]
+      second: ["doosra tv", "second tv", "bedroom ke liye", "दूसरा टीवी", "दुसरा टीव्ही"]
+  - id: old_size
+    phase: open
+    number: old_tv_in
+    ask_if: {slot: trigger, in: [replace]}
+    title: {hi: "Purana TV", mr: "जुना टीव्ही", en: "Old TV"}
+    ask: {hi: "अभी वाला टीवी कितने इंच का है?", mr: "सध्याचा टीव्ही किती इंचाचा आहे?", en: "How big is the TV you have now?"}
+    why: {hi: "Zyada-tar parivaar purane se ek size bada lekar khush rehte hain", mr: "बहुतेक कुटुंबं जुन्यापेक्षा एक साइज मोठा घेऊन समाधानी असतात", en: "Most families are happiest one size up from the old TV"}
+    quick:
+      - {id: o32, number: 32, title: {hi: "32 inch tak", mr: "32 इंचपर्यंत", en: "Up to 32 inch"}}
+      - {id: o43, number: 43, title: {hi: "40-43 inch", mr: "40-43 इंच", en: "40-43 inch"}}
+      - {id: o50, number: 55, title: {hi: "50 inch ya bada", mr: "50 इंच किंवा मोठा", en: "50 inch or bigger"}}
+    values: [o32, o43, o50]
+    value_titles:
+      o32: {hi: "Purana TV 32 inch tak", mr: "जुना टीव्ही 32 इंचपर्यंत", en: "old TV up to 32 inch"}
+      o43: {hi: "Purana TV 40-43 inch", mr: "जुना टीव्ही 40-43 इंच", en: "old TV 40-43 inch"}
+      o50: {hi: "Purana TV 50 inch+", mr: "जुना टीव्ही 50 इंच+", en: "old TV 50 inch or bigger"}
+    bands: [{max: 34, value: o32}, {max: 46, value: o43}, {max: 99, value: o50}]
+  - id: room
+    phase: life
+    title: {hi: "Kamra", mr: "खोली", en: "Room"}
+    ask: {hi: "टीवी किस कमरे में लगेगा?", mr: "टीव्ही कोणत्या खोलीत लागेल?", en: "Which room will the TV go in?"}
+    why: {hi: "Kamre se size aur awaaz tay hoti hai", mr: "खोलीवरून साइज आणि आवाज ठरतो", en: "The room decides the size and the sound"}
+    quick:
+      - {id: living, title: {hi: "Living room", mr: "हॉल", en: "Living room"}}
+      - {id: bedroom, title: {hi: "Bedroom", mr: "बेडरूम", en: "Bedroom"}}
+      - {id: other, title: {hi: "Koi aur", mr: "दुसरी खोली", en: "Other room"}}
+    values: [living, bedroom, other]
+    value_titles:
+      living: {hi: "Living room", mr: "हॉल", en: "Living room"}
+      bedroom: {hi: "Bedroom", mr: "बेडरूम", en: "Bedroom"}
+      other: {hi: "Koi aur kamra", mr: "दुसरी खोली", en: "Other room"}
+    keywords:
+      living: ["living", "hall", "drawing room", "हॉल", "लिविंग"]
+      bedroom: ["bedroom", "bed room", "बेडरूम", "बेड रूम"]
+  - id: soundbar
+    phase: site
+    title: {hi: "Soundbar", mr: "साउंडबार", en: "Soundbar"}
+    ask: {hi: "अभी घर में साउंडबार है?", mr: "सध्या घरात साउंडबार आहे?", en: "Do you have a soundbar now?"}
+    why: {hi: "TV patla hota hai, awaaz chhoti; soundbar se dialogue saaf", mr: "टीव्ही पातळ, आवाज लहान; साउंडबारने संवाद स्पष्ट", en: "Thin TVs have small speakers; a soundbar makes dialogue clear"}
+    quick:
+      - {id: has, title: {hi: "Haan, hai", mr: "हो, आहे", en: "Yes, have one"}}
+      - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
+      - {id: thinking, title: {hi: "Soch rahe", mr: "विचार करतोय", en: "Thinking about it"}}
+    values: [has, "no", thinking]
+    value_titles:
+      has: {hi: "Soundbar hai", mr: "साउंडबार आहे", en: "Has a soundbar"}
+      "no": {hi: "Soundbar nahi", mr: "साउंडबार नाही", en: "No soundbar"}
+      thinking: {hi: "Soundbar soch rahe", mr: "साउंडबारचा विचार", en: "Thinking of a soundbar"}
   - id: seat_distance
     phase: life
     number: seat_distance_ft
@@ -61,8 +130,8 @@ slots:
     why: {hi: "Isse motion aur sound ki zaroorat pata chalti hai", mr: "यावरून मोशन आणि आवाजाची गरज कळते", en: "This tells us the motion and sound needs"}
     quick:
       - {id: sports, title: {hi: "Cricket/sports", mr: "क्रिकेट/खेळ", en: "Cricket/sports"}}
-      - {id: serials, title: {hi: "Serial/news", mr: "मालिका/बातम्या", en: "Serials/news"}}
       - {id: movies, title: {hi: "Movies/OTT", mr: "सिनेमे/OTT", en: "Movies/OTT"}}
+      - {id: serials, title: {hi: "Serial/news", mr: "मालिका/बातम्या", en: "Serials/news"}}
     values: [sports, serials, movies, kids, gaming]
     value_titles:
       sports: {hi: "Cricket/sports", mr: "क्रिकेट/खेळ", en: "Cricket/sports"}
@@ -74,7 +143,7 @@ slots:
     keywords:
       sports: ["cricket", "match", "sports", "football", "ipl", "क्रिकेट", "मैच", "खेळ"]
       serials: ["serial", "news", "samachar", "सीरियल", "न्यूज़", "मालिका", "बातम्या"]
-      movies: ["movie", "film", "netflix", "ott", "picture", "फ़िल्म", "फिल्म", "सिनेमा"]
+      movies: ["movie", "movies", "film", "films", "netflix", "ott", "picture", "फ़िल्म", "फिल्म", "फिल्में", "सिनेमा", "सिनेमे"]
       kids: ["bachche", "bacche", "cartoon", "kids", "बच्चे", "कार्टून", "मुलं"]
       gaming: ["gaming", "game", "playstation", "ps5", "xbox", "गेम", "गेमिंग"]
   - id: mounting
@@ -340,6 +409,7 @@ demos:
 
 myths:
   - id: tv_4k_useless
+    short: {hi: "4K bekaar, channel HD", mr: "4K निरुपयोगी, चॅनेल HD", en: "4K useless, channels HD"}
     belief: "4K is useless because TV channels are only HD"
     proof: own_content
     keywords: ["4k bekaar", "4k bekar", "4k ka fayda nahi", "4k useless", "channel hd", "4k की ज़रूरत नहीं", "4k बेकार", "4k चा उपयोग नाही"]
@@ -347,6 +417,7 @@ myths:
            mr: "बरोबर, बहुतेक चॅनेल HD आहेत. पण Netflix, YouTube 4K मध्ये येतात, आणि हा टीव्ही HD सुद्धा स्पष्ट दाखवतो.",
            en: "True, most channels are HD. But Netflix and YouTube stream in 4K, and this TV makes HD look sharper too."}
   - id: tv_big_screen_eyes
+    short: {hi: "Bada TV, aankh kharab", mr: "मोठा टीव्ही, डोळे खराब", en: "Big TV hurts the eyes"}
     belief: "A big TV screen is bad for the eyes"
     proof: distance_demo
     keywords: ["aankh kharab", "aankhon ko nuksan", "bad for eyes", "eyes hurt", "आँख खराब", "आंखों को नुकसान", "डोळे खराब"]
@@ -354,6 +425,7 @@ myths:
            mr: "बरोबर विचार केला, खूप जवळून मोठा टीव्ही थकवतो. तुमच्या अंतरानुसार योग्य साइज असेल तर डोळ्यांवर ताण येत नाही.",
            en: "Fair point: a big screen too close is tiring. Matched to your distance, the right size is easy on the eyes."}
   - id: tv_watts
+    short: {hi: "Zyada watt, achhi awaaz", mr: "जास्त वॉट, चांगला आवाज", en: "More watts, better sound"}
     belief: "More speaker watts means better sound"
     proof: dialogue_low_volume
     keywords: ["zyada watt", "jyada watt", "more watts", "watt zyada", "ज़्यादा वॉट", "जास्त वॉट"]

@@ -7,6 +7,7 @@ longest side ~1000 px, tight crop, soft floor/contact shadow:
 * ac        split indoor unit, curved white front, outlet vanes + louvre, LED temperature, brand text
 * wm        front-load (chrome door ring, glass porthole, drum, dial + display) or top-load (glass lid, console)
 * laptop    open, 3/4 view (real perspective), wallpaper on screen, keyboard deck, trackpad
+* fridge    front view at true proportions: single / double door, bottom freezer or side-by-side
 * soundbar  slim bar with grille texture (+ subwoofer when channels is x.1)
 
 Colours come from ``info.colours`` when given. Each product is an SVG (gradients, filters, blurred shadows)
@@ -1180,11 +1181,91 @@ def svg_soundbar(p: dict) -> tuple[str, float, float]:
     return svg_doc(w_total, h_total, defs, body), w_total, h_total
 
 
+def svg_fridge(p: dict) -> tuple[str, float, float]:
+    """Front view at true proportions: single door (+ base drawer), double door (freezer on top), bottom freezer,
+    or side-by-side; recessed or bar handles, brand plate, soft floor shadow, metal sheen for steel finishes."""
+    d = _dims(p)
+    specs = p.get("specs") or {}
+    door = str(specs.get("door") or "double")
+    wmm = _num(d.get("width_mm"), 600)
+    hmm = _num(d.get("height_mm"), 1600)
+    bh = 1000.0
+    bw = round(bh * wmm / hmm)
+    m = 30.0
+    x0, y0 = m, 14.0
+    x1, y1 = x0 + bw, y0 + bh
+    w_total, h_total = bw + 2 * m, y1 + 40
+    base = colour_of(p, "#c6cad1")
+    dark = luminance(base) < 0.45
+    ink = "#c4c8ce" if dark else "#7c838c"
+    seam = darken(base, 0.35)
+    defs = [
+        lin("frb", [(0, lighten(base, 0.18)), (0.5, base), (1, darken(base, 0.10))], 0, 0, 1, 0),
+        lin("frv", [(0, "#fff", 0.10), (0.5, "#fff", 0), (1, "#000", 0.08)]),
+        lin("hdl", [(0, lighten(base, 0.55)), (0.5, darken(base, 0.18)), (1, lighten(base, 0.25))], 0, 0, 1, 0),
+        metal_sheen(),
+        blur("sh10", 10),
+        blur("sh3", 3),
+    ]
+    body = [
+        floor_shadow(x0 + bw / 2, y1 + 6, bw * 0.58, 13, 0.26, "sh10"),
+        f'<rect x="{x0 + 10}" y="{y1 - 8}" width="{bw - 20}" height="14" rx="4" fill="#2a2d32"/>',
+        f'<rect x="{x0}" y="{y0}" width="{bw}" height="{bh}" rx="16" fill="url(#frb)"/>',
+        f'<rect x="{x0}" y="{y0}" width="{bw}" height="{bh}" rx="16" fill="url(#frv)"/>',
+        (f'<rect x="{x0}" y="{y0}" width="{bw}" height="{bh}" rx="16" fill="url(#metal)"/>' if is_metallic(p) else ""),
+        f'<rect x="{x0 + 3}" y="{y0 + 1.5}" width="{bw - 6}" height="2" rx="1" fill="#fff" opacity="0.85"/>',
+    ]
+
+    def hseam(y):
+        return [f'<rect x="{x0}" y="{y - 2:.1f}" width="{bw}" height="4" fill="{seam}" opacity="0.75"/>',
+                f'<rect x="{x0}" y="{y + 2:.1f}" width="{bw}" height="1.4" fill="#fff" opacity="0.45"/>']
+
+    def vbar(x, ya, yb, w=14.0):
+        return [f'<rect x="{x - w / 2 + 3:.1f}" y="{ya + 4:.1f}" width="{w:.1f}" height="{yb - ya:.1f}" rx="{w / 2:.1f}" fill="#000" opacity="0.18" filter="url(#sh3)"/>',
+                f'<rect x="{x - w / 2:.1f}" y="{ya:.1f}" width="{w:.1f}" height="{yb - ya:.1f}" rx="{w / 2:.1f}" fill="url(#hdl)"/>']
+
+    def recess(x, ya, yb):
+        return [f'<rect x="{x - 5:.1f}" y="{ya:.1f}" width="10" height="{yb - ya:.1f}" rx="5" fill="{darken(base, 0.28)}" opacity="0.8"/>',
+                f'<rect x="{x - 3:.1f}" y="{ya + 2:.1f}" width="2" height="{yb - ya - 4:.1f}" rx="1" fill="#fff" opacity="0.4"/>']
+
+    if door == "single":
+        yd = y0 + bh * 0.86
+        body += hseam(yd)
+        body += recess(x1 - 26, y0 + bh * 0.30, y0 + bh * 0.62)
+        body += [f'<rect x="{x0 + bw * 0.2:.1f}" y="{yd + bh * 0.05:.1f}" width="{bw * 0.6:.1f}" height="10" rx="5" fill="{darken(base, 0.25)}"/>']
+        body.append(text(x0 + bw / 2, y0 + bh * 0.08, _brand(p), 0.026 * bh, ink, 700, spacing=2))
+    elif door == "bottom_freezer":
+        yd = y0 + bh * 0.63
+        body += hseam(yd)
+        body += vbar(x0 + 26, y0 + bh * 0.30, y0 + bh * 0.58)
+        body += [f'<rect x="{x0 + bw * 0.18:.1f}" y="{yd + 26:.1f}" width="{bw * 0.64:.1f}" height="14" rx="7" fill="url(#hdl)"/>']
+        body.append(text(x0 + bw / 2, y0 + bh * 0.07, _brand(p), 0.024 * bh, ink, 700, spacing=2))
+    elif door == "side_by_side":
+        xm = x0 + bw * 0.47
+        body += [f'<rect x="{xm - 2:.1f}" y="{y0}" width="4" height="{bh}" fill="{seam}" opacity="0.75"/>',
+                 f'<rect x="{xm + 2:.1f}" y="{y0}" width="1.4" height="{bh}" fill="#fff" opacity="0.4"/>']
+        body += vbar(xm - 22, y0 + bh * 0.24, y0 + bh * 0.70)
+        body += vbar(xm + 22, y0 + bh * 0.24, y0 + bh * 0.70)
+        if specs.get("water_dispenser"):
+            dx, dw = x0 + bw * 0.10, bw * 0.24
+            body += [f'<rect x="{dx:.1f}" y="{y0 + bh * 0.30:.1f}" width="{dw:.1f}" height="{bh * 0.20:.1f}" rx="10" fill="#1d2228"/>',
+                     f'<rect x="{dx + 8:.1f}" y="{y0 + bh * 0.31:.1f}" width="{dw - 16:.1f}" height="{bh * 0.035:.1f}" rx="4" fill="#2f3a46"/>',
+                     f'<rect x="{dx + dw * 0.4:.1f}" y="{y0 + bh * 0.37:.1f}" width="{dw * 0.2:.1f}" height="{bh * 0.07:.1f}" rx="4" fill="#3b4652"/>']
+        body.append(text(x0 + bw * 0.74, y0 + bh * 0.07, _brand(p), 0.024 * bh, ink, 700, spacing=2))
+    else:  # double door: freezer on top
+        yd = y0 + bh * 0.29
+        body += hseam(yd)
+        body += vbar(x0 + 24, y0 + bh * 0.10, y0 + bh * 0.24)
+        body += vbar(x0 + 24, yd + bh * 0.05, yd + bh * 0.30)
+        body.append(text(x0 + bw / 2, yd + bh * 0.06, _brand(p), 0.024 * bh, ink, 700, spacing=2))
+    return svg_doc(w_total, h_total, defs, body), w_total, h_total
+
+
 def svg_wm(p: dict):
     return svg_wm_top(p) if _wm_load(p) == "top" else svg_wm_front(p)
 
 
-SVG_BUILDERS = {"tv": svg_tv, "ac": svg_ac, "wm": svg_wm, "laptop": svg_laptop, "soundbar": svg_soundbar}
+SVG_BUILDERS = {"tv": svg_tv, "ac": svg_ac, "wm": svg_wm, "fridge": svg_fridge, "laptop": svg_laptop, "soundbar": svg_soundbar}
 
 
 # ---------- post-processing ----------

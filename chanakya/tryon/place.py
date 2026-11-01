@@ -29,7 +29,7 @@ FLOOR_MARGIN_CM = 5.0
 OBSTACLE_GAP_CM = 8.0
 # (back, front) distance from the wall in cm: a slim wall-mounted TV, a TV on its pedestal on the unit,
 # a split-AC indoor unit, a front-load washer standing against the wall.
-DEPTH_CM = {"tv": (1.0, TV_FACE_DEPTH_CM), "tv_stand": (19.0, 24.0), "ac": (0.0, 22.0), "wm": (0.0, 56.0)}
+DEPTH_CM = {"tv": (1.0, TV_FACE_DEPTH_CM), "tv_stand": (19.0, 24.0), "ac": (0.0, 22.0), "wm": (0.0, 56.0), "fridge": (0.0, 66.0)}
 
 
 @dataclass
@@ -46,6 +46,7 @@ class Placed:
     fits: bool | None = None  # WM vs niche width
     depth: float = 0.0  # front face, cm in front of the wall
     back: float = 0.0  # back face, cm in front of the wall
+    door: str | None = None  # fridge door type (drawing only)
 
 
 @dataclass
@@ -208,8 +209,8 @@ def plan(
     objs = _objects(wall, room)
     if category == "ac":
         uc, zc = _ac(wall, objs, w, h)
-    elif category == "wm":
-        uc, zc = _wm(wall, objs, w, h)
+    elif category in ("wm", "fridge"):
+        uc, zc = _wm(wall, objs, w, h)  # floor-standing: same rules as the machine
     else:
         uc, zc = _tv(wall, room, objs, w, h, mount)
     back, front = DEPTH_CM.get("tv_stand" if category == "tv" and mount == "stand" else category, DEPTH_CM["tv"])
@@ -219,7 +220,7 @@ def plan(
     out: list[Placed] = []
     for p, (pw, ph) in sized:
         pzc = zc
-        if category == "wm" or (category == "tv" and mount == "stand"):
+        if category in ("wm", "fridge") or (category == "tv" and mount == "stand"):
             pzc = zc - h / 2 + ph / 2  # same bottom edge
         if front > 0 and pose is not None:
             corners = [(uc - pw / 2, pzc + ph / 2), (uc + pw / 2, pzc + ph / 2), (uc + pw / 2, pzc - ph / 2)]
@@ -233,7 +234,7 @@ def plan(
             int(np.ceil(quad[:, 0].max())),
             int(np.ceil(quad[:, 1].max())),
         )
-        fits = (pw <= niche_width_cm) if category == "wm" and niche_width_cm else None
+        fits = (pw <= niche_width_cm) if category in ("wm", "fridge") and niche_width_cm else None
         out.append(
             Placed(
                 sku=p.sku,
@@ -248,6 +249,7 @@ def plan(
                 fits=fits,
                 depth=front,
                 back=back,
+                door=getattr(p, "door", None),
             )
         )
     return out

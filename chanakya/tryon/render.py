@@ -361,6 +361,51 @@ def wm_sprite(w_cm: float, h_cm: float, k: float, light: Light) -> Sprite:
     return Sprite(_rgba(rgb, body), _shadow_img(sh_a, light.rgb), k, margin)
 
 
+def fridge_sprite(w_cm: float, h_cm: float, k: float, light: Light, door: str = "double") -> Sprite:
+    """A brushed-steel fridge front at true size: door seams by type (single + base drawer, double with freezer on
+    top, bottom freezer, side-by-side) and long bar handles; same lighting as the room."""
+    margin = max(0.12 * w_cm, 6.0)
+    xx, yy, wp, hp = _canvas(w_cm, h_cm, k, margin)
+    body = _rrect(xx, yy, (0, 0, w_cm, h_cm), 0.025 * w_cm, k)
+    white = _appliance_white(light)
+    steel = white * 0.86
+    tx = np.clip(xx / w_cm, 0, 1)[..., None]
+    t = np.clip(yy / h_cm, 0, 1)[..., None]
+    rgb = steel * (1.04 - 0.10 * t) * (0.96 + 0.08 * np.sin(tx * np.pi))
+
+    def hseam(y):
+        return np.exp(-(((yy - y) / 0.35) ** 2))[..., None]
+
+    def vseam(x):
+        return np.exp(-(((xx - x) / 0.35) ** 2))[..., None]
+
+    def bar(x0, y0, x1, y1):
+        return _rrect(xx, yy, (x0, y0, x1, y1), min(x1 - x0, y1 - y0) / 2, k)[..., None]
+
+    handles = np.zeros_like(rgb[..., :1])
+    if door == "single":
+        rgb = rgb * (1 - 0.35 * hseam(0.86 * h_cm))
+        handles += bar(0.90 * w_cm, 0.30 * h_cm, 0.93 * w_cm, 0.60 * h_cm)
+    elif door == "bottom_freezer":
+        rgb = rgb * (1 - 0.35 * hseam(0.63 * h_cm))
+        handles += bar(0.06 * w_cm, 0.30 * h_cm, 0.09 * w_cm, 0.58 * h_cm)
+        handles += bar(0.20 * w_cm, 0.66 * h_cm, 0.80 * w_cm, 0.675 * h_cm)
+    elif door == "side_by_side":
+        rgb = rgb * (1 - 0.35 * vseam(0.47 * w_cm))
+        handles += bar(0.42 * w_cm, 0.24 * h_cm, 0.44 * w_cm, 0.70 * h_cm)
+        handles += bar(0.50 * w_cm, 0.24 * h_cm, 0.52 * w_cm, 0.70 * h_cm)
+    else:
+        rgb = rgb * (1 - 0.35 * hseam(0.29 * h_cm))
+        handles += bar(0.06 * w_cm, 0.10 * h_cm, 0.09 * w_cm, 0.24 * h_cm)
+        handles += bar(0.06 * w_cm, 0.34 * h_cm, 0.09 * w_cm, 0.58 * h_cm)
+    handles = np.clip(handles, 0, 1)
+    rgb = rgb * (1 - handles) + (white * 0.62) * handles
+    kick = np.clip((yy - 0.975 * h_cm) * 5, 0, 1)[..., None]
+    rgb = rgb * (1 - 0.35 * kick)
+    sh_a = _shadow(xx, yy, w_cm, h_cm, k, light, 0.6, 0.05 * w_cm, 0.015 * h_cm, 0.03 * w_cm)
+    return Sprite(_rgba(rgb, body), _shadow_img(sh_a, light.rgb), k, margin)
+
+
 # ---------------------------------------------------------------- warp + photo match
 
 
@@ -680,12 +725,14 @@ def compose(
             sp = ac_sprite(w, h, k, light)
         elif category == "wm":
             sp = wm_sprite(w, h, k, light)
+        elif category == "fridge":
+            sp = fridge_sprite(w, h, k, light, getattr(p, "door", None) or "double")
         else:
             sp = tv_sprite(w, h, k, light, p.mount)
         res = warp(sp.shadow, _sprite_h(wall_h, p, sp), out.size)  # cast on the wall
         if res is not None:
             _composite(out, *res)
-        if three_d and category == "wm":
+        if three_d and category in ("wm", "fridge"):
             _ground_shadow(out, pose, p, 0.0, ((uc - w / 2 - 2, uc + w / 2 + 2), (0.0, p.depth + 4)), light, 1.0)
         if three_d and category == "tv" and p.mount == "stand":
             unit_top = zc - h / 2 - STAND_GAP_CM

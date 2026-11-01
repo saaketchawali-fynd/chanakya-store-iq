@@ -77,6 +77,10 @@ def category_name(p: dict) -> str:
         return "Split AC · Inverter" if sp.get("inverter") else "Split AC"
     if cat == "wm":
         return f"{str(sp.get('load') or 'front').title()} Load Washing Machine"
+    if cat == "fridge":
+        door = {"single": "Single Door", "double": "Double Door", "bottom_freezer": "Bottom Freezer",
+                "side_by_side": "Side-by-Side"}.get(str(sp.get("door")), "")
+        return f"{door} Refrigerator".strip()
     if cat == "laptop":
         return "Gaming Laptop" if str(sp.get("gpu") or "").lower() == "dedicated" else "Laptop"
     if cat == "soundbar":
@@ -134,6 +138,14 @@ def key_specs(p: dict) -> list[tuple[str, str]]:
         add("In-built heater", yes(sp.get("heater")), "heater" in sp)
         add("Inverter motor", yes(sp.get("inverter_motor")), "inverter_motor" in sp)
         add("Steam wash", yes(sp.get("steam")), "steam" in sp)
+    elif cat == "fridge":
+        add("Gross capacity", sp.get("capacity_l") and f"{sp['capacity_l']} L")
+        add("Freezer", sp.get("freezer_l") and f"{sp['freezer_l']} L")
+        add("Vegetable box", sp.get("crisper_l") and f"{sp['crisper_l']} L")
+        add("Inverter compressor", yes(sp.get("inverter_compressor")), "inverter_compressor" in sp)
+        add("Frost-free", yes(sp.get("frost_free")), "frost_free" in sp)
+        add("Stabiliser-free", yes(sp.get("stabiliser_free")), "stabiliser_free" in sp)
+        add("Cooling in a power cut", sp.get("cooling_retention_h") and f"up to {sp['cooling_retention_h']} h")
     elif cat == "laptop":
         add("Processor", sp.get("cpu"))
         add("Memory", sp.get("ram_gb") and f"{sp['ram_gb']} GB RAM")
@@ -231,6 +243,8 @@ body{font-family:"Helvetica Neue",Arial,"Noto Sans","Noto Sans Devanagari",sans-
 .cat{font-size:24px;font-weight:700;color:#fff;background:#111;padding:8px 16px;border-radius:8px}
 .bar{height:10px;margin:20px 0 22px;border-radius:5px}
 .model{font-size:70px;line-height:1.05;font-weight:900;letter-spacing:-1px}
+.model.long{font-size:56px}
+table.tight td{padding:7px 0;font-size:27px}
 .mno{margin-top:12px;font-size:28px;font-family:Menlo,"DejaVu Sans Mono",monospace;color:#333}
 .mno b{color:#111}
 table{width:100%;border-collapse:collapse;margin-top:26px}
@@ -285,8 +299,8 @@ def label_html(p: dict, price: dict | None) -> str:
     accent = BRAND_COL.get(brand.lower(), "#111")
     rows = "".join(f'<tr><td class="k">{escape(k)}</td><td class="v">{escape(v)}</td></tr>' for k, v in key_specs(p))
     boxes = []
-    if cat in ("ac", "wm"):
-        star = energy.get("star") or sp.get("star")
+    if cat in ("ac", "wm", "fridge"):
+        star = energy.get("star") or sp.get("star") or sp.get("star_rating")
         inner = ""
         if star:
             n = max(0, min(5, int(star)))
@@ -316,10 +330,10 @@ def label_html(p: dict, price: dict | None) -> str:
         f"<!doctype html><html><head><meta charset='utf-8'><style>{CSS}</style></head><body><div class='lab'>"
         f"<div class='top'><span class='brand'>{escape(brand)}</span><span class='cat'>{escape(category_name(p))}</span></div>"
         f"<div class='bar' style='background:{accent}'></div>"
-        f"<div class='model'>{escape(model)}</div>"
+        f"<div class='model{' long' if len(model) > 19 else ''}'>{escape(model)}</div>"
         f"<div class='mno'>Model No. <b>{escape(str(info.get('model_number') or sku))}</b>"
         f"{' &nbsp;·&nbsp; ' + series if series else ''}</div>"
-        f"<table>{rows}</table>"
+        f"<table class='{'tight' if len(key_specs(p)) > 6 else ''}'>{rows}</table>"
         f"{'<div class=row>' + ''.join(boxes) + '</div>' if boxes else ''}"
         f"{price_html}"
         f"<div class='foot'><div>{barcode_svg(ean13(sku), width=380, height=96)}"

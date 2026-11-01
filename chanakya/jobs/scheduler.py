@@ -180,4 +180,4 @@ class Scheduler:
             )
             r = await manager.digest(ctx)
             for msg in r.messages:
-                await self.svc.deliver(self.svc.validate(msg, ctx.reg, None, m.lang or "hi", None))
+                await self.svc.deliver(self.svc.validate(msg, ctx.reg, None, m.lang or "en", None))

@@ -1,6 +1,9 @@
 category: ac
 label: {hi: "AC", mr: "AC", en: "AC"}
-required_slots: [room_size, sun_exposure, hours_per_day, power_issues, people, decider]
+required_slots: [room_size, sun_exposure, hours_per_day, power_issues]
+ask_order: [trigger, room_size, sun_exposure, hours_per_day, power_issues]
+complete_slots: [outdoor_spot, pipe_run_ft, wall_hole]
+placeable: true
 gate_min_slots: 4
 cost_slots: [outdoor_spot, pipe_run_ft, wall_hole]
 budget_bands:
@@ -9,11 +12,29 @@ budget_bands:
   - {id: b3, inr: 55000, title: {hi: "50k se upar", mr: "50k पेक्षा जास्त", en: "Above 50k"}}
   - {id: none, inr: null, title: {hi: "Nahi bataya", mr: "सांगितलं नाही", en: "Not told"}}
 slots:
+  - id: trigger
+    phase: open
+    title: {hi: "Kyun abhi", mr: "आत्ता का", en: "Why now"}
+    ask: {hi: "पुराना AC बदलना है, या नया लगवा रहे हैं?", mr: "जुना AC बदलायचा आहे, की नवीन बसवताय?", en: "Is this replacing an old AC, or a new one?"}
+    why: {hi: "Purana ho to wahi anchor hai: size, exchange aur jagah pehle se pata", mr: "जुनं असेल तर तेच माप: साइज, एक्सचेंज आणि जागा आधीच माहीत", en: "A replacement tells us the size, the exchange and the space already"}
+    quick:
+      - {id: replace, title: {hi: "Purana badalna", mr: "जुना बदलायचा", en: "Replacing old"}}
+      - {id: new_home, title: {hi: "Naya ghar", mr: "नवीन घर", en: "New home"}}
+      - {id: first, title: {hi: "Pehla AC", mr: "पहिला AC", en: "First AC"}}
+    values: [replace, new_home, first]
+    value_titles:
+      replace: {hi: "Purana badalna", mr: "जुना बदलायचा", en: "Replacing old"}
+      new_home: {hi: "Naya ghar", mr: "नवीन घर", en: "New home"}
+      first: {hi: "Pehla AC", mr: "पहिला AC", en: "First AC"}
+    keywords:
+      replace: ["purana", "badalna", "replace", "old ac", "पुराना", "जुना"]
+      new_home: ["naya ghar", "new home", "new flat", "नया घर", "नवीन घर"]
+      first: ["pehla ac", "first ac", "पहला एसी", "पहिला एसी"]
   - id: room_size
     phase: life
     number: room_size_sqft
     title: {hi: "Kamre ka size", mr: "खोलीचा आकार", en: "Room size"}
-    ask: {hi: "कमरा लगभग कितना बड़ा है — 10×10, 10×12 या उससे बड़ा?", mr: "खोली साधारण किती मोठी आहे — 10×10, 10×12 की त्यापेक्षा मोठी?", en: "Roughly how big is the room: 10×10, 10×12 or bigger?"}
+    ask: {hi: "AC किस कमरे में लगेगा, और कमरा लगभग कितना बड़ा है — 10×10, 10×12 या बड़ा?", mr: "AC कोणत्या खोलीत लागेल, आणि खोली साधारण किती मोठी आहे — 10×10, 10×12 की मोठी?", en: "Which room is it for, and roughly how big: 10×10, 10×12 or bigger?"}
     why: {hi: "Kamre se sahi ton tay hota hai", mr: "खोलीवरून योग्य टन ठरतो", en: "Room size decides the right tonnage"}
     quick:
       - {id: r_le120, number: 100, title: {hi: "10×10 tak", mr: "10×10 पर्यंत", en: "Up to 10×10"}}
@@ -35,15 +56,15 @@ slots:
   - id: sun_exposure
     phase: life
     title: {hi: "Top floor/dhoop", mr: "वरचा मजला/ऊन", en: "Top floor/sun"}
-    ask: {hi: "कमरा सबसे ऊपर की मंज़िल पर है या दीवार पर सीधी धूप आती है?", mr: "खोली वरच्या मजल्यावर आहे का, किंवा भिंतीवर थेट ऊन येतं का?", en: "Is the room on the top floor, or does a wall get direct sun?"}
+    ask: {hi: "कमरा सबसे ऊपर की मंज़िल पर है, या दोपहर की धूप किसी दीवार पर आती है?", mr: "खोली वरच्या मजल्यावर आहे का, किंवा दुपारचं ऊन एखाद्या भिंतीवर येतं का?", en: "Is it on the top floor, or does afternoon sun hit a wall?"}
     why: {hi: "Garam kamre ko aadha ton zyada chahiye", mr: "गरम खोलीला अर्धा टन जास्त लागतो", en: "A hot room needs half a ton more"}
     quick:
-      - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
+      - {id: "yes", title: {hi: "Haan, top/dhoop", mr: "हो, वरचा/ऊन", en: "Yes, top/sun"}}
       - {id: "no", title: {hi: "Nahi", mr: "नाही", en: "No"}}
     values: ["yes", "no"]
     value_titles:
-      "yes": {hi: "Haan, garam kamra", mr: "हो, गरम खोली", en: "Yes, hot room"}
-      "no": {hi: "Nahi", mr: "नाही", en: "No"}
+      "yes": {hi: "Garam kamra (top/dhoop)", mr: "गरम खोली (वरचा/ऊन)", en: "Hot room (top floor/sun)"}
+      "no": {hi: "Kamra garam nahi", mr: "खोली गरम नाही", en: "Not a hot room"}
     priors: {"yes": 0.4, "no": 0.6}
     keywords:
       "yes": ["top floor", "terrace ke neeche", "upar wali manzil", "dhoop wali deewar", "sun facing", "सबसे ऊपर", "धूप वाली दीवार", "वरचा मजला"]
@@ -339,6 +360,7 @@ demos:
 
 myths:
   - id: ac_inverter_saves_half
+    short: {hi: "Inverter = aadha bill", mr: "इन्व्हर्टर = अर्धं बिल", en: "Inverter halves the bill"}
     belief: "An inverter AC always saves 50% electricity"
     proof: label_compare
     keywords: ["aadha bill", "50% bachat", "50 percent bachat", "inverter half", "आधा बिल", "अर्धं बिल", "निम्मं बिल"]
@@ -346,6 +368,7 @@ myths:
            mr: "बरोबर, इन्व्हर्टर वीज वाचवतो — किती, ते लेबलवरून पाहू: या मॉडेलचं महिन्याचं बिल {monthly_bill}.",
            en: "True, inverters save power. How much? The label says this model's monthly bill is {monthly_bill}."}
   - id: ac_bigger_ton_better
+    short: {hi: "Zyada ton, zyada thanda", mr: "जास्त टन, जास्त थंड", en: "Bigger ton is better"}
     belief: "A bigger tonnage AC is always better"
     proof: null
     keywords: ["bada ton", "zyada ton", "bigger ton", "2 ton lena", "ज़्यादा टन", "जास्त टन", "बड़ा टन"]
@@ -353,6 +376,7 @@ myths:
            mr: "थंडावा महत्त्वाचा, बरोबर. खोलीनुसार योग्य टन घ्या; गरजेपेक्षा मोठा AC जास्त वीज खातो.",
            en: "Cooling matters, yes. Pick the right tonnage for the room; an oversized AC eats more power."}
   - id: ac_5star_always
+    short: {hi: "5 star hi lena chahiye", mr: "5 स्टारच घ्यावा", en: "Always buy 5 star"}
     belief: "A 5-star AC is always the right choice"
     proof: label_compare
     keywords: ["5 star hi", "5-star hi", "hamesha 5 star", "always 5 star", "5 स्टार ही", "फक्त 5 स्टार"]

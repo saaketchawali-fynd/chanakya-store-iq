@@ -37,6 +37,7 @@ TEMPLATE_NAMES = (
     "score",
     "brief",
     "digest",
+    "offer",
 )
 WIDTH = 1080
 MAX_HEIGHT = 1350
@@ -191,6 +192,20 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "note": "Bill = card · no surprises",
         },
     },
+    "offer": {
+        "hi": {"title": "आज का ऑफ़र", "pay": "पेमेंट", "price": "दाम", "after_offers": "ऑफ़र के बाद",
+               "no_offer": "इस पेमेंट पर आज कोई ऑफ़र नहीं", "extras": "इंस्टॉलेशन और ज़रूरी सामान",
+               "total": "आज का कुल खर्च", "total_note": "इंस्टॉलेशन समेत", "saving": "कुल बचत", "emi": "EMI",
+               "exchange": "एक्सचेंज", "also": "दूसरे कार्ड पर भी", "note": "सिर्फ़ असली ऑफ़र · बिल = कार्ड"},
+        "mr": {"title": "आजची ऑफर", "pay": "पेमेंट", "price": "किंमत", "after_offers": "ऑफरनंतर",
+               "no_offer": "या पेमेंटवर आज ऑफर नाही", "extras": "इन्स्टॉलेशन व आवश्यक साहित्य",
+               "total": "आजचा एकूण खर्च", "total_note": "इन्स्टॉलेशनसह", "saving": "एकूण बचत", "emi": "EMI",
+               "exchange": "एक्सचेंज", "also": "दुसऱ्या कार्डवरही", "note": "फक्त खऱ्या ऑफर · बिल = कार्ड"},
+        "en": {"title": "Today's offer", "pay": "Payment", "price": "Price", "after_offers": "After offers",
+               "no_offer": "No offer on this payment today", "extras": "Installation and required items",
+               "total": "Total today", "total_note": "installation included", "saving": "You save", "emi": "EMI",
+               "exchange": "Exchange", "also": "Also with another card", "note": "Only real offers · bill = card"},
+    },
     "parivaar": {
         "hi": {
             "kicker": "आपके लिए चुना गया",
@@ -247,21 +262,12 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
         },
     },
     "brief": {
-        "hi": {
-            "title": "Taiyari",
-            "changes": "Aaj ke badlav",
-            "offers": "Offers",
-            "followups": "Follow-up",
-            "focus": "Aaj ka focus",
-        },
-        "mr": {"title": "तयारी", "changes": "आजचे बदल", "offers": "ऑफर्स", "followups": "फॉलो-अप", "focus": "आजचा फोकस"},
-        "en": {
-            "title": "Before the shift",
-            "changes": "Today's changes",
-            "offers": "Offers",
-            "followups": "Follow-ups",
-            "focus": "Today's focus",
-        },
+        "hi": {"title": "Shift se pehle", "changes": "Stock badlav", "offers": "Aaj ke offers", "followups": "Follow-up",
+               "focus": "Aaj ka focus", "keep": "Dhyan rahe"},
+        "mr": {"title": "शिफ्टआधी", "changes": "स्टॉक बदल", "offers": "आजच्या ऑफर्स", "followups": "फॉलो-अप",
+               "focus": "आजचा फोकस", "keep": "लक्षात ठेवा"},
+        "en": {"title": "Before the shift", "changes": "Stock changes", "offers": "Today's offers", "followups": "Follow-ups",
+               "focus": "Today's focus", "keep": "Keep in mind"},
     },
     "digest": {
         "hi": {
@@ -1056,38 +1062,60 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
                 "Add 'because in your home…' to every feature",
             ),
         }
+    if template == "offer":
+        return {
+            "customer_name": "Shah",
+            "product_title": 'Meru 55" QLED Pro',
+            "product_image": "products/TV-MER-55-QL120.png",
+            "pay_text": p("HDFC कार्ड", "HDFC कार्ड", "HDFC card"),
+            "mrp_str": "₹74,990",
+            "price_str": "₹62,990",
+            "offers": [
+                {"title": p("HDFC कार्ड पर 10% छूट", "HDFC कार्डवर 10% सूट", "10% off on HDFC cards"), "amount_str": "−₹5,000",
+                 "till": p("15 Nov तक", "15 Nov पर्यंत", "till 15 Nov")},
+                {"title": p("एक्सचेंज पर ₹2,000 बोनस", "एक्सचेंजवर ₹2,000 बोनस", "₹2,000 exchange bonus"), "amount_str": "−₹2,000",
+                 "till": p("12 Nov तक", "12 Nov पर्यंत", "till 12 Nov")},
+            ],
+            "payable_str": "₹55,990",
+            "extras_str": "₹3,297",
+            "total_str": "₹59,287",
+            "saving_str": "₹19,000",
+            "finance_text": None,
+            "exchange_text": p("पुराने टीवी का एक्सचेंज: ₹4,000 – ₹7,000", "जुन्या टीव्हीचा एक्सचेंज: ₹4,000 – ₹7,000",
+                               "Old TV exchange: ₹4,000 – ₹7,000"),
+            "also": [],
+            "stamp": "2 Nov 11:00",
+        }
     if template == "brief":
         return {
             "greeting": p("Namaste Ravi ji", "नमस्कार रवी", "Namaste Ravi"),
-            "niti_line": p("दिन की शुरुआत, तैयारी के साथ।", "दिवसाची सुरुवात तयारीने.", "Start the day prepared."),
-            "changes": [
-                {
-                    "icon": "up",
-                    "text": p(
-                        "Meru 55 QLED Pro wapas stock mein (3)",
-                        "Meru 55 QLED Pro परत स्टॉकमध्ये (3)",
-                        "Meru 55 QLED Pro back in stock (3)",
-                    ),
-                },
-                {
-                    "icon": "down",
-                    "text": p("Novex 55 OLED stock khatam", "Novex 55 OLED स्टॉक संपला", "Novex 55 OLED out of stock"),
-                },
-                {
-                    "icon": "low",
-                    "text": p("Arka 43 4K: sirf 1 bacha", "Arka 43 4K: फक्त 1 उरला", "Arka 43 4K: only 1 left"),
-                },
-            ],
+            "date_line": p("Somvar 2 Nov · Juhu", "सोमवार 2 Nov · Juhu", "Monday 2 Nov · Juhu"),
+            "focus_step": p("Translate", "सोपं सांगा", "Translate"),
+            "focus_text": p("Focus: Translate", "लक्ष: सोपं सांगा", "Focus: Translate"),
+            "focus_tip": p("Har feature ke saath 'kyunki aapke ghar mein…' jodiye.", "प्रत्येक फीचरसोबत 'कारण तुमच्या घरात…' जोडा.",
+                           "Add 'because in your home…' to every feature."),
             "offers": [
-                {"text": p("HDFC 10% off — 15 Nov tak", "HDFC 10% सूट — 15 Nov पर्यंत", "HDFC 10% off: until 15 Nov")},
-                {"text": p("Naya: Exchange bonus ₹2,000", "नवीन: एक्सचेंज बोनस ₹2,000", "New: exchange bonus ₹2,000")},
+                {"kind": "ends", "badge": p("Jaldi khatam", "लवकर संपतो", "Ends soon"),
+                 "title": p("Diwali: Novex TV par ₹10,000", "दिवाळी: Novex TV वर ₹10,000", "Diwali: ₹10,000 off select Novex TVs"),
+                 "detail": p("₹10,000 chhoot", "₹10,000 सूट", "₹10,000 off"), "till": p("8 Nov tak", "8 Nov पर्यंत", "till 8 Nov")},
+                {"kind": "live", "badge": p("Chalu", "चालू", "Live"),
+                 "title": p("HDFC card par 10% chhoot", "HDFC कार्डवर 10% सूट", "10% off on HDFC cards"),
+                 "detail": p("10% chhoot · zyada se zyada ₹5,000 · HDFC card", "10% सूट · जास्तीत जास्त ₹5,000 · HDFC कार्ड",
+                             "10% off · up to ₹5,000 · HDFC cards · on bills over ₹30,000"),
+                 "till": p("15 Nov tak", "15 Nov पर्यंत", "till 15 Nov")},
             ],
-            "followups_text": p(
-                "2 customer aaj wapas aa sakte hain (Mehta ji)",
-                "2 ग्राहक आज परत येऊ शकतात (मेहता जी)",
-                "2 customers may come back today (Mehta ji)",
-            ),
-            "focus_text": p("Fayda batana (kal 1/2)", "फायदा सांगणं (काल 1/2)", "Translate (yesterday 1/2)"),
+            "keep": [
+                p("Diwali offer 8 Nov ko khatam — customer ko tareekh bataiye", "दिवाळी ऑफर 8 Nov ला संपते — ग्राहकाला तारीख सांगा",
+                  "Diwali offer ends 8 Nov: tell customers the date"),
+                p("Daam sirf demo ke baad, offer sirf data se", "किंमत फक्त डेमोनंतर, ऑफर फक्त डेटातून",
+                  "Price only after the demo; offers only from the data"),
+            ],
+            "changes": [
+                {"icon": "up", "text": p("Meru 55 QLED Pro wapas stock mein (3)", "Meru 55 QLED Pro परत स्टॉकमध्ये (3)",
+                                         "Meru 55 QLED Pro back in stock (3)")},
+                {"icon": "low", "text": p("Arka 43 4K: sirf 1 bacha", "Arka 43 4K: फक्त 1 उरला", "Arka 43 4K: only 1 left")},
+            ],
+            "followups_text": p("Aaj 2 follow-up", "आज 2 फॉलो-अप", "2 follow-ups today"),
         }
     if template == "digest":
         return {
@@ -1240,6 +1268,17 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
         for k in ("exchange_text", "lifetime_text", "stamp"):
             if d.get(k):
                 rows.append(str(d[k]))
+    elif tpl == "offer":
+        title = f"{lb['title']} · {d.get('product_title') or ''}"
+        rows.append(f"{lb['price']}: {d.get('price_str') or ''}")
+        for o in d.get("offers") or []:
+            rows.append(f"{o.get('title')}: {o.get('amount_str')} ({o.get('till') or ''})")
+        if d.get("extras_str"):
+            rows.append(f"{lb['extras']}: +{d['extras_str']}")
+        rows.append(f"{lb['total']}: {d.get('total_str') or ''}")
+        for k in ("finance_text", "exchange_text", "stamp"):
+            if d.get(k):
+                rows.append(str(d[k]))
     elif tpl == "parivaar":
         title = d.get("title") or title
         rows.append(str(d.get("product_title") or ""))
@@ -1273,7 +1312,8 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
         if d.get("niti_line"):
             rows.append(str(d["niti_line"]))
         rows += [f"• {c.get('text')}" for c in d.get("changes") or []]
-        rows += [f"• {o.get('text')}" for o in d.get("offers") or []]
+        rows += [f"• {o.get('text') or (str(o.get('title') or '') + ' · ' + str(o.get('detail') or '') + ' · ' + str(o.get('till') or ''))}"
+                 for o in d.get("offers") or []]
         for k in ("followups_text", "focus_text"):
             if d.get(k):
                 rows.append(str(d[k]))

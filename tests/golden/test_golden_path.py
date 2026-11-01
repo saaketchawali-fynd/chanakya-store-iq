@@ -23,59 +23,68 @@ async def test_golden_path(tmp_path):
         return out
 
     try:
-        # 0 first contact: the associate picks a language, and everything after is in that language
+        # 0 first contact: a neutral language picker (no greeting in any one language), nothing else
         out = await step(h.say, "namaste")
         assert [b.id for b in out[0].buttons] == ["g:alang:en", "g:alang:hi", "g:alang:mr"]
-        assert not any(m.card for m in out)
-        # 1 brief (Hindi chosen)
+        assert not any(m.card for m in out) and "Namaste" not in out[0].body and "Bhasha" not in out[0].body
+        # 1 brief (Hindi chosen): focus, offers as structured rows, stock
         out = await step(h.tap, "g:alang:hi")
         brief = next(m for m in out if m.card and m.card.template == "brief")
         assert any("Meru 55 QLED Pro" in c["text"] for c in brief.card.data["changes"])
+        offs = brief.card.data["offers"]
+        assert offs and all(o["badge"] and o["title"] and o["till"] for o in offs)
+        assert offs[0]["kind"] == "ends"  # the offers ending soonest come first
         assert [b.title for b in brief.buttons] == ["Clip dekho", "Aaj ka sawaal", "Naya customer"]
-        # 2 new customer + language
+        # 2 new customer: the opener (welcome line + product list, the associate's department first)
         out = await step(h.tap, "g:new")
+        rows = [r.id for sec in out[0].sections for r in sec.rows]
+        assert out[0].kind == "list" and rows[0] == "s:C1:cat:tv" and "s:C1:cat:fridge" in rows
         assert "C1" in texts(out)
+        # 3 the customer speaks Marathi (menu → customer language): only the lines to say follow the customer
         out = await step(h.tap, "s:C1:lang:mr")
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.customer_lang == "mr"
-        # 3 voice note → ONE message: the mounting question (Marathi line to say), no emojis
+        # 4 voice note → ONE message: why now? (Marathi line to say), what was understood in the footer
         out = await step(h.voice, "assess_1")
         assert len(out) == 1
         coach = out[0]
-        assert coach.coach and "भिंतीवर" in coach.body and coach.body.startswith("*Bolo*:") and "*Kyun*:" in coach.body
-        assert coach.footer.startswith("Samjha: 10 ft")  # what the voice note was understood as
-        assert [b.id for b in coach.buttons] == [
-            "s:C1:slot:mounting:wall",
-            "s:C1:slot:mounting:stand",
-            "s:C1:slot:mounting:unknown",
-        ]
+        assert coach.coach and "जुना टीव्ही" in coach.body and coach.body.startswith("*Bolo*:") and "*Kyun*:" in coach.body
+        assert coach.footer.startswith("Samjha: 10 ft")
+        assert button_ids(out) == ["s:C1:slot:trigger:replace", "s:C1:slot:trigger:new_home", "s:C1:slot:trigger:second"]
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
-        assert s.home.slots["seat_distance"][-1].value == "d8_10"
+        assert s.home.slots["seat_distance"][-1].value == "d8_10" and s.home.slots["room"][-1].value == "living"
         assert s.home.start_level_inr == 50000 and s.home.start_level_source == "associate_voice"
         assert "₹" not in texts(out)
-        # 4 mounting → options gate opens; budget is known, so the ONE next step is "room photo?" (2 buttons only)
-        out = await step(h.tap, "s:C1:slot:mounting:wall")
+        # 5 replacing → the old TV's size → the 4 home facts are known: room photo? (2 buttons only)
+        out = await step(h.tap, "s:C1:slot:trigger:replace")
+        assert button_ids(out)[0] == "s:C1:slot:old_size:o32"
+        out = await step(h.tap, "s:C1:slot:old_size:o43")
         assert len(out) == 1 and button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"]
-        # 5 customer has a photo → asked for it with nothing else on screen → photo → next question + try-on
+        # 6 photo → read it back (budget already said, so no range question) with the Home Card + try-on
         out = await step(h.tap, "s:C1:photo_yes")
         assert len(out) == 1 and not out[0].buttons
         out = await step(h.photo, "room_living.jpg")
         q = out[0]
-        assert "s:C1:options" == q.buttons[0].id and "s:C1:slot:elders:yes" in button_ids([q])
-        assert q.card and q.card.template == "home" and q.card.data["known"] == 4  # Home Card on the same message
-        assert "Photo" in q.footer
+        assert button_ids([q]) == ["s:C1:readback_ok", "s:C1:readback_edit"]
+        assert q.card and q.card.template == "home" and q.card.data["known"] == 4
+        assert "हॉल" in q.body and "10 ft" in q.body  # the home said back, in the customer's Marathi
         tryon = [m for m in out if m.image_bytes]
         assert tryon and "55" in tryon[0].body and "65" in tryon[0].body
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert "tryon_sent" in await ev_types(s.id)
-        # 6 claim → myth line
-        out = await step(h.voice, "assess_2_claim")
+        # 7 read-back confirmed → any doubts? → a doubt from the list → agree, then correct
+        out = await step(h.tap, "s:C1:readback_ok")
+        assert button_ids(out) == ["s:C1:options", "s:C1:doubt", "s:C1:pricefirst_q"]
+        out = await step(h.tap, "s:C1:doubt")
+        assert "s:C1:myth:tv_4k_useless" in [r.id for sec in out[0].sections for r in sec.rows]
+        out = await step(h.pick, "s:C1:myth:tv_4k_useless")
         assert "बरोबर, बहुतेक चॅनेल HD" in out[0].body
-        assert button_ids(out)[0] == "s:C1:proof:tv_4k_useless"
-        # 7–8 label → b_motion then b_bright, Benefit Card, no price
+        assert button_ids(out)[:2] == ["s:C1:go", "s:C1:proof:tv_4k_useless"]
+        # 8 label → b_motion with a trial close → 'matters' → b_bright, product card, no price
         out = await step(h.photo, "label_meru55.jpg")
         assert "120 Hz" in out[0].body and out[0].card and out[0].card.template == "product"
-        out = await step(h.tap, "s:C1:benefit_next")
+        assert "हे तुमच्या कामाचं आहे का?" in out[0].body and button_ids(out)[0] == "s:C1:bt:yes:b_motion"
+        out = await step(h.tap, "s:C1:bt:yes:b_motion")
         assert "उन्हातही" in out[0].body
         evs = await repo.events_for(s.id, ["benefit_said", "label_read"])
         assert [e.payload.get("rule_id") for e in evs if e.type == "benefit_said"] == ["b_motion", "b_bright"]
@@ -84,37 +93,60 @@ async def test_golden_path(tmp_path):
         out = await step(h.say, "offers")
         assert "Daam demo ke baad" in out[0].body and "₹" not in texts(out)
         assert "s:C1:override:price:asked" in button_ids(out)
-        # 10 options + glare demo
+        # 10 options (one message) → the demo on tap
         out = await step(h.tap, "s:C1:options")
-        card = next(m for m in out if m.card and m.card.template == "options")
-        assert [o["label"] + o["title"] for o in card.card.data["options"]] == [
+        assert len(out) == 1
+        card = out[0].card
+        assert [o["label"] + o["title"] for o in card.data["options"]] == [
             'AArka 55" 4K',
             'BMeru 55" QLED Pro',
             'CMeru 65" QLED Pro',
         ]
-        assert "₹" not in texts(out) and "price" not in str(card.card.data)
+        assert button_ids(out) == ["s:C1:demo", "s:C1:tryon", "s:C1:prefer"]
+        assert "₹" not in texts(out) and "price" not in str(card.data)
+        out = await step(h.tap, "s:C1:demo")
         evs = await repo.events_for(s.id, ["demo_recipe_sent"])
         assert evs[-1].payload["recipe"] == "glare_test"
-        # 11 shown → trial close
+        # 11 shown → which felt right? (the three + none of these)
         out = await step(h.tap, "s:C1:shown")
+        rows = [r.id for sec in out[0].sections for r in sec.rows]
+        assert rows == ["s:C1:opt:A", "s:C1:opt:B", "s:C1:opt:C", "s:C1:nonefit"]
         assert "Daam khula" in out[0].body and "Demo ho gaya" in out[0].body
-        # 12 choose B → Kharcha
-        out = await step(h.tap, "s:C1:opt:B")
+        # 12 B → the questions that change the cost (wall, wall type, soundbar) → Kharcha
+        out = await step(h.pick, "s:C1:opt:B")
+        assert button_ids(out)[0] == "s:C1:slot:mounting:wall"
+        await step(h.tap, "s:C1:slot:mounting:wall")
+        await step(h.tap, "s:C1:slot:wall_type:concrete")
+        out = await step(h.tap, "s:C1:slot:soundbar:has")
         k = out[-1]
         assert k.card.template == "kharcha"
         assert k.card.data["zaroori_total_str"] == "₹65,288" and k.card.data["with_suggestions_total_str"] == "₹68,787"
+        assert button_ids(out) == ["s:C1:offers", "s:C1:cost_rm", "s:C1:cost_show"]
         cost = (await repo.events_for(s.id, ["cost_shared"]))[-1]
         assert cost.payload["zaroori_total"] == 65288 and "charge:TV_WALLMOUNT_S" in cost.sources
-        # 13 offers → HDFC → finance sentence
-        await step(h.tap, "s:C1:offers")
-        out = await step(h.tap, "s:C1:bank:HDFC")
+        # 13 looks good → old TV working? → how will they pay? EMI → HDFC → offer card + finance in one sentence
+        out = await step(h.tap, "s:C1:offers")
+        assert button_ids(out)[0] == "s:C1:slot:exchange_old:yes_working"
+        out = await step(h.tap, "s:C1:slot:exchange_old:yes_working")
+        assert button_ids(out) == ["s:C1:pay:card", "s:C1:pay:upi", "s:C1:pay:emi"]
+        out = await step(h.tap, "s:C1:pay:emi")
+        assert "s:C1:bank:HDFC" in [r.id for sec in out[0].sections for r in sec.rows]
+        out = await step(h.pick, "s:C1:bank:HDFC")
         b = out[0].body
-        for x in ("₹4,833", "12", "₹299", "₹58,295", "₹305", "HDFC", "₹5,000", "15 Nov", "₹57,990"):
+        oc = out[0].card
+        assert oc.template == "offer" and [o["amount_str"] for o in oc.data["offers"]] == ["−₹5,000", "−₹2,000"]
+        assert oc.data["payable_str"] == "₹55,990" and oc.data["total_str"] == "₹58,288"
+        for x in ("₹4,666", "12", "₹299", "₹56,291", "₹301"):
             assert x in b, x
         fin = (await repo.events_for(s.id, ["finance_shown"]))[-1]
         assert fin.payload["plan_id"] == "FIN-NCE-12"
-        # 14 consent by QR → Parivaar Card to the customer
-        await step(h.tap, "s:C1:parivaar")
+        assert button_ids(out) == ["s:C1:delivery", "s:C1:nottoday", "s:C1:sendoffer"]
+        # 14 the close as a choice of two days → a day = sold → consent by QR → Parivaar Card to the customer
+        out = await step(h.tap, "s:C1:delivery")
+        day = button_ids(out)[0]
+        assert day.startswith("s:C1:dday:") and button_ids(out)[2] == "s:C1:nottoday"
+        out = await step(h.tap, day)
+        assert "s:C1:qr" in button_ids(out)
         out = await step(h.tap, "s:C1:qr")
         assert out[0].image_bytes
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
@@ -123,8 +155,10 @@ async def test_golden_path(tmp_path):
         to_cust = [m for m in out if m.to == PHONES["customer"]]
         assert any(m.card and m.card.template == "parivaar" for m in to_cust)
         assert all(b.id.startswith("u:") for m in to_cust for b in m.buttons)
+        to_assoc = [m for m in out if m.to == PHONES["associate"] and m.buttons]
+        assert button_ids(to_assoc) == ["s:C1:sold", "s:C1:task", "s:C1:khatam"]  # install first, then a task
         types = await ev_types(s.id)
-        assert "consent_given" in types and "parivaar_sent" in types
+        assert "consent_given" in types and "parivaar_sent" in types and "delivery_booked" in types
         # 15 task
         h.as_("associate")
         await step(h.tap, "s:C1:task")

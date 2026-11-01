@@ -36,10 +36,11 @@ async def choose_sku(ctx: SkillContext, sku: str) -> Reply:
 
 
 def _pending_site_slot(ctx: SkillContext) -> str | None:
+    """The next question that changes the cost (the pack's complete_slots, in order), if not yet known."""
     pack = ctx.pack
     home = ctx.session.home
-    for sid in pack.site_needs:
-        if sid not in pack.cost_slots or P.known(home, sid):
+    for sid in pack.complete_slots or [x for x in pack.site_needs if x in pack.cost_slots]:
+        if P.known(home, sid):
             continue
         sd = pack.slot(sid)
         if sd and sd.ask_if:
@@ -75,6 +76,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         lang=ctx.clang,
         include_suggestions=include_sug,
         include_optional=bool(ctx.x.get("optional_on")),
+        exclude_codes=tuple(ctx.x.get("dropped_codes") or ()),
     )
     s.cost_snapshot = sheet.model_dump(mode="json")
     state.advance(s, Step.COMPLETE)
@@ -99,13 +101,62 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         why += " · " + site_reason
     cites = used_site or C.known_cites(ctx)
     btns = [
+        ctx.b("b_looks_good", ctx.sid("offers")),
+        ctx.b("b_remove_item", ctx.sid("cost_rm")),
         ctx.b("b_show_customer", ctx.sid("cost_show")),
-        ctx.b("b_drop_optional", ctx.sid("cost_drop_optional")),
-        ctx.b("b_offers", ctx.sid("offers")),
     ]
     say = ctx.pick(ctx.packs.common_line("complete_line"), ctx.clang)
     msg = coach_reply(ctx, say, why, cites, btns, card=card)
+    if ctx.x.pop("removed_note", None):
+        msg.footer = ctx.x.pop("removed_footer", None) or msg.footer
     return ctx.reply(msg)
+
+
+async def remove_menu(ctx: SkillContext) -> Reply:
+    """'Remove an item': the suggested / optional lines, one tap each; required charges cannot be removed."""
+    from chanakya.channel.limits import truncate, truncate_title
+    from chanakya.core.contracts import ListRow, ListSection
+
+    s = ctx.session
+    if not s.cost_snapshot:
+        return await show_cost(ctx)
+    sheet = hisaab.CostSheet.model_validate(s.cost_snapshot)
+    rows = []
+    for ln in sheet.lines:
+        if ln.kind in ("sujhav", "optional"):
+            ctx.reg.raw(ln.amount_str, f"snapshot:{ln.code}")
+            rows.append(ListRow(id=ctx.sid("cost_drop", ln.code), title=truncate(ln.title, 24),
+                                description=truncate(f"{ln.amount_str}" + (f" · {ln.reason}" if ln.reason else ""), 72)))
+    if sheet.optional_count and not ctx.x.get("optional_on"):
+        rows.append(ListRow(id=ctx.sid("cost_drop", "_optional"), title=ctx.t("row_add_optional")))
+    if ctx.x.get("dropped_codes"):
+        rows.append(ListRow(id=ctx.sid("cost_drop", "_restore"), title=ctx.t("row_restore")))
+    for r in rows:
+        ctx.reg.static(r.title)
+    if not rows:
+        return ctx.reply(info_reply(ctx, ctx.t("nothing_to_remove"), [ctx.b("b_looks_good", ctx.sid("offers"))]))
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("remove_body"),
+                                list_button=truncate_title(ctx.t("list_remove")), sections=[ListSection(rows=rows[:10])],
+                                allowed_numbers=ctx.reg.allowed()))
+
+
+async def drop_line(ctx: SkillContext, code: str) -> Reply:
+    s = ctx.session
+    x = ctx.x
+    if code == "_optional":
+        x["optional_on"] = True
+    elif code == "_restore":
+        x["dropped_codes"] = []
+    else:
+        title = code
+        for ln in (s.cost_snapshot or {}).get("lines", []):
+            if ln.get("code") == code:
+                title = ln.get("title") or code
+        x["dropped_codes"] = sorted(set(x.get("dropped_codes") or []) | {code})
+        x["removed_note"] = True
+        x["removed_footer"] = ctx.t("removed_footer", item=ctx.reg.static(title))[:60]
+        ctx.ev("cost_line_removed", code=code)
+    return await show_cost(ctx)
 
 
 def _site_reason(ctx: SkillContext, sheet: hisaab.CostSheet) -> str | None:

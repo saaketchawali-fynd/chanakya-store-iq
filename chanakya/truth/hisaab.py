@@ -81,6 +81,9 @@ def filter_holds(flt: dict | None, p: ProductWithStock) -> bool:
         return False
     if "size_in_min" in flt and (size is None or size < flt["size_in_min"]):
         return False
+    for k, v in (flt.get("spec") or {}).items():  # e.g. {spec: {stabiliser_free: false}}
+        if p.spec(k) != v:
+            return False
     return True
 
 
@@ -94,6 +97,7 @@ async def compute(
     include_optional: bool = False,
     include_suggestions: bool = True,
     store_id: str | None = None,
+    exclude_codes: list[str] | tuple[str, ...] = (),
 ) -> CostSheet:
     p = facts.product_sync(sku, store_id)
     assert p is not None, f"unknown sku {sku}"
@@ -102,6 +106,8 @@ async def compute(
     sources: list[str] = []
 
     def add(code, title, amount, kind, source, reason=None, qty=None):
+        if kind in ("sujhav", "optional") and code in exclude_codes:  # the customer removed it
+            return
         lines.append(
             CostLine(
                 code=code,
@@ -153,7 +159,9 @@ async def compute(
                 )
         if cat == "tv":
             dist = number(home, "seat_distance", pack) if pack else None
-            if "yes" in values(home, "elders") or (dist is not None and dist >= 12):
+            sbv = values(home, "soundbar")
+            wants = any(v in ("no", "thinking") for v in sbv)
+            if "has" not in sbv and (wants or "yes" in values(home, "elders") or (dist is not None and dist >= 12)):
                 sb = facts.product_sync(SOUNDBAR_SKU, store_id)
                 if sb and sb.available:
                     add(
@@ -175,7 +183,7 @@ async def compute(
         if r:
             exch = (reg.inr(r[0], f"exchange:{r[2]}"), reg.inr(r[1], f"exchange:{r[2]}"))
             sources.append(f"exchange:{r[2]}")
-    lifetime = await lifetime_cost(p, facts, reg, store_id) if cat in ("ac", "wm") else None
+    lifetime = await lifetime_cost(p, facts, reg, store_id) if cat in ("ac", "wm", "fridge") else None
     return CostSheet(
         sku=sku,
         lines=lines,
@@ -205,7 +213,7 @@ async def lifetime_cost(
         "monthly_str": reg.inr(monthly, f"calc:energy:{p.sku}"),
         "five_year_str": reg.inr(five, f"calc:energy:{p.sku}"),
     }
-    key = "ton" if p.category == "ac" else "capacity_kg"
+    key = {"ac": "ton", "fridge": "capacity_l"}.get(p.category, "capacity_kg")
     alts = [
         q
         for q in facts.products_sync(p.category, store_id)

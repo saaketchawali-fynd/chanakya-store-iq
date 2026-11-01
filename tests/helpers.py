@@ -50,3 +50,56 @@ def texts(msgs: list[OutMessage]) -> str:
 
 def button_ids(msgs: list[OutMessage]) -> list[str]:
     return [b.id for m in msgs for b in m.buttons]
+
+
+# ---------- the sales flow (shared by the golden and red-team tests) ----------
+COMPLETE_ANSWERS = ("mounting:wall", "wall_type:concrete", "soundbar:has", "outdoor_spot:wall", "pipe_run_ft:p_le10",
+                    "wall_hole:existing")
+
+
+async def assess_tv(h, clang: str | None = "mr", trigger: str = "new_home"):
+    """New customer → (customer language) → the Shah voice note (room, distance, light, content, budget) → why now."""
+    await h.tap("g:new")
+    if clang:
+        await h.tap(f"s:C1:lang:{clang}")
+    await h.voice("assess_1")
+    return await h.tap(f"s:C1:slot:trigger:{trigger}")
+
+
+async def to_options(h, photo=None, clang: str | None = "mr"):
+    """…→ room photo (or none) → read it back → no doubts → the options."""
+    await assess_tv(h, clang)
+    if photo:
+        await h.tap("s:C1:photo_yes")
+        await h.photo(photo)
+    else:
+        await h.tap("s:C1:photo_no")
+    await h.tap("s:C1:readback_ok")
+    return await h.tap("s:C1:options")
+
+
+async def answer_complete(h, out):
+    """Answer the cost questions Complete asks (mounting, wall, soundbar / AC site) until the cost card comes."""
+    for _ in range(6):
+        if any(m.card and m.card.template == "kharcha" for m in out):
+            return out
+        ids = button_ids(out)
+        nxt = next((f"s:C1:slot:{a}" for a in COMPLETE_ANSWERS if f"s:C1:slot:{a}" in ids), None)
+        if nxt is None:
+            return out
+        out = await h.tap(nxt)
+    return out
+
+
+async def pick(h, label: str = "B"):
+    """Customer picks an option (after the demo) → Complete's questions answered → the cost card."""
+    return await answer_complete(h, await h.tap(f"s:C1:opt:{label}"))
+
+
+async def pay(h, how: str = "card", bank: str | None = "HDFC"):
+    """Offers: (exchange question if replacing) → payment → bank → the offer card."""
+    await h.tap("s:C1:offers")
+    out = await h.tap(f"s:C1:pay:{how}")
+    if bank and how in ("card", "emi"):
+        out = await h.tap(f"s:C1:bank:{bank}")
+    return out

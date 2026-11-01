@@ -67,6 +67,19 @@ def wm_kg_range(home: HomeCard, pack: Pack, guides: dict) -> tuple[float, float]
     return None
 
 
+def fridge_l_range(home: HomeCard, pack: Pack, guides: dict) -> tuple[float, float] | None:
+    n = number(home, "family_size", pack)
+    if n is None:
+        return None
+    for row in guides.get("capacity_fridge") or []:
+        if n <= row["max_people"]:
+            lo, hi = float(row["min_l"]), float(row["max_l"])
+            if any(v in ("weekly", "frozen") for v in values(home, "shopping")):
+                lo, hi = lo + 30, hi + 40
+            return lo, hi
+    return None
+
+
 def in_band(product, home: HomeCard, pack: Pack, guides: dict) -> float | None:
     """1 inside the guide band, 0.5 one step outside, 0 else; None if the home fact is unknown."""
     cat = pack.category
@@ -99,6 +112,15 @@ def in_band(product, home: HomeCard, pack: Pack, guides: dict) -> float | None:
         if lo <= kg <= hi:
             return 1.0
         return 0.5 if (lo - 1.5) <= kg <= (hi + 1.5) else 0.0
+    if cat == "fridge":
+        rng = fridge_l_range(home, pack, guides)
+        litres = product.spec("capacity_l")
+        if rng is None or litres is None:
+            return None
+        lo, hi = rng
+        if lo <= litres <= hi:
+            return 1.0
+        return 0.5 if (lo - 60) <= litres <= (hi + 80) else 0.0
     return None
 
 

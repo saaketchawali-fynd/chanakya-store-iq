@@ -33,7 +33,7 @@ def clean(text: str) -> str:
 @lru_cache
 def strings() -> dict[str, dict[str, str]]:
     out: dict[str, dict[str, str]] = {}
-    for name in ("strings.yaml", "strings_extra.yaml"):
+    for name in ("strings.yaml", "strings_extra.yaml", "strings_flow.yaml"):
         p = HERE / name
         if p.exists():
             data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
@@ -53,7 +53,7 @@ def raw(key: str, lang: str) -> str:
     entry = strings().get(key)
     if entry is None:
         raise KeyError(f"missing i18n key: {key}")
-    return entry.get(lang) or entry.get("hi") or entry.get("en") or ""
+    return entry.get(lang) or entry.get("en") or entry.get("hi") or ""  # never Hindi by default
 
 
 def fill(template: str, **vars) -> str:
@@ -76,7 +76,7 @@ def pick(d: dict | None, lang: str, reg: NumberRegistry | None = None) -> str:
     if isinstance(d, str):
         s = d
     else:
-        s = d.get(lang) or d.get("hi") or d.get("en") or next(iter(d.values()), "")
+        s = d.get(lang) or d.get("en") or d.get("hi") or next(iter(d.values()), "")
     if reg is not None:
         reg.static(s)
     return s

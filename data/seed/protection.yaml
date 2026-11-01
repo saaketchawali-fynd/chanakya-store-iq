@@ -19,3 +19,6 @@
    title: {hi: "resQ 1 साल स्क्रीन डैमेज कवर", mr: "resQ 1 वर्ष स्क्रीन डॅमेज कव्हर", en: "resQ 1-year screen damage cover"}, reason: {hi: "bachche + bada screen", mr: "मुलं + मोठी स्क्रीन", en: "kids and a big screen"}, test_data: true}
 - {code: LP_EW1, category: laptop, years: 1, price: 2999, suggest_if: {slot: user, eq: professional},
    title: {hi: "resQ 1 साल अतिरिक्त वारंटी", mr: "resQ 1 वर्ष अतिरिक्त वॉरंटी", en: "resQ 1-year extended warranty"}, reason: {hi: "kaam ka laptop, rukna nahi chahiye", mr: "कामाचा लॅपटॉप, बंद पडू नये", en: "work laptop, no downtime"}, test_data: true}
+- {code: FR_EW2, category: fridge, years: 2, price: 1999, suggest_if: {number: family_size, gte: 4},
+   title: {hi: "resQ 2 साल अतिरिक्त वारंटी", mr: "resQ 2 वर्षे अतिरिक्त वॉरंटी", en: "resQ 2-year extended warranty"},
+   reason: {hi: "bada parivaar, din-raat chalega", mr: "मोठं कुटुंब, दिवस-रात्र चालेल", en: "big family, runs day and night"}, test_data: true}

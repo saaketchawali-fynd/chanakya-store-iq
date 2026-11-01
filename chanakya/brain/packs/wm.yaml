@@ -1,6 +1,9 @@
 category: wm
 label: {hi: "Washing machine", mr: "वॉशिंग मशीन", en: "Washing machine"}
-required_slots: [family_size, wash_load, space, load_pref, elders_back, decider]
+required_slots: [family_size, wash_load, water, space]
+ask_order: [trigger, family_size, wash_load, water, space]
+complete_slots: []
+placeable: true
 gate_min_slots: 4
 cost_slots: [space]
 budget_bands:
@@ -9,6 +12,24 @@ budget_bands:
   - {id: b3, inr: 48000, title: {hi: "40k se upar", mr: "40k पेक्षा जास्त", en: "Above 40k"}}
   - {id: none, inr: null, title: {hi: "Nahi bataya", mr: "सांगितलं नाही", en: "Not told"}}
 slots:
+  - id: trigger
+    phase: open
+    title: {hi: "Kyun abhi", mr: "आत्ता का", en: "Why now"}
+    ask: {hi: "पुरानी मशीन बदलनी है, या नई ले रहे हैं?", mr: "जुनी मशीन बदलायची आहे, की नवीन घेताय?", en: "Is this replacing an old machine, or a new one?"}
+    why: {hi: "Purana ho to wahi anchor hai: size, exchange aur jagah pehle se pata", mr: "जुनं असेल तर तेच माप: साइज, एक्सचेंज आणि जागा आधीच माहीत", en: "A replacement tells us the size, the exchange and the space already"}
+    quick:
+      - {id: replace, title: {hi: "Purani badalni", mr: "जुनी बदलायची", en: "Replacing old"}}
+      - {id: new_home, title: {hi: "Naya ghar", mr: "नवीन घर", en: "New home"}}
+      - {id: first, title: {hi: "Pehli machine", mr: "पहिली मशीन", en: "First machine"}}
+    values: [replace, new_home, first]
+    value_titles:
+      replace: {hi: "Purani badalni", mr: "जुनी बदलायची", en: "Replacing old"}
+      new_home: {hi: "Naya ghar", mr: "नवीन घर", en: "New home"}
+      first: {hi: "Pehli machine", mr: "पहिली मशीन", en: "First machine"}
+    keywords:
+      replace: ["purani", "badalni", "replace", "old machine", "पुरानी", "जुनी"]
+      new_home: ["naya ghar", "new home", "new flat", "नया घर", "नवीन घर"]
+      first: ["pehli machine", "first machine", "पहली मशीन", "पहिली मशीन"]
   - id: family_size
     phase: life
     number: family_size
@@ -352,6 +373,7 @@ demos:
 
 myths:
   - id: wm_front_always_better
+    short: {hi: "Front load hi behtar", mr: "फ्रंट लोडच चांगला", en: "Front load is better"}
     belief: "A front-load machine is always better than a top-load"
     proof: bend_test
     keywords: ["front load hi achha", "front load best", "front load better", "फ्रंट लोड ही अच्छा", "फ्रंट लोडच चांगलं"]
@@ -359,6 +381,7 @@ myths:
            mr: "बरोबर, फ्रंट लोड कपडे छान धुतो. पण वाकणं आणि जागाही महत्त्वाची — तुमच्या घरानुसार बघू.",
            en: "True, front loads wash well. Bending and space matter too, so let's match it to your home."}
   - id: wm_bigger_kg_better
+    short: {hi: "Zyada kilo, behtar", mr: "जास्त किलो, चांगलं", en: "Bigger kg is better"}
     belief: "A bigger kg machine is always better"
     proof: drum_bedsheet
     keywords: ["sabse bada kilo", "zyada kilo achha", "bigger kg better", "ज़्यादा किलो", "जास्त किलो"]

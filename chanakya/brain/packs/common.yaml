@@ -1,5 +1,6 @@
 myths:
   - id: gen_online_cheaper
+    short: {hi: "Online sasta hai", mr: "ऑनलाइन स्वस्त आहे", en: "Cheaper online"}
     belief: "It is cheaper online"
     proof: kharcha
     keywords: ["online sasta", "online saste", "online cheaper", "amazon pe", "flipkart pe", "ऑनलाइन सस्ता", "ऑनलाइन स्वस्त"]
@@ -7,6 +8,7 @@ myths:
            mr: "बरोबर, ऑनलाइन किंमत कधी कधी कमी दिसते. पूर्ण खर्च मिळून पाहू — इन्स्टॉलेशन, वॉरंटी, एक्सचेंज सगळं इथेच.",
            en: "True, online prices can look lower. Let's compare the full cost: installation, warranty and exchange are all here."}
   - id: gen_only_two_brands
+    short: {hi: "Sirf 2 brand achhe", mr: "फक्त 2 ब्रँड चांगले", en: "Only 2 brands are good"}
     belief: "Only one or two brands are real or good"
     proof: null
     keywords: ["sirf do brand", "only two brands", "wahi brand achha", "baaki brand bekaar", "सिर्फ़ दो ब्रांड", "फक्त दोन ब्रँड"]
@@ -36,6 +38,12 @@ objections:
            mr: "प्रश्न योग्य आहे. वॉरंटी आणि सर्व्हिसची पूर्ण माहिती कार्डवर आहे — सोबत बघूया.",
            en: "Fair question. Warranty and service details are on the card; let's look together."}
     buttons: [cost_show, expert, go]
+  ask_family:
+    keywords: ["ghar pe pooch", "ghar par pooch", "wife se pooch", "biwi se pooch", "papa se pooch", "family se pooch", "ask my wife", "ask family", "घर पर पूछ", "घरी विचार"]
+    line: {hi: "बिल्कुल, घरवालों के साथ तय करना सही है। पूरी जानकारी — फ़ोटो, पूरा खर्च और ऑफ़र — उन्हें WhatsApp पर भेज दूँ?",
+           mr: "नक्कीच, घरच्यांसोबत ठरवणं योग्य आहे. पूर्ण माहिती — फोटो, पूर्ण खर्च आणि ऑफर — त्यांना WhatsApp वर पाठवू?",
+           en: "Of course, decide it together at home. Shall I send the family everything on WhatsApp: photo, full cost and offers?"}
+    buttons: [parivaar_family, task, go]
   installation_worry:
     keywords: ["installation ki tension", "installer nahi aaya", "installation worry", "install ka dar", "इंस्टॉलेशन की चिंता", "इन्स्टॉलेशनची काळजी"]
     line: {hi: "चिंता सही है। इंस्टॉलर को पहले से दीवार, सॉकेट और मंज़िल की जानकारी जाएगी, और चालू होने तक हम साथ हैं।",
@@ -53,9 +61,9 @@ price_rescue:
          mr: "₹{low} ते ₹{high} पर्यंत आहे. तुमच्या खोलीनुसार योग्य दाखवू का? फक्त 2 प्रश्न.",
          en: "It's between ₹{low} and ₹{high}. Shall I show the right one for your room? Just 2 questions."}
 need_validation:
-  line: {hi: "बहुत सही सोचा है। एक बार कमरे से मिला लेते हैं — बस 2 सवाल।",
-         mr: "छान विचार केलाय. एकदा खोलीशी जुळवून बघू — फक्त 2 प्रश्न.",
-         en: "Good thinking. Let's match it to your room: just 2 questions."}
+  line: {hi: "बहुत सही सोचा है, एक बार घर से मिला लेते हैं।",
+         mr: "छान विचार केलाय, एकदा घराशी जुळवून बघू.",
+         en: "Good thinking; let's match it to your home."}
 complete_line: {hi: "ये पूरा खर्च है — बिल में यही आएगा।", mr: "हा पूर्ण खर्च आहे — बिलात हेच येईल.", en: "This is the full cost. The bill will match it."}
 finance_line:
   {hi: "₹{monthly} महीना, {months} महीने; फ़ीस ₹{fee}; कुल ₹{total} — अभी देने से ₹{extra} ज़्यादा।",
@@ -84,6 +92,7 @@ category_keywords:
   tv: ["tv", "television", "led tv", "qled", "oled", "टीवी", "टीव्ही"]
   ac: [" ac ", "a.c.", "air conditioner", "split ac", "inverter ac", "एसी", "एअर कंडिशनर"]
   wm: ["washing", "machine", "washer", "front load", "top load", "वॉशिंग", "मशीन", "वॉशिंग मशीन"]
+  fridge: ["fridge", "refrigerator", "freezer", "double door", "single door", "side by side", "फ्रिज", "फ्रीज", "रेफ्रिजरेटर"]
   laptop: ["laptop", "notebook", "computer", "macbook", "लैपटॉप", "लॅपटॉप"]
 who_words:
   papa: ["papa", "pappa", "father", "daddy", "पापा", "बाबा", "वडील"]

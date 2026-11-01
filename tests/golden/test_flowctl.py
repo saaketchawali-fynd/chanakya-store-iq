@@ -19,9 +19,7 @@ async def start_customer(h):
 
 async def test_coach_replies_carry_a_menu_hint(h):
     await start_customer(h)
-    out = await h.tap("s:C1:slot:mounting:wall")
-    await h.tap("s:C1:photo_no")
-    out = await h.tap("s:C1:slot:elders:yes")
+    out = await h.tap("s:C1:slot:trigger:new_home")
     coach = next(m for m in out if m.coach)
     assert coach.footer == "Tap karein ya voice note bhejein · menu" and len(coach.footer) <= 60
 
@@ -53,7 +51,7 @@ async def test_exit_confirms_then_ends_current_customer(h):
 async def test_end_and_start_new_customer(h):
     await start_customer(h)
     out = await h.tap("g:exitnew")
-    assert "C1" in out[0].body and button_ids([out[-1]]) == ["s:C2:lang:hi", "s:C2:lang:mr", "s:C2:lang:en"]
+    assert "C1" in out[0].body and rows(out[-1])[0] == "s:C2:cat:tv"  # the new customer's opener
     assert (await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")).step.value == "closed"
 
 

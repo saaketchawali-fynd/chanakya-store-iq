@@ -46,6 +46,17 @@ LABELS: dict[str, tuple[dict, str]] = {
     "rpm": ({"hi": "स्पिन स्पीड", "mr": "स्पिन स्पीड", "en": "Spin speed"}, "RPM"),
     "quick_wash": ({"hi": "क्विक वॉश", "mr": "क्विक वॉश", "en": "Quick wash"}, ""),
     "steam": ({"hi": "स्टीम", "mr": "स्टीम", "en": "Steam"}, ""),
+    "capacity_l": ({"hi": "क्षमता", "mr": "क्षमता", "en": "Capacity"}, "L"),
+    "door": ({"hi": "दरवाज़ा", "mr": "दरवाजा", "en": "Door type"}, ""),
+    "star_rating": ({"hi": "स्टार रेटिंग", "mr": "स्टार रेटिंग", "en": "Star rating"}, "star"),
+    "inverter_compressor": ({"hi": "इन्वर्टर कंप्रेसर", "mr": "इन्व्हर्टर कंप्रेसर", "en": "Inverter compressor"}, ""),
+    "stabiliser_free": ({"hi": "स्टेबलाइज़र-फ्री", "mr": "स्टॅबिलायझर-फ्री", "en": "Stabiliser-free"}, ""),
+    "frost_free": ({"hi": "फ्रॉस्ट-फ्री", "mr": "फ्रॉस्ट-फ्री", "en": "Frost-free"}, ""),
+    "convertible": ({"hi": "कन्वर्टिबल", "mr": "कन्व्हर्टिबल", "en": "Convertible"}, ""),
+    "freezer_l": ({"hi": "फ्रीज़र", "mr": "फ्रीझर", "en": "Freezer"}, "L"),
+    "crisper_l": ({"hi": "सब्ज़ी का डिब्बा", "mr": "भाजीचा डबा", "en": "Vegetable box"}, "L"),
+    "cooling_retention_h": ({"hi": "बिजली जाने पर ठंडक", "mr": "वीज गेल्यावर थंडावा", "en": "Cooling in a power cut"}, "h"),
+    "water_dispenser": ({"hi": "वॉटर डिस्पेंसर", "mr": "वॉटर डिस्पेन्सर", "en": "Water dispenser"}, ""),
     "cpu": ({"hi": "प्रोसेसर", "mr": "प्रोसेसर", "en": "Processor"}, ""),
     "cpu_tier": ({"hi": "प्रोसेसर श्रेणी", "mr": "प्रोसेसर श्रेणी", "en": "Processor class"}, ""),
     "ram_gb": ({"hi": "RAM", "mr": "RAM", "en": "RAM"}, "GB"),
@@ -71,6 +82,7 @@ KEY_SPECS = {
     "tv": ["size_in", "panel", "refresh_hz", "brightness_nits", "speaker_w", "warranty"],
     "ac": ["ton", "star", "noise_db", "kwh_year", "wifi", "warranty"],
     "wm": ["capacity_kg", "load", "rpm", "heater", "kwh_year", "warranty"],
+    "fridge": ["capacity_l", "door", "star_rating", "freezer_l", "stabiliser_free", "warranty"],
     "laptop": ["cpu", "ram_gb", "storage_gb", "battery_h", "weight_kg", "warranty"],
     "soundbar": ["speaker_w", "channels", "dialogue_enhance"],
 }
@@ -79,6 +91,12 @@ UNIT_WORD = {
     "ton": {"hi": "टन", "mr": "टन", "en": "ton"},
     "star": {"hi": "स्टार", "mr": "स्टार", "en": "star"},
     "h": {"hi": "घंटे", "mr": "तास", "en": "h"},
+}
+DOOR = {
+    "single": {"hi": "सिंगल डोर", "mr": "सिंगल डोअर", "en": "Single door"},
+    "double": {"hi": "डबल डोर", "mr": "डबल डोअर", "en": "Double door"},
+    "bottom_freezer": {"hi": "बॉटम फ्रीज़र", "mr": "बॉटम फ्रीझर", "en": "Bottom freezer"},
+    "side_by_side": {"hi": "साइड-बाय-साइड", "mr": "साइड-बाय-साइड", "en": "Side-by-side"},
 }
 TIER = {
     "entry": {"hi": "एंट्री", "mr": "एंट्री", "en": "Entry"},
@@ -130,6 +148,8 @@ def fmt_value(ctx: SkillContext, p, key: str, lang: str, customer: bool = True) 
         return ctx.reg.raw(", ".join(pick(x, word_lang) if isinstance(x, dict) else str(x) for x in v), src)
     if key == "cpu_tier":
         return pick(TIER.get(str(v), {"en": str(v)}), word_lang)
+    if key == "door":
+        return ctx.reg.static(pick(DOOR.get(str(v), {"en": str(v)}), word_lang))
     if isinstance(v, list):
         return ctx.reg.raw(", ".join(map(str, v)), src)
     if isinstance(v, (int, float)):

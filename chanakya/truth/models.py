@@ -49,7 +49,7 @@ class Staff(_Ts, Base):
     base_role: Mapped[str | None] = mapped_column(String, nullable=True)  # role before a /role demo switch
     store_id: Mapped[str] = mapped_column(String)
     dept: Mapped[str] = mapped_column(String, default="tv")
-    lang: Mapped[str] = mapped_column(String, default="hi")
+    lang: Mapped[str] = mapped_column(String, default="en")
     lang_set: Mapped[bool] = mapped_column(Boolean, default=False)  # associate picked a language at first contact
     current_session_id: Mapped[str | None] = mapped_column(String, nullable=True)
     streak: Mapped[int] = mapped_column(Integer, default=0)

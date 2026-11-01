@@ -27,7 +27,7 @@ WALL_WIDTHS = {"w7": 7, "w9": 9, "w11": 11, "w13": 13}
 WALL_TITLES = {"w7": "6-8 ft", "w9": "8-10 ft", "w11": "10-12 ft", "w13": "12 ft+"}
 
 
-PLACEABLE = ("tv", "ac", "wm")
+PLACEABLE = ("tv", "ac", "wm", "fridge")
 
 
 # ---------------------------------------------------------------- what the customer is considering
@@ -248,6 +248,9 @@ async def job(ctx: SkillContext) -> Reply:
     # A TV already on that wall is the best size reference: ask its size once (one tap), then draw.
     wants_tv = any(p.category == "tv" for pl in plans for p, _ in pl)
     old_tv = P.number(s.home, "existing_tv_in")
+    osv = s.home.slots.get("old_size")
+    if old_tv is None and osv and osv[-1].number and osv[-1].source in ("voice", "text"):
+        old_tv = osv[-1].number  # an exact size the associate said: a scale reference for the old TV in the photo
     has_old_tv = bool(read and any(b.label == "existing_tv" for b in read.boxes))
     if wants_tv and has_old_tv and old_tv is None and not s.extra.get("oldtv_asked"):
         s.extra["oldtv_asked"] = True
@@ -269,13 +272,16 @@ async def job(ctx: SkillContext) -> Reply:
                 extra["dims_text"] = PV.dims_text(ctx, p)
             if "mount" in TRYON_FIELDS:
                 extra["mount"] = mount
+            if p.category == "fridge":
+                extra["door"] = p.spec("door")
             tps.append(TryonProduct(sku=p.sku, category=p.category, width_mm=p.spec("width_mm"),
                                     height_mm=p.spec("height_mm"), label=_label(ctx, p), solid=solid, **extra))
         only_tv = all(p.category == "tv" for p, _ in pl)
         dist_text = (ctx.t("tryon_distance", ctx.clang, ft=ctx.reg.num(dist, "card:seat_distance"))
                      if dist and only_tv else None)
         req = TryonRequest(photo=raw.data, read=read, products=tps, wall_width_ft=P.number(s.home, "wall_width_ft"),
-                           niche_width_cm=P.number(s.home, "niche_width_cm"), distance_text=dist_text,
+                           niche_width_cm=P.number(s.home, "niche_width_cm") or P.number(s.home, "space_width"),
+                           distance_text=dist_text,
                            existing_tv_size_in=old_tv)
         res = await run(req, editor=None, harmonise=False, timeout=12)  # composite only: < 5 s end to end
         if res.blurred_photo and not drawn:

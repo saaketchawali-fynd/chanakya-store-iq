@@ -129,7 +129,7 @@ async def install_reply(ctx: SkillContext, action: str) -> Reply:
                 kind="text",
                 body=ctx.t(
                     "install_problem_manager",
-                    m.lang or "hi",
+                    m.lang or "en",
                     id=ctx.reg.raw(str(job.id), "job:id"),
                     name=_name(ctx),
                     site=ctx.reg.static(site),

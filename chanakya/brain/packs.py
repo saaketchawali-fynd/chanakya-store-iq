@@ -55,7 +55,7 @@ class SlotDef(_M):
     def value_title(self, value: str, lang: str) -> str:
         vt = self.value_titles.get(value)
         if vt:
-            return vt.get(lang) or vt.get("hi") or value
+            return vt.get(lang) or vt.get("en") or value
         for q in self.quick:
             if q.id == value:
                 return q.title.get(lang) or value
@@ -148,6 +148,9 @@ class Pack(_M):
     label: dict[str, str]
     required_slots: list[str]
     gate_min_slots: int = 4
+    ask_order: list[str] = []  # the fixed question sequence in Assess (why-now first, then the home questions)
+    complete_slots: list[str] = []  # asked in Complete, before the cost, only when they change it
+    placeable: bool = False  # can be shown in the customer's room photo
     cost_slots: list[str] = []
     budget_bands: list[BudgetBand] = []
     slots: list[SlotDef]
@@ -176,6 +179,10 @@ class Pack(_M):
 
     def myth(self, mid: str) -> Myth | None:
         return next((m for m in self.myths if m.id == mid), None)
+
+    @property
+    def order(self) -> list[str]:
+        return self.ask_order or self.required_slots
 
     def known_required(self, home: HomeCard) -> int:
         return sum(1 for s in self.required_slots if known(home, s))
@@ -266,7 +273,15 @@ def validate_packs(packs: dict[str, Pack], common: dict) -> list[str]:
                     if not d.get(lg):
                         errs.append(f"{cat}.{s.id}: missing {key}.{lg}")
         known_slots = set(ids) | {"wall_width_ft", "niche_width_cm"}
-        for ref in p.required_slots + p.cost_slots + p.site_needs:
+        if len(p.required_slots) != p.gate_min_slots:
+            errs.append(f"{cat}: required_slots must be exactly the {p.gate_min_slots} gate questions")
+        for ref in p.required_slots:
+            if p.ask_order and ref not in p.ask_order:
+                errs.append(f"{cat}: required slot {ref} missing from ask_order")
+        for m in p.myths:
+            if not isinstance(getattr(m, "short", None), dict) or any(len(m.short.get(lg, "")) > 24 or not m.short.get(lg) for lg in LANGS):
+                errs.append(f"{cat}.{m.id}: myth short title missing or > 24 chars")
+        for ref in p.required_slots + p.cost_slots + p.site_needs + p.ask_order + p.complete_slots:
             if ref not in known_slots:
                 errs.append(f"{cat}: unknown slot ref {ref}")
         for b in p.benefits:

@@ -2,12 +2,10 @@
 
 from datetime import UTC, date, datetime
 
-import pytest
-
 from chanakya.brain import packs as P
 from chanakya.brain.demos import pick_demo
 from chanakya.brain.fit import fit
-from chanakya.brain.next_question import next_slot, score_slots
+from chanakya.brain.next_question import next_slot, ordered_next, score_slots
 from chanakya.brain.options import compute_options
 from chanakya.core.contracts import HomeCard
 from chanakya.truth import finance, hisaab, offers
@@ -139,15 +137,34 @@ def test_options_out_of_stock_uses_nearby(rt):
 
 
 def test_next_question_golden(rt):
+    """Assess runs in a fixed order: why now → (old size, if replacing) → room → distance → light → content."""
     pack, g = rt.packs.get("tv"), rt.facts.snap.guides
     prods = rt.facts.products_sync("tv")
     h = shah(rt)
-    ranked = dict(score_slots(h, pack, prods, g, 0, False))
-    assert next_slot(h, pack, prods, g, 0) == "mounting"
-    assert ranked["mounting"] == pytest.approx(0.65)
-    assert ranked["elders"] == pytest.approx(0.633, abs=0.001) and ranked["seating"] == pytest.approx(0.633, abs=0.001)
-    h2 = shah(rt, mounting="wall")
-    assert next_slot(h2, pack, prods, g, 1) == "elders"
+    assert ordered_next(h, pack) == "trigger"
+    assert ordered_next(shah(rt, trigger="replace"), pack) == "old_size"
+    assert ordered_next(shah(rt, trigger="new_home"), pack) == "room"  # old size only when replacing
+    assert ordered_next(shah(rt, trigger="new_home", room="living"), pack) is None  # all 4 known: the gate is open
+    assert pack.known_required(shah(rt, room="living")) == 4
+    # the info-gain picker (spec 10.6) still ranks the extra questions
+    ranked = dict(score_slots(shah(rt, trigger="new_home", room="living"), pack, prods, g, 4, False))
+    assert "mounting" in ranked and "trigger" not in ranked
+    assert next_slot(shah(rt, trigger="new_home", room="living"), pack, prods, g, 4) in ranked
+
+
+def test_fridge_sizing_and_options(rt):
+    pack, g = rt.packs.get("fridge"), rt.facts.snap.guides
+    h = HomeCard(category="fridge")
+    P.set_slot(h, pack, "family_size", "f3_4", 4, "tap", NOW)
+    P.set_slot(h, pack, "shopping", "weekly", None, "tap", NOW)
+    P.set_slot(h, pack, "space_width", "w_lt65", 62, "tap", NOW)
+    P.set_slot(h, pack, "power_cuts", "yes", None, "tap", NOW)
+    o = compute_options(rt.facts.products_sync("fridge"), h, pack, g)
+    for x in o.options:
+        assert x.product.spec("width_mm") <= 620  # a hard fit: never wider than the kitchen spot
+        assert not fit(x.product, h, pack, g).excluded
+    best = o.by_role("best").product
+    assert 270 <= best.spec("capacity_l") <= 390 and best.spec("stabiliser_free")  # 4 people + weekly stock + cuts
 
 
 def test_demo_golden(rt):

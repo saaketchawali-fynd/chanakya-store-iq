@@ -125,6 +125,7 @@ class Orchestrator:
         from chanakya.skills import tryon_flow
 
         async with locks.for_(associate_wa_id):
+            staff = None
             try:
                 staff = await repo.staff_by_wa(associate_wa_id)
                 session = await self.svc.sessions.get(session_id)
@@ -162,7 +163,7 @@ class Orchestrator:
                 try:
                     from chanakya.i18n.lang import t
 
-                    await self.svc.deliver(OutMessage(to=associate_wa_id, kind="text", body=t("tryon_failed", "hi")))
+                    await self.svc.deliver(OutMessage(to=associate_wa_id, kind="text", body=t("tryon_failed", (staff.lang if staff and staff.lang else "en"))))
                 except Exception:
                     pass
                 return

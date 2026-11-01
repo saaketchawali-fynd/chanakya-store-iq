@@ -41,3 +41,11 @@
    title: {hi: "वायरलेस माउस", mr: "वायरलेस माउस", en: "Wireless mouse"}, test_data: true}
 - {code: SB_WALLMOUNT, category: soundbar, kind: optional, unit: flat, amount: 499,
    title: {hi: "साउंडबार वॉल माउंट", mr: "साउंडबार वॉल माउंट", en: "Soundbar wall mount"}, test_data: true}
+# --- fridge
+- {code: FR_INSTALL, category: fridge, kind: mandatory, unit: flat, amount: 0,
+   title: {hi: "डिलीवरी, इंस्टॉलेशन और डेमो — शामिल", mr: "डिलिव्हरी, इन्स्टॉलेशन व डेमो — समाविष्ट", en: "Delivery, installation and demo — included"}, test_data: true}
+- {code: FR_STABILISER, category: fridge, kind: suggest, unit: flat, amount: 2200, condition: {slot: power_cuts, eq: "yes"}, filter: {spec: {stabiliser_free: false}},
+   title: {hi: "फ्रिज स्टेबलाइज़र", mr: "फ्रिज स्टॅबिलायझर", en: "Fridge stabiliser"},
+   reason: {hi: "ghar mein bijli jaati hai", mr: "घरी वीज जाते", en: "power cuts at home"}, test_data: true}
+- {code: FR_STAND, category: fridge, kind: optional, unit: flat, amount: 899,
+   title: {hi: "पहियों वाला फ्रिज स्टैंड", mr: "चाकांचा फ्रिज स्टँड", en: "Fridge stand with wheels"}, test_data: true}

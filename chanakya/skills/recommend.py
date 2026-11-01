@@ -50,6 +50,11 @@ def gate_price_reply(ctx: SkillContext) -> Reply:
 def _option_set(ctx: SkillContext) -> OptionSet | None:
     pack = ctx.pack
     products = ctx.facts.products_sync(pack.category)
+    ex_sku = set(ctx.x.get("excluded_skus") or [])
+    ex_brand = set(ctx.x.get("excluded_brands") or [])
+    if ex_sku or ex_brand:  # 'none of these': drop what they turned down (never below three choices if avoidable)
+        left = [p for p in products if p.sku not in ex_sku and p.brand not in ex_brand]
+        products = left if len([p for p in left if p.qty > 0 or p.nearby_qty > 0]) >= 1 else products
     return compute_options(products, ctx.session.home, pack, ctx.facts.snap.guides)
 
 
@@ -128,16 +133,112 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
         )
         btns.append(C.option_button(ctx, o.label, p))
     card = Card(template="options", lang=ctx.lang, data={"options": card_opts})  # type: ignore[arg-type]
-    m1 = info_reply(ctx, "\n".join(lines), btns, card=card)
     demo = pick_demo(opts, s.home, pack, ctx.facts.snap.guides)
-    msgs: list[OutMessage] = [m1]
     if demo:
         d, other, _ = demo
         s.demo_recipe = d.id
+        ctx.x["demo_other"] = other
         ctx.x["demos_sent"] = [d.id]
-        msgs.append(demo_message(ctx, d, other, reason_key=best.reason_key))
-        ctx.ev("demo_recipe_sent", recipe=d.id)
-    return ctx.reply(*msgs)
+    btns = [ctx.b("b_demo_next", ctx.sid("demo"))]
+    if pack.placeable:
+        btns.append(ctx.b("b_tryon", ctx.sid("tryon")))
+    btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
+    m1 = info_reply(ctx, "\n".join(lines), btns, card=card)
+    if ctx.x.pop("rerank_note", None):
+        m1.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
+    return ctx.reply(m1)
+
+
+async def demo(ctx: SkillContext) -> Reply:
+    """The one demo that shows the difference between the options (picked when the options were shown)."""
+    s = ctx.session
+    if not s.shortlist:
+        return await show_options(ctx)
+    d = ctx.pack.demo(s.demo_recipe) if s.demo_recipe else None
+    if d is None:
+        opts = _option_set(ctx)
+        nxt = pick_demo(opts, s.home, ctx.pack, ctx.facts.snap.guides) if opts else None
+        if nxt is None:
+            return await prefer(ctx)
+        d, other, _ = nxt
+        s.demo_recipe = d.id
+        ctx.x["demo_other"] = other
+    best = ctx.facts.product_sync(s.option_labels["B"]) if s.option_labels.get("B") else None
+    from chanakya.brain.fit import fit
+
+    reason_key = None
+    if best:
+        top = fit(best, s.home, ctx.pack, ctx.facts.snap.guides).top_rule()
+        reason_key = top if top in ctx.pack.reasons else None
+    ctx.ev("demo_recipe_sent", recipe=d.id)
+    return ctx.reply(demo_message(ctx, d, ctx.x.get("demo_other"), reason_key=reason_key))
+
+
+async def prefer(ctx: SkillContext) -> Reply:
+    """'Which one felt right for your home?' — the three options and 'none of these', as one list."""
+    from chanakya.channel.limits import truncate, truncate_title
+    from chanakya.core.contracts import ListRow, ListSection
+
+    s = ctx.session
+    if not s.option_labels:
+        return await show_options(ctx)
+    rows = []
+    for lab, sku in sorted(s.option_labels.items()):
+        p = ctx.facts.product_sync(sku)
+        role = {"A": "value_fit", "C": "step_up"}.get(lab)
+        reason = _reason(ctx, role, ctx.lang) if role else ""
+        if lab == "B":
+            from chanakya.brain.fit import fit
+
+            top = fit(p, s.home, ctx.pack, ctx.facts.snap.guides).top_rule()
+            reason = _reason(ctx, top if top in ctx.pack.reasons else "value_fit", ctx.lang)
+        rows.append(ListRow(id=ctx.sid("opt", lab), title=truncate(f"{lab}: {p.model}", 24), description=truncate(reason, 72)))
+        ctx.reg.raw(rows[-1].title, f"product:{sku}")
+    rows.append(ListRow(id=ctx.sid("nonefit"), title=ctx.t("row_none_fit"), description=ctx.t("row_none_fit_d")))
+    ctx.reg.static(" ".join((r.description or "") for r in rows))
+    cites = C.known_cites(ctx)
+    msg = coach_reply(ctx, ctx.tc("bolo_prefer"), ctx.t("kyun_prefer"), cites, [])
+    msg.kind = "list"
+    msg.list_button = truncate_title(ctx.t("list_prefer"))
+    msg.sections = [ListSection(rows=rows)]
+    msg.allowed_numbers = ctx.reg.allowed()
+    return ctx.reply(msg)
+
+
+async def none_fit(ctx: SkillContext) -> Reply:
+    btns = [ctx.b("b_rr_lower", ctx.sid("rerank", "lower")), ctx.b("b_rr_higher", ctx.sid("rerank", "higher")),
+            ctx.b("b_rr_brand", ctx.sid("rerank", "brand"))]
+    ctx.ev("options_rejected", shown=list(ctx.session.option_labels.values()))
+    return ctx.reply(coach_reply(ctx, ctx.tc("bolo_missing"), ctx.t("kyun_missing"), C.known_cites(ctx), btns))
+
+
+async def rerank(ctx: SkillContext, how: str) -> Reply:
+    """New options from what the customer said was missing: lower cost, bigger / more, or another brand."""
+    s = ctx.session
+    shown = [ctx.facts.product_sync(sku) for sku in s.option_labels.values()]
+    shown = [p for p in shown if p]
+    before = sorted(s.option_labels.values())
+    ex = set(ctx.x.get("excluded_skus") or [])
+    if how == "lower" and shown:
+        low = min(p.price for p in shown)
+        s.home.start_level_inr = int(low * 0.92 / 1.3)
+        ex |= {p.sku for p in shown if p.price > low}
+    elif how == "higher" and shown:
+        high = max(p.price for p in shown)
+        s.home.start_level_inr = int(high * 1.25)
+        ex |= {p.sku for p in shown if p.price < high}
+    elif how == "brand":
+        ctx.x["excluded_brands"] = sorted(set(ctx.x.get("excluded_brands") or []) | {p.brand for p in shown})
+    s.home.start_level_source = "associate_tap"
+    ctx.x.pop("range_id", None)
+    ctx.x["excluded_skus"] = sorted(ex)
+    ctx.x["rerank_note"] = True
+    ctx.x["rerank_last"] = how
+    ctx.ev("options_reranked", how=how)
+    r = await show_options(ctx)
+    if sorted(s.option_labels.values()) == before:
+        r.messages[0].footer = ctx.t("rr_none")[:60]
+    return r
 
 
 def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str | None = None) -> OutMessage:
@@ -160,25 +261,20 @@ def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str 
     if reason_key:
         why += " — " + ctx.t("because") + " " + _reason(ctx, reason_key, ctx.lang)
     cites = [k for k in d.when_slots if P.known(s.home, k)] or C.known_cites(ctx)
-    btns = [ctx.b("b_shown", ctx.sid("shown")), ctx.b("b_demo2", ctx.sid("demo2")), ctx.b("b_tryon", ctx.sid("tryon"))]
+    btns = [ctx.b("b_shown", ctx.sid("shown")), ctx.b("b_demo2", ctx.sid("demo2"))]
+    btns.append(ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")))
     return coach_reply(ctx, say, why, cites, btns)
 
 
 async def shown(ctx: SkillContext) -> Reply:
+    """Demo done (the price gate opens): ask which one felt right."""
     s = ctx.session
     if not s.shortlist:
         return await show_options(ctx)
     s.demo_done = True
     state.advance(s, Step.DEMONSTRATED)
     ctx.ev("demo_shown", recipe=s.demo_recipe)
-    best_p = ctx.facts.product_sync(s.option_labels["B"])
-    from chanakya.i18n.lang import fill
-
-    say = fill(ctx.pick(ctx.packs.common_line("trial_close"), ctx.clang), best=C.product_name(ctx, best_p))
-    demo = ctx.pack.demo(s.demo_recipe) if s.demo_recipe else None
-    cites = ([k for k in demo.when_slots if P.known(s.home, k)] if demo else []) or C.known_cites(ctx)
-    btns = [C.option_button(ctx, lab, ctx.facts.product_sync(sku)) for lab, sku in sorted(s.option_labels.items())]
-    return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_trial_close"), cites, btns))
+    return await prefer(ctx)
 
 
 async def demo2(ctx: SkillContext) -> Reply:

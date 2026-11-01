@@ -1,6 +1,8 @@
 category: laptop
 label: {hi: "Laptop", mr: "लॅपटॉप", en: "Laptop"}
-required_slots: [user, course, software, carry, battery_need, decider]
+required_slots: [user, course, software, carry]
+ask_order: [user, course, software, carry]
+complete_slots: []
 gate_min_slots: 4
 cost_slots: []
 budget_bands:
@@ -248,6 +250,7 @@ demos:
 
 myths:
   - id: lp_bigger_processor_always
+    short: {hi: "Bada processor hamesha", mr: "मोठा प्रोसेसर नेहमी", en: "Bigger processor always"}
     belief: "A higher processor number is always better for everyone"
     proof: open_software
     keywords: ["i7 hi lena", "sabse bada processor", "i9 chahiye", "highest processor", "सबसे बड़ा प्रोसेसर", "मोठा प्रोसेसर"]
@@ -255,6 +258,7 @@ myths:
            mr: "बरोबर, मोठा प्रोसेसर वेगवान असतो. पण कोर्सच्या सॉफ्टवेअरसाठी RAM जास्त महत्त्वाची — चालवून बघा.",
            en: "True, a bigger processor is faster. For course software, RAM matters more: try it."}
   - id: lp_storage_speed
+    short: {hi: "Zyada storage = tez", mr: "जास्त स्टोरेज = वेगवान", en: "More storage = faster"}
     belief: "More storage makes a laptop faster"
     proof: open_software
     keywords: ["zyada storage tez", "1tb tez", "more storage faster", "ज़्यादा स्टोरेज", "जास्त स्टोरेज"]

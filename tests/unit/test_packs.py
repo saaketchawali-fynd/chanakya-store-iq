@@ -36,7 +36,7 @@ ALLOWED_PH = {
 
 def test_packs_load_and_validate():
     r = load_packs()
-    assert set(r.packs) == {"tv", "ac", "wm", "laptop"}
+    assert set(r.packs) == {"tv", "ac", "wm", "fridge", "laptop"}
     for p in r.packs.values():
         for s in p.slots:
             assert len(s.quick) <= 3

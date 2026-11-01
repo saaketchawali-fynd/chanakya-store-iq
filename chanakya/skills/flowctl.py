@@ -42,6 +42,9 @@ async def menu(ctx: SkillContext) -> Reply:
     active = await ctx.svc.sessions.active(ctx.actor_wa_id)
     if len(active) > (1 if s else 0):
         rows.append(_row(ctx, encode("g", "switch"), "menu_switch", "menu_switch_d"))
+    if s:
+        lname = ctx.t(f"lang_name_{s.home.customer_lang}")
+        rows.append(_row(ctx, ctx.sid("clang"), "menu_clang", "menu_clang_d", lang=lname))
     rows.append(_row(ctx, encode("g", "status"), "menu_status", None))
     rows.append(_row(ctx, encode("g", "catalog", "", 0), "menu_catalog", None))
     rows.append(_row(ctx, encode("g", "langpick"), "menu_lang", None))

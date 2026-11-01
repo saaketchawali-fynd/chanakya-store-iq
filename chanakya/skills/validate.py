@@ -64,9 +64,9 @@ async def myth(ctx: SkillContext, claim_id: str) -> Reply:
         why += " · " + ctx.t("proof_label", demo=ctx.pick(demo.title) or demo.id)
         prefer = list(demo.when_slots.keys())
     cites = C.known_cites(ctx, prefer + ["content"])
-    btns = [
-        ctx.b("b_proof", ctx.sid("proof", m.id)),
-        ctx.b("b_go", ctx.sid("go")),
+    btns = [  # agree-then-correct; if still unsure, the demo (or the full cost) that proves it
+        ctx.b("b_convinced", ctx.sid("go")),
+        ctx.b("b_unsure", ctx.sid("proof", m.id)),
         ctx.b("b_expert", ctx.sid("expert")),
     ]
     ctx.ev("claim_validated", claim_id=m.id, proof=m.proof)

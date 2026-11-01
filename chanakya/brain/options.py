@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from chanakya.brain.fit import FitResult, fit
+from chanakya.brain.fit import FitResult, fit, in_band
 from chanakya.brain.packs import Pack
 from chanakya.core.contracts import HomeCard
 
@@ -48,6 +48,8 @@ def compute_options(products: list, home: HomeCard, pack: Pack, guides: dict) ->
     best = sorted(band, key=lambda p: (-fits[p.sku].score, p.price))[0]
     rest = [p for p in band if p.sku != best.sku]
     good = [p for p in rest if fits[p.sku].score >= 0.6 * fits[best.sku].score]
+    right_size = [p for p in good if (in_band(p, home, pack, guides) or 1.0) >= 1.0]
+    good = right_size or good  # the lower-cost choice still has the right size / ton / kg / litres for this home
     value = (
         sorted(good, key=lambda p: (p.price, -fits[p.sku].score))[0]
         if good

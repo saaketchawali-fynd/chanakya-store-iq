@@ -39,7 +39,7 @@ class SkillContext:
 
     @property
     def lang(self) -> str:
-        return self.staff.lang if self.staff and self.staff.lang else "hi"
+        return self.staff.lang if self.staff and self.staff.lang else "en"
 
     @property
     def clang(self) -> str:

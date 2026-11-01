@@ -71,6 +71,19 @@ def score_slots(
     return sorted(out, key=lambda x: (-x[1], order[x[0]]))
 
 
+def ordered_next(home: HomeCard, pack: Pack, exclude: set[str] | None = None, phase: str | None = None) -> str | None:
+    """The Assess sequence: the first question in the pack's fixed order (why now, then the home) that is not known
+    yet and whose condition holds. None once the order is done."""
+    for sid in pack.order:
+        sd = pack.slot(sid)
+        if sd is None or known(home, sid) or (exclude and sid in exclude) or (phase and sd.phase != phase):
+            continue
+        if sd.ask_if and not eval_slot_cond(home, sd.ask_if["slot"], {k: v for k, v in sd.ask_if.items() if k != "slot"}, pack):
+            continue
+        return sid
+    return None
+
+
 def next_slot(
     home: HomeCard,
     pack: Pack,

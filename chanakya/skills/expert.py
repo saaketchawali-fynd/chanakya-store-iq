@@ -89,7 +89,7 @@ async def ask(ctx: SkillContext, question: str, via_truth_check: bool = False, l
     else:
         msgs.append(info_reply(ctx, f'{ctx.t("label_bolo")}: "{hold}"\n{ctx.t("kyun_expert_hold")}', btns))
     if expert:
-        elang = expert.lang or "hi"
+        elang = expert.lang or "en"
         ctx.reg.raw(question, "associate:question")
         body = ctx.t(
             "expert_question",

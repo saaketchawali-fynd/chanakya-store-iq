@@ -180,8 +180,10 @@ def test_icon_keywords_render_as_svg_not_text():
     for k in kws[:-1]:
         assert f"i-{k} " in html and f">{k}<" not in html
     assert "i-dot " in html and "mystery" not in html  # unknown keyword → neutral dot
-    data = {"changes": [{"icon": k, "text": f"change {i}"} for i, k in enumerate(("up", "down", "low", "zzz"))]}
-    html = r.html(_card("brief", "en", data))
+    html = ""
+    for ks in (("up", "down", "zzz"), ("low",)):  # the brief shows up to 3 stock changes
+        data = {"changes": [{"icon": k, "text": f"change {i}"} for i, k in enumerate(ks)]}
+        html += r.html(_card("brief", "en", data))
     assert all(f"k-{k}" in html for k in ("up", "down", "low", "dot")) and "zzz" not in html
 
 

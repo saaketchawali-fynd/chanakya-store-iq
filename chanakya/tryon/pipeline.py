@@ -24,13 +24,14 @@ DEFAULT_FOOTER = "Approx. preview · to scale · TEST DATA"
 @dataclass
 class TryonProduct:
     sku: str
-    category: str  # tv | ac | wm
+    category: str  # tv | ac | wm | fridge
     width_mm: float
     height_mm: float
     label: str  # e.g. '55" · Meru QLED Pro' (already formatted by caller)
     solid: bool  # True = primary (solid render), False = dashed saffron outline
     dims_text: str | None = None  # e.g. '123 × 71 cm' (pre-formatted), second line of the label
     mount: str = "wall"  # TV: wall | stand
+    door: str | None = None  # fridge: single | double | bottom_freezer | side_by_side
 
 
 @dataclass

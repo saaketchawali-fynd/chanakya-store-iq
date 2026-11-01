@@ -8,3 +8,5 @@
 - {id: EX-WM-NW, category: wm, condition: not_working, size_band: {}, min_value: 500, max_value: 1000, test_data: true}
 # --- added bands
 - {id: EX-TV-W-M, category: tv, condition: working, size_band: {min_in: 44, max_in: 49}, min_value: 3000, max_value: 5500, test_data: true}
+- {id: EX-FR-W, category: fridge, condition: working, size_band: {}, min_value: 2000, max_value: 4500, test_data: true}
+- {id: EX-FR-NW, category: fridge, condition: not_working, size_band: {}, min_value: 600, max_value: 1500, test_data: true}

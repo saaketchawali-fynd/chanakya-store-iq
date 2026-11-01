@@ -48,7 +48,7 @@ async def test_compare_two_real_labels(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:mr")
     await h.voice("assess_1")
-    await h.tap("s:C1:slot:mounting:wall")
+    await h.tap("s:C1:slot:trigger:new_home")
     await h.photo(LABELS / "TV-MER-55-QL120.jpg")
     await h.tap("s:C1:compare")
     out = await h.photo(LABELS / "TV-ARK-55-4K60.jpg")

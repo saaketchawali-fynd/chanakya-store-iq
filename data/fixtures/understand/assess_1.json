@@ -6,6 +6,10 @@
  "sports_viewer": "papa",
  "slots": [
   {
+   "slot": "room",
+   "value": "living"
+  },
+  {
    "slot": "room_light",
    "value": "sunny"
   },

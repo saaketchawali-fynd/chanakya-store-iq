@@ -19,8 +19,9 @@ async def to_options_without_photo(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:hi")
     await h.voice("assess_1")
-    await h.tap("s:C1:slot:mounting:wall")
+    await h.tap("s:C1:slot:trigger:new_home")
     await h.tap("s:C1:photo_no")  # no photo during the questions
+    await h.tap("s:C1:readback_ok")
     await h.tap("s:C1:options")
 
 

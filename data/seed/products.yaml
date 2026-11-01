@@ -3545,3 +3545,733 @@
     - {hi: '1.7 किलो, 9 घंटे बैटरी', mr: '1.7 किलो, 9 तास बॅटरी', en: '1.7 kg, 9 h battery'}
     - {hi: NVIDIA GeForce RTX 5060 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 5060 ग्राफिक्स, en: NVIDIA GeForce RTX 5060 graphics}
   test_data: true
+# --- fridge category (TEST DATA): 12 fridges, single door to side-by-side; features restate the row's own specs only
+- sku: FR-ARK-190-SD
+  category: fridge
+  brand: Arka
+  model: Arka 190 L Single Door
+  title:
+    hi: Arka 190 L Single Door
+    mr: Arka 190 L Single Door
+    en: Arka 190 L Single Door
+  specs:
+    capacity_l: 190
+    door: single
+    star_rating: 3
+    inverter_compressor: false
+    stabiliser_free: false
+    frost_free: false
+    convertible: false
+    freezer_l: 18
+    crisper_l: 16
+    cooling_retention_h: 6
+    water_dispenser: false
+  dims:
+    width_mm: 535
+    depth_mm: 640
+    height_mm: 1180
+    weight_kg: 33
+  energy:
+    kwh_year: 160
+  image: products/FR-ARK-190-SD.png
+  info:
+    series: CoolLine
+    year: 2025
+    model_number: AK-SD190-25
+    colours:
+    - Wine Red
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 190 लीटर, सिंगल डोर
+      mr: 190 लिटर, सिंगल डोअर
+      en: 190 litres, single door
+    - hi: 3-स्टार
+      mr: 3-स्टार
+      en: 3-star
+    - hi: फ्रीज़र 18 लीटर, सब्ज़ी का डिब्बा 16 लीटर
+      mr: फ्रीझर 18 लिटर, भाजीचा डबा 16 लिटर
+      en: 18 L freezer, 16 L vegetable box
+    - hi: 160 kWh/साल बिजली खपत
+      mr: 160 kWh/वर्ष वीज वापर
+      en: 160 kWh/year energy use
+  test_data: true
+- sku: FR-MER-215-SD
+  category: fridge
+  brand: Meru
+  model: Meru 215 L Single Door
+  title:
+    hi: Meru 215 L Single Door
+    mr: Meru 215 L Single Door
+    en: Meru 215 L Single Door
+  specs:
+    capacity_l: 215
+    door: single
+    star_rating: 4
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: false
+    convertible: false
+    freezer_l: 20
+    crisper_l: 22
+    cooling_retention_h: 8
+    water_dispenser: false
+  dims:
+    width_mm: 545
+    depth_mm: 660
+    height_mm: 1260
+    weight_kg: 36
+  energy:
+    kwh_year: 140
+  image: products/FR-MER-215-SD.png
+  info:
+    series: FreshKeep
+    year: 2025
+    model_number: MR-SD215-25
+    colours:
+    - Blue Floral
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 215 लीटर, सिंगल डोर
+      mr: 215 लिटर, सिंगल डोअर
+      en: 215 litres, single door
+    - hi: 4-स्टार, इन्वर्टर कंप्रेसर
+      mr: 4-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 4-star, inverter compressor
+    - hi: फ्रीज़र 20 लीटर, सब्ज़ी का डिब्बा 22 लीटर
+      mr: फ्रीझर 20 लिटर, भाजीचा डबा 22 लिटर
+      en: 20 L freezer, 22 L vegetable box
+    - hi: 140 kWh/साल बिजली खपत
+      mr: 140 kWh/वर्ष वीज वापर
+      en: 140 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 8 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 8 तास थंड
+      en: Stabiliser-free, 8 h cooling in a power cut
+  test_data: true
+- sku: FR-NOV-240-SD
+  category: fridge
+  brand: Novex
+  model: Novex 240 L Single Door
+  title:
+    hi: Novex 240 L Single Door
+    mr: Novex 240 L Single Door
+    en: Novex 240 L Single Door
+  specs:
+    capacity_l: 240
+    door: single
+    star_rating: 5
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: false
+    convertible: false
+    freezer_l: 22
+    crisper_l: 28
+    cooling_retention_h: 10
+    water_dispenser: false
+  dims:
+    width_mm: 560
+    depth_mm: 680
+    height_mm: 1350
+    weight_kg: 40
+  energy:
+    kwh_year: 118
+  image: products/FR-NOV-240-SD.png
+  info:
+    series: Crisp
+    year: 2025
+    model_number: NX-SD240-25
+    colours:
+    - Silver
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 240 लीटर, सिंगल डोर
+      mr: 240 लिटर, सिंगल डोअर
+      en: 240 litres, single door
+    - hi: 5-स्टार, इन्वर्टर कंप्रेसर
+      mr: 5-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 5-star, inverter compressor
+    - hi: फ्रीज़र 22 लीटर, सब्ज़ी का डिब्बा 28 लीटर
+      mr: फ्रीझर 22 लिटर, भाजीचा डबा 28 लिटर
+      en: 22 L freezer, 28 L vegetable box
+    - hi: 118 kWh/साल बिजली खपत
+      mr: 118 kWh/वर्ष वीज वापर
+      en: 118 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 10 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 10 तास थंड
+      en: Stabiliser-free, 10 h cooling in a power cut
+  test_data: true
+- sku: FR-NOV-280-DD
+  category: fridge
+  brand: Novex
+  model: Novex 280 L Double Door
+  title:
+    hi: Novex 280 L Double Door
+    mr: Novex 280 L Double Door
+    en: Novex 280 L Double Door
+  specs:
+    capacity_l: 280
+    door: double
+    star_rating: 2
+    inverter_compressor: false
+    stabiliser_free: false
+    frost_free: true
+    convertible: false
+    freezer_l: 75
+    crisper_l: 22
+    cooling_retention_h: 6
+    water_dispenser: false
+  dims:
+    width_mm: 600
+    depth_mm: 660
+    height_mm: 1600
+    weight_kg: 52
+  energy:
+    kwh_year: 310
+  image: products/FR-NOV-280-DD.png
+  info:
+    series: Frost Free
+    year: 2025
+    model_number: NX-DD280-25
+    colours:
+    - Grey Steel
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 280 लीटर, डबल डोर
+      mr: 280 लिटर, डबल डोअर
+      en: 280 litres, double door
+    - hi: 2-स्टार
+      mr: 2-स्टार
+      en: 2-star
+    - hi: फ्रीज़र 75 लीटर, सब्ज़ी का डिब्बा 22 लीटर
+      mr: फ्रीझर 75 लिटर, भाजीचा डबा 22 लिटर
+      en: 75 L freezer, 22 L vegetable box
+    - hi: 310 kWh/साल बिजली खपत
+      mr: 310 kWh/वर्ष वीज वापर
+      en: 310 kWh/year energy use
+    - hi: फ्रॉस्ट-फ्री
+      mr: फ्रॉस्ट-फ्री
+      en: Frost-free
+  test_data: true
+- sku: FR-ARK-253-DD
+  category: fridge
+  brand: Arka
+  model: Arka 253 L Double Door
+  title:
+    hi: Arka 253 L Double Door
+    mr: Arka 253 L Double Door
+    en: Arka 253 L Double Door
+  specs:
+    capacity_l: 253
+    door: double
+    star_rating: 3
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: false
+    freezer_l: 65
+    crisper_l: 24
+    cooling_retention_h: 8
+    water_dispenser: false
+  dims:
+    width_mm: 555
+    depth_mm: 640
+    height_mm: 1555
+    weight_kg: 48
+  energy:
+    kwh_year: 230
+  image: products/FR-ARK-253-DD.png
+  info:
+    series: FrostFree
+    year: 2025
+    model_number: AK-DD253-25
+    colours:
+    - Steel
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 253 लीटर, डबल डोर
+      mr: 253 लिटर, डबल डोअर
+      en: 253 litres, double door
+    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
+      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 3-star, inverter compressor
+    - hi: फ्रीज़र 65 लीटर, सब्ज़ी का डिब्बा 24 लीटर
+      mr: फ्रीझर 65 लिटर, भाजीचा डबा 24 लिटर
+      en: 65 L freezer, 24 L vegetable box
+    - hi: 230 kWh/साल बिजली खपत
+      mr: 230 kWh/वर्ष वीज वापर
+      en: 230 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 8 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 8 तास थंड
+      en: Stabiliser-free, 8 h cooling in a power cut
+  test_data: true
+- sku: FR-MER-265-DD
+  category: fridge
+  brand: Meru
+  model: Meru 265 L Convertible
+  title:
+    hi: Meru 265 L Convertible
+    mr: Meru 265 L Convertible
+    en: Meru 265 L Convertible
+  specs:
+    capacity_l: 265
+    door: double
+    star_rating: 3
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: true
+    freezer_l: 70
+    crisper_l: 26
+    cooling_retention_h: 9
+    water_dispenser: false
+  dims:
+    width_mm: 555
+    depth_mm: 660
+    height_mm: 1610
+    weight_kg: 50
+  energy:
+    kwh_year: 238
+  image: products/FR-MER-265-DD.png
+  info:
+    series: FlexiCool
+    year: 2025
+    model_number: MR-DD265-25
+    colours:
+    - Black Steel
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 265 लीटर, डबल डोर
+      mr: 265 लिटर, डबल डोअर
+      en: 265 litres, double door
+    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
+      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 3-star, inverter compressor
+    - hi: फ्रीज़र 70 लीटर, सब्ज़ी का डिब्बा 26 लीटर
+      mr: फ्रीझर 70 लिटर, भाजीचा डबा 26 लिटर
+      en: 70 L freezer, 26 L vegetable box
+    - hi: 238 kWh/साल बिजली खपत
+      mr: 238 kWh/वर्ष वीज वापर
+      en: 238 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 9 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 9 तास थंड
+      en: Stabiliser-free, 9 h cooling in a power cut
+  test_data: true
+- sku: FR-ARK-308-DD
+  category: fridge
+  brand: Arka
+  model: Arka 308 L Convertible
+  title:
+    hi: Arka 308 L Convertible
+    mr: Arka 308 L Convertible
+    en: Arka 308 L Convertible
+  specs:
+    capacity_l: 308
+    door: double
+    star_rating: 3
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: true
+    freezer_l: 80
+    crisper_l: 30
+    cooling_retention_h: 12
+    water_dispenser: false
+  dims:
+    width_mm: 600
+    depth_mm: 690
+    height_mm: 1690
+    weight_kg: 58
+  energy:
+    kwh_year: 255
+  image: products/FR-ARK-308-DD.png
+  info:
+    series: FlexiZone
+    year: 2025
+    model_number: AK-DD308-25
+    colours:
+    - Inox
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 308 लीटर, डबल डोर
+      mr: 308 लिटर, डबल डोअर
+      en: 308 litres, double door
+    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
+      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 3-star, inverter compressor
+    - hi: फ्रीज़र 80 लीटर, सब्ज़ी का डिब्बा 30 लीटर
+      mr: फ्रीझर 80 लिटर, भाजीचा डबा 30 लिटर
+      en: 80 L freezer, 30 L vegetable box
+    - hi: 255 kWh/साल बिजली खपत
+      mr: 255 kWh/वर्ष वीज वापर
+      en: 255 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+      en: Stabiliser-free, 12 h cooling in a power cut
+  test_data: true
+- sku: FR-MER-340-DD
+  category: fridge
+  brand: Meru
+  model: Meru 340 L Double Door
+  title:
+    hi: Meru 340 L Double Door
+    mr: Meru 340 L Double Door
+    en: Meru 340 L Double Door
+  specs:
+    capacity_l: 340
+    door: double
+    star_rating: 3
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: false
+    freezer_l: 88
+    crisper_l: 32
+    cooling_retention_h: 12
+    water_dispenser: false
+  dims:
+    width_mm: 610
+    depth_mm: 690
+    height_mm: 1750
+    weight_kg: 62
+  energy:
+    kwh_year: 268
+  image: products/FR-MER-340-DD.png
+  info:
+    series: FreshKeep Max
+    year: 2025
+    model_number: MR-DD340-25
+    colours:
+    - Steel
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 340 लीटर, डबल डोर
+      mr: 340 लिटर, डबल डोअर
+      en: 340 litres, double door
+    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
+      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 3-star, inverter compressor
+    - hi: फ्रीज़र 88 लीटर, सब्ज़ी का डिब्बा 32 लीटर
+      mr: फ्रीझर 88 लिटर, भाजीचा डबा 32 लिटर
+      en: 88 L freezer, 32 L vegetable box
+    - hi: 268 kWh/साल बिजली खपत
+      mr: 268 kWh/वर्ष वीज वापर
+      en: 268 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+      en: Stabiliser-free, 12 h cooling in a power cut
+  test_data: true
+- sku: FR-NOV-360-BM
+  category: fridge
+  brand: Novex
+  model: Novex 360 L Bottom Freezer
+  title:
+    hi: Novex 360 L Bottom Freezer
+    mr: Novex 360 L Bottom Freezer
+    en: Novex 360 L Bottom Freezer
+  specs:
+    capacity_l: 360
+    door: bottom_freezer
+    star_rating: 3
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: true
+    freezer_l: 100
+    crisper_l: 35
+    cooling_retention_h: 14
+    water_dispenser: false
+  dims:
+    width_mm: 600
+    depth_mm: 700
+    height_mm: 1810
+    weight_kg: 68
+  energy:
+    kwh_year: 280
+  image: products/FR-NOV-360-BM.png
+  info:
+    series: Bottom Mount
+    year: 2025
+    model_number: NX-BM360-25
+    colours:
+    - Glass Black
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 360 लीटर, बॉटम फ्रीज़र
+      mr: 360 लिटर, बॉटम फ्रीझर
+      en: 360 litres, bottom freezer
+    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
+      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 3-star, inverter compressor
+    - hi: फ्रीज़र 100 लीटर, सब्ज़ी का डिब्बा 35 लीटर
+      mr: फ्रीझर 100 लिटर, भाजीचा डबा 35 लिटर
+      en: 100 L freezer, 35 L vegetable box
+    - hi: 280 kWh/साल बिजली खपत
+      mr: 280 kWh/वर्ष वीज वापर
+      en: 280 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 14 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 14 तास थंड
+      en: Stabiliser-free, 14 h cooling in a power cut
+  test_data: true
+- sku: FR-ARK-415-DD
+  category: fridge
+  brand: Arka
+  model: Arka 415 L Double Door
+  title:
+    hi: Arka 415 L Double Door
+    mr: Arka 415 L Double Door
+    en: Arka 415 L Double Door
+  specs:
+    capacity_l: 415
+    door: double
+    star_rating: 2
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: false
+    freezer_l: 110
+    crisper_l: 38
+    cooling_retention_h: 12
+    water_dispenser: false
+  dims:
+    width_mm: 700
+    depth_mm: 720
+    height_mm: 1780
+    weight_kg: 72
+  energy:
+    kwh_year: 330
+  image: products/FR-ARK-415-DD.png
+  info:
+    series: Grande
+    year: 2025
+    model_number: AK-DD415-25
+    colours:
+    - Steel
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 415 लीटर, डबल डोर
+      mr: 415 लिटर, डबल डोअर
+      en: 415 litres, double door
+    - hi: 2-स्टार, इन्वर्टर कंप्रेसर
+      mr: 2-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 2-star, inverter compressor
+    - hi: फ्रीज़र 110 लीटर, सब्ज़ी का डिब्बा 38 लीटर
+      mr: फ्रीझर 110 लिटर, भाजीचा डबा 38 लिटर
+      en: 110 L freezer, 38 L vegetable box
+    - hi: 330 kWh/साल बिजली खपत
+      mr: 330 kWh/वर्ष वीज वापर
+      en: 330 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+      en: Stabiliser-free, 12 h cooling in a power cut
+  test_data: true
+- sku: FR-MER-580-SBS
+  category: fridge
+  brand: Meru
+  model: Meru 580 L Side-by-Side
+  title:
+    hi: Meru 580 L Side-by-Side
+    mr: Meru 580 L Side-by-Side
+    en: Meru 580 L Side-by-Side
+  specs:
+    capacity_l: 580
+    door: side_by_side
+    star_rating: 3
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: false
+    freezer_l: 210
+    crisper_l: 40
+    cooling_retention_h: 10
+    water_dispenser: false
+  dims:
+    width_mm: 910
+    depth_mm: 720
+    height_mm: 1780
+    weight_kg: 105
+  energy:
+    kwh_year: 420
+  image: products/FR-MER-580-SBS.png
+  info:
+    series: Twin
+    year: 2025
+    model_number: MR-SB580-25
+    colours:
+    - Black Steel
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 580 लीटर, साइड-बाय-साइड
+      mr: 580 लिटर, साइड-बाय-साइड
+      en: 580 litres, side-by-side
+    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
+      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 3-star, inverter compressor
+    - hi: फ्रीज़र 210 लीटर, सब्ज़ी का डिब्बा 40 लीटर
+      mr: फ्रीझर 210 लिटर, भाजीचा डबा 40 लिटर
+      en: 210 L freezer, 40 L vegetable box
+    - hi: 420 kWh/साल बिजली खपत
+      mr: 420 kWh/वर्ष वीज वापर
+      en: 420 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 10 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 10 तास थंड
+      en: Stabiliser-free, 10 h cooling in a power cut
+  test_data: true
+- sku: FR-NOV-650-SBS
+  category: fridge
+  brand: Novex
+  model: Novex 650 L Side-by-Side
+  title:
+    hi: Novex 650 L Side-by-Side
+    mr: Novex 650 L Side-by-Side
+    en: Novex 650 L Side-by-Side
+  specs:
+    capacity_l: 650
+    door: side_by_side
+    star_rating: 3
+    inverter_compressor: true
+    stabiliser_free: true
+    frost_free: true
+    convertible: true
+    freezer_l: 230
+    crisper_l: 45
+    cooling_retention_h: 12
+    water_dispenser: true
+  dims:
+    width_mm: 912
+    depth_mm: 735
+    height_mm: 1790
+    weight_kg: 115
+  energy:
+    kwh_year: 450
+  image: products/FR-NOV-650-SBS.png
+  info:
+    series: Twin Pro
+    year: 2025
+    model_number: NX-SB650-25
+    colours:
+    - Glass Black
+    warranty:
+      years: 1
+      compressor_years: 10
+    in_box:
+    - hi: सब्ज़ी का डिब्बा और अंडे की ट्रे
+      mr: भाजीचा डबा आणि अंड्यांचा ट्रे
+      en: Vegetable box and egg tray
+    - hi: यूज़र मैनुअल, वारंटी कार्ड
+      mr: युजर मॅन्युअल, वॉरंटी कार्ड
+      en: User manual, warranty card
+    features:
+    - hi: 650 लीटर, साइड-बाय-साइड
+      mr: 650 लिटर, साइड-बाय-साइड
+      en: 650 litres, side-by-side
+    - hi: 3-स्टार, इन्वर्टर कंप्रेसर
+      mr: 3-स्टार, इन्व्हर्टर कंप्रेसर
+      en: 3-star, inverter compressor
+    - hi: फ्रीज़र 230 लीटर, सब्ज़ी का डिब्बा 45 लीटर
+      mr: फ्रीझर 230 लिटर, भाजीचा डबा 45 लिटर
+      en: 230 L freezer, 45 L vegetable box
+    - hi: 450 kWh/साल बिजली खपत
+      mr: 450 kWh/वर्ष वीज वापर
+      en: 450 kWh/year energy use
+    - hi: स्टेबलाइज़र-फ्री, बिजली जाने पर 12 घंटे ठंडा
+      mr: स्टॅबिलायझर-फ्री, वीज गेल्यावर 12 तास थंड
+      en: Stabiliser-free, 12 h cooling in a power cut
+  test_data: true

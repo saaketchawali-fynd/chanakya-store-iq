@@ -9,7 +9,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 Lang = Literal["hi", "mr", "en"]
-Category = Literal["tv", "ac", "wm", "laptop"]
+Category = Literal["tv", "ac", "wm", "fridge", "laptop"]
 Role = Literal["associate", "manager", "expert", "visitor", "customer", "unknown"]
 
 
@@ -58,7 +58,7 @@ class ListSection(BaseModel):
 
 
 class Card(BaseModel):
-    template: Literal["home", "benefit", "options", "kharcha", "parivaar", "score", "brief", "digest", "catalog", "product", "compare"]
+    template: Literal["home", "benefit", "options", "kharcha", "parivaar", "score", "brief", "digest", "catalog", "product", "compare", "offer"]
     lang: Lang  # language of the card text
     data: dict[str, Any]  # template variables (numbers already formatted via firewall)
 
@@ -128,7 +128,7 @@ class SlotValue(BaseModel):
 class HomeCard(BaseModel):
     category: Category | None = None
     customer_name: str | None = None
-    customer_lang: Lang = "hi"
+    customer_lang: Lang = "en"
     slots: dict[str, list[SlotValue]] = {}  # multi-valued slots allowed (e.g. content)
     start_level_inr: int | None = None  # ONLY from associate statement/tap
     start_level_source: Literal["associate_voice", "associate_tap", "none"] = "none"

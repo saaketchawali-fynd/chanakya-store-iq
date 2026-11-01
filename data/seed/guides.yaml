@@ -14,4 +14,8 @@ capacity_wm:  # family size → kg range; +1 kg if heavy weekly bedsheets
   - {max_people: 2, min_kg: 6, max_kg: 7}
   - {max_people: 4, min_kg: 7, max_kg: 8}
   - {max_people: 99, min_kg: 8, max_kg: 10}
+capacity_fridge:  # family size → litres; +30/40 L if they stock up weekly or keep frozen food
+  - {max_people: 2, min_l: 180, max_l: 260}
+  - {max_people: 4, min_l: 240, max_l: 350}
+  - {max_people: 99, min_l: 330, max_l: 480}
 tariff: {region: Mumbai, rupees_per_unit: 9.5}

@@ -34,13 +34,17 @@ TASK_WHEN = {"today_evening": "b_task_eve", "tomorrow": "b_task_tmr", "weekend":
 def needs_install(ctx: SkillContext) -> bool:
     s = ctx.session
     cat = s.home.category
-    if cat in ("ac", "wm"):
+    if cat in ("ac", "wm", "fridge"):
         return True
     return cat == "tv" and "wall" in P.values(s.home, "mounting")
 
 
-async def parivaar(ctx: SkillContext) -> Reply:
+async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = False) -> Reply:
+    """Consent first (QR), then the Parivaar Card. presale=True: the customer will ask the family before buying —
+    the same card goes now (recommendation, full cost, offers), so the sale stays alive at home."""
     s = ctx.session
+    if presale:
+        ctx.x["presale_parivaar"] = True
     if not s.consent or not s.customer_wa_id:
         ctx.x["pending_parivaar"] = True
         cites = C.known_cites(ctx, ["decider"])
@@ -50,9 +54,10 @@ async def parivaar(ctx: SkillContext) -> Reply:
             ctx.b("b_back", ctx.sid("go")),
         ]
         say = ctx.pick(ctx.packs.common_line("consent_ask"), ctx.clang)
+        why = ctx.t("kyun_consent_note", note=note) if note else ctx.t("kyun_consent")
         if not cites:
-            return ctx.reply(info_reply(ctx, f'{ctx.t("label_bolo")}: "{say}"\n{ctx.t("kyun_consent")}', btns))
-        return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_consent"), cites, btns))
+            return ctx.reply(info_reply(ctx, f'{ctx.t("label_bolo")}: "{say}"\n{why}', btns))
+        return ctx.reply(coach_reply(ctx, say, why, cites, btns))
     return await send_parivaar(ctx)
 
 
@@ -171,7 +176,8 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
         return ctx.reply(info_reply(ctx, ctx.t("parivaar_need_product", alang)))
     p = ctx.facts.product_sync(sku)
     name = s.home.customer_name or ""
-    title = ctx.t("parivaar_title", lang, name=short_name(name) if name else "")
+    presale = bool(s.extra.get("presale_parivaar")) and s.extra.get("outcome") != "sold"
+    title = ctx.t("parivaar_title_presale" if presale else "parivaar_title", lang, name=short_name(name) if name else "")
     image: str | bytes | None = p.image
     tryon = await repo.media_latest(s.id, "tryon")
     if tryon:
@@ -215,11 +221,13 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
                 {"label": ctx.t("row_with_sug", lang), "value": cs["with_suggestions_total_str"], "strong": False}
             )
     if s.offer_snapshot and s.offer_snapshot.get("applied"):
-        a = s.offer_snapshot["applied"][0]
-        cost_rows.append({"label": ctx.t("row_offer", lang), "value": "−" + a["amount_str"], "strong": False})
-        cost_rows.append(
-            {"label": ctx.t("row_payable", lang), "value": s.offer_snapshot["payable_str"], "strong": True}
-        )
+        os_ = s.offer_snapshot
+        for a in os_["applied"][:2]:
+            ctx.reg.raw(a["amount_str"], f"offer:{a['id']}")
+            cost_rows.append({"label": ctx.t("row_offer", lang), "value": "−" + a["amount_str"], "strong": False})
+        final = os_.get("total_today_str") or os_["payable_str"]
+        ctx.reg.raw(final, "snapshot:total_today")
+        cost_rows.append({"label": ctx.t("row_payable", lang), "value": final, "strong": True})
     if s.extra.get("delivery_choice"):
         from datetime import date
 
@@ -265,16 +273,19 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
     state.advance(s, Step.FOLLOW)
     ctx.ev("parivaar_sent", to="customer")
     nm = ctx.reg.raw(short_name(name) if name else ctx.t("customer_word", alang), "card:name")
-    to_assoc = OutMessage(
-        to=s.associate_wa_id,
-        kind="buttons",
-        body=ctx.t("parivaar_sent", alang, name=nm),
-        buttons=[
-            Button(id=ctx.sid("voice_add"), title=ctx.t("b_voice_add", alang)),
-            Button(id=ctx.sid("task"), title=ctx.t("b_task", alang)),
-            Button(id=ctx.sid("khatam"), title=ctx.t("b_khatam", alang)),
-        ],
-    )
+    if presale:  # not bought yet: the next step is the follow-up task
+        abtns = [Button(id=ctx.sid("task"), title=ctx.t("b_task", alang)),
+                 Button(id=ctx.sid("voice_add"), title=ctx.t("b_voice_add", alang)),
+                 Button(id=ctx.sid("khatam"), title=ctx.t("b_khatam", alang))]
+        body = ctx.t("parivaar_sent_presale", alang, name=nm)
+    else:  # sold: installation (when needed), then a task, then the score
+        first = (Button(id=ctx.sid("sold"), title=ctx.t("b_install", alang))
+                 if needs_install(ctx) and not s.extra.get("install_job_id")
+                 else Button(id=ctx.sid("voice_add"), title=ctx.t("b_voice_add", alang)))
+        abtns = [first, Button(id=ctx.sid("task"), title=ctx.t("b_task", alang)),
+                 Button(id=ctx.sid("khatam"), title=ctx.t("b_khatam", alang))]
+        body = ctx.t("parivaar_sent", alang, name=nm)
+    to_assoc = OutMessage(to=s.associate_wa_id, kind="buttons", body=body, buttons=abtns)
     return ctx.reply(to_customer, to_assoc)
 
 
@@ -433,7 +444,7 @@ async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
                     kind="text",
                     body=ctx.t(
                         "install_risk_manager",
-                        m.lang or "hi",
+                        m.lang or "en",
                         id=ctx.reg.raw(str(job.id), "job:id"),
                         risks=", ".join(risks),
                         site=ctx.reg.static(summary),

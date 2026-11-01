@@ -212,7 +212,7 @@ async def nudge(ctx: SkillContext, wa_id: str, step: str) -> Reply:
     staff = await repo.staff_by_wa(wa_id)
     if staff is None:
         return ctx.reply(info_reply(ctx, ctx.t("fallback_body")))
-    lang = staff.lang or "hi"
+    lang = staff.lang or "en"
     body = ctx.t("nudge_body", lang, step=ctx.t(f"step_{step}", lang), tip=ctx.t(f"tip_{step}", lang))
     btns = [
         Button(id=encode("g", "clip", step), title=ctx.t("b_clip", lang)),

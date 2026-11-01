@@ -149,7 +149,7 @@ async def dispatch(ctx: SkillContext) -> Reply:
     # first contact (or 'language'): the associate picks a language; everything after uses only that language
     b0 = decode(msg.reply_id) if msg.type in ("button_reply", "list_reply") else None
     if b0 and b0.scope == "g" and b0.get(0) == "alang":
-        return await set_staff_language(ctx, b0.get(1, "hi"))
+        return await set_staff_language(ctx, b0.get(1, "en"))
     if ctx.staff and (name == "language" or (not ctx.staff.lang_set and name not in ("role", "clock", "reset"))):
         return language_picker(ctx)
     if name in ("exit", "restart") and ctx.role != "associate":
@@ -205,8 +205,8 @@ LANG_BUTTONS = (("en", "English"), ("hi", "हिंदी"), ("mr", "मरा�
 
 
 def language_picker(ctx: SkillContext) -> Reply:
-    name = ctx.staff.name if ctx.staff else ""
-    body = f"Namaste {name}! Main Chanakya, aapka sales saathi.\nभाषा निवडा · Bhasha chuniye · Choose your language"
+    """First contact: nothing in any one language before the associate picks one (each line in its own script)."""
+    body = "Choose your language\nभाषा चुनें\nभाषा निवडा"
     btns = [Button(id=encode("g", "alang", lg), title=title) for lg, title in LANG_BUTTONS]
     return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="buttons", body=body, buttons=btns))
 
@@ -404,7 +404,7 @@ async def global_action(ctx: SkillContext, bid: ButtonId) -> Reply:
     if a == "qa":
         return await brief.answer(ctx, bid.get(1), bid.get(2))
     if a == "lang":
-        ctx.staff.lang = bid.get(1, "hi")
+        ctx.staff.lang = bid.get(1, "en")
         return ctx.reply(info_reply(ctx, ctx.t("lang_set")))
     if a == "switch":
         if await _switch_to(ctx, bid.get(1)):
@@ -461,7 +461,7 @@ async def command(ctx: SkillContext, name: str, arg: str) -> Reply:
     if name == "status":
         return await assess.status(ctx)
     if name == "catalog":
-        cat = {"washing": "wm", "washing machine": "wm", "wm": "wm", "ac": "ac", "tv": "tv", "laptop": "laptop"}.get(
+        cat = {"washing": "wm", "washing machine": "wm", "wm": "wm", "ac": "ac", "tv": "tv", "laptop": "laptop", "fridge": "fridge", "refrigerator": "fridge"}.get(
             (arg or "").strip().lower()
         )
         return await catalog.show(ctx, cat)
@@ -505,6 +505,18 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "tryon": lambda: tryon_flow.tryon_request(ctx),
         "tmenu": lambda: tryon_flow.menu(ctx),
         "benefit_next": lambda: translate.benefit(ctx),
+        "readback_ok": lambda: assess.readback_ok(ctx),
+        "readback_edit": lambda: assess.readback_edit(ctx),
+        "doubt": lambda: assess.doubt_list(ctx),
+        "doubt_voice": lambda: assess.doubt_voice(ctx),
+        "pricefirst_q": lambda: validate.price_rescue(ctx),
+        "demo": lambda: recommend.demo(ctx),
+        "prefer": lambda: recommend.prefer(ctx),
+        "nonefit": lambda: recommend.none_fit(ctx),
+        "cost_rm": lambda: complete.remove_menu(ctx),
+        "nottoday": lambda: close.not_today(ctx),
+        "presale": lambda: follow.parivaar(ctx, presale=True),
+        "clang": lambda: assess.customer_lang_picker(ctx),
         "compare": lambda: translate.compare_prompt(ctx),
         "cost_show": lambda: complete.resend_card(ctx) if ctx.session.cost_snapshot else complete.show_cost(ctx),
         "cost_drop_optional": lambda: complete.toggle_suggestions(ctx),
@@ -532,10 +544,19 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     if action == "cat" and a0:
         return await assess.set_category(ctx, a0)
     if action == "slotask" and a0:
-        from chanakya.skills import common
-
-        if ctx.pack and ctx.pack.slot(a0):
-            return ctx.reply(common.question_reply(ctx, a0))
+        return await assess.reask(ctx, a0)
+    if action == "myth" and a0:
+        return await validate.myth(ctx, a0)
+    if action == "rerank" and a0:
+        return await recommend.rerank(ctx, a0)
+    if action == "bt" and a0:
+        return await translate.benefit_reply(ctx, a0, a1)
+    if action == "cost_drop" and a0:
+        return await complete.drop_line(ctx, a0)
+    if action == "pay" and a0:
+        return await close.set_pay(ctx, a0)
+    if action == "obj" and a0:
+        return await close.objection(ctx, a0)
     if action == "budget":
         return await assess.set_budget(ctx, a0 or "none")
     if action == "opt" and a0:
@@ -653,7 +674,7 @@ async def on_speech(ctx: SkillContext) -> Reply:
     # 2. apply slots and numbers
     if s.home.category is None and u.category and ctx.packs.get(u.category):
         s.home.category = u.category
-    if s.home.category is None and (ctx.staff.dept if ctx.staff else None) not in ctx.packs.packs:
+    if s.home.category is None:  # product first: keep what was said, ask the product (the note is applied after)
         s.extra["pending_u"] = u.model_dump()
         return assess.category_question(ctx)
     gate_before = state.options_gate_open(s, ctx.pack)
