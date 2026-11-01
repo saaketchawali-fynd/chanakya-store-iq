@@ -251,8 +251,27 @@ td.v{font-weight:700;text-align:right}
 .tax{font-size:20px;color:#666;margin-top:4px}
 .foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:22px;padding-top:18px;border-top:3px dashed #bbb}
 .sku{font-size:22px;font-family:Menlo,"DejaVu Sans Mono",monospace;color:#333;text-align:right;line-height:1.5}
+.qr{text-align:center;font-size:17px;font-weight:700;color:#333}
+.qr img{width:190px;height:190px;display:block;image-rendering:pixelated}
 .test{display:inline-block;font-size:18px;font-weight:800;letter-spacing:2px;color:#b4365a;border:2px solid #b4365a;border-radius:6px;padding:2px 8px}
 """
+
+
+QR_PREFIX = "CHANAKYA:SKU:"  # decoded by chanakya.ai.qr → exact product, even if the photo is blurry
+
+
+def qr_data_uri(sku: str) -> str:
+    import base64
+    import io
+
+    import qrcode
+
+    q = qrcode.QRCode(box_size=10, border=2, error_correction=qrcode.constants.ERROR_CORRECT_M)
+    q.add_data(QR_PREFIX + sku)
+    q.make(fit=True)
+    buf = io.BytesIO()
+    q.make_image(fill_color="black", back_color="white").save(buf, "PNG")
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
 def label_html(p: dict, price: dict | None) -> str:
@@ -303,8 +322,10 @@ def label_html(p: dict, price: dict | None) -> str:
         f"<table>{rows}</table>"
         f"{'<div class=row>' + ''.join(boxes) + '</div>' if boxes else ''}"
         f"{price_html}"
-        f"<div class='foot'>{barcode_svg(ean13(sku))}<div class='sku'>SKU {escape(sku)}<br>"
+        f"<div class='foot'><div>{barcode_svg(ean13(sku), width=380, height=96)}"
+        f"<div class='sku' style='text-align:left;margin-top:8px'>SKU {escape(sku)}<br>"
         f"<span class='test'>TEST DATA</span></div></div>"
+        f"<div class='qr'><img src='{qr_data_uri(sku)}'><div>Scan with Chanakya</div></div></div>"
         f"</div></body></html>"
     )
 

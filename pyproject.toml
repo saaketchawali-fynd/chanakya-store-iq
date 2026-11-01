@@ -6,7 +6,7 @@ requires-python = ">=3.12"
 dependencies = [
   "fastapi", "uvicorn[standard]", "httpx", "pydantic>=2", "pydantic-settings",
   "sqlalchemy[asyncio]>=2", "asyncpg", "aiosqlite", "jinja2", "playwright", "pillow", "numpy",
-  "qrcode[pil]", "rapidfuzz", "pyyaml", "python-multipart", "tzdata", "google-genai",
+  "qrcode[pil]", "rapidfuzz", "pyyaml", "python-multipart", "tzdata", "google-genai", "opencv-python-headless",
 ]
 
 [dependency-groups]

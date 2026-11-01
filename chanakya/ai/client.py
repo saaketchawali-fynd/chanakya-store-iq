@@ -101,11 +101,17 @@ class AIClient:
     async def read_image(
         self, img: bytes, filename: str | None = None, caption: str | None = None, hint: str | None = None
     ) -> ImageRead:
-        """Fixture by filename stem; Gemini vision when live; else a caption/hint-based read."""
+        """Fixture by filename stem; a Chanakya label QR; Gemini vision when live; else a caption/hint-based read."""
         if filename:
             stem = Path(filename).stem
             if (self.fix / "image_read" / f"{stem}.json").exists():
                 return self._fixture("image_read", stem, ImageRead)
+        if hint != "room":
+            from chanakya.ai.qr import decode_sku
+
+            sku = decode_sku(img)
+            if sku:
+                return ImageRead(kind="label", sku=sku, model_text=sku, confidence=1.0)
         if self.live:
             from google.genai import types
 

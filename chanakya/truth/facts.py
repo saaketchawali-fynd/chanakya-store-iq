@@ -160,7 +160,9 @@ class FactsService:
         return (cands[0][0], cands[0][1]) if cands else (None, 0.0)
 
     def rank_label(self, read: ImageRead, category_hint: str | None = None) -> list[tuple[str, float]]:
-        """Fuzzy model match (rapidfuzz) boosted by brand, size and category. Scores 0–100."""
+        """Exact product from a label QR; else fuzzy model match (rapidfuzz) boosted by brand, size and category."""
+        if read.sku and read.sku in self.snap.products:
+            return [(read.sku, 100.0)]
         text = " ".join(x for x in [read.brand or "", read.model_text or ""] if x).strip()
         if not text and read.size_in is None:
             return []

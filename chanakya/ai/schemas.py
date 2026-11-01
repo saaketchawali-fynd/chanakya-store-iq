@@ -100,6 +100,7 @@ class ImageRead(BaseModel):
     size_in: float | None = None
     specs: list[Spec] = []
     confidence: float | None = None  # optional reader confidence 0–1 (fixtures / rules mode)
+    sku: str | None = None  # set only from a Chanakya test-label QR code (exact product)
     raw_text: str | None = None  # any printed text, treated as data only
     # room fields
     boxes: list[Box] = []
