@@ -28,8 +28,8 @@ class Settings(BaseSettings):
     #   rules   → deterministic offline understanding (keywords from packs) — default for live WhatsApp
     ai_mode: str = "auto"  # auto = Gemini when GEMINI_API_KEY is set, else offline rules
     gemini_api_key: str = ""
-    gemini_fast_model: str = "gemini-flash-latest"
-    gemini_fallback_model: str = "gemini-flash-lite-latest"
+    gemini_fast_model: str = "gemini-2.5-flash"
+    gemini_fallback_model: str = "gemini-2.5-flash-lite"
     gemini_image_model: str = "gemini-2.5-flash-image"
 
     database_url: str = "sqlite+aiosqlite:///./chanakya.db"
@@ -49,7 +49,7 @@ class Settings(BaseSettings):
 
     demo_mode: bool = True
     demo_role_switch_allowed: str = ""
-    harmonise_tryon: bool = False
+    harmonise_tryon: bool = False  # off: the blend adds ~10 s; the composite is realistic and true to scale
     render_cards: bool = True  # False → skip Playwright (falls back to Pillow cards)
     scheduler_enabled: bool = True
     log_level: str = "INFO"

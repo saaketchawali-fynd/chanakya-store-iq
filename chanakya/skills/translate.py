@@ -169,6 +169,9 @@ async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0) -> Reply:
     prev_at = x.get("label_at")
     x["label_sku"] = sku
     x["label_at"] = ctx.now.isoformat()
+    from chanakya.skills.tryon_flow import add_interest
+
+    add_interest(ctx, sku)
     x.setdefault("benefits_said", {})
     ctx.ev("label_read", sku=sku, confidence=round(conf, 1))
     if (
@@ -271,7 +274,7 @@ async def product_card(ctx: SkillContext, p) -> Card:
     mn = (p.info or {}).get("model_number")
     if mn:
         data["note"] = ctx.t("label_note", lang, model=ctx.reg.raw(mn, f"product:{p.sku}"))
-    if state.options_gate_open(s, ctx.pack):
+    if state.options_gate_open(s, ctx.pack) and p.category == ctx.pack.category:
         pros, cons, score = await pros_cons(ctx, p, lang)
         badge, kind = _badge(ctx, score, lang)
         data.update(pros=pros, cons=cons, badge=badge, badge_kind=kind,
@@ -333,7 +336,7 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
     data = {"title": ctx.t("compare_title", lang),
             "a": {"title": C.product_title(ctx, a, lang), "image": a.image},
             "b": {"title": C.product_title(ctx, b, lang), "image": b.image}, "rows": rows[:8]}
-    gate = state.options_gate_open(s, ctx.pack)
+    gate = state.options_gate_open(s, ctx.pack) and a.category == b.category == ctx.pack.category
     winner = None
     if gate:
         pa, _, sa = await pros_cons(ctx, a, lang)
@@ -352,7 +355,7 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
                      winner=C.product_name(ctx, winner))
     else:
         body = ctx.t("compare_body_nofit", a=C.product_name(ctx, a), b=C.product_name(ctx, b))
-    btns = [C.option_button(ctx, "1", a), C.option_button(ctx, "2", b), ctx.b("b_options", ctx.sid("options"))]
+    btns = [C.option_button(ctx, "1", a), C.option_button(ctx, "2", b), ctx.b("b_tryon", ctx.sid("tryon"))]
     btns[0] = btns[0].model_copy(update={"id": ctx.sid("tpick", a.sku)})
     btns[1] = btns[1].model_copy(update={"id": ctx.sid("tpick", b.sku)})
     card = Card(template="compare", lang=lang, data=data)  # type: ignore[arg-type]

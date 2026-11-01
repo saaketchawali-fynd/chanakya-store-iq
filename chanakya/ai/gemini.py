@@ -41,9 +41,13 @@ class GeminiClient:
 
     async def json(self, parts: list, schema: type[BaseModel], system: str, timeout: float, kind: str) -> BaseModel:
         last_err = ""
-        for model, t in ((self.fast, timeout), (self.fallback, timeout * 0.7)):
+        deadline = time.perf_counter() + timeout * 1.2  # never more than this in total, whatever fails
+        for model, share in ((self.fast, 0.6), (self.fallback, 1.0)):
             for thinking in (True, False):  # some models reject the thinking config: retry without it
                 t0 = time.perf_counter()
+                t = min(timeout * share if model == self.fast else timeout, deadline - t0)
+                if t < 0.8:
+                    break
                 try:
                     r = await asyncio.wait_for(
                         self.client.aio.models.generate_content(

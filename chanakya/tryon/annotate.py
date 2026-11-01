@@ -274,9 +274,12 @@ def annotate(
             out, mb = render.fit_marker(out, p.quad, p.fits)
             lay.add(f"fit:{p.sku}", mb)
     if placed:
-        union = _union([p.box for p in placed])
+        # each product type is labelled from its own area (product + its comparison outline), so with a TV and
+        # an AC on one wall every label sits next to its own product
+        unions = {c: _union([q.box for q in placed if q.category == c]) for c in {q.category for q in placed}}
         g = lay.gap
         for p in solids:
+            union = unions[p.category]
             pp = _pill([p.label, p.dims_text or ""], size, INDIGO, (255, 255, 255), fg2=(206, 214, 232))
             s = p.box
             cands = [

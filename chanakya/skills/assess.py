@@ -208,6 +208,7 @@ async def photo_no(ctx: SkillContext) -> Reply:
     """No photo: carry on with what the customer says."""
     ctx.x["photo_asked"] = True
     ctx.session.awaiting = None
+    ctx.x.pop("tryon_after_photo", None)
     return ctx.reply(C.next_question_or_options(ctx, footer=ctx.t("footer_photo_none")))
 
 

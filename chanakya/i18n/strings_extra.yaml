@@ -321,3 +321,19 @@ compare_send: {hi: "Doosre model ke label ki photo bhejiye.", mr: "दुसऱ�
 footer_compare: {hi: "Dono ki tulna is ghar ke hisaab se", mr: "दोघांची तुलना या घरानुसार", en: "Compared for this home"}
 bolo_label_intro: {hi: "यह {product} है — खास बातें कार्ड पर हैं। आपके घर के बारे में दो सवाल पूछूँ, ताकि सही फ़िट बता सकूँ?", mr: "हा {product} आहे — खास गोष्टी कार्डवर आहेत. तुमच्या घराबद्दल दोन प्रश्न विचारू का, म्हणजे योग्य फिट सांगता येईल?", en: "This is the {product}; the highlights are on the card. May I ask two questions about your home to judge the fit?"}
 footer_noted: {hi: "Samjha: {facts}", mr: "समजलं: {facts}", en: "Noted: {facts}"}
+
+# ---------- Ghar mein dekho: decision menu ----------
+tm_body: {hi: "Customer ke kamre mein kya dikhayein? Ek chuniye — 3-4 second mein deewar par.", mr: "ग्राहकाच्या खोलीत काय दाखवायचं? एक निवडा — 3-4 सेकंदात भिंतीवर.", en: "What should we show in the customer's room? Pick one; it appears on their wall in 3-4 seconds."}
+tm_button: {hi: "Kya dikhayein", mr: "काय दाखवायचं", en: "Choose"}
+tm_best: {hi: "Sabse sahi wala", mr: "सर्वात योग्य", en: "Best pick"}
+tm_size: {hi: "Size: {a} vs {b} inch", mr: "साइज: {a} vs {b} इंच", en: "Size: {a} vs {b} inch"}
+tm_size_d: {hi: "Ek tasveer mein dono size, asli naap mein", mr: "एका फोटोत दोन्ही साइज, खऱ्या मापात", en: "Both sizes in one picture, true to scale"}
+tm_all: {hi: "Teeno options, ek-ek", mr: "तिन्ही पर्याय, एकेक", en: "All options, one by one"}
+tm_combo: {hi: "{cats} saath mein", mr: "{cats} एकत्र", en: "{cats} together"}
+tm_one_d: {hi: "Sirf yeh, unki deewar par", mr: "फक्त हे, त्यांच्या भिंतीवर", en: "Just this one, on their wall"}
+b_like_this: {hi: "Yeh pasand", mr: "हे आवडलं", en: "Like this one"}
+b_like_both: {hi: "Dono pasand", mr: "दोन्ही आवडले", en: "Like both"}
+b_show_more: {hi: "Aur dikhao", mr: "आणखी दाखवा", en: "Show more"}
+tryon_bolo_item: {hi: "ये आपकी जगह में {product} — असली नाप में।", mr: "ही तुमच्या जागेत {product} — खऱ्या मापात.", en: "Here is the {product} in your space, true to scale."}
+tryon_bolo_combo: {hi: "ये आपकी जगह में सब साथ में — असली नाप में।", mr: "हे सगळं तुमच्या जागेत एकत्र — खऱ्या मापात.", en: "Here they are together in your space, true to scale."}
+room_photo_ack: {hi: "Photo mil gayi. Kuch second mein deewar par dikhata hoon.", mr: "फोटो मिळाला. काही सेकंदात भिंतीवर दाखवतो.", en: "Got the photo. Showing it on their wall in a few seconds."}

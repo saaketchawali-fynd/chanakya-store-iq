@@ -503,6 +503,7 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "shown": lambda: recommend.shown(ctx),
         "demo2": lambda: recommend.demo2(ctx),
         "tryon": lambda: tryon_flow.tryon_request(ctx),
+        "tmenu": lambda: tryon_flow.menu(ctx),
         "benefit_next": lambda: translate.benefit(ctx),
         "compare": lambda: translate.compare_prompt(ctx),
         "cost_show": lambda: complete.resend_card(ctx) if ctx.session.cost_snapshot else complete.show_cost(ctx),
@@ -559,6 +560,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         return await tryon_flow.set_old_tv(ctx, a0 or "none")
     if action == "wallw":
         return await tryon_flow.set_wall_width(ctx, a0 or "w9")
+    if action == "tmode" and a0:
+        return await tryon_flow.choose(ctx, a0, a1)
     if action == "tpick" and a0:
         return await tryon_flow.pick(ctx, a0)
     if action == "label" and a0:

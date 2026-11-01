@@ -95,6 +95,9 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
     s.option_labels = {o.label: o.product.sku for o in opts.options}
     best, value, step = opts.by_role("best"), opts.by_role("value"), opts.by_role("step")
     s.shortlist = [o.product.sku for o in (best, value, step) if o]
+    from chanakya.skills.tryon_flow import add_interest
+
+    add_interest(ctx, *s.shortlist)
     state.advance(s, Step.RECOMMEND)
     ctx.ev(
         "options_shown",

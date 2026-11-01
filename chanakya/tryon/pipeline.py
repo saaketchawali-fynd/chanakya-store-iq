@@ -98,15 +98,21 @@ def _prepare(req: TryonRequest, res: TryonResult) -> _Prepared | None:
         res.needs_wall_width = True
         return None
     res.perspective = sc.wall.perspective
-    category = (req.products[0].category if req.products else "tv") or "tv"
-    placed = place.plan(category, req.products, sc.wall, room, req.niche_width_cm)
+    cats = list(dict.fromkeys((p.category or "tv") for p in req.products)) or ["tv"]
+    category = cats[0]
+    placed, composite = [], img
+    for cat in cats:  # e.g. a TV and an AC on the same wall: each type is planned and drawn in turn
+        group = place.plan(cat, [p for p in req.products if (p.category or "tv") == cat], sc.wall, room,
+                           req.niche_width_cm)
+        if group:
+            composite = render.compose(composite, cat, group, sc.wall, room, req.niche_width_cm)
+            placed += group
     if not placed:
         raise ValueError("no product with usable dimensions")
     primary = next((p for p in placed if p.solid), placed[0])
     res.px_per_cm = round(sc.wall.scale_at(primary.rect[0], primary.rect[1])[0], 4)
     res.planned = [(p.sku, p.box) for p in placed]
     res.quads = [(p.sku, p.quad) for p in placed]
-    composite = render.compose(img, category, placed, sc.wall, room, req.niche_width_cm)
     return _Prepared(category, placed, composite, sc, room)
 
 

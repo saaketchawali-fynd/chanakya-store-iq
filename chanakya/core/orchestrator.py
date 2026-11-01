@@ -153,6 +153,8 @@ class Orchestrator:
                 )
                 if job == "tryon":
                     reply = await asyncio.wait_for(tryon_flow.job(ctx), timeout=30)
+                elif job == "room_read":
+                    reply = await asyncio.wait_for(tryon_flow.prefetch(ctx), timeout=25)
                 else:
                     return
             except Exception:
