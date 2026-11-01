@@ -94,7 +94,7 @@ async def digest(ctx: SkillContext, to: str | None = None) -> Reply:
         },
         {"label": ctx.t("kpi_minute"), "value_str": n(statistics.median(minutes), "calc:digest") if minutes else "–"},
         {"label": ctx.t("kpi_parivaar"), "value_str": n(parivaar, "calc:digest")},
-        {"label": ctx.t("kpi_install"), "value_str": f"{n(inst_ok, 'calc:digest')} ✓ · {n(inst_bad, 'calc:digest')} ✗"},
+        {"label": ctx.t("kpi_install"), "value_str": f"{n(inst_ok, 'calc:digest')} ok · {n(inst_bad, 'calc:digest')} issue"},
         {"label": ctx.t("kpi_expert_open"), "value_str": n(expert_open, "calc:digest")},
     ]
     ctx.reg.static("14")

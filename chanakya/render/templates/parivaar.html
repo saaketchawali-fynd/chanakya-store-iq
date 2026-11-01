@@ -1,34 +1,119 @@
 {% extends "base.html" %}
+{# Sent to the customer's family: try-on photo (or product), why it suits, key specs, full cost, offer/EMI/delivery. #}
+{% set specs = (key_specs|aslist)[:4] %}
+{% set rows = (cost_rows|aslist)[:5] %}
+{% set why = (reasons|aslist)[:3] %}
+{% set last_strong = namespace(i=-1) %}
+{% for r in rows %}{% if r.strong %}{% set last_strong.i = loop.index0 %}{% endif %}{% endfor %}
 {% block style %}
-  .hero { background: #fff; border-radius: 22px; padding: 16px; margin-bottom: 18px; }
-  .hero img { width: 100%; max-height: 250px; object-fit: contain; display: block; border-radius: 14px; }
-  .ptitle { font-size: 40px; font-weight: 800; color: var(--indigo); margin-bottom: 6px; }
-  .reason { display: flex; gap: 16px; align-items: flex-start; padding: 6px 0; font-size: 31px; }
-  .reason .tick { color: var(--green); font-weight: 900; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
-  .cell { background: #fff; border-radius: 20px; padding: 18px 22px; font-size: 28px; }
-  .cell .k { font-size: 22px; font-weight: 900; color: var(--saffron); text-transform: uppercase; letter-spacing: 1px; }
-  .cell.wide { grid-column: span 2; }
-  .from { margin-top: 20px; font-size: 26px; color: var(--muted); text-align: center; }
+  .hero { padding: 0; overflow: hidden; }
+  .media { position: relative; }
+  .media .photo { display: block; width: 100%; height: 360px; object-fit: cover; object-position: 50% 42%; }
+  .media .stage { height: 340px; border-radius: 0; align-items: flex-start; padding-top: 22px; }
+  .media .stage img { max-width: 64%; max-height: 66%; }
+  .specbar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: rgba(255,255,255,.94); }
+  .media .specbar { position: absolute; left: 0; right: 0; bottom: 0; border-top: 1px solid rgba(27,42,74,.06); }
+  .spec { padding: 13px 18px 13px 26px; border-left: 2px solid var(--line); min-width: 0; }
+  .spec:first-child { border-left: none; }
+  .spec .k { display: block; font-size: 20px; font-weight: 700; color: var(--muted); line-height: 1.3; }
+  .spec .v { display: block; font-size: 27px; font-weight: 800; color: var(--ink); line-height: 1.25;
+              }
+  .sub.prod { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 33px; font-weight: 700; margin-top: 12px; }
+  .sub.prod .ic { color: #F4A86F; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; align-items: stretch; }
+  .duo.one { grid-template-columns: 1fr; }
+  .duo .card { padding: 24px 28px; }
+  .reasons .rs { display: flex; align-items: flex-start; gap: 14px; padding: 9px 0; font-size: 28px; line-height: 1.36; }
+  .reasons .rs + .rs { border-top: 2px solid var(--line); }
+  .chk { width: 36px; height: 36px; background: var(--green); color: #fff; margin-top: 2px; }
+  .cost .crow { display: flex; justify-content: space-between; align-items: baseline; gap: 18px; padding: 9px 0;
+                font-size: 26px; line-height: 1.3; color: var(--muted); }
+  .cost .crow + .crow { border-top: 2px solid var(--line); }
+  .cost .crow .v { color: var(--text); font-weight: 700; white-space: nowrap; font-size: 28px; }
+  .cost .crow.strong { color: var(--ink); font-weight: 700; }
+  .cost .crow.strong .v { font-weight: 800; font-size: 32px; color: var(--ink); }
+  .cost .crow.total { background: var(--green-pale); color: var(--green-deep); border-radius: 18px; padding: 14px 16px;
+                      margin: 10px -14px 0; border-top: none; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .cost .crow.total .v { color: var(--green-deep); font-size: 40px; }
+  .cost .crow.solo { justify-content: flex-start; }
+  .extras { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin-top: 18px; padding: 22px 10px; }
+  .ex { padding: 0 20px; border-left: 2px solid var(--line); min-width: 0; }
+  .ex:first-child { border-left: none; }
+  .ex .top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .ex .bubble { width: 42px; height: 42px; background: var(--saffron-pale); color: var(--saffron-deep); }
+  .ex .k { font-size: 23px; font-weight: 800; color: var(--muted); }
+  .ex .k.dv { font-size: 24px; font-weight: 700; }
+  .ex .v { font-size: 25px; line-height: 1.34; color: var(--text); font-weight: 600; }
+  .from { display: flex; align-items: center; gap: 18px; padding: 20px 56px 28px; }
+  .avatar { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #F29A56, #DD6A1E);
+            color: #fff; font-size: 28px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
+  .from .who { font-size: 24px; color: var(--muted); line-height: 1.3; }
+  .from .who b { color: var(--ink); font-size: 28px; }
+  .from .store { font-size: 22px; color: var(--faint); }
 {% endblock %}
-{% block band %}
-  <div class="kicker">Reliance Digital · Chanakya</div>
-  <h1>{{ title|default('', true) }}</h1>
+{% block brand_tail %} <span class="soft">· {{ L.brand_sub_customer|default('Reliance Digital') }}</span>{% endblock %}
+{% block hd_class %}{% if image or specs %} lift{% endif %}{% endblock %}
+{% block header %}
+  {% set ttl = title or product_title or '' %}
+  {% if title and L.kicker %}<div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>{% endif %}
+  <h1 class="{{ ttl|dv }}">{{ ttl }}</h1>
+  {% if title and product_title %}<div class="sub prod">{{ icon('sparkle', 30) }}<span >{{ product_title }}</span></div>{% endif %}
 {% endblock %}
+{% macro specbar() %}
+  <div class="specbar">{% for s in specs %}<div class="spec"><span class="k{{ s.label|dv }}">{{ s.label }}</span><span class="v num">{{ s.value }}</span></div>{% endfor %}</div>
+{% endmacro %}
 {% block content %}
-  {% if image %}<div class="hero"><img src="{{ image }}"></div>{% endif %}
-  <div class="ptitle">{{ product_title|default('', true) }}</div>
-  {% if reasons %}
-  <div class="label">{{ L.reasons }}</div>
-  {% for r in reasons[:3] %}<div class="reason"><span class="tick">✓</span><span>{{ r }}</span></div>{% endfor %}
+  {% if image or specs %}
+  <section class="hero card">
+    {% if image %}
+    <div class="media">
+      {% if image_is_photo %}<img class="photo" src="{{ image }}" alt="">{% else %}<div class="stage"><img src="{{ image }}" alt=""></div>{% endif %}
+      {% if specs %}{{ specbar() }}{% endif %}
+    </div>
+    {% else %}{{ specbar() }}{% endif %}
+  </section>
   {% endif %}
-  <div class="grid">
-    {% if cost_text %}<div class="cell wide"><div class="k">{{ L.cost }}</div>{{ cost_text }}</div>{% endif %}
-    {% if offer_text %}<div class="cell"><div class="k">{{ L.offer }}</div>{{ offer_text }}</div>{% endif %}
-    {% if delivery_text %}<div class="cell"><div class="k">{{ L.delivery }}</div>{{ delivery_text }}</div>{% endif %}
-    {% if finance_text %}<div class="cell wide"><div class="k">{{ L.finance }}</div>{{ finance_text }}</div>{% endif %}
-  </div>
+
+  {% set extras = [] %}
+  {% if offer_text %}{% set _ = extras.append(('tag', L.offer, offer_text)) %}{% endif %}
+  {% if finance_text %}{% set _ = extras.append(('card', L.finance, finance_text)) %}{% endif %}
+  {% if delivery_text %}{% set _ = extras.append(('truck', L.delivery, delivery_text)) %}{% endif %}
+  {% if why or rows %}
+  <section class="duo{% if not (why and rows) %} one{% endif %}">
+    {% if why %}
+    <div class="card reasons">
+      <div class="label{{ L.reasons|dv }}">{{ icon('home', 26) }}{{ L.reasons }}</div>
+      {% for r in why %}<div class="rs"><span class="bubble chk">{{ icon('check', 22, '', 3) }}</span><span>{{ r }}</span></div>{% endfor %}
+    </div>
+    {% endif %}
+    {% if rows %}
+    <div class="card cost">
+      <div class="label{{ L.cost|dv }}">{{ icon('rupee', 26) }}{{ L.cost }}</div>
+      {% for r in rows %}
+      <div class="crow num{% if r.strong %} strong{% endif %}{% if loop.index0 == last_strong.i and loop.last and rows|length > 1 %} total{% endif %}{% if not r.label or not r.value %} solo{% endif %}">
+        {% if r.label %}<span class="k">{{ r.label }}</span>{% endif %}{% if r.value %}<span class="v">{{ r.value }}</span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+  {% endif %}
+  {% if extras %}
+  <section class="card extras">
+    {% for ic, k, v in extras %}
+    <div class="ex"><div class="top"><span class="bubble">{{ icon(ic, 23) }}</span><span class="k{{ k|dv }}">{{ k }}</span></div><div class="v">{{ v }}</div></div>
+    {% endfor %}
+  </section>
+  {% endif %}
+{% endblock %}
+{% block footer %}
   {% if associate_name or store_name %}
-  <div class="from">{{ L.from }}: <b>{{ associate_name|default('', true) }}</b>{% if store_name %} · {{ store_name }}{% endif %}</div>
-  {% endif %}
+  <footer class="from">
+    <span class="avatar">{{ (associate_name or store_name)|initial }}</span>
+    <div>
+      <div class="who{{ L.from|dv }}">{{ L.from }}{% if associate_name %} · <b>{{ associate_name }}</b>{% endif %}</div>
+      {% if store_name %}<div class="store">{{ store_name }}</div>{% endif %}
+    </div>
+  </footer>
+  {% else %}{{ super() }}{% endif %}
 {% endblock %}

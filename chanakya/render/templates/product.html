@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{# Product detail after a label scan: image, fit badge, key specs, highlights, pros/cons, price/offer/stock. #}
+{% set specs = (key_specs|aslist)[:6] %}
+{% set feats = (features|aslist)[:4] %}
+{% set ups = (pros|aslist)[:4] %}
+{% set downs = (cons|aslist)[:3] %}
+{% set kind = badge_kind if badge_kind in ('good', 'partial', 'poor') else 'neutral' %}
+{% block style %}
+  .hd-row { align-items: flex-end; }
+  .verdict { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; margin-bottom: 6px; }
+  .badge2 { display: inline-flex; align-items: center; gap: 10px; font-size: 25px; font-weight: 800; padding: 10px 18px;
+            border-radius: 999px; background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.18); }
+  .badge2.good { background: #2E8B57; border-color: #2E8B57; }
+  .badge2.partial { background: #E8833A; border-color: #E8833A; }
+  .badge2.poor { background: #C2453D; border-color: #C2453D; }
+  .fitline { display: inline-flex; align-items: center; gap: 10px; font-size: 22px; color: #C6CFE2; font-weight: 600; }
+  .fitline b { color: #fff; font-size: 26px; }
+  .meter { width: 80px; height: 10px; border-radius: 99px; background: rgba(255,255,255,.18); overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: #45C486; }
+  .hero { padding: 0; overflow: hidden; }
+  .hero .stage { height: 250px; border-radius: 30px 30px 0 0; }
+  .hero .stage img { max-width: 60%; max-height: 88%; }
+  .hero .feats { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 24px 20px; }
+  .hero.noimg .feats { padding-top: 24px; }
+  .specs { display: grid; grid-template-columns: repeat(3, 1fr); padding: 6px 10px; }
+  .specs.n2, .specs.n4 { grid-template-columns: repeat(2, 1fr); }
+  .specs.n1 { grid-template-columns: 1fr; }
+  .sp { padding: 12px 22px; border-left: 2px solid var(--line); }
+  .specs.n3 .sp:nth-child(3n+1), .specs.n5 .sp:nth-child(3n+1), .specs.n6 .sp:nth-child(3n+1),
+  .specs.n2 .sp:nth-child(2n+1), .specs.n4 .sp:nth-child(2n+1), .specs.n1 .sp { border-left: none; }
+  .sp .k { display: block; font-size: 21px; font-weight: 700; color: var(--muted); }
+  .sp .v { display: block; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.28; margin-top: 2px; }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+  .duo.one { grid-template-columns: 1fr; }
+  .duo .card { padding: 22px 26px; }
+  .pc { display: flex; align-items: flex-start; gap: 12px; padding: 5px 0; font-size: 26px; line-height: 1.34; }
+  .pc .bubble { width: 34px; height: 34px; margin-top: 2px; }
+  .pros .bubble { background: var(--green); color: #fff; }
+  .pros .label .ic { color: var(--green); }
+  .cons .bubble { background: var(--saffron-pale); color: var(--saffron-deep); }
+  .cons .label .ic { color: var(--saffron); }
+  .buy { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-top: 18px; padding: 18px 28px; }
+  .buy .price { font-size: 42px; font-weight: 800; color: var(--ink); letter-spacing: -.5px; }
+  .buy .stock { display: inline-flex; align-items: center; gap: 10px; font-size: 25px; color: var(--muted); }
+  .buy .stock .ic { color: var(--green); }
+  .buy .stock .ic.i-truck { color: var(--saffron); }
+  .buy .stock .ic.i-alert { color: var(--red); }
+  .note { font-size: 21px; color: var(--faint); }
+{% endblock %}
+{% block hd_class %}{% if image or feats %} lift{% endif %}{% endblock %}
+{% block header %}
+  <div class="hd-row">
+    <div class="grow">
+      <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+      <h1 class="{{ title|dv }}">{{ title or L.kicker }}</h1>
+    </div>
+    {% if badge or fit_str %}
+    <div class="verdict">
+      {% if badge %}<span class="badge2 {{ kind }}{{ badge|dv }}">{{ icon({'good': 'check-circle', 'partial': 'alert', 'poor': 'x'}.get(kind, 'info'), 26, '', 2.4) }}{{ badge }}</span>{% endif %}
+      {% if fit_str %}{% set v = fit_str|pct %}<span class="fitline{{ L.fit|dv }}">{% if v is not none %}<span class="meter"><i style="width: {{ v|round|int }}%"></i></span>{% endif %}<b class="num">{{ fit_str }}</b>{{ L.fit }}</span>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+{% endblock %}
+{% block content %}
+  {% if image or feats %}
+  <section class="card hero{% if not image %} noimg{% endif %}">
+    {% if image %}<div class="stage"><img src="{{ image }}" alt=""></div>{% endif %}
+    {% if feats %}<div class="feats">{% for f in feats %}<span class="chip indigo">{{ icon('sparkle', 20) }}{{ f }}</span>{% endfor %}</div>{% endif %}
+  </section>
+  {% endif %}
+  {% if specs %}
+  <section class="sec">
+    <div class="label{{ L.specs|dv }}">{{ icon('list', 26) }}{{ L.specs }}</div>
+    <div class="card specs n{{ specs|length }}">
+      {% for s in specs %}<div class="sp"><span class="k">{{ s.label }}</span><span class="v num">{{ s.value }}</span></div>{% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% if ups or downs %}
+  <section class="duo{% if not (ups and downs) %} one{% endif %}">
+    {% if ups %}
+    <div class="card pros">
+      <div class="label{{ L.pros|dv }}">{{ icon('check-circle', 26) }}{{ L.pros }}</div>
+      {% for x in ups %}<div class="pc"><span class="bubble">{{ icon('check', 20, '', 3) }}</span><span>{{ x }}</span></div>{% endfor %}
+    </div>
+    {% endif %}
+    {% if downs %}
+    <div class="card cons">
+      <div class="label{{ L.cons|dv }}">{{ icon('alert', 26) }}{{ L.cons }}</div>
+      {% for x in downs %}<div class="pc"><span class="bubble">{{ icon('alert', 20, '', 2.4) }}</span><span>{{ x }}</span></div>{% endfor %}
+    </div>
+    {% endif %}
+  </section>
+  {% endif %}
+  {% if price_str or offer_text or stock_line %}
+  <section class="card buy">
+    {% if price_str %}<span class="price num">{{ price_str }}</span>{% endif %}
+    {% if offer_text %}<span class="chip saffron">{{ icon('tag', 22) }}{{ offer_text }}</span>{% endif %}
+    {% if stock_line %}<span class="stock">{{ icon(stock_line|stock_icon, 24) }}{{ stock_line }}</span>{% endif %}
+  </section>
+  {% endif %}
+{% endblock %}
+{% block foot_left %}{% if note %}<span class="note">{{ note }}</span>{% else %}{{ super() }}{% endif %}{% endblock %}

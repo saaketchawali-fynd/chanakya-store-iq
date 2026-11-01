@@ -28,7 +28,7 @@ def test_lines_buttons_titles():
 
 def test_coach_needs_kyun_and_known_cite():
     reg = NumberRegistry()
-    ok = OutMessage(to="1", kind="text", body='🗣 Bolo: "x"\n💡 Kyun: y', coach=True, why_cites=["room_light"])
+    ok = OutMessage(to="1", kind="text", body='*Bolo*: "x"\n*Kyun*: y', coach=True, why_cites=["room_light"])
     assert not validator.check(ok, reg, _home(), "hi", BANNED).fatal
     bad = ok.model_copy(update={"why_cites": ["mounting"]})
     assert validator.check(bad, reg, _home(), "hi", BANNED).fatal

@@ -21,6 +21,15 @@ class _SafeDict(dict):
         return "{" + key + "}"
 
 
+_EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF\u2B50\u23F0-\u23FF\uFE0F]")
+
+
+def clean(text: str) -> str:
+    """No emojis in anything Chanakya writes: strip pictographs and tidy the spaces they leave."""
+    out = _EMOJI.sub("", text or "")
+    return "\n".join(" ".join(line.split()) for line in out.split("\n"))
+
+
 @lru_cache
 def strings() -> dict[str, dict[str, str]]:
     out: dict[str, dict[str, str]] = {}
@@ -29,7 +38,7 @@ def strings() -> dict[str, dict[str, str]]:
         if p.exists():
             data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
             out.update(data)
-    return out
+    return {k: {lg: clean(v) if isinstance(v, str) else v for lg, v in d.items()} for k, d in out.items()}
 
 
 def reload_strings() -> None:

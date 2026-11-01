@@ -6,3 +6,5 @@ latency.csv
 __pycache__
 .pytest_cache
 .ruff_cache
+data/labels
+sim.db

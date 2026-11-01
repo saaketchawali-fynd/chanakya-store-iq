@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{# Associate reference list: up to 6 products. ≤ 4 items → tiles (2 per row), 5–6 → compact rows. #}
+{% set its = (items|aslist)[:6] %}
+{% set compact = its|length > 4 %}
+{% block style %}
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .tile { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .tile .stage { height: 230px; border-radius: 30px 30px 0 0; }
+  .tile .stage img { max-width: 82%; max-height: 84%; }
+  .tile .body { padding: 20px 26px 22px; display: flex; flex-direction: column; flex: 1; }
+  .tile.wide { grid-column: span 2; flex-direction: row; }
+  .tile.wide .stage { width: 430px; height: auto; min-height: 250px; border-radius: 30px 0 0 30px; }
+  .tile.wide .body { padding: 26px 32px; }
+  .t { font-size: 31px; line-height: 1.2; font-weight: 800; color: var(--ink); }
+  .specs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .specs span { font-size: 22px; font-weight: 600; color: var(--text); background: #F2EFEA; padding: 6px 12px;
+                border-radius: 10px; line-height: 1.25; }
+  .stock { display: flex; align-items: center; gap: 9px; margin-top: 12px; font-size: 23px; color: var(--muted); }
+  .stock .ic { color: var(--green); }
+  .stock .ic.i-truck { color: var(--saffron); }
+  .stock .ic.i-alert { color: var(--red); }
+  .bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto;
+            padding-top: 14px; }
+  .price { font-size: 34px; font-weight: 800; color: var(--ink); letter-spacing: -.3px; white-space: nowrap; }
+  .offer { display: inline-flex; align-items: center; gap: 7px; font-size: 21px; font-weight: 700; color: var(--saffron-deep);
+           background: var(--saffron-pale); padding: 6px 12px; border-radius: 999px; max-width: 100%; }
+  .noprice { font-size: 22px; color: var(--faint); font-weight: 600; }
+  .list { padding: 8px 30px; }
+  .item { display: flex; align-items: center; gap: 24px; padding: 13px 0; border-bottom: 2px solid var(--line); }
+  .item:last-child { border-bottom: none; }
+  .item .stage { width: 192px; height: 122px; flex: none; border-radius: 20px; }
+  .item .stage img { max-width: 86%; max-height: 84%; }
+  .item .mid { flex: 1; min-width: 0; }
+  .item .t { font-size: 29px; }
+  .item .specs { margin-top: 8px; }
+  .item .specs span { font-size: 20px; padding: 4px 10px; }
+  .item .stock { margin-top: 8px; font-size: 21px; }
+  .item .right { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; max-width: 250px; }
+  .item .price { font-size: 31px; }
+  .empty { text-align: center; color: var(--muted); padding: 60px 20px; }
+  .empty .ic { color: var(--faint); margin-bottom: 12px; }
+  .ph { color: #C9C2B6; }
+{% endblock %}
+{% block header %}
+  <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+  {% set ttl = title or L.title %}
+  <h1 class="{{ ttl|dv }}">{{ ttl }}</h1>
+  {% if subtitle %}<div class="sub{{ subtitle|dv }}">{{ subtitle }}</div>{% endif %}
+{% endblock %}
+{% macro img(it, size) %}{% if it.image %}<img src="{{ it.image }}" alt="">{% else %}{{ icon('box', size, 'ph', 1.4) }}{% endif %}{% endmacro %}
+{% macro offer(it) %}{% if it.offer_badge %}<span class="offer{{ it.offer_badge|dv }}">{{ icon('tag', 20) }}{{ it.offer_badge }}</span>{% endif %}{% endmacro %}
+{% block content %}
+  {% if not its %}
+  <div class="card empty">{{ icon('box', 64) }}<div>{{ L.empty }}</div></div>
+  {% elif compact %}
+  <div class="card list">
+    {% for it in its %}
+    <div class="item">
+      <div class="stage">{{ img(it, 60) }}</div>
+      <div class="mid">
+        <div class="t">{{ it.title }}</div>
+        {% if it.specs %}<div class="specs">{% for s in (it.specs|aslist)[:3] %}{% if s %}<span>{{ s }}</span>{% endif %}{% endfor %}</div>{% endif %}
+        {% if it.stock_line %}<div class="stock">{{ icon(it.stock_line|stock_icon, 22) }}<span >{{ it.stock_line }}</span></div>{% endif %}
+      </div>
+      <div class="right">
+        {% if it.price_str %}<span class="price num">{{ it.price_str }}</span>{% endif %}
+        {{ offer(it) }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="grid">
+    {% for it in its %}
+    <div class="tile card{% if loop.last and its|length is odd %} wide{% endif %}">
+      <div class="stage">{{ img(it, 90) }}</div>
+      <div class="body">
+        <div class="t">{{ it.title }}</div>
+        {% if it.specs %}<div class="specs">{% for s in (it.specs|aslist)[:3] %}{% if s %}<span>{{ s }}</span>{% endif %}{% endfor %}</div>{% endif %}
+        {% if it.stock_line %}<div class="stock">{{ icon(it.stock_line|stock_icon, 23) }}<span >{{ it.stock_line }}</span></div>{% endif %}
+        {% if it.price_str or it.offer_badge %}
+        <div class="bottom">
+          {% if it.price_str %}<span class="price num">{{ it.price_str }}</span>{% endif %}
+          {{ offer(it) }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endblock %}

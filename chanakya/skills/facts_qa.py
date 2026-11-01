@@ -126,7 +126,7 @@ async def answer(ctx: SkillContext, question: str) -> Reply | None:
     name = ctx.reg.raw(p.model, f"product:{p.sku}")
     ctx.ev("fact_answered", sources=[f"spec:{p.sku}:{field}"], sku=p.sku, field=field)
     body = (
-        f"📋 {name} · {ctx.reg.static(PV.label(field, ctx.lang, customer=False))}: {value}\n{ctx.t('fact_from_data')}"
+        f"*{name}* · {ctx.reg.static(PV.label(field, ctx.lang, customer=False))}: {value}\n{ctx.t('fact_from_data')}"
     )
     s = ctx.session
     btns = ([ctx.b("b_go", ctx.sid("go")), ctx.b("b_options", ctx.sid("options"))] if s else []) + [

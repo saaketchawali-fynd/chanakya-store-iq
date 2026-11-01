@@ -1,51 +1,66 @@
 {% extends "base.html" %}
+{# Manager card: today's KPIs, step heatmap per associate (0–2), and the biggest gap. #}
+{% set hm = heatmap or {} %}
+{% set steps = hm.steps|aslist %}
+{% set people = hm.associates|aslist %}
+{% set cells = hm.cells or [] %}
 {% block style %}
-  .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .kpi { background: #fff; border-radius: 20px; padding: 20px 24px; }
-  .kpi .v { font-size: 48px; font-weight: 800; color: var(--indigo); }
-  .kpi .k { font-size: 24px; color: var(--muted); }
-  table.hm { width: 100%; border-collapse: separate; border-spacing: 6px; font-size: 26px; }
-  table.hm th { font-weight: 700; color: var(--muted); font-size: 22px; text-align: center; }
-  table.hm th.name { text-align: left; }
-  table.hm td { height: 56px; border-radius: 10px; text-align: center; font-weight: 700; color: #fff; }
-  table.hm td.name { background: none; color: var(--text); text-align: left; font-weight: 600; }
-  .gap { background: var(--pale-orange); border-radius: 22px; padding: 22px 28px; font-size: 30px; }
+  .kpis { display: grid; grid-template-columns: repeat({{ [kpis|length, 4]|min if kpis else 1 }}, 1fr); gap: 16px; }
+  .kpi { background: var(--surface); border-radius: 26px; box-shadow: var(--shadow-sm); padding: 20px 22px; }
+  .kpi .v { font-size: 50px; font-weight: 800; color: var(--ink); line-height: 1.1; letter-spacing: -.5px; }
+  .kpi .k { font-size: 22px; color: var(--muted); margin-top: 6px; line-height: 1.3; font-weight: 600; }
+  .heat { padding: 22px 26px 18px; }
+  table { width: 100%; border-collapse: separate; border-spacing: 7px; table-layout: fixed; }
+  th { font-size: 19px; font-weight: 700; color: var(--muted); text-align: center; vertical-align: bottom; line-height: 1.2;
+       padding-bottom: 4px; word-break: break-word; }
+  th.nm, td.nm { width: 170px; text-align: left; }
+  td { height: 60px; border-radius: 14px; text-align: center; font-size: 25px; font-weight: 800; color: #fff; }
+  td.nm { color: var(--ink); font-weight: 700; font-size: 27px; background: none;  }
+  td.g { background: var(--green); } td.o { background: var(--saffron); } td.r { background: #D65A4E; }
+  td.na { background: #ECE8E1; color: var(--faint); }
+  .legend { display: flex; gap: 26px; justify-content: flex-end; margin: 10px 8px 0; font-size: 20px; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend i { width: 18px; height: 18px; border-radius: 6px; display: inline-block; }
+  .gap { display: flex; align-items: flex-start; gap: 18px; margin-top: 18px; padding: 22px 28px; border-radius: 26px;
+         background: var(--saffron-pale); }
+  .gap .bubble { width: 52px; height: 52px; background: #fff; color: var(--saffron-deep); }
+  .gap .k { display: block; font-size: 22px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--saffron-deep); }
+  .gap .k.dv { font-size: 24px; font-weight: 700; }
+  .gap .v { font-size: 29px; line-height: 1.36; color: var(--text); font-weight: 600; }
 {% endblock %}
-{% block band %}
-  <div class="kicker">Sabha</div>
-  <h1>{{ L.title }}</h1>
+{% block header %}
+  <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+  <h1 class="{{ L.title|dv }}">{{ L.title }}</h1>
 {% endblock %}
 {% block content %}
+  {% set kpis = kpis|aslist %}
   {% if kpis %}
-  <div class="kpis">
-    {% for k in kpis %}<div class="kpi"><div class="v">{{ k.value_str }}</div><div class="k">{{ k.label }}</div></div>{% endfor %}
-  </div>
+  <section class="kpis">
+    {% for k in kpis[:4] %}<div class="kpi"><div class="v num">{{ k.value_str }}</div><div class="k">{{ k.label }}</div></div>{% endfor %}
+  </section>
   {% endif %}
-  {% set hm = heatmap|default({}, true) %}
-  {% if hm and hm.associates %}
-  <div class="label">{{ L.heatmap }}</div>
-  <div class="panel">
-    <table class="hm">
-      <tr><th class="name"></th>{% for s in hm.steps|default([]) %}<th>{{ s }}</th>{% endfor %}</tr>
-      {% for a in hm.associates %}
-      {% set row = (hm.cells|default([]))[loop.index0] if loop.index0 < (hm.cells|default([]))|length else [] %}
-      <tr><td class="name">{{ a }}</td>
-        {% for s in hm.steps|default([]) %}
-        {% set c = row[loop.index0] if loop.index0 < row|length else None %}
-        {% if c is none %}<td style="background:#D9D6D0">–</td>
-        {% else %}
-          {% set v = c|float %}
-          {% if v >= 1.5 %}{% set col = '#2E8B57' %}{% elif v >= 0.75 %}{% set col = '#E8833A' %}{% else %}{% set col = '#C94A4A' %}{% endif %}
-          <td style="background: {{ col }}">{{ c }}</td>
-        {% endif %}
+  {% if people %}
+  <section class="sec">
+    <div class="label{{ L.heatmap|dv }}">{{ icon('users', 26) }}{{ L.heatmap }}</div>
+    <div class="card heat">
+      <table>
+        <tr><th class="nm"></th>{% for s in steps %}<th>{{ s }}</th>{% endfor %}</tr>
+        {% for a in people[:8] %}
+        {% set row = (cells[loop.index0] if loop.index0 < cells|length else []) or [] %}
+        <tr><td class="nm">{{ a }}</td>
+          {% for s in steps %}
+          {% set c = row[loop.index0] if loop.index0 < row|length else none %}
+          {% if c is none %}<td class="na">–</td>
+          {% else %}{% set v = c|float %}<td class="{{ 'g' if v >= 1.5 else ('o' if v >= 0.75 else 'r') }} num">{{ c }}</td>{% endif %}
+          {% endfor %}
+        </tr>
         {% endfor %}
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
+      </table>
+      <div class="legend"><span><i style="background:#2E8B57"></i>2</span><span><i style="background:#E8833A"></i>1</span><span><i style="background:#D65A4E"></i>0</span></div>
+    </div>
+  </section>
   {% endif %}
   {% if gaps_text %}
-  <div class="label">{{ L.gaps }}</div>
-  <div class="gap">{{ gaps_text }}</div>
+  <section class="gap"><span class="bubble">{{ icon('target', 28) }}</span><div><span class="k{{ L.gaps|dv }}">{{ L.gaps }}</span><span class="v">{{ gaps_text }}</span></div></section>
   {% endif %}
 {% endblock %}

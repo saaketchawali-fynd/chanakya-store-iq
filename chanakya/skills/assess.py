@@ -50,12 +50,9 @@ async def set_customer_lang(ctx: SkillContext, lang: str) -> Reply:
     if lang not in ("hi", "mr", "en"):
         lang = "hi"
     ctx.session.home.customer_lang = lang  # type: ignore[assignment]
-    btns = [
-        ctx.b("b_photo", ctx.sid("photo")),
-        ctx.b("b_help", encode("g", "help")),
-        ctx.b("b_status", encode("g", "status")),
-    ]
-    return ctx.reply(info_reply(ctx, ctx.t("speak_it_back"), btns))
+    m = info_reply(ctx, ctx.t("speak_it_back"))
+    m.footer = ctx.t("footer_voice_first")
+    return ctx.reply(m)
 
 
 def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voice") -> int:
@@ -128,17 +125,43 @@ async def on_info(
                 else None
             )
     else:
-        msgs.append(C.next_question_or_options(ctx))
-    msgs.append(C.home_card_message(ctx))
-    if (
-        not gate_before
-        and state.options_gate_open(s, pack)
-        and s.home.start_level_inr is None
-        and not s.extra.get("budget_asked")
-    ):
-        s.extra["budget_asked"] = True
-        msgs.append(C.budget_list(ctx))
+        msgs.append(C.next_question_or_options(ctx, footer=noted_footer(ctx, source)))
     return ctx.reply(*msgs)
+
+
+def noted_footer(ctx: SkillContext, source: str) -> str | None:
+    """After a voice/typed note: show what was understood ("Samjha: 10 ft · Dhoop · Cricket"), so a mishearing
+    is caught at once. Facts only from this note; fits WhatsApp's 60-character footer without cutting words."""
+    if source == "tap":
+        return None
+    pack = ctx.pack
+    nums, facts = [], []
+    for e in ctx.events:
+        if e.type != "slot_filled":
+            continue
+        sd = pack.slot(e.payload.get("slot")) if pack else None
+        if not sd:
+            continue
+        if e.payload.get("number") is not None and sd.number:
+            unit = {"seat_distance_ft": "ft", "room_size_sqft": "sq ft", "pipe_run_ft": "ft",
+                    "hours_per_day": "h", "niche_width_cm": "cm"}.get(sd.number, "")
+            nums.append(ctx.reg.num(e.payload["number"], f"card:{sd.id}", unit))
+        else:
+            facts.append(ctx.reg.static(sd.value_title(e.payload.get("value"), ctx.lang)))
+    home = ctx.session.home
+    if home.start_level_inr and home.start_level_source == "associate_voice" and not ctx.x.get("budget_noted"):
+        ctx.x["budget_noted"] = True
+        nums.append(ctx.reg.inr(home.start_level_inr, "card:start_level"))
+    facts = nums + facts  # numbers (distance, size, budget) first: they matter most
+    if not facts:
+        return None
+    out = ""
+    for f in facts:
+        cand = ctx.t("footer_noted", facts=(out + " · " + f) if out else f)
+        if len(cand) > 60:
+            break
+        out = (out + " · " + f) if out else f
+    return ctx.t("footer_noted", facts=out) if out else None
 
 
 async def tap_slot(ctx: SkillContext, slot: str, val: str) -> Reply:
@@ -170,6 +193,22 @@ async def set_budget(ctx: SkillContext, band_id: str) -> Reply:
         s.home.start_level_source = "none"
     s.extra["budget_asked"] = True
     return ctx.reply(C.next_question_or_options(ctx))
+
+
+async def photo_yes(ctx: SkillContext) -> Reply:
+    """Customer has a photo: ask for it, nothing else on screen."""
+    ctx.session.awaiting = "room_photo"
+    ctx.x["photo_asked"] = True
+    m = info_reply(ctx, ctx.t("room_photo_send"))
+    m.footer = ctx.t("footer_photo_skip")
+    return ctx.reply(m)
+
+
+async def photo_no(ctx: SkillContext) -> Reply:
+    """No photo: carry on with what the customer says."""
+    ctx.x["photo_asked"] = True
+    ctx.session.awaiting = None
+    return ctx.reply(C.next_question_or_options(ctx, footer=ctx.t("footer_photo_none")))
 
 
 async def photo_prompt(ctx: SkillContext) -> Reply:

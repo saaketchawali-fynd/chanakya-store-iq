@@ -1,0 +1,3 @@
+{"kind": "label", "brand": "Arka", "model_text": "Arka 55 4K", "category": "tv", "size_in": 55,
+ "specs": [{"name": "refresh_rate", "value": "60", "unit": "Hz"}, {"name": "brightness", "value": "350", "unit": "nits"}],
+ "confidence": 0.95}

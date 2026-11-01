@@ -1,4 +1,5 @@
-"""Ghar Mein Dekho (spec 17): blur people → read room → scale → place → (harmonise → verify) → annotate.
+"""Ghar Mein Dekho (spec 17): blur people → read room → true scale → place → render → (harmonise → verify)
+→ annotate.
 
 Pure image work, no DB and no number registry: the caller passes pre-formatted label strings.
 Never raises: failures come back in TryonResult.error with the best image available."""
@@ -13,7 +14,7 @@ from dataclasses import dataclass, field
 from PIL import Image, ImageOps
 
 from chanakya.ai.schemas import ImageRead
-from chanakya.tryon import annotate, harmonise, place, privacy, read_room, scale, verify
+from chanakya.tryon import annotate, harmonise, place, privacy, read_room, render, scale, verify
 
 MAX_WIDTH = 1080
 JPEG_QUALITY = 88
@@ -28,6 +29,8 @@ class TryonProduct:
     height_mm: float
     label: str  # e.g. '55" · Meru QLED Pro' (already formatted by caller)
     solid: bool  # True = primary (solid render), False = dashed saffron outline
+    dims_text: str | None = None  # e.g. '123 × 71 cm' (pre-formatted), second line of the label
+    mount: str = "wall"  # TV: wall | stand
 
 
 @dataclass
@@ -50,10 +53,14 @@ class TryonResult:
     harmonised: bool = False
     needs_wall_width: bool = False
     scale_confidence: float = 0.0
-    px_per_cm: float | None = None
+    px_per_cm: float | None = None  # at the primary product (scale varies across an oblique wall)
     ms: int = 0
     error: str | None = None
     planned: list[tuple[str, tuple[int, int, int, int]]] = field(default_factory=list)  # (sku, px box) for tests
+    scale_source: str | None = None  # existing_tv | wall_width | frame_width | door | ceiling | floor_tile | …
+    perspective: bool = False  # True when the wall corners gave a homography
+    quads: list[tuple[str, tuple[tuple[float, float], ...]]] = field(default_factory=list)  # (sku, TL TR BR BL)
+    label_boxes: list[tuple[str, tuple[int, int, int, int]]] = field(default_factory=list)
 
 
 def _jpeg(img: Image.Image) -> bytes:
@@ -66,63 +73,66 @@ def _load(photo: bytes) -> Image.Image:
     img = Image.open(io.BytesIO(photo))
     img = ImageOps.exif_transpose(img).convert("RGB")
     if img.width > MAX_WIDTH:
-        img = img.resize((MAX_WIDTH, round(img.height * MAX_WIDTH / img.width)), Image.LANCZOS)
+        img = img.resize((MAX_WIDTH, round(img.height * MAX_WIDTH / img.width)), Image.Resampling.LANCZOS)
     return img
 
 
-def _has_real_wall(read: ImageRead | None) -> bool:
-    return bool(read and read.kind == "room" and any(b.label == "wall" for b in read.boxes))
+@dataclass
+class _Prepared:
+    category: str
+    placed: list[place.Placed]
+    composite: Image.Image
+    sc: scale.Scale
+    room: read_room.Room
 
 
-def _prepare(req: TryonRequest, res: TryonResult):
+def _prepare(req: TryonRequest, res: TryonResult) -> _Prepared | None:
     img = _load(req.photo)
-    boxes = read_room.to_pixels(req.read, img.width, img.height)
-    img = privacy.blur_people(img, boxes.get("person"))
+    room = read_room.parse(req.read, img.width, img.height)
+    img = privacy.blur_people(img, room.boxes.get("person"))
     res.blurred_photo = _jpeg(img)
-    ppc, conf = scale.estimate(boxes, req.wall_width_ft)
-    res.px_per_cm, res.scale_confidence = ppc, conf
-    if ppc is None or conf < scale.MIN_CONFIDENCE:
+    sc = scale.estimate(room, req.wall_width_ft, req.existing_tv_size_in)
+    res.scale_confidence, res.scale_source = sc.confidence, sc.source
+    res.px_per_cm = sc.px_per_cm
+    if sc.wall is None or sc.confidence < scale.MIN_CONFIDENCE:
         res.needs_wall_width = True
         return None
+    res.perspective = sc.wall.perspective
     category = (req.products[0].category if req.products else "tv") or "tv"
-    wall = read_room.main_wall(boxes)
-    sofa = read_room.first(boxes, "sofa")
-    ceiling = read_room.first(boxes, "ceiling_line")
-    if sofa is not None:
-        floor_y = float(sofa[3])
-    elif _has_real_wall(req.read):
-        floor_y = float(wall[3])
-    else:
-        floor_y = None
-    ceiling_y = (ceiling[1] + ceiling[3]) / 2 if ceiling else None
-    placed = place.plan(category, req.products, wall, ppc, sofa, floor_y, ceiling_y)
+    placed = place.plan(category, req.products, sc.wall, room, req.niche_width_cm)
+    if not placed:
+        raise ValueError("no product with usable dimensions")
+    primary = next((p for p in placed if p.solid), placed[0])
+    res.px_per_cm = round(sc.wall.scale_at(primary.rect[0], primary.rect[1])[0], 4)
     res.planned = [(p.sku, p.box) for p in placed]
-    composite = place.compose(img, category, placed, ppc, req.niche_width_cm, req.products)
-    return category, placed, composite
+    res.quads = [(p.sku, p.quad) for p in placed]
+    composite = render.compose(img, category, placed, sc.wall, room, req.niche_width_cm)
+    return _Prepared(category, placed, composite, sc, room)
+
+
+def _annotated(req: TryonRequest, prep: _Prepared, img: Image.Image, res: TryonResult) -> bytes:
+    out, boxes = annotate.annotate(img, prep.placed, req.distance_text, req.footer_text, prep.sc.wall, prep.room)
+    res.label_boxes = boxes
+    return _jpeg(out)
 
 
 async def _run(req: TryonRequest, editor, do_harmonise: bool, res: TryonResult) -> None:
-    prepared = await asyncio.to_thread(_prepare, req, res)
-    if prepared is None:
+    prep = await asyncio.to_thread(_prepare, req, res)
+    if prep is None:
         return
-    category, placed, composite = prepared
     # keep a usable image from here on, even if a later step fails or times out
-    res.image = await asyncio.to_thread(
-        lambda: _jpeg(annotate.labels(composite, placed, req.distance_text, req.footer_text))
-    )
-    final = composite
-    if do_harmonise and editor is not None and category == "tv":
-        edited = await harmonise.run(editor, composite)
-        primary = next((p for p in placed if p.solid), placed[0] if placed else None)
+    res.image = await asyncio.to_thread(_annotated, req, prep, prep.composite, res)
+    final = prep.composite
+    if do_harmonise and editor is not None and prep.category == "tv":
+        edited = await harmonise.run(editor, prep.composite)
+        primary = next((p for p in prep.placed if p.solid), prep.placed[0] if prep.placed else None)
         if edited is not None and primary is not None:
-            ok = await asyncio.to_thread(verify.check, composite, edited, primary.box)
+            ok = await asyncio.to_thread(verify.check, prep.composite, edited, primary.box, primary.quad)
             if ok:
-                final = edited.resize(composite.size) if edited.size != composite.size else edited
+                final = edited.resize(prep.composite.size) if edited.size != prep.composite.size else edited
                 res.harmonised = res.verified = True
-    if final is not composite:
-        res.image = await asyncio.to_thread(
-            lambda: _jpeg(annotate.labels(final, placed, req.distance_text, req.footer_text))
-        )
+    if final is not prep.composite:
+        res.image = await asyncio.to_thread(_annotated, req, prep, final, res)
 
 
 async def run(req: TryonRequest, editor=None, harmonise: bool = False, timeout: float = 30) -> TryonResult:

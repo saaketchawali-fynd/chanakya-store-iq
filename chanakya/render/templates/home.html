@@ -1,34 +1,61 @@
 {% extends "base.html" %}
+{# Associate card: what we know about the customer's home, the start level, and what is still to ask. #}
+{% set k = known|default(0, true) %}{% set tot = total|default(0, true) %}
+{% set frac = ((k / tot) if tot else 0) %}
+{% set frac = 1 if frac > 1 else frac %}
 {% block style %}
-  .progress { height: 26px; background: #E8E2D8; border-radius: 999px; overflow: hidden; margin-top: 12px; }
-  .progress .fill { height: 100%; background: var(--green); border-radius: 999px; }
-  .pct { display: flex; justify-content: space-between; font-size: 28px; }
-  .missing span { display: inline-block; background: var(--pale-orange); color: #B4611F; font-size: 26px;
-                  padding: 6px 16px; border-radius: 999px; margin: 0 10px 10px 0; }
+  .ring { position: relative; width: 168px; height: 168px; flex: none; }
+  .ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .ring .c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring .n { font-size: 44px; font-weight: 800; line-height: 1; }
+  .ring .n small { font-size: 26px; color: #AFC0DD; font-weight: 700; }
+  .ring .l { font-size: 18px; color: #C6CFE2; margin-top: 6px; font-weight: 600; max-width: 120px; text-align: center; line-height: 1.2; }
+  .facts { padding: 14px 34px; }
+  .facts .rows .k { font-size: 27px; }
+  .facts .rows .v { font-size: 30px; }
+  .start { display: flex; align-items: center; gap: 20px; margin-top: 18px; padding: 22px 30px; }
+  .start .bubble { width: 56px; height: 56px; background: var(--saffron-pale); color: var(--saffron-deep); }
+  .start .k { display: block; font-size: 22px; font-weight: 800; color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase; }
+  .start .k.dv { font-size: 24px; font-weight: 700; }
+  .start .v { font-size: 33px; font-weight: 800; color: var(--ink); }
+  .ask { display: flex; flex-wrap: wrap; gap: 12px; }
+  .ask .chip { font-size: 27px; padding: 11px 20px 11px 14px; }
+  .ask .chip .ic { color: var(--saffron); }
 {% endblock %}
-{% block band %}
-  <div class="kicker">{{ L.title }}{% if category_label %} · {{ category_label }}{% endif %}</div>
-  <h1>{{ name|default('Customer', true) }}</h1>
+{% block header %}
+  <div class="hd-row">
+    <div class="grow">
+      {% set kk = L.title ~ (' · ' ~ category_label if category_label else '') %}
+      <div class="kicker{{ kk|dv }}">{{ kk }}</div>
+      <h1 class="{{ name|dv }}">{{ name or 'Customer' }}</h1>
+    </div>
+    <div class="ring">
+      <svg width="168" height="168" viewBox="0 0 168 168">
+        <circle cx="84" cy="84" r="70" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="14"/>
+        <circle cx="84" cy="84" r="70" fill="none" stroke="#45C486" stroke-width="14" stroke-linecap="round"
+                stroke-dasharray="439.8" stroke-dashoffset="{{ (439.8 * (1 - frac))|round(1) }}"/>
+      </svg>
+      <div class="c"><span class="n num">{{ known_str or k }}<small>/{{ total_str or tot }}</small></span><span class="l{{ L.progress|dv }}">{{ L.progress }}</span></div>
+    </div>
+  </div>
 {% endblock %}
 {% block content %}
-  {% set k = known|default(0) %}{% set tot = total|default(0) %}
-  <div class="pct"><span class="muted">{{ L.progress }}</span><b>{{ k }}/{{ tot }}</b></div>
-  <div class="progress"><div class="fill" style="width: {{ ((k / tot * 100) if tot else 0)|round|int }}%"></div></div>
-
+  {% set rows = rows|aslist %}{% set missing = missing|aslist %}
   {% if rows %}
-  <div class="label">{{ L.facts }}</div>
-  <div class="panel">
-    {% for r in rows %}
-    <div class="row"><span class="k">{{ r.label }}</span><span class="v">{{ r.value }}</span></div>
-    {% endfor %}
-  </div>
+  <section class="sec">
+    <div class="label{{ L.facts|dv }}">{{ icon('home', 26) }}{{ L.facts }}</div>
+    <div class="card facts rows">
+      {% for r in rows %}<div class="r"><span class="k">{{ r.label }}</span><span class="v">{{ r.value }}</span></div>{% endfor %}
+    </div>
+  </section>
   {% endif %}
-
-  <div class="label">{{ L.start_level }}</div>
-  <div class="panel">{{ start_level_text|default('—', true) }}</div>
-
+  {% if start_level_text %}
+  <section class="card start"><span class="bubble">{{ icon('rupee', 28) }}</span><div><span class="k{{ L.start_level|dv }}">{{ L.start_level }}</span><span class="v">{{ start_level_text }}</span></div></section>
+  {% endif %}
   {% if missing %}
-  <div class="label">{{ L.missing }}</div>
-  <div class="missing">{% for m in missing %}<span>{{ m }}</span>{% endfor %}</div>
+  <section class="sec">
+    <div class="label{{ L.missing|dv }}">{{ icon('help', 26) }}{{ L.missing }}</div>
+    <div class="ask">{% for m in missing %}<span class="chip saffron">{{ icon('help', 26) }}{{ m }}</span>{% endfor %}</div>
+  </section>
   {% endif %}
 {% endblock %}

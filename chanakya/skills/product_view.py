@@ -68,10 +68,10 @@ LABELS: dict[str, tuple[dict, str]] = {
     "series": ({"hi": "सीरीज़", "mr": "सिरीज", "en": "Series"}, ""),
 }
 KEY_SPECS = {
-    "tv": ["size_in", "panel", "refresh_hz", "brightness_nits"],
-    "ac": ["ton", "star", "noise_db", "wifi"],
-    "wm": ["capacity_kg", "load", "rpm", "heater"],
-    "laptop": ["cpu_tier", "ram_gb", "storage_gb", "weight_kg"],
+    "tv": ["size_in", "panel", "refresh_hz", "brightness_nits", "speaker_w", "warranty"],
+    "ac": ["ton", "star", "noise_db", "kwh_year", "wifi", "warranty"],
+    "wm": ["capacity_kg", "load", "rpm", "heater", "kwh_year", "warranty"],
+    "laptop": ["cpu", "ram_gb", "storage_gb", "battery_h", "weight_kg", "warranty"],
     "soundbar": ["speaker_w", "channels", "dialogue_enhance"],
 }
 UNIT_WORD = {

@@ -18,9 +18,12 @@ async def start_customer(h):
 
 
 async def test_coach_replies_carry_a_menu_hint(h):
-    out = await start_customer(h)
+    await start_customer(h)
+    out = await h.tap("s:C1:slot:mounting:wall")
+    await h.tap("s:C1:photo_no")
+    out = await h.tap("s:C1:slot:elders:yes")
     coach = next(m for m in out if m.coach)
-    assert coach.footer == "menu: naya customer · shuru se" and len(coach.footer) <= 60
+    assert coach.footer == "Tap karein ya voice note bhejein · menu" and len(coach.footer) <= 60
 
 
 async def test_menu_lists_new_end_restart(h):

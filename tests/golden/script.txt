@@ -5,7 +5,7 @@ tap g:new
 tap s:C1:lang:mr
 voice assess_1
 tap s:C1:slot:mounting:wall
-tap s:C1:photo
+tap s:C1:photo_yes
 photo room_living.jpg
 voice assess_2_claim
 photo label_meru55.jpg

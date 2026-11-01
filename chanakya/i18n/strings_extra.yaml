@@ -286,3 +286,38 @@ exit_done_short: {hi: "{who} band ✓", mr: "{who} बंद ✓", en: "{who} en
 restart_confirm: {hi: "{n} chalu customer band karke bilkul shuru se karein? (bhasha → brief → naya customer)", mr: "{n} चालू ग्राहक बंद करून अगदी सुरुवातीपासून? (भाषा → ब्रीफ → नवीन ग्राहक)", en: "Close {n} open customer(s) and start over? (language → brief → new customer)"}
 footer_menu: {hi: "menu: naya customer · shuru se", mr: "menu: नवीन ग्राहक · पुन्हा सुरू", en: "menu: new customer · start over"}
 help_body: {hi: "Voice note: customer ke ghar ki baat · Photo: label ya kamra\nNaya = naya customer · Khatam = score · 'shuru se' = bilkul shuru se", mr: "व्हॉइस नोट: ग्राहकाच्या घराबद्दल · फोटो: लेबल किंवा खोली\nनवीन = नवीन ग्राहक · संपलं = स्कोअर · 'पुन्हा सुरू' = अगदी सुरुवातीपासून", en: "Voice note: the customer's home · Photo: a label or the room\nNew = new customer · Done = score · 'start over' = from the very beginning"}
+
+# ---------- clean, emoji-free coaching format ----------
+label_bolo: {hi: "*Bolo*", mr: "*बोला*", en: "*Say*"}
+label_kyun: {hi: "*Kyun*", mr: "*का*", en: "*Why*"}
+st_demo_done: {hi: "Demo ho gaya", mr: "डेमो झाला", en: "Demo done"}
+st_demo_pending: {hi: "Demo baaki", mr: "डेमो बाकी", en: "Demo pending"}
+st_price_open: {hi: "Daam khula", mr: "किंमत खुली", en: "Price open"}
+st_price_locked: {hi: "Daam demo ke baad", mr: "किंमत डेमोनंतर", en: "Price after demo"}
+best_pick: {hi: "sabse sahi", mr: "सर्वात योग्य", en: "best fit"}
+footer_voice: {hi: "Tap karein ya voice note bhejein · menu", mr: "टॅप करा किंवा व्हॉइस नोट पाठवा · menu", en: "Tap an answer or send a voice note · menu"}
+footer_voice_first: {hi: "Voice note ya text, dono chalega", mr: "व्हॉइस नोट किंवा टेक्स्ट, दोन्ही चालेल", en: "Voice note or text, either works"}
+footer_photo_skip: {hi: "Photo nahi mili? Voice note se aage badhiye", mr: "फोटो मिळाला नाही? व्हॉइस नोटने पुढे चला", en: "No photo after all? Just continue by voice note"}
+footer_photo_none: {hi: "Theek hai, customer ki baaton se aage", mr: "ठीक आहे, ग्राहकाच्या बोलण्यावरून पुढे", en: "Fine, we'll go by what the customer says"}
+footer_photo_got: {hi: "Photo mil gayi, deewar par TV aa raha hai", mr: "फोटो मिळाला, भिंतीवर टीव्ही येतोय", en: "Got the photo; drawing the TV on their wall"}
+b_photo_yes: {hi: "Photo hai", mr: "फोटो आहे", en: "Has a photo"}
+b_photo_no: {hi: "Photo nahi hai", mr: "फोटो नाही", en: "No photo"}
+bolo_photo_ask: {hi: "क्या आपके फ़ोन में उस कमरे की फ़ोटो है? मैं आपकी दीवार पर टीवी दिखा देता हूँ।", mr: "तुमच्या फोनमध्ये त्या खोलीचा फोटो आहे का? मी तुमच्या भिंतीवर टीव्ही दाखवतो.", en: "Do you have a photo of that room on your phone? I can show the TV on your own wall."}
+kyun_photo_ask: {hi: "Apni deewar par sahi size dekh kar faisla aasaan hota hai", mr: "स्वतःच्या भिंतीवर योग्य आकार पाहून निर्णय सोपा होतो", en: "Seeing the true size on their own wall makes the choice easy"}
+room_photo_send: {hi: "Customer ke phone se kamre ki photo yahan bhejiye — deewar saamne se.", mr: "ग्राहकाच्या फोनवरून खोलीचा फोटो इथे पाठवा — भिंत समोरून.", en: "Send the room photo here from the customer's phone, taken facing the wall."}
+speak_it_back: {hi: "Customer ki baat unhe dohraate hue ek voice note bhejiye — ghar, kamra, kaun dekhega, budget.", mr: "ग्राहकाचं बोलणं त्यांना पुन्हा सांगत एक व्हॉइस नोट पाठवा — घर, खोली, कोण पाहणार, बजेट.", en: "Repeat the customer's needs back to them while recording one voice note: home, room, who watches, budget."}
+
+# ---------- label scan: product card, fit, compare ----------
+badge_good: {hi: "इस घर के लिए सही", mr: "या घरासाठी योग्य", en: "Fits this home"}
+badge_partial: {hi: "कुछ हद तक सही", mr: "काही प्रमाणात योग्य", en: "Partly fits"}
+badge_poor: {hi: "इस घर के लिए सही नहीं", mr: "या घरासाठी योग्य नाही", en: "Not a fit"}
+label_note: {hi: "लेबल से · मॉडल {model}", mr: "लेबलवरून · मॉडेल {model}", en: "Read from the label · model {model}"}
+kyun_label_gate: {hi: "Fit batane ke liye ghar ki {n} aur baatein chahiye — pehle sawaal", mr: "फिट सांगण्यासाठी घराच्या आणखी {n} गोष्टी हव्यात — आधी प्रश्न", en: "Need {n} more home facts before judging fit; ask first"}
+compare_title: {hi: "दोनों की तुलना", mr: "दोघांची तुलना", en: "Side by side"}
+compare_verdict: {hi: "इस घर के लिए {name} बेहतर", mr: "या घरासाठी {name} जास्त योग्य", en: "{name} suits this home better"}
+compare_body_fit: {hi: "{a} vs {b}: is ghar ke liye {winner} behtar. Card customer ko dikhaiye.", mr: "{a} vs {b}: या घरासाठी {winner} जास्त योग्य. कार्ड ग्राहकाला दाखवा.", en: "{a} vs {b}: {winner} suits this home better. Show the card to the customer."}
+compare_body_nofit: {hi: "{a} vs {b}: specs saath mein. Fit ke liye ghar ke aur sawaal poochhiye.", mr: "{a} vs {b}: स्पेक्स शेजारी. फिटसाठी घराचे आणखी प्रश्न विचारा.", en: "{a} vs {b}: specs side by side. Ask more home questions to judge fit."}
+compare_send: {hi: "Doosre model ke label ki photo bhejiye.", mr: "दुसऱ्या मॉडेलच्या लेबलचा फोटो पाठवा.", en: "Send a photo of the second model's label."}
+footer_compare: {hi: "Dono ki tulna is ghar ke hisaab se", mr: "दोघांची तुलना या घरानुसार", en: "Compared for this home"}
+bolo_label_intro: {hi: "यह {product} है — खास बातें कार्ड पर हैं। आपके घर के बारे में दो सवाल पूछूँ, ताकि सही फ़िट बता सकूँ?", mr: "हा {product} आहे — खास गोष्टी कार्डवर आहेत. तुमच्या घराबद्दल दोन प्रश्न विचारू का, म्हणजे योग्य फिट सांगता येईल?", en: "This is the {product}; the highlights are on the card. May I ask two questions about your home to judge the fit?"}
+footer_noted: {hi: "Samjha: {facts}", mr: "समजलं: {facts}", en: "Noted: {facts}"}

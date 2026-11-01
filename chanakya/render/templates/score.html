@@ -1,32 +1,74 @@
 {% extends "base.html" %}
+{# Associate card after a conversation: score ring, the 7 steps (0–2 each), best moment, next-time tip. #}
+{% set st = steps|aslist %}
+{% set got = namespace(v=0) %}{% for s in st %}{% set got.v = got.v + ((s.points|default(0, true))|int) %}{% endfor %}
+{% set f = score_str|frac %}
+{% if f is none %}{% set f = (got.v / (2 * st|length)) if st else 0 %}{% endif %}
 {% block style %}
-  .big { font-size: 120px; font-weight: 900; color: var(--indigo); text-align: center; line-height: 1; }
-  .level { text-align: center; font-size: 36px; font-weight: 700; color: var(--green); margin: 10px 0 24px; }
-  .step { display: flex; justify-content: space-between; align-items: center; padding: 12px 0;
-          border-bottom: 2px solid #EFEAE2; }
-  .step:last-child { border-bottom: none; }
-  .dots span { display: inline-block; width: 34px; height: 34px; border-radius: 50%; margin-left: 10px;
-               background: #E4DED4; }
-  .dots span.on { background: var(--green); }
-  .note { border-radius: 22px; padding: 22px 28px; margin-top: 18px; font-size: 30px; }
-  .note.p { background: var(--pale-green); }
-  .note.t { background: var(--pale-orange); }
-  .note b { display: block; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; color: var(--saffron); }
+  .summary { display: flex; align-items: center; gap: 34px; padding: 26px 34px; }
+  .ring { position: relative; width: 196px; height: 196px; flex: none; }
+  .ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .ring .c { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+             font-size: 43px; font-weight: 800; color: var(--ink); letter-spacing: -1px; }
+  .summary .lv { font-size: 40px; font-weight: 800; color: var(--green-deep); line-height: 1.2; }
+  .summary .bar { display: flex; gap: 6px; margin-top: 16px; }
+  .summary .bar i { flex: 1; height: 12px; border-radius: 99px; background: #E8E3DA; }
+  .summary .bar i.on { background: var(--green); }
+  .summary .bar i.half { background: var(--saffron); }
+  .steps { padding: 10px 34px; }
+  .step { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 10px 0; font-size: 29px; }
+  .step + .step { border-top: 2px solid var(--line); }
+  .step .nm { display: flex; align-items: center; gap: 14px; color: var(--ink); font-weight: 600; }
+  .step .no { width: 36px; height: 36px; border-radius: 11px; background: #F0ECE6; color: var(--muted); font-size: 20px;
+              font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .step.p0 .nm { color: var(--muted); }
+  .pts { display: flex; gap: 8px; }
+  .pts i { width: 54px; height: 14px; border-radius: 99px; background: #E8E3DA; }
+  .step.p2 .pts i { background: var(--green); }
+  .step.p1 .pts i:first-child { background: var(--saffron); }
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+  .note { border-radius: 26px; padding: 22px 26px; font-size: 27px; line-height: 1.36; color: var(--text); }
+  .note .k { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; letter-spacing: 1.2px;
+             text-transform: uppercase; margin-bottom: 8px; }
+  .note .k.dv { font-size: 24px; font-weight: 700; }
+  .note.p { background: var(--green-pale); } .note.p .k { color: var(--green-deep); }
+  .note.t { background: var(--saffron-pale); } .note.t .k { color: var(--saffron-deep); }
+  .notes.one { grid-template-columns: 1fr; }
 {% endblock %}
-{% block band %}
-  <div class="kicker">Chanakya · Seekh</div>
-  <h1>{{ L.title }}</h1>
+{% block header %}
+  <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+  <h1 class="{{ L.title|dv }}">{{ L.title }}</h1>
 {% endblock %}
 {% block content %}
-  <div class="big">{{ score_str|default('', true) }}</div>
-  {% if level_text %}<div class="level">{{ level_text }}</div>{% endif %}
-  <div class="panel">
-    {% for s in steps|default([]) %}
-    {% set p = (s.points|default(0))|int %}
-    <div class="step"><span>{{ s.name }}</span>
-      <span class="dots"><span class="{{ 'on' if p >= 1 }}"></span><span class="{{ 'on' if p >= 2 }}"></span></span></div>
-    {% endfor %}
-  </div>
-  {% if praise %}<div class="note p"><b>{{ L.praise }}</b>{{ praise }}</div>{% endif %}
-  {% if tip %}<div class="note t"><b>{{ L.tip }}</b>{{ tip }}</div>{% endif %}
+  <section class="card summary">
+    <div class="ring">
+      <svg width="196" height="196" viewBox="0 0 196 196">
+        <circle cx="98" cy="98" r="82" fill="none" stroke="#EEE9E1" stroke-width="18"/>
+        <circle cx="98" cy="98" r="82" fill="none" stroke="{{ '#2E8B57' if f >= 0.75 else '#E8833A' }}" stroke-width="18"
+                stroke-linecap="round" stroke-dasharray="515.2" stroke-dashoffset="{{ (515.2 * (1 - f))|round(1) }}"/>
+      </svg>
+      <div class="c num">{{ score_str or (got.v ~ '/' ~ (2 * st|length)) }}</div>
+    </div>
+    <div>
+      {% if level_text %}<div class="lv">{{ level_text }}</div>{% endif %}
+      {% if st %}<div class="bar">{% for s in st %}{% set p = (s.points|default(0, true))|int %}<i class="{{ 'on' if p >= 2 else ('half' if p == 1 else '') }}"></i>{% endfor %}</div>{% endif %}
+    </div>
+  </section>
+  {% if st %}
+  <section class="sec">
+    <div class="label{{ L.steps|dv }}">{{ icon('list', 26) }}{{ L.steps }}</div>
+    <div class="card steps">
+      {% for s in st %}
+      {% set p = (s.points|default(0, true))|int %}
+      <div class="step p{{ 2 if p >= 2 else (1 if p == 1 else 0) }}"><span class="nm"><span class="no">{{ loop.index }}</span>{{ s.name }}</span><span class="pts"><i></i><i></i></span></div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% if praise or tip %}
+  <section class="notes{% if not (praise and tip) %} one{% endif %}">
+    {% if praise %}<div class="note p"><div class="k{{ L.praise|dv }}">{{ icon('star', 24) }}{{ L.praise }}</div>{{ praise }}</div>{% endif %}
+    {% if tip %}<div class="note t"><div class="k{{ L.tip|dv }}">{{ icon('arrow-right', 24, '', 2.6) }}{{ L.tip }}</div>{{ tip }}</div>{% endif %}
+  </section>
+  {% endif %}
 {% endblock %}

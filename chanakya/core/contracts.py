@@ -58,7 +58,7 @@ class ListSection(BaseModel):
 
 
 class Card(BaseModel):
-    template: Literal["home", "benefit", "options", "kharcha", "parivaar", "score", "brief", "digest", "catalog"]
+    template: Literal["home", "benefit", "options", "kharcha", "parivaar", "score", "brief", "digest", "catalog", "product", "compare"]
     lang: Lang  # language of the card text
     data: dict[str, Any]  # template variables (numbers already formatted via firewall)
 

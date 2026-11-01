@@ -36,7 +36,7 @@ class GeminiClient:
             if "2.5" in model:
                 kw["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
             else:
-                kw["thinking_config"] = types.ThinkingConfig(thinking_level="low")
+                kw["thinking_config"] = types.ThinkingConfig(thinking_level="MINIMAL")
         return types.GenerateContentConfig(**kw)
 
     async def json(self, parts: list, schema: type[BaseModel], system: str, timeout: float, kind: str) -> BaseModel:

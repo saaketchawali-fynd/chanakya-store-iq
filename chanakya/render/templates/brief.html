@@ -1,34 +1,54 @@
 {% extends "base.html" %}
+{# Associate card before the shift: today's changes, offers, follow-ups and the focus step. #}
 {% block style %}
-  .niti { background: #FFF9F3; border-left: 10px solid var(--saffron); border-radius: 18px; padding: 20px 26px;
-          font-size: 34px; font-weight: 600; color: var(--indigo); }
-  .focus { background: var(--pale-green); color: var(--green); font-weight: 800; border-radius: 22px;
-           padding: 22px 28px; font-size: 34px; }
+  .niti { display: flex; align-items: center; gap: 14px; margin-top: 16px; font-size: 29px; color: #E3E8F3; font-weight: 600; }
+  .niti::before { content: ""; width: 6px; align-self: stretch; border-radius: 3px; background: var(--saffron); flex: none; }
+  .list { padding: 10px 32px; }
+  .it { display: flex; align-items: center; gap: 18px; padding: 15px 0; font-size: 29px; line-height: 1.34; color: var(--text); }
+  .it + .it { border-top: 2px solid var(--line); }
+  .it .em { width: 52px; height: 52px; background: #F2EFEA; color: var(--muted); }
+  .it .em.k-up { background: var(--green-pale); color: var(--green-deep); }
+  .it .em.k-down { background: #FBE4E1; color: var(--red); }
+  .it .em.k-low { background: var(--saffron-pale); color: var(--saffron-deep); }
+  .it .tg { width: 52px; height: 52px; background: var(--saffron-pale); color: var(--saffron-deep); }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+  .duo.one { grid-template-columns: 1fr; }
+  .tile { border-radius: 28px; padding: 22px 26px; font-size: 27px; line-height: 1.36; }
+  .tile .k { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; letter-spacing: 1.2px;
+             text-transform: uppercase; margin-bottom: 8px; }
+  .tile .k.dv { font-size: 24px; font-weight: 700; }
+  .tile.fu { background: var(--surface); box-shadow: var(--shadow); color: var(--text); }
+  .tile.fu .k { color: var(--muted); } .tile.fu .k .ic { color: var(--indigo); }
+  .tile.fo { background: var(--green-pale); color: var(--green-deep); font-weight: 700; }
+  .tile.fo .k { color: var(--green-deep); }
 {% endblock %}
-{% block band %}
-  <div class="kicker">{{ L.title }}</div>
-  <h1>{{ greeting|default('Namaste!', true) }}</h1>
+{% block header %}
+  <div class="kicker{{ L.title|dv }}">{{ L.title }}</div>
+  <h1 class="{{ (greeting or 'Namaste!')|dv }}">{{ greeting or 'Namaste!' }}</h1>
+  {% if niti_line %}<div class="niti{{ niti_line|dv }}">{{ niti_line }}</div>{% endif %}
 {% endblock %}
 {% block content %}
-  {% if niti_line %}<div class="niti">{{ niti_line }}</div>{% endif %}
+  {% set changes = changes|aslist %}{% set offers = offers|aslist %}
   {% if changes %}
-  <div class="label">{{ L.changes }}</div>
-  <div class="panel">
-    {% for c in changes %}<div class="list-item"><span class="icon">{{ c.icon|default('•', true) }}</span><span>{{ c.text }}</span></div>{% endfor %}
-  </div>
+  <section class="sec">
+    <div class="label{{ L.changes|dv }}">{{ icon('refresh', 26) }}{{ L.changes }}</div>
+    <div class="card list">
+      {% for c in changes[:5] %}<div class="it">{% set ic = c.icon|icon_name %}<span class="bubble em k-{{ ic }}">{{ icon(ic, 26, '', 2.4) }}</span><span>{{ c.text }}</span></div>{% endfor %}
+    </div>
+  </section>
   {% endif %}
   {% if offers %}
-  <div class="label">{{ L.offers }}</div>
-  <div class="panel">
-    {% for o in offers %}<div class="list-item"><span class="icon">🏷</span><span>{{ o.text }}</span></div>{% endfor %}
-  </div>
+  <section class="sec">
+    <div class="label{{ L.offers|dv }}">{{ icon('tag', 26) }}{{ L.offers }}</div>
+    <div class="card list">
+      {% for o in offers[:3] %}<div class="it"><span class="bubble tg">{{ icon('tag', 24) }}</span><span>{{ o.text }}</span></div>{% endfor %}
+    </div>
+  </section>
   {% endif %}
-  {% if followups_text %}
-  <div class="label">{{ L.followups }}</div>
-  <div class="panel">{{ followups_text }}</div>
-  {% endif %}
-  {% if focus_text %}
-  <div class="label">{{ L.focus }}</div>
-  <div class="focus">🎯 {{ focus_text }}</div>
+  {% if followups_text or focus_text %}
+  <section class="duo{% if not (followups_text and focus_text) %} one{% endif %}">
+    {% if followups_text %}<div class="tile fu"><div class="k{{ L.followups|dv }}">{{ icon('users', 24) }}{{ L.followups }}</div>{{ followups_text }}</div>{% endif %}
+    {% if focus_text %}<div class="tile fo"><div class="k{{ L.focus|dv }}">{{ icon('target', 24) }}{{ L.focus }}</div>{{ focus_text }}</div>{% endif %}
+  </section>
   {% endif %}
 {% endblock %}

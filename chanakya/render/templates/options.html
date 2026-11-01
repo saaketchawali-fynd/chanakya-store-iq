@@ -1,39 +1,119 @@
 {% extends "base.html" %}
+{# Customer-facing pick of up to 3 products. The best pick (is_best) is the hero. Never shows prices. #}
+{% set opts = (options|aslist)[:4] %}
+{% set best = (opts|selectattr('is_best')|first) or (opts|first) %}
+{% set others = [] %}
+{% for o in opts %}{% if o is not sameas best %}{% set _ = others.append(o) %}{% endif %}{% endfor %}
 {% block style %}
-  .opt { display: flex; gap: 26px; align-items: center; background: #fff; border-radius: 24px;
-         padding: 24px 28px; margin-bottom: 20px; border: 4px solid transparent; }
-  .opt.best { border-color: var(--saffron); background: #FFF9F3; }
-  .opt .letter { flex: 0 0 84px; height: 84px; border-radius: 50%; background: var(--indigo); color: #fff;
-                 font-size: 46px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-  .opt.best .letter { background: var(--saffron); }
-  .opt .thumb { flex: 0 0 190px; height: 130px; display: flex; align-items: center; justify-content: center; }
-  .opt .thumb img { max-width: 190px; max-height: 130px; object-fit: contain; }
-  .opt .body { flex: 1; min-width: 0; }
-  .opt .title { font-size: 36px; font-weight: 700; }
-  .opt .reason { font-size: 30px; color: var(--text); margin-top: 4px; }
-  .opt .meta { font-size: 24px; color: var(--muted); margin-top: 8px; display: flex; gap: 18px; flex-wrap: wrap; }
-  .fit { background: var(--pale-green); color: var(--green); font-weight: 800; padding: 4px 12px; border-radius: 999px; }
-  .star { color: var(--saffron); }
-  .note { font-size: 26px; color: var(--muted); text-align: center; margin-top: 8px; }
+  .hero { padding: 0; overflow: hidden; }
+  .hero .stage { height: 304px; border-radius: 30px 30px 0 0; }
+  .hero .stage img { max-width: 54%; max-height: 90%; }
+  .ribbon { position: absolute; left: 26px; top: 24px; display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #F09550, #E2722A); color: #fff; font-size: 24px; font-weight: 800;
+            padding: 9px 20px 9px 15px; border-radius: 999px; box-shadow: 0 6px 18px rgba(226,114,42,.32); }
+  .fit { display: inline-flex; align-items: center; gap: 10px; color: var(--green-deep); font-weight: 700; }
+  .fit b { font-size: 1.08em; font-weight: 800; }
+  .fit.low { color: var(--saffron-deep); }
+  .meter { width: 70px; height: 10px; border-radius: 99px; background: #E4E9E6; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--green); }
+  .fit.low .meter i { background: var(--saffron); }
+  .hero-body { padding: 26px 36px 30px; }
+  .trow { display: flex; align-items: center; gap: 18px; }
+  .letter { flex: none; width: 56px; height: 56px; border-radius: 17px; background: var(--indigo); color: #fff;
+            font-size: 30px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .letter.best { background: var(--saffron); }
+  h2 { font-size: 44px; line-height: 1.14; font-weight: 800; color: var(--ink); letter-spacing: -.4px; }
+  .reason { margin-top: 14px; font-size: 31px; line-height: 1.36; color: var(--text); }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 12px 34px; margin-top: 20px; padding-top: 18px;
+          border-top: 2px solid var(--line); font-size: 25px; color: var(--muted); }
+  .meta span { display: inline-flex; align-items: center; gap: 10px; }
+  .meta .ic { color: var(--faint); }
+  .others { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-top: 22px; }
+  .others.n1 { grid-template-columns: 1fr; }
+  .others.n3 { grid-template-columns: repeat(3, 1fr); }
+  .opt { padding: 0; overflow: hidden; }
+  .opt .stage { height: 166px; border-radius: 30px 30px 0 0; }
+  .opt .stage img { max-width: 80%; max-height: 80%; }
+  .opt .fit { gap: 8px; }
+  .opt .fit .meter { width: 46px; height: 8px; }
+  .opt-body { padding: 18px 24px 22px; }
+  .opt .letter { width: 44px; height: 44px; border-radius: 13px; font-size: 24px; }
+  .opt .trow { gap: 14px; align-items: flex-start; }
+  h3 { font-size: 30px; line-height: 1.2; font-weight: 800; color: var(--ink); padding-top: 4px; }
+  .opt .reason { margin-top: 10px; font-size: 25px; line-height: 1.35; color: var(--muted); }
+  .opt .meta { margin-top: 14px; padding-top: 12px; font-size: 22px; gap: 8px 20px; }
+  .others.n1 .opt { display: flex; }
+  .others.n1 .opt .stage { width: 400px; height: auto; min-height: 220px; border-radius: 30px 0 0 30px; }
+  .others.n1 .opt-body { flex: 1; }
+  .ph { color: #C9C2B6; }
+  .hd-row { align-items: flex-end; }
+  .lockchip { display: inline-flex; align-items: center; gap: 9px; flex: none; margin-bottom: 8px; font-size: 23px;
+              font-weight: 600; color: #DCE3F1; background: rgba(255,255,255,.10); border: 1.5px solid rgba(255,255,255,.16);
+              padding: 8px 16px; border-radius: 999px; }
+  .lockchip .ic { color: #F4A86F; }
 {% endblock %}
-{% block band %}
-  <div class="kicker">Chanakya · Dikhao</div>
-  <h1>{{ L.title }}</h1>
+{% block hd_class %}{% if best %} lift{% endif %}{% endblock %}
+{% block header %}
+  <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+  {% set title = L.title|replace('{n}', (opts|length or 3)|string) %}
+  <div class="hd-row">
+    <h1 class="grow{{ title|dv }}">{{ title }}</h1>
+    {% if L.no_price %}<span class="lockchip{{ L.no_price|dv }}">{{ icon('lock', 24) }}{{ L.no_price }}</span>{% endif %}
+  </div>
 {% endblock %}
+{% macro fit_badge(o) %}
+  {% set v = o.fit_str|pct %}
+  {% if o.fit_str %}
+  <span class="fit{% if v is not none and v < 70 %} low{% endif %}{{ L.fit|dv }}">
+    {% if v is not none %}<span class="meter"><i style="width: {{ v|round|int }}%"></i></span>{% endif %}
+    <b class="num">{{ o.fit_str }}</b>{% if L.fit %} {{ L.fit }}{% endif %}
+  </span>
+  {% endif %}
+{% endmacro %}
 {% block content %}
-  {% for o in options|default([]) %}
-  <div class="opt{% if o.is_best %} best{% endif %}">
-    <div class="letter">{{ o.label }}</div>
-    {% if o.image %}<div class="thumb"><img src="{{ o.image }}"></div>{% endif %}
-    <div class="body">
-      <div class="title">{{ o.title }}{% if o.is_best %} <span class="star">⭐ {{ L.best }}</span>{% endif %}</div>
-      {% if o.reason %}<div class="reason">{{ o.reason }}</div>{% endif %}
+  {% if best %}
+  <section class="hero card">
+    <div class="stage">
+      {% if best.image %}<img src="{{ best.image }}" alt="">{% else %}{{ icon('box', 120, 'ph', 1.4) }}{% endif %}
+      <span class="ribbon{{ L.best|dv }}">{{ icon('star', 24) }}{{ L.best }}</span>
+    </div>
+    <div class="hero-body">
+      <div class="trow">{% if best.label %}<span class="letter best">{{ best.label }}</span>{% endif %}<h2 >{{ best.title }}</h2></div>
+      {% if best.reason %}<p class="reason">{{ best.reason }}</p>{% endif %}
+      {% if best.features %}
+      <div class="chips">{% for f in (best.features|aslist)[:3] %}{% if f %}<span class="chip green">{{ icon('check', 22, '', 2.6) }}{{ f }}</span>{% endif %}{% endfor %}</div>
+      {% endif %}
+      {% if best.fit_str or best.stock_line or best.dims_text %}
       <div class="meta">
-        {% if o.fit_str %}<span class="fit">{{ L.fit }} {{ o.fit_str }}</span>{% endif %}
-        {% if o.stock_line %}<span>{{ o.stock_line }}</span>{% endif %}
+        {{ fit_badge(best) }}
+        {% if best.stock_line %}<span>{{ icon('store', 26) }}{{ best.stock_line }}</span>{% endif %}
+        {% if best.dims_text %}<span>{{ icon('ruler', 26) }}{{ best.dims_text }}</span>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+  {% if others %}
+  <section class="others n{{ others|length }}">
+    {% for o in others %}
+    <div class="opt card">
+      <div class="stage">
+        {% if o.image %}<img src="{{ o.image }}" alt="">{% else %}{{ icon('box', 80, 'ph', 1.4) }}{% endif %}
+      </div>
+      <div class="opt-body">
+        <div class="trow">{% if o.label %}<span class="letter">{{ o.label }}</span>{% endif %}<h3 >{{ o.title }}</h3></div>
+        {% if o.reason %}<p class="reason">{{ o.reason }}</p>{% endif %}
+        {% if o.fit_str or o.stock_line or o.dims_text %}
+        <div class="meta">
+          {{ fit_badge(o) }}
+          {% if o.stock_line %}<span>{{ icon('store', 22) }}{{ o.stock_line }}</span>{% endif %}
+          {% if o.dims_text and others|length == 1 %}<span>{{ icon('ruler', 22) }}{{ o.dims_text }}</span>{% endif %}
+        </div>
+        {% endif %}
       </div>
     </div>
-  </div>
-  {% endfor %}
-  <div class="note">🔒 {{ L.no_price }}</div>
+    {% endfor %}
+  </section>
+  {% endif %}
 {% endblock %}

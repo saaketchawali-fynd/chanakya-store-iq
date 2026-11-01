@@ -23,6 +23,7 @@ def coach_reply(
     buttons: list[Button],
     card: Card | None = None,
     status: bool = True,
+    footer: str | None = None,
 ) -> OutMessage:
     L = ctx.lang
     body = f'{ctx.t("label_bolo", L)}: "{_one_line(say)}"\n{ctx.t("label_kyun", L)}: {_one_line(why)}'
@@ -33,7 +34,7 @@ def coach_reply(
         to=ctx.actor_wa_id,
         kind="buttons" if buttons else "text",
         body=body,
-        footer=ctx.t("footer_menu"),
+        footer=footer or ctx.t("footer_voice"),
         buttons=buttons[:3],
         card=card,
         coach=True,

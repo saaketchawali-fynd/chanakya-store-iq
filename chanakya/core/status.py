@@ -1,4 +1,4 @@
-"""Status line: 📍 C1 · Shah · TV · Ghar 4/7 · Demo – · Daam 🔒 (≤ 60 chars)."""
+"""Status line: C1 Shah · TV · Ghar 4/7 · Demo baaki · Daam band (plain words, no symbols)."""
 
 from __future__ import annotations
 
@@ -35,12 +35,9 @@ def status_line(ctx: SkillContext) -> str:
     code = ctx.reg.raw(s.code, "session:code")
     k = ctx.reg.num(known, "card:known")
     tt = ctx.reg.num(total, "pack:required")
-    demo = "✓" if s.demo_done else "–"
-    lock = "🔓" if state.price_gate_open(s, pack) else "🔒"
-    line = (
-        f"📍 {code} · {short_name(s.home.customer_name)} · {cat} · {ctx.t('status_home', L)} {k}/{tt} · "
-        f"{ctx.t('status_demo', L)} {demo} · {ctx.t('status_price', L)} {lock}"
-    )
-    if len(line) > 60:
-        line = line.replace(f" · {short_name(s.home.customer_name)}", "", 1)
+    demo = ctx.t("st_demo_done" if s.demo_done else "st_demo_pending", L)
+    price = ctx.t("st_price_open" if state.price_gate_open(s, pack) else "st_price_locked", L)
+    name = short_name(s.home.customer_name)
+    who = f"{code} {name}" if name and name != "–" else code
+    line = f"{who} · {cat} · {ctx.t('status_home', L)} {k}/{tt} · {demo} · {price}"
     return line

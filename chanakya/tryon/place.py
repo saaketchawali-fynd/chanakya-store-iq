@@ -1,250 +1,253 @@
-"""Place products to scale on the room photo (spec 17.1.4). Size and position come from geometry only."""
+"""Placement (spec 17.1.4): where each product goes on the wall, in centimetres, from geometry only.
+
+TV: on the old TV's centre when one is on the wall (the customer's real spot); else above the TV unit
+(wall mount: bottom edge 15 cm above the unit top; stand: on the unit top); else centre 105 cm above the
+floor, centred on the sofa opposite or on the wall. AC: top edge 30 cm below the ceiling (bottom edge at
+least 210 cm above the floor). WM: standing on the floor line. Everything is clamped inside the wall."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from functools import lru_cache
-from pathlib import Path
+import re
+from dataclasses import dataclass, field
 
-from PIL import Image, ImageDraw, ImageFilter
+import numpy as np
 
-from chanakya.tryon.read_room import PxBox
+from chanakya.tryon.geometry import Wall
+from chanakya.tryon.read_room import PxBox, Room
+from chanakya.tryon.scale import TV_FACE_DEPTH_CM, WALL_HEIGHT_CM, tv_height_cm, tv_width_cm
 
-SCREEN_PATH = Path(__file__).resolve().parent.parent / "render" / "static" / "img" / "screen_bright.jpg"
 SAFFRON = (232, 131, 58)
 BEZEL = (17, 17, 17)
-TV_CENTRE_ABOVE_FLOOR_CM = 105
-AC_BELOW_CEILING_CM = 30
-AC_ABOVE_FLOOR_CM = 210
+TV_CENTRE_ABOVE_FLOOR_CM = 105.0
+TV_ABOVE_UNIT_CM = 15.0
+STAND_GAP_CM = 6.0  # pedestal: panel bottom above the TV-unit top
+TV_ABOVE_SOFA_CM = 10.0
+AC_BELOW_CEILING_CM = 30.0
+AC_ABOVE_FLOOR_CM = 210.0  # minimum height of the AC's bottom edge
+CEILING_MARGIN_CM = 8.0
+FLOOR_MARGIN_CM = 5.0
+OBSTACLE_GAP_CM = 8.0
+# (back, front) distance from the wall in cm: a slim wall-mounted TV, a TV on its pedestal on the unit,
+# a split-AC indoor unit, a front-load washer standing against the wall.
+DEPTH_CM = {"tv": (1.0, TV_FACE_DEPTH_CM), "tv_stand": (19.0, 24.0), "ac": (0.0, 22.0), "wm": (0.0, 56.0)}
 
 
 @dataclass
 class Placed:
     sku: str
-    box: PxBox
+    box: PxBox  # bounding box of the product's image quad (px)
     solid: bool
     label: str
+    quad: tuple[tuple[float, float], ...] = ()  # TL, TR, BR, BL in px
+    rect: tuple[float, float, float, float] = (0.0, 0.0, 0.0, 0.0)  # u centre, z centre, width, height (cm)
+    dims_text: str | None = None
+    category: str = "tv"
+    mount: str = "wall"
+    fits: bool | None = None  # WM vs niche width
+    depth: float = 0.0  # front face, cm in front of the wall
+    back: float = 0.0  # back face, cm in front of the wall
 
 
-@lru_cache
-def _screen_source() -> Image.Image:
-    if SCREEN_PATH.exists():
-        try:
-            im = Image.open(SCREEN_PATH)
-            im.load()
-            return im.convert("RGB")
-        except Exception:
-            pass
-    # fallback: bright sky-to-field gradient
-    w, h = 320, 180
-    im = Image.new("RGB", (w, h))
-    px = im.load()
-    for y in range(h):
-        for x in range(w):
-            if y < h * 0.62:
-                t = y / (h * 0.62)
-                px[x, y] = (int(90 + 100 * t), int(160 + 60 * t), int(240 - 10 * t))
-            else:
-                t = (y - h * 0.62) / (h * 0.38)
-                px[x, y] = (int(80 - 30 * t), int(180 - 50 * t), int(70 - 20 * t))
-    d = ImageDraw.Draw(im)
-    d.ellipse((w * 0.72, h * 0.1, w * 0.86, h * 0.35), fill=(255, 236, 150))
-    return im
+@dataclass
+class _Obj:
+    label: str
+    u0: float
+    u1: float
+    z0: float
+    z1: float
+    uc: float = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.uc = (self.u0 + self.u1) / 2
 
 
-def _centered(cx: float, cy: float, w: float, h: float) -> PxBox:
-    return (round(cx - w / 2), round(cy - h / 2), round(cx + w / 2), round(cy + h / 2))
+def product_dims_cm(p) -> tuple[float, float] | None:
+    """(width, height) in cm; for a TV without dimensions, from the size in its label (16:9)."""
+    try:
+        w, h = float(p.width_mm or 0) / 10, float(p.height_mm or 0) / 10
+    except (TypeError, ValueError):
+        w = h = 0.0
+    if w > 1 and h > 1:
+        return w, h
+    if (p.category or "tv") == "tv":
+        m = re.search(r"(\d{2,3}(?:\.\d)?)\s*(?:\"|”|inch|in\b)", p.label or "")
+        if m:
+            d = float(m.group(1))
+            return tv_width_cm(d), tv_height_cm(d)
+    return None
 
 
-def _clamp_centre(cx: float, cy: float, w: float, h: float, wall: PxBox) -> tuple[float, float]:
-    wx0, wy0, wx1, wy1 = wall
-    if w <= wx1 - wx0:
-        cx = min(max(cx, wx0 + w / 2), wx1 - w / 2)
-    else:
-        cx = (wx0 + wx1) / 2
-    if h <= wy1 - wy0:
-        cy = min(max(cy, wy0 + h / 2), wy1 - h / 2)
-    else:
-        cy = (wy0 + wy1) / 2
-    return cx, cy
+def _objects(wall: Wall, room: Room) -> dict[str, list[_Obj]]:
+    out: dict[str, list[_Obj]] = {}
+    for label in ("door", "window", "tv_unit", "sofa", "existing_tv"):
+        for b in room.all(label):
+            x0, y0, x1, y1 = b
+            xc = (x0 + x1) / 2
+            p = wall.to_wall([(x0, y0), (x1, y0), (x1, y1), (x0, y1), (xc, y0)])
+            if not np.all(np.isfinite(p)):
+                continue
+            u0, u1 = float(p[:4, 0].min()), float(p[:4, 0].max())
+            z1 = float(p[4, 1])  # top edge at the box's centre: the back-top edge, on the wall plane
+            z0 = float(p[:4, 1].min())
+            out.setdefault(label, []).append(_Obj(label, u0, u1, min(z0, z1), z1))
+    return out
 
 
-def _dashed_rect(d: ImageDraw.ImageDraw, box: PxBox, color, width: int, dash: int, gap: int) -> None:
-    x0, y0, x1, y1 = box
-
-    def seg_line(a, b, horizontal: bool, fixed: int):
-        pos = a
-        while pos < b:
-            end = min(pos + dash, b)
-            if horizontal:
-                d.line([(pos, fixed), (end, fixed)], fill=color, width=width)
-            else:
-                d.line([(fixed, pos), (fixed, end)], fill=color, width=width)
-            pos = end + gap
-
-    seg_line(x0, x1, True, y0)
-    seg_line(x0, x1, True, y1)
-    seg_line(y0, y1, False, x0)
-    seg_line(y0, y1, False, x1)
-
-
-def _shadow(img: Image.Image, box: PxBox, radius: int = 18, offset=(0, 8), alpha: float = 0.35) -> Image.Image:
-    pad = radius * 3
-    x0, y0, x1, y1 = box
-    layer = Image.new("L", img.size, 0)
-    ImageDraw.Draw(layer).rectangle(
-        (x0 + offset[0], y0 + offset[1], x1 + offset[0], y1 + offset[1]), fill=int(255 * alpha)
+def _overlaps(uc: float, zc: float, w: float, h: float, objs: list[_Obj], gap: float) -> bool:
+    return any(
+        uc - w / 2 < o.u1 + gap and uc + w / 2 > o.u0 - gap and zc - h / 2 < o.z1 and zc + h / 2 > o.z0 for o in objs
     )
-    crop = (max(0, x0 - pad), max(0, y0 - pad), min(img.width, x1 + pad), min(img.height, y1 + pad + offset[1]))
-    region = layer.crop(crop).filter(ImageFilter.GaussianBlur(radius))
-    layer = Image.new("L", img.size, 0)
-    layer.paste(region, crop[:2])
-    black = Image.new("RGB", img.size, (0, 0, 0))
-    return Image.composite(black, img, layer)
 
 
-def _draw_tv(img: Image.Image, box: PxBox, px_per_cm: float) -> Image.Image:
-    img = _shadow(img, box)
-    d = ImageDraw.Draw(img)
-    x0, y0, x1, y1 = box
-    d.rectangle(box, fill=BEZEL)
-    bezel = max(4, round(1.2 * px_per_cm))
-    sx0, sy0, sx1, sy1 = x0 + bezel, y0 + bezel, x1 - bezel, y1 - bezel
-    if sx1 - sx0 > 4 and sy1 - sy0 > 4:
-        screen = _screen_source().resize((sx1 - sx0, sy1 - sy0))
-        img.paste(screen, (sx0, sy0))
-        d = ImageDraw.Draw(img)
-        # 3 px highlight along the top edge of the glass
-        d.line([(sx0, sy0 + 1), (sx1 - 1, sy0 + 1)], fill=(255, 255, 255), width=3)
-    return img
+def _avoid(uc: float, zc: float, w: float, h: float, objs: list[_Obj], lo: float, hi: float) -> float:
+    """Shift horizontally to the nearest spot (inside [lo, hi]) that clears the obstacles."""
+    gap = OBSTACLE_GAP_CM
+    if not objs or not _overlaps(uc, zc, w, h, objs, gap):
+        return uc
+    cands = [uc] + [c for o in objs for c in (o.u0 - gap - w / 2, o.u1 + gap + w / 2)]
+    ok = [c for c in cands if lo + w / 2 <= c <= hi - w / 2 and not _overlaps(c, zc, w, h, objs, gap)]
+    return min(ok, key=lambda c: abs(c - uc)) if ok else uc
 
 
-def _draw_ac(img: Image.Image, box: PxBox) -> Image.Image:
-    img = _shadow(img, box, radius=12, offset=(0, 6), alpha=0.25)
-    d = ImageDraw.Draw(img)
-    x0, y0, x1, y1 = box
-    r = max(4, (y1 - y0) // 5)
-    d.rounded_rectangle(box, radius=r, fill=(248, 248, 248), outline=(170, 170, 170), width=2)
-    vy = y0 + round((y1 - y0) * 0.72)
-    d.line([(x0 + r, vy), (x1 - r, vy)], fill=(140, 140, 140), width=max(2, (y1 - y0) // 25))
-    return img
+def _clamp(v: float, size: float, lo: float, hi: float) -> float:
+    if hi - lo >= size:
+        return min(max(v, lo + size / 2), hi - size / 2)
+    return v
 
 
-def _draw_wm(img: Image.Image, box: PxBox, front: bool = True) -> Image.Image:
-    img = _shadow(img, box, radius=12, offset=(0, 4), alpha=0.25)
-    d = ImageDraw.Draw(img)
-    x0, y0, x1, y1 = box
-    w, h = x1 - x0, y1 - y0
-    d.rounded_rectangle(box, radius=max(3, w // 20), fill=(246, 246, 246), outline=(160, 160, 160), width=2)
-    d.line([(x0, y0 + h * 0.15), (x1, y0 + h * 0.15)], fill=(180, 180, 180), width=2)
-    if front:
-        rr = min(w, h) * 0.32
-        cx, cy = x0 + w / 2, y0 + h * 0.57
-        d.ellipse(
-            (cx - rr, cy - rr, cx + rr, cy + rr), outline=(120, 120, 120), width=max(3, w // 40), fill=(205, 220, 232)
-        )
-    return img
+def _u_range(wall: Wall, z: float) -> tuple[float, float]:
+    vis = wall.visible_u(z)
+    if vis is None or vis[1] - vis[0] < 1:
+        return 0.0, wall.width_cm
+    return max(0.0, vis[0]), min(wall.width_cm, vis[1])
 
 
-def _fit_marker(img: Image.Image, box: PxBox, fits: bool) -> None:
-    d = ImageDraw.Draw(img)
-    r = max(14, (box[2] - box[0]) // 8)
-    cx, cy = box[2] - r // 2, box[1] - r // 2
-    color = (46, 139, 87) if fits else (200, 40, 40)
-    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=color, outline=(255, 255, 255), width=3)
-    lw = max(3, r // 4)
-    if fits:
-        d.line(
-            [(cx - r * 0.5, cy), (cx - r * 0.1, cy + r * 0.4), (cx + r * 0.55, cy - r * 0.45)], fill="white", width=lw
-        )
+def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float, mount: str):
+    ceiling = wall.ceiling_z or WALL_HEIGHT_CM
+    old = (objs.get("existing_tv") or [None])[0]
+    unit = (objs.get("tv_unit") or [None])[0]
+    sofa = (objs.get("sofa") or [None])[0]
+    anchored = True
+    if old is not None:
+        ob = room.first("existing_tv")
+        uc, zc = (float(v) for v in wall.to_wall([((ob[0] + ob[2]) / 2, (ob[1] + ob[3]) / 2)])[0])
+        if unit is not None and unit.u0 - w / 2 < uc < unit.u1 + w / 2:
+            if mount == "stand":
+                zc = unit.z1 + STAND_GAP_CM + h / 2
+            elif zc - h / 2 < unit.z1 + 4:
+                zc = unit.z1 + 4 + h / 2
+    elif unit is not None:
+        uc = unit.uc
+        zc = unit.z1 + (STAND_GAP_CM if mount == "stand" else TV_ABOVE_UNIT_CM) + h / 2
     else:
-        d.line([(cx - r * 0.45, cy - r * 0.45), (cx + r * 0.45, cy + r * 0.45)], fill="white", width=lw)
-        d.line([(cx - r * 0.45, cy + r * 0.45), (cx + r * 0.45, cy - r * 0.45)], fill="white", width=lw)
+        anchored = False
+        zc = TV_CENTRE_ABOVE_FLOOR_CM
+        lo, hi = _u_range(wall, zc)
+        uc = sofa.uc if sofa is not None and lo <= sofa.uc <= hi else (lo + hi) / 2
+        if sofa is not None and uc - w / 2 < sofa.u1 and uc + w / 2 > sofa.u0 and zc - h / 2 < sofa.z1 + 10:
+            zc = sofa.z1 + TV_ABOVE_SOFA_CM + h / 2
+    zc = min(zc, ceiling - CEILING_MARGIN_CM - h / 2) if h < ceiling - 2 * CEILING_MARGIN_CM else zc
+    zc = max(zc, FLOOR_MARGIN_CM + h / 2)
+    lo, hi = _u_range(wall, zc)
+    if not anchored:
+        uc = _avoid(uc, zc, w, h, (objs.get("door") or []) + (objs.get("window") or []), lo, hi)
+    uc = _clamp(uc, w, 0.0, wall.width_cm)
+    if not anchored:
+        uc = _clamp(uc, w, lo, hi)
+    return uc, _fit_frame_z(wall, uc, zc, h, ceiling)
+
+
+def _fit_frame_z(wall: Wall, uc: float, zc: float, h: float, ceiling: float) -> float:
+    """Keep the product inside the photo vertically when it fits (true size, approximate height)."""
+    vis = wall.visible_z(uc, margin_px=4)
+    if vis is None:
+        return zc
+    lo, hi = vis[0], min(vis[1], ceiling)
+    return _clamp(zc, h, lo, hi)
+
+
+def _ac(wall: Wall, objs: dict[str, list[_Obj]], w: float, h: float):
+    if wall.ceiling_z is not None:
+        zc = wall.ceiling_z - AC_BELOW_CEILING_CM - h / 2
+    else:
+        zc = max(WALL_HEIGHT_CM - AC_BELOW_CEILING_CM - h / 2, AC_ABOVE_FLOOR_CM + h / 2)
+    lo, hi = _u_range(wall, zc)
+    uc = (lo + hi) / 2
+    uc = _avoid(uc, zc, w, h, (objs.get("window") or []) + (objs.get("existing_tv") or []), lo, hi)
+    uc = _clamp(_clamp(uc, w, 0.0, wall.width_cm), w, lo, hi)
+    return uc, _fit_frame_z(wall, uc, zc, h, wall.ceiling_z or WALL_HEIGHT_CM)
+
+
+def _wm(wall: Wall, objs: dict[str, list[_Obj]], w: float, h: float):
+    zc = h / 2
+    lo, hi = _u_range(wall, zc)
+    uc = (lo + hi) / 2
+    floor_objs = [o for k in ("door", "tv_unit", "sofa") for o in objs.get(k) or []]
+    uc = _avoid(uc, zc, w, h, floor_objs, lo, hi)
+    uc = _clamp(_clamp(uc, w, 0.0, wall.width_cm), w, lo, hi)
+    if wall.frame:  # floor only guessed: keep the machine in the photo
+        zc = _fit_frame_z(wall, uc, zc, h, WALL_HEIGHT_CM)
+    return uc, zc
 
 
 def plan(
     category: str,
     products: list,
-    wall: PxBox,
-    px_per_cm: float,
-    sofa: PxBox | None,
-    floor_y: float | None,
-    ceiling_y: float | None,
-) -> list[Placed]:
-    """Compute pixel boxes for every product. The primary (solid) sets the anchor; outlines share its centre."""
-    if not products:
-        return []
-    primary = next((p for p in products if p.solid), products[0])
-    wx0, wy0, wx1, wy1 = wall
-    pw = primary.width_mm / 10 * px_per_cm
-    ph = primary.height_mm / 10 * px_per_cm
-
-    if category == "ac":
-        cx = (wx0 + wx1) / 2
-        if ceiling_y is not None:
-            top = ceiling_y + AC_BELOW_CEILING_CM * px_per_cm
-        elif floor_y is not None:
-            top = floor_y - AC_ABOVE_FLOOR_CM * px_per_cm
-        else:
-            top = wy0 + (wy1 - wy0) * 0.1
-        cy = top + ph / 2
-        cx, cy = _clamp_centre(cx, cy, pw, ph, wall)
-    elif category == "wm":
-        cx = (wx0 + wx1) / 2
-        bottom = floor_y if floor_y is not None else wy1
-        cy = bottom - ph / 2
-        cx = min(max(cx, wx0 + pw / 2), wx1 - pw / 2) if pw <= wx1 - wx0 else (wx0 + wx1) / 2
-    else:  # tv
-        sofa_under = False
-        if sofa is not None:
-            scx = (sofa[0] + sofa[2]) / 2
-            sofa_under = wx0 <= scx <= wx1 and (sofa[1] + sofa[3]) / 2 > (wy0 + wy1) / 2
-        cx = (sofa[0] + sofa[2]) / 2 if sofa_under else (wx0 + wx1) / 2
-        if floor_y is not None:
-            cy = floor_y - TV_CENTRE_ABOVE_FLOOR_CM * px_per_cm
-        else:
-            cy = wy0 + (wy1 - wy0) * 0.45
-        cx, cy = _clamp_centre(cx, cy, pw, ph, wall)
-
-    out: list[Placed] = []
-    for p in products:
-        w = p.width_mm / 10 * px_per_cm
-        h = p.height_mm / 10 * px_per_cm
-        pcy = cy
-        if category == "wm":  # all washing machines stand on the floor line
-            pcy = cy + ph / 2 - h / 2
-        out.append(Placed(sku=p.sku, box=_centered(cx, pcy, w, h), solid=p is primary, label=p.label))
-    return out
-
-
-def compose(
-    img: Image.Image,
-    category: str,
-    placed: list[Placed],
-    px_per_cm: float,
+    wall: Wall,
+    room: Room,
     niche_width_cm: float | None = None,
-    products: list | None = None,
-) -> Image.Image:
-    out = img.convert("RGB").copy()
-    by_sku = {p.sku: p for p in (products or [])}
-    for pl in placed:
-        if not pl.solid:
-            continue
-        if category == "ac":
-            out = _draw_ac(out, pl.box)
-        elif category == "wm":
-            out = _draw_wm(out, pl.box)
+) -> list[Placed]:
+    """Wall rectangle and image quad for every product. The primary (solid) sets the anchor; comparison
+    sizes share its centre (TV on a stand / WM: its bottom edge)."""
+    sized = [(p, product_dims_cm(p)) for p in products]
+    sized = [(p, d) for p, d in sized if d is not None]
+    if not sized:
+        return []
+    primary, (w, h) = next(((p, d) for p, d in sized if p.solid), sized[0])
+    mount = getattr(primary, "mount", "wall") or "wall"
+    objs = _objects(wall, room)
+    if category == "ac":
+        uc, zc = _ac(wall, objs, w, h)
+    elif category == "wm":
+        uc, zc = _wm(wall, objs, w, h)
+    else:
+        uc, zc = _tv(wall, room, objs, w, h, mount)
+    back, front = DEPTH_CM.get("tv_stand" if category == "tv" and mount == "stand" else category, DEPTH_CM["tv"])
+    pose = wall.pose()
+    if pose is None or front > 0.6 * pose.centre[2]:
+        back = front = 0.0  # no usable camera: draw on the wall plane
+    out: list[Placed] = []
+    for p, (pw, ph) in sized:
+        pzc = zc
+        if category == "wm" or (category == "tv" and mount == "stand"):
+            pzc = zc - h / 2 + ph / 2  # same bottom edge
+        if front > 0 and pose is not None:
+            corners = [(uc - pw / 2, pzc + ph / 2), (uc + pw / 2, pzc + ph / 2), (uc + pw / 2, pzc - ph / 2)]
+            corners.append((uc - pw / 2, pzc - ph / 2))
+            quad = pose.project([(u, z, front) for u, z in corners])
         else:
-            out = _draw_tv(out, pl.box, px_per_cm)
-    d = ImageDraw.Draw(out)
-    lw = max(3, round(out.width / 300))
-    for pl in placed:
-        if pl.solid:
-            continue
-        _dashed_rect(d, pl.box, SAFFRON, width=lw, dash=lw * 6, gap=lw * 4)
-    if category == "wm" and niche_width_cm:
-        for pl in placed:
-            prod = by_sku.get(pl.sku)
-            if prod is not None:
-                _fit_marker(out, pl.box, prod.width_mm / 10 <= niche_width_cm)
+            quad = wall.rect_quad(uc, pzc, pw, ph)
+        box = (
+            int(np.floor(quad[:, 0].min())),
+            int(np.floor(quad[:, 1].min())),
+            int(np.ceil(quad[:, 0].max())),
+            int(np.ceil(quad[:, 1].max())),
+        )
+        fits = (pw <= niche_width_cm) if category == "wm" and niche_width_cm else None
+        out.append(
+            Placed(
+                sku=p.sku,
+                box=box,
+                solid=p is primary,
+                label=p.label,
+                quad=tuple((float(x), float(y)) for x, y in quad),
+                rect=(float(uc), float(pzc), float(pw), float(ph)),
+                dims_text=getattr(p, "dims_text", None),
+                category=category,
+                mount=mount,
+                fits=fits,
+                depth=front,
+                back=back,
+            )
+        )
     return out

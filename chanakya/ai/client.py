@@ -75,11 +75,17 @@ class AIClient:
                     [part, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)],
                     Understanding,
                     prompts.UNDERSTAND_SYSTEM,
-                    timeout=8.0 if audio is not None else 6.0,
+                    timeout=12.0 if audio is not None else 8.0,
                     kind="understand_audio" if audio is not None else "understand_text",
                 )
                 if not u.transcript and text:
                     u.transcript = text
+                from chanakya.app import diag
+
+                diag.mark("ai_last_understanding", {
+                    "source": "audio" if audio is not None else "text", "language": u.language,
+                    "category": u.category, "slots": len(u.slots), "numbers": len(u.numbers),
+                    "intents": u.intents, "transcript_chars": len(u.transcript or "")})
                 return u
             except AIUnavailable:
                 if audio is not None:
@@ -111,7 +117,7 @@ class AIClient:
                     [types.Part.from_bytes(data=img, mime_type="image/jpeg"), ask],
                     ImageRead,
                     prompts.READ_IMAGE_SYSTEM + prompts.READ_IMAGE_GEOMETRY,
-                    timeout=12.0,
+                    timeout=18.0,
                     kind="read_image",
                 )
             except AIUnavailable:

@@ -206,7 +206,7 @@ LANG_BUTTONS = (("en", "English"), ("hi", "हिंदी"), ("mr", "मरा�
 
 def language_picker(ctx: SkillContext) -> Reply:
     name = ctx.staff.name if ctx.staff else ""
-    body = f"Namaste {name}! 🙏 Main Chanakya, aapka sales saathi.\nभाषा निवडा · Bhasha chuniye · Choose your language"
+    body = f"Namaste {name}! Main Chanakya, aapka sales saathi.\nभाषा निवडा · Bhasha chuniye · Choose your language"
     btns = [Button(id=encode("g", "alang", lg), title=title) for lg, title in LANG_BUTTONS]
     return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="buttons", body=body, buttons=btns))
 
@@ -497,6 +497,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     table = {
         "go": lambda: assess.go(ctx),
         "photo": lambda: assess.photo_prompt(ctx),
+        "photo_yes": lambda: assess.photo_yes(ctx),
+        "photo_no": lambda: assess.photo_no(ctx),
         "options": lambda: recommend.show_options(ctx),
         "shown": lambda: recommend.shown(ctx),
         "demo2": lambda: recommend.demo2(ctx),

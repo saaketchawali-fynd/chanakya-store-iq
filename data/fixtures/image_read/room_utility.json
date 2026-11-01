@@ -1,0 +1,45 @@
+{
+  "kind": "room",
+  "boxes": [
+    {
+      "label": "wall",
+      "box_2d": [
+        0,
+        212,
+        733,
+        788
+      ]
+    },
+    {
+      "label": "window",
+      "box_2d": [
+        0,
+        345,
+        55,
+        552
+      ]
+    }
+  ],
+  "light": "moderate",
+  "frontal": true,
+  "people_present": false,
+  "wall_corners": [
+    {
+      "x": 212,
+      "y": -177
+    },
+    {
+      "x": 788,
+      "y": -177
+    },
+    {
+      "x": 740,
+      "y": 733
+    },
+    {
+      "x": 260,
+      "y": 733
+    }
+  ],
+  "floor_y": 733
+}

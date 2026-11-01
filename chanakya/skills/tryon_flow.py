@@ -34,10 +34,8 @@ async def on_room_photo(ctx: SkillContext, data: bytes, filename: str | None) ->
     jpeg = _to_jpeg(data)
     await repo.media_put(s.id, "room_photo_raw", jpeg, "image/jpeg", ctx.now, days=1)
     s.extra["room_photo_name"] = filename
-    ack = info_reply(ctx, ctx.t("room_photo_ack"))
-    ctx.reg.static(ctx.t("room_photo_ack"))
-    nxt = C.next_question_or_options(ctx)
-    return ctx.reply(ack, nxt, background=["tryon"])
+    nxt = C.next_question_or_options(ctx, footer=ctx.t("footer_photo_got"))
+    return ctx.reply(nxt, background=["tryon"])
 
 
 def _to_jpeg(data: bytes) -> bytes:
@@ -142,7 +140,8 @@ async def job(ctx: SkillContext) -> Reply:
             )
         )
     dist = P.number(s.home, "seat_distance", ctx.pack)
-    dist_text = ctx.t("tryon_distance", ctx.clang, ft=ctx.reg.num(dist, "card:seat_distance")) if dist else None
+    dist_text = (ctx.t("tryon_distance", ctx.clang, ft=ctx.reg.num(dist, "card:seat_distance"))
+                 if dist and ctx.pack.category == "tv" else None)
     ww = P.number(s.home, "wall_width_ft")
     req = TryonRequest(
         photo=raw.data,

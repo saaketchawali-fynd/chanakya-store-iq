@@ -16,7 +16,7 @@ from chanakya.skills.review import STEPS
 from chanakya.truth import fmt
 
 CLIPS = ROOT / "data" / "clips"
-ICON = {"back_in_stock": "🟢", "out_of_stock": "🔴", "low": "🟡"}
+ICON = {"back_in_stock": "up", "out_of_stock": "down", "low": "low"}
 
 
 async def focus_step(ctx: SkillContext) -> tuple[str, int | None]:
@@ -101,7 +101,9 @@ async def brief(ctx: SkillContext) -> Reply:
 
 
 async def clip(ctx: SkillContext, step: str) -> Reply:
-    f = CLIPS / f"{step}.mp4"
+    f = CLIPS / f"{step}_{ctx.lang}.mp4"
+    if not f.exists():
+        f = CLIPS / f"{step}.mp4"
     btns = [ctx.b("b_quiz", encode("g", "quiz", step)), ctx.b("b_new_customer", encode("g", "new"))]
     if f.exists():
         mid = await ctx.svc.channel.upload_media(f.read_bytes(), "video/mp4", f.name)

@@ -81,12 +81,29 @@ def question_reply(
     return coach_reply(ctx, say, why, (extra_cites or []) + [slot_id], btns)
 
 
-def next_question_or_options(ctx: SkillContext, lead: str | None = None) -> OutMessage:
-    """Coach reply with the next-best question. Once the options gate is open, the first button is Options."""
+def photo_question(ctx: SkillContext, footer: str | None = None) -> OutMessage:
+    """One question, two answers only: does the customer have a photo of the room?"""
+    ctx.x["photo_asked"] = True
+    cites = known_cites(ctx, ["seat_distance", "room_size", "space"]) or []
+    btns = [ctx.b("b_photo_yes", ctx.sid("photo_yes")), ctx.b("b_photo_no", ctx.sid("photo_no"))]
+    if not cites:
+        return info_reply(ctx, ctx.tc("bolo_photo_ask"), btns)
+    return coach_reply(ctx, ctx.tc("bolo_photo_ask"), ctx.t("kyun_photo_ask"), cites, btns, footer=footer)
+
+
+def next_question_or_options(ctx: SkillContext, lead: str | None = None, footer: str | None = None) -> OutMessage:
+    """Exactly ONE next step, chosen from what is known: the next home question; once the options gate opens,
+    the budget (if the customer has not said it), then 'room photo?' (once), then questions with Options first."""
     pack = ctx.pack
     s = ctx.session
-    slot = pick_next_slot(ctx)
     gate_open = state.options_gate_open(s, pack)
+    if gate_open and not s.shortlist and lead is None:
+        if s.home.start_level_inr is None and not ctx.x.get("budget_asked"):
+            ctx.x["budget_asked"] = True
+            return budget_list(ctx)
+        if not ctx.x.get("photo_asked") and not s.tryon_done and pack.category in ("tv", "ac", "wm"):
+            return photo_question(ctx, footer=footer)
+    slot = pick_next_slot(ctx)
     if slot is None:
         cites = known_cites(ctx)
         if not cites:
@@ -95,16 +112,20 @@ def next_question_or_options(ctx: SkillContext, lead: str | None = None) -> OutM
                 ctx.t("fallback_body"),
                 [ctx.b("b_options", ctx.sid("options")), ctx.b("b_status", encode("g", "status"))],
             )
-        btns = [
-            ctx.b("b_options", ctx.sid("options")),
-            ctx.b("b_photo", ctx.sid("photo")),
-            ctx.b("b_status", encode("g", "status")),
-        ]
-        return coach_reply(ctx, ctx.tc("bolo_options_ready"), ctx.t("kyun_options_ready"), cites, btns)
+        btns = [ctx.b("b_options", ctx.sid("options")), ctx.b("b_status", encode("g", "status"))]
+        return coach_reply(ctx, ctx.tc("bolo_options_ready"), ctx.t("kyun_options_ready"), cites, btns, footer=footer)
     btns = quick_buttons(ctx, slot)
     if gate_open and not s.shortlist:
         btns = [ctx.b("b_options", ctx.sid("options"))] + btns[:2]
-    return question_reply(ctx, slot, btns, say_override=lead)
+    msg = question_reply(ctx, slot, btns, say_override=lead)
+    if footer:
+        msg.footer = footer
+    if gate_open and not s.shortlist and not ctx.x.get("gate_card_sent"):
+        # the Home Card rides on this same message when the options open (no separate message)
+        ctx.x["gate_card_sent"] = True
+        msg.card = home_card(ctx)
+        ctx.ev("home_card_sent", known=pack.known_required(s.home), total=len(pack.required_slots))
+    return msg
 
 
 def home_card(ctx: SkillContext) -> Card:
@@ -209,8 +230,13 @@ def product_name(ctx: SkillContext, p) -> str:
 
 
 def option_button(ctx: SkillContext, label: str, p) -> Button:
-    name = ctx.reg.raw(p.model, f"product:{p.sku}")
-    return Button(id=ctx.sid("opt", label), title=truncate_title(f"{label} · {name}"))
+    """'B: Meru 55 QLED Pro' when it fits in 20 characters, else 'B: Meru 55"', else 'Option B' — never cut off."""
+    size = p.spec("size_in")
+    for title in (f"{label}: {p.model}", f'{label}: {p.brand} {int(size)}"' if size else "", f"{label}: {p.brand}"):
+        if title and len(title) <= 20:
+            ctx.reg.raw(title, f"product:{p.sku}")
+            return Button(id=ctx.sid("opt", label), title=title)
+    return Button(id=ctx.sid("opt", label), title=f"Option {label}")
 
 
 def who_title(ctx: SkillContext, lang: str) -> str | None:

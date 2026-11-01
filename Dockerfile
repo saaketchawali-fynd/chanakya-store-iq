@@ -8,8 +8,8 @@ COPY pyproject.toml uv.lock* ./
 RUN uv pip install --system -r pyproject.toml
 RUN python -m playwright install --with-deps chromium
 COPY . .
-RUN uv pip install --system --no-deps -e . \
- && python scripts/make_product_images.py && python scripts/make_screen_image.py
+# product images, screen wallpaper and clips are committed (regenerate with scripts/make_*.py)
+RUN uv pip install --system --no-deps -e .
 EXPOSE 8080
 HEALTHCHECK CMD curl -fs http://localhost:${PORT:-8080}/health || exit 1
 CMD ["sh", "-c", "uvicorn chanakya.app.main:app --host 0.0.0.0 --port ${PORT:-8080} --workers 1"]

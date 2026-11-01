@@ -38,30 +38,35 @@ async def test_golden_path(tmp_path):
         out = await step(h.tap, "s:C1:lang:mr")
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.customer_lang == "mr"
-        # 3 voice note → mounting question (Marathi) + Home Card 3/7
+        # 3 voice note → ONE message: the mounting question (Marathi line to say), no emojis
         out = await step(h.voice, "assess_1")
+        assert len(out) == 1
         coach = out[0]
-        assert coach.coach and "भिंतीवर" in coach.body and "Kyun" in coach.body
+        assert coach.coach and "भिंतीवर" in coach.body and coach.body.startswith("*Bolo*:") and "*Kyun*:" in coach.body
+        assert coach.footer.startswith("Samjha: 10 ft")  # what the voice note was understood as
         assert [b.id for b in coach.buttons] == [
             "s:C1:slot:mounting:wall",
             "s:C1:slot:mounting:stand",
             "s:C1:slot:mounting:unknown",
         ]
-        assert any(m.card and m.card.template == "home" and m.card.data["known"] == 3 for m in out)
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.slots["seat_distance"][-1].value == "d8_10"
         assert s.home.start_level_inr == 50000 and s.home.start_level_source == "associate_voice"
         assert "₹" not in texts(out)
-        # 4 mounting → elders question with Options; Home Card 4/7
+        # 4 mounting → options gate opens; budget is known, so the ONE next step is "room photo?" (2 buttons only)
         out = await step(h.tap, "s:C1:slot:mounting:wall")
-        assert "s:C1:options" in button_ids(out) and "s:C1:slot:elders:yes" in button_ids(out)
-        assert any(m.card and m.card.template == "home" and m.card.data["known"] == 4 for m in out)
-        # 5 room photo → ack + try-on
-        await step(h.tap, "s:C1:photo")
+        assert len(out) == 1 and button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"]
+        # 5 customer has a photo → asked for it with nothing else on screen → photo → next question + try-on
+        out = await step(h.tap, "s:C1:photo_yes")
+        assert len(out) == 1 and not out[0].buttons
         out = await step(h.photo, "room_living.jpg")
-        assert "Photo mil gayi" in out[0].body
+        q = out[0]
+        assert "s:C1:options" == q.buttons[0].id and "s:C1:slot:elders:yes" in button_ids([q])
+        assert q.card and q.card.template == "home" and q.card.data["known"] == 4  # Home Card on the same message
+        assert "Photo" in q.footer
         tryon = [m for m in out if m.image_bytes]
         assert tryon and "55" in tryon[0].body and "65" in tryon[0].body
+        s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert "tryon_sent" in await ev_types(s.id)
         # 6 claim → myth line
         out = await step(h.voice, "assess_2_claim")
@@ -69,7 +74,7 @@ async def test_golden_path(tmp_path):
         assert button_ids(out)[0] == "s:C1:proof:tv_4k_useless"
         # 7–8 label → b_motion then b_bright, Benefit Card, no price
         out = await step(h.photo, "label_meru55.jpg")
-        assert "120 Hz" in out[0].body and any(m.card and m.card.template == "benefit" for m in out)
+        assert "120 Hz" in out[0].body and out[0].card and out[0].card.template == "product"
         out = await step(h.tap, "s:C1:benefit_next")
         assert "उन्हातही" in out[0].body
         evs = await repo.events_for(s.id, ["benefit_said", "label_read"])
@@ -92,7 +97,7 @@ async def test_golden_path(tmp_path):
         assert evs[-1].payload["recipe"] == "glare_test"
         # 11 shown → trial close
         out = await step(h.tap, "s:C1:shown")
-        assert "🔓" in out[0].body and "Demo ✓" in out[0].body
+        assert "Daam khula" in out[0].body and "Demo ho gaya" in out[0].body
         # 12 choose B → Kharcha
         out = await step(h.tap, "s:C1:opt:B")
         k = out[-1]
@@ -140,7 +145,7 @@ async def test_golden_path(tmp_path):
         assert any(m.to == PHONES["customer"] and "u:" in "".join(button_ids([m])) for m in out)
         h.as_("customer")
         out = await step(h.tap, f"u:{s.id[:8]}:working")
-        assert any(m.to == PHONES["associate"] and "✓" in m.body for m in out)
+        assert any(m.to == PHONES["associate"] and "Meru 55 QLED Pro" in m.body for m in out)
         assert "install_confirmed" in await ev_types(s.id)
         # global: no validator violations during the run
         assert await repo.events_for(None, ["validator_violation"]) == []

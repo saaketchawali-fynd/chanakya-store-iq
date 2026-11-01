@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{# Two products side by side (A left, B right): spec rows with the better cell highlighted, pros, verdict. #}
+{% set A = a if a is mapping else {} %}
+{% set B = b if b is mapping else {} %}
+{% set rs = (rows|aslist)[:8] %}
+{% set ap = (a_pros|aslist)[:3] %}
+{% set bp = (b_pros|aslist)[:3] %}
+{% set score = namespace(a=0, b=0) %}
+{% for r in rs %}{% if r.better == 'a' %}{% set score.a = score.a + 1 %}{% elif r.better == 'b' %}{% set score.b = score.b + 1 %}{% endif %}{% endfor %}
+{% block style %}
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .prod { padding: 0; overflow: hidden; border: 3px solid transparent; }
+  .prod.win { border-color: #F2B784; }
+  .prod .stage { height: 160px; border-radius: 27px 27px 0 0; }
+  .prod .stage img { max-width: 52%; max-height: 82%; }
+  .tag { position: absolute; left: 16px; top: 16px; width: 48px; height: 48px; border-radius: 15px; background: var(--indigo);
+         color: #fff; font-size: 26px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .win .tag { background: var(--saffron); }
+  .prod .body { padding: 14px 22px 18px; }
+  .prod .pros { margin-top: 8px; }
+  .prod h3 { font-size: 30px; line-height: 1.2; font-weight: 800; color: var(--ink); }
+  .fit { position: absolute; right: 14px; top: 14px; display: inline-flex; align-items: center; gap: 8px; font-size: 22px;
+         font-weight: 700; color: var(--muted); background: rgba(255,255,255,.94); padding: 6px 12px; border-radius: 999px; }
+  .fit b { font-size: 24px; }
+  .fit.good b { color: var(--green-deep); } .fit.partial b { color: var(--saffron-deep); } .fit.poor b { color: var(--red); }
+  .meter { width: 56px; height: 8px; border-radius: 99px; background: #E8E3DA; overflow: hidden; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--faint); }
+  .fit.good .meter i { background: var(--green); } .fit.partial .meter i { background: var(--saffron); } .fit.poor .meter i { background: var(--red); }
+  .tbl { margin-top: 18px; padding: 10px 18px; }
+  .tr { display: grid; grid-template-columns: 1fr 210px 1fr; align-items: center; gap: 10px; padding: 5px 0; }
+  .tr + .tr { border-top: 2px solid var(--line); }
+  .tr .k { text-align: center; font-size: 21px; font-weight: 700; color: var(--muted); line-height: 1.25; }
+  .tr .c { display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 14px; font-size: 27px;
+           color: var(--text); line-height: 1.28; }
+  .tr .c.av { justify-content: flex-end; text-align: right; }
+  .tr .c.best { background: var(--green-pale); color: var(--green-deep); font-weight: 800; }
+  .tr .c .ic { color: var(--green); }
+  .tr.price .c { font-size: 31px; font-weight: 800; color: var(--ink); }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+  .duo .card { padding: 20px 24px; }
+  .duo .label { margin-bottom: 8px; }
+  .pc { display: flex; align-items: flex-start; gap: 10px; padding: 3px 0; font-size: 25px; line-height: 1.32; color: var(--text); }
+  .pc .ic { color: var(--green); margin-top: 4px; }
+  .callout { display: flex; align-items: flex-start; gap: 16px; margin-top: 18px; padding: 20px 26px; border-radius: 26px;
+             background: var(--saffron-pale); }
+  .callout .bubble { width: 50px; height: 50px; background: #fff; color: var(--saffron-deep); }
+  .callout .k { display: block; font-size: 22px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--saffron-deep); }
+  .callout .k.dv { font-size: 24px; font-weight: 700; }
+  .callout .v { font-size: 29px; line-height: 1.36; color: var(--ink); font-weight: 700; }
+{% endblock %}
+{% block hd_class %}{% if A or B %} lift{% endif %}{% endblock %}
+{% block header %}
+  <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+  {% set ttl = title or L.title %}
+  <h1 class="{{ ttl|dv }}">{{ ttl }}</h1>
+{% endblock %}
+{% macro prod(p, letter, win, pros) %}
+  <div class="card prod{% if win %} win{% endif %}">
+    <div class="stage">{% if p.image %}<img src="{{ p.image }}" alt="">{% else %}{{ icon('box', 80, '', 1.4) }}{% endif %}<span class="tag">{{ letter }}</span>
+      {% if p.fit_str %}{% set v = p.fit_str|pct %}
+      <span class="fit {{ p.badge_kind if p.badge_kind in ('good', 'partial', 'poor') else '' }}">{% if v is not none %}<span class="meter"><i style="width: {{ v|round|int }}%"></i></span>{% endif %}<b class="num">{{ p.fit_str }}</b></span>
+      {% endif %}
+    </div>
+    <div class="body">
+      <h3>{{ p.title or letter }}</h3>
+      {% if pros %}<div class="pros">{% for x in pros %}<div class="pc">{{ icon('check', 24, '', 2.8) }}<span>{{ x }}</span></div>{% endfor %}</div>{% endif %}
+    </div>
+  </div>
+{% endmacro %}
+{% block content %}
+  {% if A or B or ap or bp %}
+  <section class="pair">{{ prod(A, 'A', score.a > score.b, ap) }}{{ prod(B, 'B', score.b > score.a, bp) }}</section>
+  {% endif %}
+  {% if rs or price_a or price_b %}
+  <section class="card tbl">
+    {% for r in rs %}
+    <div class="tr">
+      <span class="c av num{% if r.better == 'a' %} best{% endif %}">{% if r.better == 'a' %}{{ icon('check', 22, '', 3) }}{% endif %}{{ r.a if r.a is not none else '–' }}</span>
+      <span class="k{{ r.label|dv }}">{{ r.label }}</span>
+      <span class="c num{% if r.better == 'b' %} best{% endif %}">{{ r.b if r.b is not none else '–' }}{% if r.better == 'b' %}{{ icon('check', 22, '', 3) }}{% endif %}</span>
+    </div>
+    {% endfor %}
+    {% if price_a or price_b %}
+    <div class="tr price"><span class="c av num">{{ price_a or '–' }}</span><span class="k{{ L.price|dv }}">{{ L.price }}</span><span class="c num">{{ price_b or '–' }}</span></div>
+    {% endif %}
+  </section>
+  {% endif %}
+  {% if verdict %}
+  <section class="callout"><span class="bubble">{{ icon('target', 28) }}</span><div><span class="k{{ L.verdict|dv }}">{{ L.verdict }}</span><span class="v">{{ verdict }}</span></div></section>
+  {% endif %}
+{% endblock %}

@@ -36,7 +36,7 @@ async def test_product_question_answered_from_data_not_expert(h):
     await to_options(h)
     out = await h.say("Meru 55 QLED Pro mein kitne HDMI port hain?")
     check_floor(out)
-    assert out[0].body.startswith("📋 Meru 55 QLED Pro · HDMI ports: 3")
+    assert out[0].body.startswith("*Meru 55 QLED Pro* · HDMI ports: 3")
     assert not await repo.expert_q_open()
     out = await h.say("Option A mein Dolby Atmos hai kya?")
     assert "Dolby Atmos: Nahi" in out[0].body  # Arka 55 4K: dolby_atmos false in data
@@ -103,3 +103,42 @@ async def test_old_tv_on_wall_asks_its_size_then_draws(h):
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     assert s.home.slots["existing_tv_in"][-1].number == 32
     assert (await repo.events_for(s.id, ["tryon_sent"]))
+
+
+async def test_label_scan_before_and_after_home_is_understood(h):
+    await h.tap("g:new")
+    await h.tap("s:C1:lang:en")
+    out = await h.photo("label_meru55.jpg")  # nothing known yet: facts only, no fit verdict
+    card = out[0].card
+    assert len(out) == 1 and card.template == "product" and card.data["key_specs"]
+    assert "pros" not in card.data and "badge" not in card.data and card.data["price_str"] is None
+    assert out[0].buttons[0].id == "s:C1:go"  # first: ask about the home
+    await h.voice("assess_1")
+    await h.tap("s:C1:slot:mounting:wall")
+    out = await h.photo("label_meru55.jpg")
+    d = out[0].card.data
+    assert d["badge_kind"] == "good" and d["fit_str"] == "100%" and d["pros"] and not d.get("cons")
+
+
+async def test_compare_two_labels_for_this_home(h):
+    await to_options(h)
+    await h.photo("label_meru55.jpg")
+    out = await h.tap("s:C1:compare")
+    assert not out[0].buttons
+    out = await h.photo("label_arka55.jpg")
+    check_floor(out)
+    m = out[0]
+    d = m.card.data
+    assert m.card.template == "compare" and d["rows"] and d["a"]["fit_str"] == "100%"
+    assert "Meru 55 QLED Pro" in d["verdict"] and "Meru 55 QLED Pro" in m.body
+    assert button_ids(out)[:2] == ["s:C1:tpick:TV-MER-55-QL120", "s:C1:tpick:TV-ARK-55-4K60"]
+    assert any(r["better"] == "a" for r in d["rows"])  # brightness / refresh favour the Meru
+    assert d.get("price_a") is None  # price stays locked until the demo
+
+
+async def test_voice_note_shows_what_was_understood(h):
+    await h.tap("g:new")
+    await h.tap("s:C1:lang:mr")
+    out = await h.voice("assess_1")
+    f = out[0].footer
+    assert f.startswith("Samjha: ") and "10 ft" in f and len(f) <= 60

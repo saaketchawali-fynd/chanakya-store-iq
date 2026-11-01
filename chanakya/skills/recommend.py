@@ -108,7 +108,8 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
         name = C.product_name(ctx, p)
         reason_a = _reason(ctx, o.reason_key, ctx.lang)
         extra = "" if p.qty > 0 else f" ({_stock_line(ctx, p)})"
-        lines.append(f"{o.label}: {name} — {reason_a}{' ⭐' if o.role == 'best' else ''}{extra}")
+        tag = f" ({ctx.t('best_pick')})" if o.role == "best" else ""
+        lines.append(f"*{o.label}* {name}{tag}: {reason_a}{extra}")
         card_opts.append(
             {
                 "label": o.label,

@@ -1,0 +1,91 @@
+{
+  "kind": "room",
+  "boxes": [
+    {
+      "label": "wall",
+      "box_2d": [
+        0,
+        0,
+        1000,
+        869
+      ]
+    },
+    {
+      "label": "door",
+      "box_2d": [
+        166,
+        0,
+        1000,
+        259
+      ]
+    },
+    {
+      "label": "window",
+      "box_2d": [
+        234,
+        700,
+        586,
+        819
+      ]
+    },
+    {
+      "label": "tv_unit",
+      "box_2d": [
+        717,
+        298,
+        1000,
+        734
+      ]
+    },
+    {
+      "label": "sofa",
+      "box_2d": [
+        613,
+        724,
+        932,
+        968
+      ]
+    },
+    {
+      "label": "floor_tile",
+      "box_2d": [
+        883,
+        410,
+        1000,
+        614
+      ]
+    },
+    {
+      "label": "ceiling_line",
+      "box_2d": [
+        0,
+        0,
+        122,
+        869
+      ]
+    }
+  ],
+  "light": "sunny",
+  "frontal": false,
+  "people_present": false,
+  "wall_corners": [
+    {
+      "x": -134,
+      "y": -180
+    },
+    {
+      "x": 869,
+      "y": 118
+    },
+    {
+      "x": 860,
+      "y": 793
+    },
+    {
+      "x": -107,
+      "y": 1062
+    }
+  ],
+  "floor_y": 888,
+  "ceiling_y": 13
+}

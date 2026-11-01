@@ -6,10 +6,13 @@ from datetime import datetime
 
 from chanakya.ai.schemas import ImageRead
 from chanakya.brain import packs as P
+from chanakya.brain.fit import fit
 from chanakya.channel.limits import truncate
+from chanakya.core import state
 from chanakya.core.coach import coach_reply, info_reply
 from chanakya.core.contracts import Card, ListRow, ListSection, OutMessage, Reply
 from chanakya.skills import common as C
+from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 
 SPEC_LABELS = {
@@ -31,13 +34,13 @@ SPEC_LABELS = {
     "heater": {"hi": "हीटर", "mr": "हीटर", "en": "Heater"},
 }
 ICONS = {
-    "b_motion": "🏏",
-    "b_bright": "☀️",
-    "b_size": "📏",
-    "b_dialogue": "🗣",
-    "b_angle": "↔️",
-    "b_dark": "🎬",
-    "b_apps": "📺",
+    "b_motion": "motion",
+    "b_bright": "sun",
+    "b_size": "size",
+    "b_dialogue": "voice",
+    "b_angle": "angle",
+    "b_dark": "film",
+    "b_apps": "apps",
 }
 UNITS = {
     "refresh_hz": "",
@@ -176,7 +179,7 @@ async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0) -> Reply:
             or (prev_at and (ctx.now - datetime.fromisoformat(prev_at)).total_seconds() <= 120)
         )
     ):
-        return compare(ctx, prev, sku)
+        return await compare(ctx, prev, sku)
     return await benefit(ctx, first=True)
 
 
@@ -189,6 +192,21 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     said = x.setdefault("benefits_said", {}).setdefault(sku, [])
     ms = matching(ctx, p)
     nxt = next((b for b in ms if b.id not in said), None)
+    if nxt is None and first:
+        # no home facts match yet: show the product from the data, and steer back to the home questions
+        card = await product_card(ctx, p)
+        slot = C.pick_next_slot(ctx)
+        btns = [ctx.b("b_next_q", ctx.sid("go")), ctx.b("b_compare", ctx.sid("compare")),
+                ctx.b("b_options", ctx.sid("options"))]
+        say = ctx.tc("bolo_label_intro", product=C.product_name(ctx, p))
+        n = state.missing_for_options(ctx.session, ctx.pack)
+        why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing")) if n else ctx.t("kyun_options_ready")
+        cites = C.known_cites(ctx) or ([slot] if slot else [])
+        if slot and not C.known_cites(ctx):
+            ctx.asking.add(slot)
+        if not cites:
+            return ctx.reply(info_reply(ctx, say, btns, card=card))
+        return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
     if nxt is None:
         btns = [ctx.b("b_options", ctx.sid("options")), ctx.b("b_compare", ctx.sid("compare"))]
         return ctx.reply(info_reply(ctx, ctx.t("benefits_done"), btns))
@@ -207,16 +225,64 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         ctx.b("b_compare", ctx.sid("compare")),
         ctx.b("label_dikhao_btn", ctx.sid("options")),
     ]
-    msgs = [coach_reply(ctx, say, why, [c for c in nxt.cites if P.known(ctx.session.home, c)] or nxt.cites, btns)]
+    card = None
     if first:
-        msgs.append(await benefit_card(ctx, p, ms))
-    return ctx.reply(*msgs)
+        card = await product_card(ctx, p)
+        if not state.options_gate_open(ctx.session, ctx.pack):  # judge the fit only once the home is understood
+            n = state.missing_for_options(ctx.session, ctx.pack)
+            why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
+            btns = [ctx.b("b_next_q", ctx.sid("go")), btns[0], btns[1]]
+    cites = [c for c in nxt.cites if P.known(ctx.session.home, c)] or nxt.cites
+    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+
+
+def _badge(ctx: SkillContext, score: int, lang: str) -> tuple[str, str]:
+    kind = "good" if score >= 85 else "partial" if score >= 60 else "poor"
+    return ctx.t(f"badge_{kind}", lang), kind
+
+
+async def pros_cons(ctx: SkillContext, p, lang: str) -> tuple[list[str], list[str], int]:
+    """Pros / cons of this product for THIS home, from the fit rules (data + Home Card only)."""
+    pack = ctx.pack
+    f = fit(p, ctx.session.home, pack, ctx.facts.snap.guides)
+    pros_t, cons_t = ctx.packs.common.get("fit_pros", {}), ctx.packs.common.get("fit_cons", {})
+    pros, cons = [], []
+    for c in sorted(f.contributions, key=lambda c: -c.weight):
+        if c.match >= 0.99 and c.rule_id in pros_t:
+            pros.append(await fill(ctx, ctx.pick(pros_t[c.rule_id], lang), p, lang))
+        elif c.match < 0.75 and c.rule_id in cons_t:
+            cons.append(await fill(ctx, ctx.pick(cons_t[c.rule_id], lang), p, lang))
+    return pros[:4], cons[:3], f.score
+
+
+async def product_card(ctx: SkillContext, p) -> Card:
+    """Label scan → the product, straight from the database; the fit for this home once enough is known."""
+    lang = ctx.clang
+    s = ctx.session
+    if p.qty > 0:
+        stock = ctx.t("stock_in_store", lang, qty=ctx.reg.num(p.qty, f"stock:{p.sku}@{p.store_id}"))
+    else:
+        stock = ctx.t("stock_nearby", lang, days=ctx.reg.num(p.delivery_days, f"stock:{p.sku}:days"),
+                      store=ctx.reg.raw(ctx.facts.store_name(p.nearby_store_id).replace("Reliance Digital ", "")
+                                        .replace(" (TEST)", ""), "store"))
+    data = {"title": C.product_title(ctx, p, lang), "image": p.image, "key_specs": PV.key_specs(ctx, p, lang, 6),
+            "features": PV.features(ctx, p, lang, 4), "stock_line": stock, "offer_text": PV.offer_badge(ctx, p, lang),
+            "price_str": ctx.reg.inr(p.price, p.price_source) if state.price_gate_open(s, ctx.pack) else None}
+    mn = (p.info or {}).get("model_number")
+    if mn:
+        data["note"] = ctx.t("label_note", lang, model=ctx.reg.raw(mn, f"product:{p.sku}"))
+    if state.options_gate_open(s, ctx.pack):
+        pros, cons, score = await pros_cons(ctx, p, lang)
+        badge, kind = _badge(ctx, score, lang)
+        data.update(pros=pros, cons=cons, badge=badge, badge_kind=kind,
+                    fit_str=ctx.reg.num(score, f"calc:fit:{p.sku}") + "%")
+    return Card(template="product", lang=lang, data=data)  # type: ignore[arg-type]
 
 
 async def benefit_card(ctx: SkillContext, p, ms: list) -> OutMessage:
     lang = ctx.clang
     benefits = [
-        {"icon": ICONS.get(b.id, "✓"), "text": await fill(ctx, ctx.pick(b.card, lang), p, lang)} for b in ms[:3]
+        {"icon": ICONS.get(b.id, "check"), "text": await fill(ctx, ctx.pick(b.card, lang), p, lang)} for b in ms[:3]
     ]
     ign = ignored_specs(ctx, p, ms)[:3]
     ignore_text = (
@@ -237,31 +303,64 @@ async def benefit_card(ctx: SkillContext, p, ms: list) -> OutMessage:
     return info_reply(ctx, ctx.t("benefit_card_caption"), card=card)
 
 
-def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
+LOWER_IS_BETTER = {"weight_kg", "noise_db", "kwh_year"}
+
+
+def _better(va, vb, key: str) -> str | None:
+    if isinstance(va, bool) and isinstance(vb, bool):
+        return None if va == vb else ("a" if va else "b")
+    if isinstance(va, (int, float)) and isinstance(vb, (int, float)) and va != vb:
+        hi = va > vb
+        return ("b" if hi else "a") if key in LOWER_IS_BETTER else ("a" if hi else "b")
+    return None
+
+
+async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
+    """Two labels → side by side from the database, with which is better for THIS home."""
     a, b = ctx.facts.product_sync(sku_a), ctx.facts.product_sync(sku_b)
-    keys = sorted(set(a.specs) | set(b.specs))
-    diffs = [k for k in keys if a.specs.get(k) != b.specs.get(k)]
-    pack = ctx.pack
-    rel = set()
-    for bn in matching(ctx, a) + matching(ctx, b):
-        rel |= _spec_keys(bn.when_spec)
-        for c in bn.when_spec_any:
-            rel |= _spec_keys(c)
-    matter = [k for k in diffs if k in rel]
-    names = ", ".join(ctx.pick(SPEC_LABELS.get(k, {"en": k.replace("_", " ")})) for k in matter[:3]) or "–"
-    body = ctx.t(
-        "compare_body",
-        a=C.product_name(ctx, a),
-        b=C.product_name(ctx, b),
-        n=ctx.reg.num(len(diffs), "calc:compare_diffs"),
-        k=ctx.reg.num(len(matter), "calc:compare_matter"),
-        list=ctx.reg.static(names),
-    )
-    _ = pack
-    btns = [ctx.b("b_options", ctx.sid("options")), ctx.b("b_benefit_next", ctx.sid("benefit_next"))]
-    return ctx.reply(info_reply(ctx, body, btns))
+    lang = ctx.clang
+    s = ctx.session
+    keys = list(dict.fromkeys(PV.KEY_SPECS.get(a.category, []) + PV.KEY_SPECS.get(b.category, [])))
+    rows, wins = [], {"a": 0, "b": 0}
+    for k in keys:
+        va, vb = PV.fmt_value(ctx, a, k, lang), PV.fmt_value(ctx, b, k, lang)
+        if va is None and vb is None:
+            continue
+        better = _better(PV.raw_value(a, k), PV.raw_value(b, k), k)
+        if better:
+            wins[better] += 1
+        rows.append({"label": ctx.reg.static(PV.label(k, lang)), "a": va or "–", "b": vb or "–", "better": better})
+    data = {"title": ctx.t("compare_title", lang),
+            "a": {"title": C.product_title(ctx, a, lang), "image": a.image},
+            "b": {"title": C.product_title(ctx, b, lang), "image": b.image}, "rows": rows[:8]}
+    gate = state.options_gate_open(s, ctx.pack)
+    winner = None
+    if gate:
+        pa, _, sa = await pros_cons(ctx, a, lang)
+        pb, _, sb = await pros_cons(ctx, b, lang)
+        data["a"].update(fit_str=ctx.reg.num(sa, f"calc:fit:{a.sku}") + "%", badge_kind=_badge(ctx, sa, lang)[1])
+        data["b"].update(fit_str=ctx.reg.num(sb, f"calc:fit:{b.sku}") + "%", badge_kind=_badge(ctx, sb, lang)[1])
+        data["a_pros"], data["b_pros"] = pa[:3], pb[:3]
+        if sa != sb:
+            winner = a if sa > sb else b
+            data["verdict"] = ctx.t("compare_verdict", lang, name=C.product_name(ctx, winner))
+    if state.price_gate_open(s, ctx.pack):
+        data["price_a"], data["price_b"] = ctx.reg.inr(a.price, a.price_source), ctx.reg.inr(b.price, b.price_source)
+    ctx.ev("compare_shown", a=a.sku, b=b.sku, winner=winner.sku if winner else None)
+    if winner:
+        body = ctx.t("compare_body_fit", a=C.product_name(ctx, a), b=C.product_name(ctx, b),
+                     winner=C.product_name(ctx, winner))
+    else:
+        body = ctx.t("compare_body_nofit", a=C.product_name(ctx, a), b=C.product_name(ctx, b))
+    btns = [C.option_button(ctx, "1", a), C.option_button(ctx, "2", b), ctx.b("b_options", ctx.sid("options"))]
+    btns[0] = btns[0].model_copy(update={"id": ctx.sid("tpick", a.sku)})
+    btns[1] = btns[1].model_copy(update={"id": ctx.sid("tpick", b.sku)})
+    card = Card(template="compare", lang=lang, data=data)  # type: ignore[arg-type]
+    return ctx.reply(info_reply(ctx, body, btns, card=card))
 
 
 async def compare_prompt(ctx: SkillContext) -> Reply:
     ctx.x["compare_pending"] = True
-    return ctx.reply(info_reply(ctx, ctx.t("compare_send")))
+    m = info_reply(ctx, ctx.t("compare_send"))
+    m.footer = ctx.t("footer_compare")
+    return ctx.reply(m)
