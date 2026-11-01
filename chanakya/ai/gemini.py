@@ -66,6 +66,8 @@ class GeminiClient:
                         continue
                     break
             log.warning("gemini_fail", model=model, kind=kind, err=last_err)
+            if model == self.fast:  # why the main model was skipped (shown on /health)
+                diag.mark("ai_fast_model_error", {"model": model, "kind": kind, "error": last_err[:200]})
         diag.bump("ai_errors")
         diag.mark(f"ai_last_{kind}", {"ok": False, "error": last_err})
         raise AIUnavailable(last_err)
