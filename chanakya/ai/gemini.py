@@ -19,6 +19,9 @@ class AIUnavailable(Exception):
     """The requested capability needs a model that is not configured or did not answer in time."""
 
 
+LATEST = "gemini-flash-latest"  # Google's always-current alias: used only if both pinned models are retired (404)
+
+
 class GeminiClient:
     def __init__(self, s: Settings):
         from google import genai
@@ -42,7 +45,10 @@ class GeminiClient:
     async def json(self, parts: list, schema: type[BaseModel], system: str, timeout: float, kind: str) -> BaseModel:
         last_err = ""
         deadline = time.perf_counter() + timeout * 1.2  # never more than this in total, whatever fails
-        for model, share in ((self.fast, 0.6), (self.fallback, 1.0)):
+        not_found = 0
+        for i, (model, share) in enumerate(((self.fast, 0.6), (self.fallback, 1.0), (LATEST, 1.0))):
+            if i == 2 and (not_found < 2 or LATEST in (self.fast, self.fallback)):
+                break  # the alias only when Google retired both pinned models
             for thinking in (True, False):  # some models reject the thinking config: retry without it
                 t0 = time.perf_counter()
                 t = min(timeout * share if model == self.fast else timeout, deadline - t0)
@@ -69,6 +75,7 @@ class GeminiClient:
                     if thinking and "think" in last_err.lower():
                         continue
                     break
+            not_found += "NOT_FOUND" in last_err or "404" in last_err[:8]
             log.warning("gemini_fail", model=model, kind=kind, err=last_err)
             if model == self.fast:  # why the main model was skipped (shown on /health)
                 diag.mark("ai_fast_model_error", {"model": model, "kind": kind, "error": last_err[:200]})

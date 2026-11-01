@@ -28,9 +28,9 @@ class Settings(BaseSettings):
     #   rules   → deterministic offline understanding (keywords from packs) — default for live WhatsApp
     ai_mode: str = "auto"  # auto = Gemini when GEMINI_API_KEY is set, else offline rules
     gemini_api_key: str = ""
-    gemini_fast_model: str = "gemini-2.5-flash"
-    gemini_fallback_model: str = "gemini-2.5-flash-lite"
-    gemini_image_model: str = "gemini-2.5-flash-image"
+    gemini_fast_model: str = "gemini-3.8-flash"
+    gemini_fallback_model: str = "gemini-3.5-flash-lite"
+    gemini_image_model: str = "gemini-nano-banana-2.1"
 
     database_url: str = "sqlite+aiosqlite:///./chanakya.db"
     public_base_url: str = "http://localhost:8000"
