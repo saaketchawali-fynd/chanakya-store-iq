@@ -26,3 +26,18 @@
    title: {hi: "स्टैंड", mr: "स्टँड", en: "Stand"}, reason: {hi: "bathroom ka geela farsh", mr: "बाथरूमचा ओला फरशी", en: "wet bathroom floor"}, test_data: true}
 - {code: LP_OFFICE, category: laptop, kind: optional, unit: flat, amount: 4999, title: {hi: "Office सॉफ़्टवेयर", mr: "Office सॉफ्टवेअर", en: "Office software"}, test_data: true}
 - {code: LP_BAG, category: laptop, kind: optional, unit: flat, amount: 1299, title: {hi: "लैपटॉप बैग", mr: "लॅपटॉप बॅग", en: "Laptop bag"}, test_data: true}
+# --- added charges
+- {code: TV_SPIKE, category: tv, kind: optional, unit: flat, amount: 899,
+   title: {hi: "स्पाइक गार्ड", mr: "स्पाइक गार्ड", en: "Spike guard"}, test_data: true}
+- {code: AC_GAS_TOPUP, category: ac, kind: conditional, unit: flat, amount: 1000, condition: {number: pipe_run_ft, gt: 15},
+   title: {hi: "गैस टॉप-अप (15 फ़ुट से लंबा पाइप)", mr: "गॅस टॉप-अप (15 फूटपेक्षा लांब पाइप)", en: "Gas top-up (pipe over 15 ft)"}, test_data: true}
+- {code: AC_OUT_STAND, category: ac, kind: conditional, unit: flat, amount: 900, condition: {slot: outdoor_spot, in: [balcony, terrace]},
+   title: {hi: "आउटडोर यूनिट स्टैंड", mr: "आउटडोअर युनिट स्टँड", en: "Outdoor unit stand"}, test_data: true}
+- {code: WM_COVER, category: wm, kind: suggest, unit: flat, amount: 699, condition: {slot: space, eq: balcony},
+   title: {hi: "मशीन कवर", mr: "मशीन कव्हर", en: "Machine cover"}, reason: {hi: "balcony mein dhoop-baarish", mr: "बाल्कनीत ऊन-पाऊस", en: "sun and rain on the balcony"}, test_data: true}
+- {code: WM_INLET_FILTER, category: wm, kind: suggest, unit: flat, amount: 1199, condition: {slot: water, eq: hard},
+   title: {hi: "इनलेट वॉटर फ़िल्टर", mr: "इनलेट वॉटर फिल्टर", en: "Inlet water filter"}, reason: {hi: "khara paani", mr: "खारट पाणी", en: "hard water"}, test_data: true}
+- {code: LP_MOUSE, category: laptop, kind: optional, unit: flat, amount: 699,
+   title: {hi: "वायरलेस माउस", mr: "वायरलेस माउस", en: "Wireless mouse"}, test_data: true}
+- {code: SB_WALLMOUNT, category: soundbar, kind: optional, unit: flat, amount: 499,
+   title: {hi: "साउंडबार वॉल माउंट", mr: "साउंडबार वॉल माउंट", en: "Soundbar wall mount"}, test_data: true}

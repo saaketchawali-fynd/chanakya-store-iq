@@ -5,3 +5,14 @@
    title: {hi: "12 महीने नो-कॉस्ट EMI", mr: "12 महिने नो-कॉस्ट EMI", en: "12-month no-cost EMI"}, test_data: true}
 - {id: FIN-STD-18, kind: standard, months: 18, apr_pct: 15, fee_pct: 1, fee_min: 199, min_amount: 15000, banks: [], categories: [tv, ac, wm, laptop],
    title: {hi: "18 महीने EMI (ब्याज सहित)", mr: "18 महिने EMI (व्याजासह)", en: "18-month EMI (with interest)"}, test_data: true}
+# --- added plans (bank / category restricted)
+- {id: FIN-NCE-3, kind: no_cost, months: 3, apr_pct: 0, fee_flat: 0, min_amount: 5000, banks: [], categories: [tv, ac, wm, laptop],
+   title: {hi: "3 महीने नो-कॉस्ट EMI, कोई फ़ीस नहीं", mr: "3 महिने नो-कॉस्ट EMI, शुल्क नाही", en: "3-month no-cost EMI, no fee"}, test_data: true}
+- {id: FIN-NCE-9-AK, kind: no_cost, months: 9, apr_pct: 0, fee_flat: 249, min_amount: 20000, banks: [Axis, Kotak], categories: [tv, ac, wm, laptop],
+   title: {hi: "9 महीने नो-कॉस्ट EMI (Axis, Kotak)", mr: "9 महिने नो-कॉस्ट EMI (Axis, Kotak)", en: "9-month no-cost EMI (Axis, Kotak)"}, test_data: true}
+- {id: FIN-NCE-12-LAP, kind: no_cost, months: 12, apr_pct: 0, fee_flat: 349, min_amount: 40000, banks: [HDFC, ICICI, Axis], categories: [laptop],
+   title: {hi: "12 महीने नो-कॉस्ट EMI (लैपटॉप)", mr: "12 महिने नो-कॉस्ट EMI (लॅपटॉप)", en: "12-month no-cost EMI (laptops)"}, test_data: true}
+- {id: FIN-NCE-18-SBI, kind: no_cost, months: 18, apr_pct: 0, fee_flat: 499, min_amount: 50000, banks: [SBI], categories: [tv, ac],
+   title: {hi: "18 महीने नो-कॉस्ट EMI (SBI)", mr: "18 महिने नो-कॉस्ट EMI (SBI)", en: "18-month no-cost EMI (SBI)"}, test_data: true}
+- {id: FIN-STD-24, kind: standard, months: 24, apr_pct: 16, fee_pct: 1, fee_min: 299, min_amount: 30000, banks: [], categories: [tv, ac, wm, laptop],
+   title: {hi: "24 महीने EMI (ब्याज सहित)", mr: "24 महिने EMI (व्याजासह)", en: "24-month EMI (with interest)"}, test_data: true}

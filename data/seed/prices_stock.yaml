@@ -1,4 +1,5 @@
 # TEST DATA ONLY — fictional brands (Arka, Meru, Novex). Generated from spec 9.2.
+# 3 stores per SKU. New rows (RD-ANDHERI, added SKUs): nearby_store_id = closest other store with stock, nearby_qty = its qty; delivery_days 1 in stock, 2 from nearby, 3 from warehouse.
 - sku: TV-ARK-43-4K60
   store_id: RD-JUHU
   price: 27990
@@ -15,6 +16,16 @@
   mrp: 32990
   qty: 1
   qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-43-4K60
+  store_id: RD-ANDHERI
+  price: 27990
+  mrp: 32990
+  qty: 3
+  qty_yesterday: 3
   nearby_store_id: RD-JUHU
   nearby_qty: 1
   delivery_days: 1
@@ -39,6 +50,16 @@
   nearby_qty: 5
   delivery_days: 1
   test_data: true
+- sku: TV-ARK-50-4K60
+  store_id: RD-ANDHERI
+  price: 33990
+  mrp: 39990
+  qty: 0
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 2
+  test_data: true
 - sku: TV-ARK-55-4K60
   store_id: RD-JUHU
   price: 38990
@@ -55,6 +76,16 @@
   mrp: 45990
   qty: 4
   qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-55-4K60
+  store_id: RD-ANDHERI
+  price: 38990
+  mrp: 45990
+  qty: 5
+  qty_yesterday: 5
   nearby_store_id: RD-JUHU
   nearby_qty: 4
   delivery_days: 1
@@ -79,6 +110,16 @@
   nearby_qty: 6
   delivery_days: 1
   test_data: true
+- sku: TV-MER-55-QL60
+  store_id: RD-ANDHERI
+  price: 46990
+  mrp: 54990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 6
+  delivery_days: 1
+  test_data: true
 - sku: TV-MER-55-QL120
   store_id: RD-JUHU
   price: 62990
@@ -95,6 +136,16 @@
   mrp: 73990
   qty: 3
   qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-55-QL120
+  store_id: RD-ANDHERI
+  price: 62990
+  mrp: 73990
+  qty: 2
+  qty_yesterday: 2
   nearby_store_id: RD-JUHU
   nearby_qty: 3
   delivery_days: 1
@@ -119,6 +170,16 @@
   nearby_qty: 0
   delivery_days: 1
   test_data: true
+- sku: TV-NOV-55-OL120
+  store_id: RD-ANDHERI
+  price: 109990
+  mrp: 129990
+  qty: 1
+  qty_yesterday: 0
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
 - sku: TV-ARK-65-4K60
   store_id: RD-JUHU
   price: 56990
@@ -135,6 +196,16 @@
   mrp: 66990
   qty: 3
   qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-65-4K60
+  store_id: RD-ANDHERI
+  price: 56990
+  mrp: 66990
+  qty: 2
+  qty_yesterday: 2
   nearby_store_id: RD-JUHU
   nearby_qty: 3
   delivery_days: 1
@@ -159,6 +230,16 @@
   nearby_qty: 2
   delivery_days: 1
   test_data: true
+- sku: TV-MER-65-QL120
+  store_id: RD-ANDHERI
+  price: 84990
+  mrp: 99990
+  qty: 3
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
 - sku: TV-NOV-65-ML120
   store_id: RD-JUHU
   price: 124990
@@ -171,6 +252,16 @@
   test_data: true
 - sku: TV-NOV-65-ML120
   store_id: RD-BELAPUR
+  price: 124990
+  mrp: 146990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-65-ML120
+  store_id: RD-ANDHERI
   price: 124990
   mrp: 146990
   qty: 1
@@ -199,6 +290,376 @@
   nearby_qty: 1
   delivery_days: 1
   test_data: true
+- sku: TV-MER-75-QL120
+  store_id: RD-ANDHERI
+  price: 129990
+  mrp: 152990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: TV-ARK-32-HD60
+  store_id: RD-JUHU
+  price: 12990
+  mrp: 17990
+  qty: 0
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 5
+  delivery_days: 2
+  test_data: true
+- sku: TV-ARK-32-HD60
+  store_id: RD-BELAPUR
+  price: 12990
+  mrp: 17990
+  qty: 6
+  qty_yesterday: 6
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-32-HD60
+  store_id: RD-ANDHERI
+  price: 12990
+  mrp: 17990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 6
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-40-FHD60
+  store_id: RD-JUHU
+  price: 18990
+  mrp: 23990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 2
+  test_data: true
+- sku: TV-ARK-40-FHD60
+  store_id: RD-BELAPUR
+  price: 18990
+  mrp: 23990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-40-FHD60
+  store_id: RD-ANDHERI
+  price: 18990
+  mrp: 23990
+  qty: 3
+  qty_yesterday: 0
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-43-QL60
+  store_id: RD-JUHU
+  price: 31990
+  mrp: 37990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-43-QL60
+  store_id: RD-BELAPUR
+  price: 31990
+  mrp: 37990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-43-QL60
+  store_id: RD-ANDHERI
+  price: 31990
+  mrp: 37990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-50-QL60
+  store_id: RD-JUHU
+  price: 39990
+  mrp: 46990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-50-QL60
+  store_id: RD-BELAPUR
+  price: 39990
+  mrp: 46990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-50-QL60
+  store_id: RD-ANDHERI
+  price: 39990
+  mrp: 46990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-55-QL60
+  store_id: RD-JUHU
+  price: 42990
+  mrp: 51990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-55-QL60
+  store_id: RD-BELAPUR
+  price: 42990
+  mrp: 51990
+  qty: 3
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-55-QL60
+  store_id: RD-ANDHERI
+  price: 42990
+  mrp: 51990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-65-QL60
+  store_id: RD-JUHU
+  price: 69990
+  mrp: 82990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-65-QL60
+  store_id: RD-BELAPUR
+  price: 69990
+  mrp: 82990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-65-QL60
+  store_id: RD-ANDHERI
+  price: 69990
+  mrp: 82990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-75-4K60
+  store_id: RD-JUHU
+  price: 79990
+  mrp: 99990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-75-4K60
+  store_id: RD-BELAPUR
+  price: 79990
+  mrp: 99990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-ARK-75-4K60
+  store_id: RD-ANDHERI
+  price: 79990
+  mrp: 99990
+  qty: 0
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 2
+  test_data: true
+- sku: TV-NOV-48-OL120
+  store_id: RD-JUHU
+  price: 89990
+  mrp: 109990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-48-OL120
+  store_id: RD-BELAPUR
+  price: 89990
+  mrp: 109990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-48-OL120
+  store_id: RD-ANDHERI
+  price: 89990
+  mrp: 109990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-75-QL60
+  store_id: RD-JUHU
+  price: 99990
+  mrp: 119990
+  qty: 1
+  qty_yesterday: 0
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-75-QL60
+  store_id: RD-BELAPUR
+  price: 99990
+  mrp: 119990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: TV-MER-75-QL60
+  store_id: RD-ANDHERI
+  price: 99990
+  mrp: 119990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: TV-NOV-55-ML144
+  store_id: RD-JUHU
+  price: 114990
+  mrp: 134990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-55-ML144
+  store_id: RD-BELAPUR
+  price: 114990
+  mrp: 134990
+  qty: 2
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-55-ML144
+  store_id: RD-ANDHERI
+  price: 114990
+  mrp: 134990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-65-OL120
+  store_id: RD-JUHU
+  price: 189990
+  mrp: 224990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: TV-NOV-65-OL120
+  store_id: RD-BELAPUR
+  price: 189990
+  mrp: 224990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-65-OL120
+  store_id: RD-ANDHERI
+  price: 189990
+  mrp: 224990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: TV-NOV-85-ML144
+  store_id: RD-JUHU
+  price: 249990
+  mrp: 299990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: TV-NOV-85-ML144
+  store_id: RD-BELAPUR
+  price: 249990
+  mrp: 299990
+  qty: 0
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: TV-NOV-85-ML144
+  store_id: RD-ANDHERI
+  price: 249990
+  mrp: 299990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 0
+  delivery_days: 1
+  test_data: true
 - sku: SB-MER-21
   store_id: RD-JUHU
   price: 12990
@@ -219,6 +680,106 @@
   nearby_qty: 4
   delivery_days: 1
   test_data: true
+- sku: SB-MER-21
+  store_id: RD-ANDHERI
+  price: 12990
+  mrp: 14990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: SB-ARK-20
+  store_id: RD-JUHU
+  price: 5990
+  mrp: 7990
+  qty: 8
+  qty_yesterday: 8
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 7
+  delivery_days: 1
+  test_data: true
+- sku: SB-ARK-20
+  store_id: RD-BELAPUR
+  price: 5990
+  mrp: 7990
+  qty: 6
+  qty_yesterday: 6
+  nearby_store_id: RD-JUHU
+  nearby_qty: 8
+  delivery_days: 1
+  test_data: true
+- sku: SB-ARK-20
+  store_id: RD-ANDHERI
+  price: 5990
+  mrp: 7990
+  qty: 7
+  qty_yesterday: 7
+  nearby_store_id: RD-JUHU
+  nearby_qty: 8
+  delivery_days: 1
+  test_data: true
+- sku: SB-MER-31
+  store_id: RD-JUHU
+  price: 19990
+  mrp: 24990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: SB-MER-31
+  store_id: RD-BELAPUR
+  price: 19990
+  mrp: 24990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: SB-MER-31
+  store_id: RD-ANDHERI
+  price: 19990
+  mrp: 24990
+  qty: 2
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: SB-NOV-512
+  store_id: RD-JUHU
+  price: 39990
+  mrp: 49990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: SB-NOV-512
+  store_id: RD-BELAPUR
+  price: 39990
+  mrp: 49990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: SB-NOV-512
+  store_id: RD-ANDHERI
+  price: 39990
+  mrp: 49990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
 - sku: AC-ARK-10-3S
   store_id: RD-JUHU
   price: 31990
@@ -235,6 +796,16 @@
   mrp: 37990
   qty: 4
   qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-10-3S
+  store_id: RD-ANDHERI
+  price: 31990
+  mrp: 37990
+  qty: 6
+  qty_yesterday: 6
   nearby_store_id: RD-JUHU
   nearby_qty: 4
   delivery_days: 1
@@ -259,6 +830,16 @@
   nearby_qty: 5
   delivery_days: 1
   test_data: true
+- sku: AC-MER-15-3S
+  store_id: RD-ANDHERI
+  price: 36990
+  mrp: 43990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
 - sku: AC-MER-15-5S
   store_id: RD-JUHU
   price: 41990
@@ -274,6 +855,16 @@
   price: 41990
   mrp: 49990
   qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-15-5S
+  store_id: RD-ANDHERI
+  price: 41990
+  mrp: 49990
+  qty: 2
   qty_yesterday: 3
   nearby_store_id: RD-JUHU
   nearby_qty: 3
@@ -299,6 +890,16 @@
   nearby_qty: 2
   delivery_days: 1
   test_data: true
+- sku: AC-NOV-15-5S
+  store_id: RD-ANDHERI
+  price: 46990
+  mrp: 54990
+  qty: 0
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 2
+  test_data: true
 - sku: AC-ARK-20-3S
   store_id: RD-JUHU
   price: 47990
@@ -315,6 +916,16 @@
   mrp: 56990
   qty: 2
   qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-20-3S
+  store_id: RD-ANDHERI
+  price: 47990
+  mrp: 56990
+  qty: 3
+  qty_yesterday: 3
   nearby_store_id: RD-JUHU
   nearby_qty: 2
   delivery_days: 1
@@ -339,6 +950,316 @@
   nearby_qty: 2
   delivery_days: 1
   test_data: true
+- sku: AC-MER-20-5S
+  store_id: RD-ANDHERI
+  price: 52990
+  mrp: 62990
+  qty: 2
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-10-3S
+  store_id: RD-JUHU
+  price: 32990
+  mrp: 38990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-10-3S
+  store_id: RD-BELAPUR
+  price: 32990
+  mrp: 38990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-10-3S
+  store_id: RD-ANDHERI
+  price: 32990
+  mrp: 38990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-15-3S
+  store_id: RD-JUHU
+  price: 33990
+  mrp: 40990
+  qty: 6
+  qty_yesterday: 6
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-15-3S
+  store_id: RD-BELAPUR
+  price: 33990
+  mrp: 40990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-JUHU
+  nearby_qty: 6
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-15-3S
+  store_id: RD-ANDHERI
+  price: 33990
+  mrp: 40990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 6
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-10-5S
+  store_id: RD-JUHU
+  price: 35990
+  mrp: 42990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-10-5S
+  store_id: RD-BELAPUR
+  price: 35990
+  mrp: 42990
+  qty: 3
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-10-5S
+  store_id: RD-ANDHERI
+  price: 35990
+  mrp: 42990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-10-5S
+  store_id: RD-JUHU
+  price: 37990
+  mrp: 44990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-10-5S
+  store_id: RD-BELAPUR
+  price: 37990
+  mrp: 44990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-10-5S
+  store_id: RD-ANDHERI
+  price: 37990
+  mrp: 44990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-15-4S
+  store_id: RD-JUHU
+  price: 37990
+  mrp: 45990
+  qty: 0
+  qty_yesterday: 2
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 2
+  test_data: true
+- sku: AC-ARK-15-4S
+  store_id: RD-BELAPUR
+  price: 37990
+  mrp: 45990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-15-4S
+  store_id: RD-ANDHERI
+  price: 37990
+  mrp: 45990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-10-5S
+  store_id: RD-JUHU
+  price: 39990
+  mrp: 47990
+  qty: 2
+  qty_yesterday: 0
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-10-5S
+  store_id: RD-BELAPUR
+  price: 39990
+  mrp: 47990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-10-5S
+  store_id: RD-ANDHERI
+  price: 39990
+  mrp: 47990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-15-5SW
+  store_id: RD-JUHU
+  price: 44990
+  mrp: 53990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-15-5SW
+  store_id: RD-BELAPUR
+  price: 44990
+  mrp: 53990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: AC-MER-15-5SW
+  store_id: RD-ANDHERI
+  price: 44990
+  mrp: 53990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-20-5S
+  store_id: RD-JUHU
+  price: 49990
+  mrp: 59990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-20-5S
+  store_id: RD-BELAPUR
+  price: 49990
+  mrp: 59990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-ARK-20-5S
+  store_id: RD-ANDHERI
+  price: 49990
+  mrp: 59990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-15-5SP
+  store_id: RD-JUHU
+  price: 54990
+  mrp: 64990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-15-5SP
+  store_id: RD-BELAPUR
+  price: 54990
+  mrp: 64990
+  qty: 0
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: AC-NOV-15-5SP
+  store_id: RD-ANDHERI
+  price: 54990
+  mrp: 64990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-20-5S
+  store_id: RD-JUHU
+  price: 62990
+  mrp: 74990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-20-5S
+  store_id: RD-BELAPUR
+  price: 62990
+  mrp: 74990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: AC-NOV-20-5S
+  store_id: RD-ANDHERI
+  price: 62990
+  mrp: 74990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
 - sku: WM-ARK-65-TL
   store_id: RD-JUHU
   price: 22990
@@ -355,6 +1276,16 @@
   mrp: 26990
   qty: 5
   qty_yesterday: 5
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-65-TL
+  store_id: RD-ANDHERI
+  price: 22990
+  mrp: 26990
+  qty: 4
+  qty_yesterday: 4
   nearby_store_id: RD-JUHU
   nearby_qty: 5
   delivery_days: 1
@@ -379,6 +1310,16 @@
   nearby_qty: 4
   delivery_days: 1
   test_data: true
+- sku: WM-MER-7-TL
+  store_id: RD-ANDHERI
+  price: 26990
+  mrp: 31990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
 - sku: WM-ARK-7-FL
   store_id: RD-JUHU
   price: 31990
@@ -395,6 +1336,16 @@
   mrp: 37990
   qty: 3
   qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-7-FL
+  store_id: RD-ANDHERI
+  price: 31990
+  mrp: 37990
+  qty: 2
+  qty_yesterday: 2
   nearby_store_id: RD-JUHU
   nearby_qty: 3
   delivery_days: 1
@@ -419,6 +1370,16 @@
   nearby_qty: 3
   delivery_days: 1
   test_data: true
+- sku: WM-MER-8-FL
+  store_id: RD-ANDHERI
+  price: 38990
+  mrp: 45990
+  qty: 3
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
 - sku: WM-MER-10-TL
   store_id: RD-JUHU
   price: 34990
@@ -435,6 +1396,16 @@
   mrp: 40990
   qty: 2
   qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-10-TL
+  store_id: RD-ANDHERI
+  price: 34990
+  mrp: 40990
+  qty: 1
+  qty_yesterday: 1
   nearby_store_id: RD-JUHU
   nearby_qty: 2
   delivery_days: 1
@@ -459,6 +1430,316 @@
   nearby_qty: 2
   delivery_days: 1
   test_data: true
+- sku: WM-NOV-9-FL
+  store_id: RD-ANDHERI
+  price: 48990
+  mrp: 57990
+  qty: 0
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 2
+  test_data: true
+- sku: WM-ARK-7-TL
+  store_id: RD-JUHU
+  price: 24990
+  mrp: 29990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-7-TL
+  store_id: RD-BELAPUR
+  price: 24990
+  mrp: 29990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-7-TL
+  store_id: RD-ANDHERI
+  price: 24990
+  mrp: 29990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-6-FL
+  store_id: RD-JUHU
+  price: 25990
+  mrp: 30990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-6-FL
+  store_id: RD-BELAPUR
+  price: 25990
+  mrp: 30990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-6-FL
+  store_id: RD-ANDHERI
+  price: 25990
+  mrp: 30990
+  qty: 0
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 2
+  test_data: true
+- sku: WM-ARK-8-TL
+  store_id: RD-JUHU
+  price: 27990
+  mrp: 32990
+  qty: 3
+  qty_yesterday: 0
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-8-TL
+  store_id: RD-BELAPUR
+  price: 27990
+  mrp: 32990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-8-TL
+  store_id: RD-ANDHERI
+  price: 27990
+  mrp: 32990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-75-TL
+  store_id: RD-JUHU
+  price: 28990
+  mrp: 34990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-75-TL
+  store_id: RD-BELAPUR
+  price: 28990
+  mrp: 34990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-75-TL
+  store_id: RD-ANDHERI
+  price: 28990
+  mrp: 34990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-9-TL
+  store_id: RD-JUHU
+  price: 29990
+  mrp: 35990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-9-TL
+  store_id: RD-BELAPUR
+  price: 29990
+  mrp: 35990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-ARK-9-TL
+  store_id: RD-ANDHERI
+  price: 29990
+  mrp: 35990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-7-FL
+  store_id: RD-JUHU
+  price: 33990
+  mrp: 40990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-7-FL
+  store_id: RD-BELAPUR
+  price: 33990
+  mrp: 40990
+  qty: 2
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-7-FL
+  store_id: RD-ANDHERI
+  price: 33990
+  mrp: 40990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-9-FL
+  store_id: RD-JUHU
+  price: 42990
+  mrp: 50990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-9-FL
+  store_id: RD-BELAPUR
+  price: 42990
+  mrp: 50990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-9-FL
+  store_id: RD-ANDHERI
+  price: 42990
+  mrp: 50990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-NOV-8-FL
+  store_id: RD-JUHU
+  price: 44990
+  mrp: 53990
+  qty: 0
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 2
+  test_data: true
+- sku: WM-NOV-8-FL
+  store_id: RD-BELAPUR
+  price: 44990
+  mrp: 53990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-NOV-8-FL
+  store_id: RD-ANDHERI
+  price: 44990
+  mrp: 53990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-12-TL
+  store_id: RD-JUHU
+  price: 46990
+  mrp: 55990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-12-TL
+  store_id: RD-BELAPUR
+  price: 46990
+  mrp: 55990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: WM-MER-12-TL
+  store_id: RD-ANDHERI
+  price: 46990
+  mrp: 55990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: WM-NOV-105-FL
+  store_id: RD-JUHU
+  price: 59990
+  mrp: 71990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: WM-NOV-105-FL
+  store_id: RD-BELAPUR
+  price: 59990
+  mrp: 71990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: WM-NOV-105-FL
+  store_id: RD-ANDHERI
+  price: 59990
+  mrp: 71990
+  qty: 1
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
 - sku: LP-ARK-E-8
   store_id: RD-JUHU
   price: 36990
@@ -475,6 +1756,16 @@
   mrp: 43990
   qty: 5
   qty_yesterday: 5
+  nearby_store_id: RD-JUHU
+  nearby_qty: 5
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-E-8
+  store_id: RD-ANDHERI
+  price: 36990
+  mrp: 43990
+  qty: 6
+  qty_yesterday: 6
   nearby_store_id: RD-JUHU
   nearby_qty: 5
   delivery_days: 1
@@ -499,6 +1790,16 @@
   nearby_qty: 4
   delivery_days: 1
   test_data: true
+- sku: LP-ARK-M-8
+  store_id: RD-ANDHERI
+  price: 49990
+  mrp: 58990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
 - sku: LP-MER-M-16
   store_id: RD-JUHU
   price: 58990
@@ -515,6 +1816,16 @@
   mrp: 69990
   qty: 3
   qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-M-16
+  store_id: RD-ANDHERI
+  price: 58990
+  mrp: 69990
+  qty: 4
+  qty_yesterday: 2
   nearby_store_id: RD-JUHU
   nearby_qty: 3
   delivery_days: 1
@@ -539,6 +1850,16 @@
   nearby_qty: 2
   delivery_days: 1
   test_data: true
+- sku: LP-MER-H-16U
+  store_id: RD-ANDHERI
+  price: 74990
+  mrp: 87990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
 - sku: LP-NOV-H-16G
   store_id: RD-JUHU
   price: 89990
@@ -555,6 +1876,16 @@
   mrp: 105990
   qty: 2
   qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-NOV-H-16G
+  store_id: RD-ANDHERI
+  price: 89990
+  mrp: 105990
+  qty: 2
+  qty_yesterday: 0
   nearby_store_id: RD-JUHU
   nearby_qty: 2
   delivery_days: 1
@@ -576,6 +1907,316 @@
   qty: 1
   qty_yesterday: 1
   nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: LP-NOV-H-32G
+  store_id: RD-ANDHERI
+  price: 119990
+  mrp: 141990
+  qty: 0
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: LP-ARK-E-8L
+  store_id: RD-JUHU
+  price: 29990
+  mrp: 36990
+  qty: 7
+  qty_yesterday: 7
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 6
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-E-8L
+  store_id: RD-BELAPUR
+  price: 29990
+  mrp: 36990
+  qty: 5
+  qty_yesterday: 5
+  nearby_store_id: RD-JUHU
+  nearby_qty: 7
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-E-8L
+  store_id: RD-ANDHERI
+  price: 29990
+  mrp: 36990
+  qty: 6
+  qty_yesterday: 6
+  nearby_store_id: RD-JUHU
+  nearby_qty: 7
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-E-8
+  store_id: RD-JUHU
+  price: 41990
+  mrp: 49990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-E-8
+  store_id: RD-BELAPUR
+  price: 41990
+  mrp: 49990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-E-8
+  store_id: RD-ANDHERI
+  price: 41990
+  mrp: 49990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-E-16
+  store_id: RD-JUHU
+  price: 42990
+  mrp: 51990
+  qty: 4
+  qty_yesterday: 4
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-E-16
+  store_id: RD-BELAPUR
+  price: 42990
+  mrp: 51990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-E-16
+  store_id: RD-ANDHERI
+  price: 42990
+  mrp: 51990
+  qty: 0
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 4
+  delivery_days: 2
+  test_data: true
+- sku: LP-ARK-M-16
+  store_id: RD-JUHU
+  price: 54990
+  mrp: 64990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-M-16
+  store_id: RD-BELAPUR
+  price: 54990
+  mrp: 64990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-M-16
+  store_id: RD-ANDHERI
+  price: 54990
+  mrp: 64990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-H-16G
+  store_id: RD-JUHU
+  price: 64990
+  mrp: 79990
+  qty: 2
+  qty_yesterday: 0
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-H-16G
+  store_id: RD-BELAPUR
+  price: 64990
+  mrp: 79990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-ARK-H-16G
+  store_id: RD-ANDHERI
+  price: 64990
+  mrp: 79990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-M-16L
+  store_id: RD-JUHU
+  price: 66990
+  mrp: 78990
+  qty: 3
+  qty_yesterday: 3
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-M-16L
+  store_id: RD-BELAPUR
+  price: 66990
+  mrp: 78990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-M-16L
+  store_id: RD-ANDHERI
+  price: 66990
+  mrp: 78990
+  qty: 3
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 3
+  delivery_days: 1
+  test_data: true
+- sku: LP-NOV-M-16G
+  store_id: RD-JUHU
+  price: 79990
+  mrp: 94990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: LP-NOV-M-16G
+  store_id: RD-BELAPUR
+  price: 79990
+  mrp: 94990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-NOV-M-16G
+  store_id: RD-ANDHERI
+  price: 79990
+  mrp: 94990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-H-16F
+  store_id: RD-JUHU
+  price: 84990
+  mrp: 99990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 2
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-H-16F
+  store_id: RD-BELAPUR
+  price: 84990
+  mrp: 99990
+  qty: 0
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: LP-MER-H-16F
+  store_id: RD-ANDHERI
+  price: 84990
+  mrp: 99990
+  qty: 2
+  qty_yesterday: 2
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-H-32U
+  store_id: RD-JUHU
+  price: 104990
+  mrp: 124990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-BELAPUR
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-H-32U
+  store_id: RD-BELAPUR
+  price: 104990
+  mrp: 124990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: LP-MER-H-32U
+  store_id: RD-ANDHERI
+  price: 104990
+  mrp: 124990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-JUHU
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: LP-NOV-H-32S
+  store_id: RD-JUHU
+  price: 139990
+  mrp: 164990
+  qty: 0
+  qty_yesterday: 0
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 2
+  test_data: true
+- sku: LP-NOV-H-32S
+  store_id: RD-BELAPUR
+  price: 139990
+  mrp: 164990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-ANDHERI
+  nearby_qty: 1
+  delivery_days: 1
+  test_data: true
+- sku: LP-NOV-H-32S
+  store_id: RD-ANDHERI
+  price: 139990
+  mrp: 164990
+  qty: 1
+  qty_yesterday: 1
+  nearby_store_id: RD-BELAPUR
   nearby_qty: 1
   delivery_days: 1
   test_data: true

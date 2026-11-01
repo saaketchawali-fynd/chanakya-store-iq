@@ -1,4 +1,5 @@
 # TEST DATA ONLY — fictional brands (Arka, Meru, Novex). Generated from spec 9.2.
+# Extended catalogue: info{series, year, model_number, colours, warranty, in_box, features} on every row; features restate the row's own specs only.
 - sku: TV-ARK-43-4K60
   category: tv
   brand: Arka
@@ -23,13 +24,37 @@
     - Netflix
     hdmi_ports: 2
     os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: false
+    wifi: true
+    voice_assistant: false
   dims:
     width_mm: 963
     height_mm: 560
     depth_mm: 80
     weight_kg: 11.2
     vesa: 200x200
+    height_with_stand_mm: 615
+    stand_width_mm: 820
   image: products/TV-ARK-43-4K60.png
+  info:
+    series: Vista 4K
+    year: 2025
+    model_number: AK-43U60-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 300 निट्स ब्राइटनेस, mr: 300 निट्स ब्राइटनेस, en: 300 nits brightness}
+    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
+    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
   test_data: true
 - sku: TV-ARK-50-4K60
   category: tv
@@ -55,13 +80,37 @@
     - Netflix
     hdmi_ports: 2
     os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: false
+    wifi: true
+    voice_assistant: false
   dims:
     width_mm: 1117
     height_mm: 646
     depth_mm: 80
     weight_kg: 13.0
     vesa: 200x200
+    height_with_stand_mm: 705
+    stand_width_mm: 960
   image: products/TV-ARK-50-4K60.png
+  info:
+    series: Vista 4K
+    year: 2025
+    model_number: AK-50U60-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 350 निट्स ब्राइटनेस, mr: 350 निट्स ब्राइटनेस, en: 350 nits brightness}
+    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
+    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
   test_data: true
 - sku: TV-ARK-55-4K60
   category: tv
@@ -87,13 +136,37 @@
     - Netflix
     hdmi_ports: 2
     os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: false
   dims:
     width_mm: 1240
     height_mm: 720
     depth_mm: 80
     weight_kg: 14.3
     vesa: 300x300
+    height_with_stand_mm: 782
+    stand_width_mm: 1080
   image: products/TV-ARK-55-4K60.png
+  info:
+    series: Vista 4K
+    year: 2025
+    model_number: AK-55U60-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 350 निट्स ब्राइटनेस, mr: 350 निट्स ब्राइटनेस, en: 350 nits brightness}
+    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
+    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
   test_data: true
 - sku: TV-MER-55-QL60
   category: tv
@@ -120,13 +193,37 @@
     - Prime Video
     hdmi_ports: 2
     os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
   dims:
     width_mm: 1230
     height_mm: 710
     depth_mm: 60
     weight_kg: 14.3
     vesa: 300x300
+    height_with_stand_mm: 770
+    stand_width_mm: 1010
   image: products/TV-MER-55-QL60.png
+  info:
+    series: Q6
+    year: 2025
+    model_number: MR-55Q60-25
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
+    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
   test_data: true
 - sku: TV-MER-55-QL120
   category: tv
@@ -153,13 +250,36 @@
     - Prime Video
     hdmi_ports: 3
     os: Smart TV
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
   dims:
     width_mm: 1230
     height_mm: 708
     depth_mm: 60
     weight_kg: 14.3
     vesa: 300x300
+    height_with_stand_mm: 768
+    stand_width_mm: 1010
   image: products/TV-MER-55-QL120.png
+  info:
+    series: Q8 Pro
+    year: 2025
+    model_number: MR-55QP120-25
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 120 Hz रिफ्रेश रेट', mr: '4K QLED, 120 Hz रिफ्रेश रेट', en: '4K QLED, 120 Hz refresh rate'}
+    - {hi: '600 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '600 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '600 nits brightness, anti-glare'}
+    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', mr: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', en: '3 HDMI + 2 USB ports, Wi-Fi, Bluetooth'}
   test_data: true
 - sku: TV-NOV-55-OL120
   category: tv
@@ -186,13 +306,37 @@
     - Prime Video
     hdmi_ports: 3
     os: Smart TV
+    hdr_formats: [HDR10, HLG, Dolby Vision]
+    usb_ports: 3
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
   dims:
     width_mm: 1228
     height_mm: 708
     depth_mm: 60
     weight_kg: 14.3
     vesa: 300x300
+    height_with_stand_mm: 745
+    stand_width_mm: 430
   image: products/TV-NOV-55-OL120.png
+  info:
+    series: Aura OLED
+    year: 2025
+    model_number: NX-55O120-25
+    colours: [Graphite Black]
+    warranty: {years: 2, panel_years: 3}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K OLED, 120 Hz रिफ्रेश रेट', mr: '4K OLED, 120 Hz रिफ्रेश रेट', en: '4K OLED, 120 Hz refresh rate'}
+    - {hi: 450 निट्स ब्राइटनेस, mr: 450 निट्स ब्राइटनेस, en: 450 nits brightness}
+    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG, Dolby Vision सपोर्ट', mr: 'HDR10, HLG, Dolby Vision सपोर्ट', en: 'HDR10, HLG, Dolby Vision support'}
   test_data: true
 - sku: TV-ARK-65-4K60
   category: tv
@@ -218,13 +362,37 @@
     - Netflix
     hdmi_ports: 2
     os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: false
   dims:
     width_mm: 1460
     height_mm: 845
     depth_mm: 80
     weight_kg: 16.9
     vesa: 300x300
+    height_with_stand_mm: 910
+    stand_width_mm: 1290
   image: products/TV-ARK-65-4K60.png
+  info:
+    series: Vista 4K
+    year: 2025
+    model_number: AK-65U60-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 380 निट्स ब्राइटनेस, mr: 380 निट्स ब्राइटनेस, en: 380 nits brightness}
+    - {hi: 24 W स्पीकर, mr: 24 W स्पीकर, en: 24 W speakers}
+    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
   test_data: true
 - sku: TV-MER-65-QL120
   category: tv
@@ -251,13 +419,36 @@
     - Prime Video
     hdmi_ports: 3
     os: Smart TV
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
   dims:
     width_mm: 1450
     height_mm: 835
     depth_mm: 60
     weight_kg: 16.9
     vesa: 300x300
+    height_with_stand_mm: 898
+    stand_width_mm: 1200
   image: products/TV-MER-65-QL120.png
+  info:
+    series: Q8 Pro
+    year: 2025
+    model_number: MR-65QP120-25
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 120 Hz रिफ्रेश रेट', mr: '4K QLED, 120 Hz रिफ्रेश रेट', en: '4K QLED, 120 Hz refresh rate'}
+    - {hi: '650 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '650 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '650 nits brightness, anti-glare'}
+    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', mr: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', en: '3 HDMI + 2 USB ports, Wi-Fi, Bluetooth'}
   test_data: true
 - sku: TV-NOV-65-ML120
   category: tv
@@ -284,13 +475,37 @@
     - Prime Video
     hdmi_ports: 3
     os: Smart TV
+    hdr_formats: [HDR10+, HLG, Dolby Vision]
+    usb_ports: 3
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
   dims:
     width_mm: 1447
     height_mm: 832
     depth_mm: 60
     weight_kg: 16.9
     vesa: 300x300
+    height_with_stand_mm: 875
+    stand_width_mm: 460
   image: products/TV-NOV-65-ML120.png
+  info:
+    series: Aura Mini LED
+    year: 2025
+    model_number: NX-65M120-25
+    colours: [Graphite Black]
+    warranty: {years: 2, panel_years: 3}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K Mini LED, 120 Hz रिफ्रेश रेट', mr: '4K Mini LED, 120 Hz रिफ्रेश रेट', en: '4K Mini LED, 120 Hz refresh rate'}
+    - {hi: '1000 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '1000 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '1000 nits brightness, anti-glare'}
+    - {hi: '60 W स्पीकर, Dolby Atmos', mr: '60 W स्पीकर, Dolby Atmos', en: '60 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10+, HLG, Dolby Vision सपोर्ट', mr: 'HDR10+, HLG, Dolby Vision सपोर्ट', en: 'HDR10+, HLG, Dolby Vision support'}
   test_data: true
 - sku: TV-MER-75-QL120
   category: tv
@@ -317,13 +532,718 @@
     - Prime Video
     hdmi_ports: 3
     os: Smart TV
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
   dims:
     width_mm: 1672
     height_mm: 960
     depth_mm: 60
     weight_kg: 19.5
     vesa: 300x300
+    height_with_stand_mm: 1025
+    stand_width_mm: 1380
   image: products/TV-MER-75-QL120.png
+  info:
+    series: Q8 Pro
+    year: 2025
+    model_number: MR-75QP120-25
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 120 Hz रिफ्रेश रेट', mr: '4K QLED, 120 Hz रिफ्रेश रेट', en: '4K QLED, 120 Hz refresh rate'}
+    - {hi: '700 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '700 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '700 nits brightness, anti-glare'}
+    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', mr: '3 HDMI + 2 USB पोर्ट, Wi-Fi, ब्लूटूथ', en: '3 HDMI + 2 USB ports, Wi-Fi, Bluetooth'}
+  test_data: true
+- sku: TV-ARK-32-HD60
+  category: tv
+  brand: Arka
+  model: Arka 32 HD
+  title:
+    hi: Arka 32" HD
+    mr: Arka 32" HD
+    en: Arka 32" HD
+  specs:
+    size_in: 32
+    panel: LED
+    resolution: HD
+    refresh_hz: 60
+    brightness_nits: 250
+    anti_glare: false
+    speaker_w: 20
+    dolby_atmos: false
+    dialogue_enhance: false
+    wide_angle: false
+    apps:
+    - YouTube
+    - Netflix
+    hdmi_ports: 2
+    os: Smart TV
+    usb_ports: 1
+    bluetooth: false
+    wifi: true
+    voice_assistant: false
+  dims:
+    width_mm: 725
+    height_mm: 430
+    depth_mm: 85
+    weight_kg: 4.1
+    vesa: 100x100
+    height_with_stand_mm: 470
+    stand_width_mm: 640
+  image: products/TV-ARK-32-HD60.png
+  info:
+    series: Vista HD
+    year: 2025
+    model_number: AK-32H60-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: 'HD LED, 60 Hz रिफ्रेश रेट', mr: 'HD LED, 60 Hz रिफ्रेश रेट', en: 'HD LED, 60 Hz refresh rate'}
+    - {hi: 250 निट्स ब्राइटनेस, mr: 250 निट्स ब्राइटनेस, en: 250 nits brightness}
+    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
+    - {hi: 'YouTube, Netflix ऐप्स', mr: 'YouTube, Netflix अ‍ॅप्स', en: 'YouTube, Netflix apps'}
+    - {hi: '2 HDMI + 1 USB पोर्ट, Wi-Fi', mr: '2 HDMI + 1 USB पोर्ट, Wi-Fi', en: '2 HDMI + 1 USB ports, Wi-Fi'}
+  test_data: true
+- sku: TV-ARK-40-FHD60
+  category: tv
+  brand: Arka
+  model: Arka 40 FHD
+  title:
+    hi: Arka 40" Full HD
+    mr: Arka 40" Full HD
+    en: Arka 40" Full HD
+  specs:
+    size_in: 40
+    panel: LED
+    resolution: Full HD
+    refresh_hz: 60
+    brightness_nits: 280
+    anti_glare: false
+    speaker_w: 20
+    dolby_atmos: false
+    dialogue_enhance: false
+    wide_angle: false
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 2
+    os: Smart TV
+    hdr_formats: [HDR10]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: false
+  dims:
+    width_mm: 902
+    height_mm: 526
+    depth_mm: 82
+    weight_kg: 6.2
+    vesa: 200x200
+    height_with_stand_mm: 570
+    stand_width_mm: 760
+  image: products/TV-ARK-40-FHD60.png
+  info:
+    series: Vista FHD
+    year: 2025
+    model_number: AK-40F60-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: 'Full HD LED, 60 Hz रिफ्रेश रेट', mr: 'Full HD LED, 60 Hz रिफ्रेश रेट', en: 'Full HD LED, 60 Hz refresh rate'}
+    - {hi: 280 निट्स ब्राइटनेस, mr: 280 निट्स ब्राइटनेस, en: 280 nits brightness}
+    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
+    - {hi: 'YouTube, Netflix, Prime Video ऐप्स', mr: 'YouTube, Netflix, Prime Video अ‍ॅप्स', en: 'YouTube, Netflix, Prime Video apps'}
+    - {hi: HDR10 सपोर्ट, mr: HDR10 सपोर्ट, en: HDR10 support}
+  test_data: true
+- sku: TV-MER-43-QL60
+  category: tv
+  brand: Meru
+  model: Meru 43 QLED
+  title:
+    hi: Meru 43" QLED
+    mr: Meru 43" QLED
+    en: Meru 43" QLED
+  specs:
+    size_in: 43
+    panel: QLED
+    resolution: 4K
+    refresh_hz: 60
+    brightness_nits: 350
+    anti_glare: false
+    speaker_w: 20
+    dolby_atmos: false
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 2
+    os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 960
+    height_mm: 558
+    depth_mm: 62
+    weight_kg: 8.6
+    vesa: 200x200
+    height_with_stand_mm: 612
+    stand_width_mm: 780
+  image: products/TV-MER-43-QL60.png
+  info:
+    series: Q6
+    year: 2025
+    model_number: MR-43Q60-25
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 350 निट्स ब्राइटनेस, mr: 350 निट्स ब्राइटनेस, en: 350 nits brightness}
+    - {hi: 20 W स्पीकर, mr: 20 W स्पीकर, en: 20 W speakers}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+  test_data: true
+- sku: TV-MER-50-QL60
+  category: tv
+  brand: Meru
+  model: Meru 50 QLED
+  title:
+    hi: Meru 50" QLED
+    mr: Meru 50" QLED
+    en: Meru 50" QLED
+  specs:
+    size_in: 50
+    panel: QLED
+    resolution: 4K
+    refresh_hz: 60
+    brightness_nits: 400
+    anti_glare: false
+    speaker_w: 24
+    dolby_atmos: false
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 3
+    os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1115
+    height_mm: 645
+    depth_mm: 62
+    weight_kg: 11.6
+    vesa: 200x200
+    height_with_stand_mm: 702
+    stand_width_mm: 905
+  image: products/TV-MER-50-QL60.png
+  info:
+    series: Q6
+    year: 2025
+    model_number: MR-50Q60-25
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
+    - {hi: 24 W स्पीकर, mr: 24 W स्पीकर, en: 24 W speakers}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+  test_data: true
+- sku: TV-ARK-55-QL60
+  category: tv
+  brand: Arka
+  model: Arka 55 QLED
+  title:
+    hi: Arka 55" QLED
+    mr: Arka 55" QLED
+    en: Arka 55" QLED
+  specs:
+    size_in: 55
+    panel: QLED
+    resolution: 4K
+    refresh_hz: 60
+    brightness_nits: 400
+    anti_glare: false
+    speaker_w: 24
+    dolby_atmos: false
+    dialogue_enhance: false
+    wide_angle: false
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 2
+    os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1232
+    height_mm: 712
+    depth_mm: 78
+    weight_kg: 13.8
+    vesa: 300x300
+    height_with_stand_mm: 768
+    stand_width_mm: 1060
+  image: products/TV-ARK-55-QL60.png
+  info:
+    series: Vista QLED
+    year: 2026
+    model_number: AK-55Q60-26
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
+    - {hi: 24 W स्पीकर, mr: 24 W स्पीकर, en: 24 W speakers}
+    - {hi: 'YouTube, Netflix, Prime Video ऐप्स', mr: 'YouTube, Netflix, Prime Video अ‍ॅप्स', en: 'YouTube, Netflix, Prime Video apps'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+  test_data: true
+- sku: TV-MER-65-QL60
+  category: tv
+  brand: Meru
+  model: Meru 65 QLED
+  title:
+    hi: Meru 65" QLED
+    mr: Meru 65" QLED
+    en: Meru 65" QLED
+  specs:
+    size_in: 65
+    panel: QLED
+    resolution: 4K
+    refresh_hz: 60
+    brightness_nits: 420
+    anti_glare: false
+    speaker_w: 30
+    dolby_atmos: false
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 3
+    os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1449
+    height_mm: 834
+    depth_mm: 64
+    weight_kg: 16.6
+    vesa: 300x300
+    height_with_stand_mm: 895
+    stand_width_mm: 1200
+  image: products/TV-MER-65-QL60.png
+  info:
+    series: Q6
+    year: 2025
+    model_number: MR-65Q60-25
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 420 निट्स ब्राइटनेस, mr: 420 निट्स ब्राइटनेस, en: 420 nits brightness}
+    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+  test_data: true
+- sku: TV-ARK-75-4K60
+  category: tv
+  brand: Arka
+  model: Arka 75 4K
+  title:
+    hi: Arka 75" 4K
+    mr: Arka 75" 4K
+    en: Arka 75" 4K
+  specs:
+    size_in: 75
+    panel: LED
+    resolution: 4K
+    refresh_hz: 60
+    brightness_nits: 400
+    anti_glare: false
+    speaker_w: 30
+    dolby_atmos: false
+    dialogue_enhance: false
+    wide_angle: false
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 3
+    os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: false
+  dims:
+    width_mm: 1676
+    height_mm: 966
+    depth_mm: 88
+    weight_kg: 24.8
+    vesa: 400x300
+    height_with_stand_mm: 1030
+    stand_width_mm: 1480
+  image: products/TV-ARK-75-4K60.png
+  info:
+    series: Vista 4K
+    year: 2026
+    model_number: AK-75U60-26
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K LED, 60 Hz रिफ्रेश रेट', mr: '4K LED, 60 Hz रिफ्रेश रेट', en: '4K LED, 60 Hz refresh rate'}
+    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
+    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
+    - {hi: 'YouTube, Netflix, Prime Video ऐप्स', mr: 'YouTube, Netflix, Prime Video अ‍ॅप्स', en: 'YouTube, Netflix, Prime Video apps'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+  test_data: true
+- sku: TV-NOV-48-OL120
+  category: tv
+  brand: Novex
+  model: Novex 48 OLED
+  title:
+    hi: Novex 48" OLED
+    mr: Novex 48" OLED
+    en: Novex 48" OLED
+  specs:
+    size_in: 48
+    panel: OLED
+    resolution: 4K
+    refresh_hz: 120
+    brightness_nits: 400
+    anti_glare: false
+    speaker_w: 40
+    dolby_atmos: true
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 4
+    os: Smart TV
+    hdr_formats: [HDR10, HLG, Dolby Vision]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1071
+    height_mm: 616
+    depth_mm: 47
+    weight_kg: 14.6
+    vesa: 300x200
+    height_with_stand_mm: 650
+    stand_width_mm: 420
+  image: products/TV-NOV-48-OL120.png
+  info:
+    series: Aura OLED
+    year: 2025
+    model_number: NX-48O120-25
+    colours: [Graphite Black]
+    warranty: {years: 2, panel_years: 3}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K OLED, 120 Hz रिफ्रेश रेट', mr: '4K OLED, 120 Hz रिफ्रेश रेट', en: '4K OLED, 120 Hz refresh rate'}
+    - {hi: 400 निट्स ब्राइटनेस, mr: 400 निट्स ब्राइटनेस, en: 400 nits brightness}
+    - {hi: '40 W स्पीकर, Dolby Atmos', mr: '40 W स्पीकर, Dolby Atmos', en: '40 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG, Dolby Vision सपोर्ट', mr: 'HDR10, HLG, Dolby Vision सपोर्ट', en: 'HDR10, HLG, Dolby Vision support'}
+  test_data: true
+- sku: TV-MER-75-QL60
+  category: tv
+  brand: Meru
+  model: Meru 75 QLED
+  title:
+    hi: Meru 75" QLED
+    mr: Meru 75" QLED
+    en: Meru 75" QLED
+  specs:
+    size_in: 75
+    panel: QLED
+    resolution: 4K
+    refresh_hz: 60
+    brightness_nits: 450
+    anti_glare: false
+    speaker_w: 30
+    dolby_atmos: false
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 3
+    os: Smart TV
+    hdr_formats: [HDR10, HLG]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1672
+    height_mm: 962
+    depth_mm: 66
+    weight_kg: 20.2
+    vesa: 400x300
+    height_with_stand_mm: 1025
+    stand_width_mm: 1380
+  image: products/TV-MER-75-QL60.png
+  info:
+    series: Q6
+    year: 2026
+    model_number: MR-75Q60-26
+    colours: [Titan Grey]
+    warranty: {years: 1, panel_years: 2}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K QLED, 60 Hz रिफ्रेश रेट', mr: '4K QLED, 60 Hz रिफ्रेश रेट', en: '4K QLED, 60 Hz refresh rate'}
+    - {hi: 450 निट्स ब्राइटनेस, mr: 450 निट्स ब्राइटनेस, en: 450 nits brightness}
+    - {hi: 30 W स्पीकर, mr: 30 W स्पीकर, en: 30 W speakers}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG सपोर्ट', mr: 'HDR10, HLG सपोर्ट', en: 'HDR10, HLG support'}
+  test_data: true
+- sku: TV-NOV-55-ML144
+  category: tv
+  brand: Novex
+  model: Novex 55 Mini LED
+  title:
+    hi: Novex 55" Mini LED
+    mr: Novex 55" Mini LED
+    en: Novex 55" Mini LED
+  specs:
+    size_in: 55
+    panel: MiniLED
+    resolution: 4K
+    refresh_hz: 144
+    brightness_nits: 1500
+    anti_glare: true
+    speaker_w: 50
+    dolby_atmos: true
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 4
+    os: Smart TV
+    hdr_formats: [HDR10+, HLG, Dolby Vision]
+    usb_ports: 2
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1227
+    height_mm: 707
+    depth_mm: 58
+    weight_kg: 15.8
+    vesa: 300x300
+    height_with_stand_mm: 745
+    stand_width_mm: 440
+  image: products/TV-NOV-55-ML144.png
+  info:
+    series: Aura Mini LED
+    year: 2026
+    model_number: NX-55M144-26
+    colours: [Graphite Black]
+    warranty: {years: 2, panel_years: 3}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K Mini LED, 144 Hz रिफ्रेश रेट', mr: '4K Mini LED, 144 Hz रिफ्रेश रेट', en: '4K Mini LED, 144 Hz refresh rate'}
+    - {hi: '1500 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '1500 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '1500 nits brightness, anti-glare'}
+    - {hi: '50 W स्पीकर, Dolby Atmos', mr: '50 W स्पीकर, Dolby Atmos', en: '50 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10+, HLG, Dolby Vision सपोर्ट', mr: 'HDR10+, HLG, Dolby Vision सपोर्ट', en: 'HDR10+, HLG, Dolby Vision support'}
+  test_data: true
+- sku: TV-NOV-65-OL120
+  category: tv
+  brand: Novex
+  model: Novex 65 OLED
+  title:
+    hi: Novex 65" OLED
+    mr: Novex 65" OLED
+    en: Novex 65" OLED
+  specs:
+    size_in: 65
+    panel: OLED
+    resolution: 4K
+    refresh_hz: 120
+    brightness_nits: 450
+    anti_glare: false
+    speaker_w: 60
+    dolby_atmos: true
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 4
+    os: Smart TV
+    hdr_formats: [HDR10, HLG, Dolby Vision]
+    usb_ports: 3
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1444
+    height_mm: 828
+    depth_mm: 48
+    weight_kg: 18.6
+    vesa: 300x300
+    height_with_stand_mm: 865
+    stand_width_mm: 460
+  image: products/TV-NOV-65-OL120.png
+  info:
+    series: Aura OLED
+    year: 2026
+    model_number: NX-65O120-26
+    colours: [Graphite Black]
+    warranty: {years: 2, panel_years: 3}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K OLED, 120 Hz रिफ्रेश रेट', mr: '4K OLED, 120 Hz रिफ्रेश रेट', en: '4K OLED, 120 Hz refresh rate'}
+    - {hi: 450 निट्स ब्राइटनेस, mr: 450 निट्स ब्राइटनेस, en: 450 nits brightness}
+    - {hi: '60 W स्पीकर, Dolby Atmos', mr: '60 W स्पीकर, Dolby Atmos', en: '60 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10, HLG, Dolby Vision सपोर्ट', mr: 'HDR10, HLG, Dolby Vision सपोर्ट', en: 'HDR10, HLG, Dolby Vision support'}
+  test_data: true
+- sku: TV-NOV-85-ML144
+  category: tv
+  brand: Novex
+  model: Novex 85 Mini LED
+  title:
+    hi: Novex 85" Mini LED
+    mr: Novex 85" Mini LED
+    en: Novex 85" Mini LED
+  specs:
+    size_in: 85
+    panel: MiniLED
+    resolution: 4K
+    refresh_hz: 144
+    brightness_nits: 1600
+    anti_glare: true
+    speaker_w: 70
+    dolby_atmos: true
+    dialogue_enhance: true
+    wide_angle: true
+    apps:
+    - YouTube
+    - Netflix
+    - Prime Video
+    hdmi_ports: 4
+    os: Smart TV
+    hdr_formats: [HDR10+, HLG, Dolby Vision]
+    usb_ports: 3
+    bluetooth: true
+    wifi: true
+    voice_assistant: true
+  dims:
+    width_mm: 1890
+    height_mm: 1082
+    depth_mm: 72
+    weight_kg: 38.5
+    vesa: 400x400
+    height_with_stand_mm: 1150
+    stand_width_mm: 1650
+  image: products/TV-NOV-85-ML144.png
+  info:
+    series: Aura Mini LED
+    year: 2026
+    model_number: NX-85M144-26
+    colours: [Graphite Black]
+    warranty: {years: 2, panel_years: 3}
+    in_box:
+    - {hi: वॉइस रिमोट और बैटरी, mr: व्हॉइस रिमोट आणि बॅटरी, en: Voice remote with batteries}
+    - {hi: टेबल स्टैंड, mr: टेबल स्टँड, en: Table-top stand}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '4K Mini LED, 144 Hz रिफ्रेश रेट', mr: '4K Mini LED, 144 Hz रिफ्रेश रेट', en: '4K Mini LED, 144 Hz refresh rate'}
+    - {hi: '1600 निट्स ब्राइटनेस, एंटी-ग्लेयर', mr: '1600 निट्स ब्राइटनेस, अँटी-ग्लेअर', en: '1600 nits brightness, anti-glare'}
+    - {hi: '70 W स्पीकर, Dolby Atmos', mr: '70 W स्पीकर, Dolby Atmos', en: '70 W speakers, Dolby Atmos'}
+    - {hi: 'डायलॉग एन्हांस, वाइड व्यूइंग एंगल', mr: 'डायलॉग एन्हान्स, वाइड व्ह्यूइंग अँगल', en: 'Dialogue enhance, wide viewing angle'}
+    - {hi: 'HDR10+, HLG, Dolby Vision सपोर्ट', mr: 'HDR10+, HLG, Dolby Vision सपोर्ट', en: 'HDR10+, HLG, Dolby Vision support'}
   test_data: true
 - sku: SB-MER-21
   category: soundbar
@@ -338,12 +1258,160 @@
     dolby_atmos: false
     dialogue_enhance: true
     channels: '2.1'
+    sound_modes: 4
+    bluetooth: true
+    hdmi_arc: true
+    optical_in: true
+    subwoofer: true
   dims:
     width_mm: 860
     height_mm: 65
     depth_mm: 90
     weight_kg: 3.2
   image: products/SB-MER-21.png
+  info:
+    series: SoundStage
+    year: 2025
+    model_number: MR-SB21-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: साउंडबार, mr: साउंडबार, en: Soundbar}
+    - {hi: सबवूफ़र, mr: सबवूफर, en: Subwoofer}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: HDMI केबल, mr: HDMI केबल, en: HDMI cable}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    features:
+    - {hi: '120 W आउटपुट, 2.1 चैनल', mr: '120 W आउटपुट, 2.1 चॅनेल', en: '120 W output, 2.1 channel'}
+    - {hi: डायलॉग एन्हांस मोड, mr: डायलॉग एन्हान्स मोड, en: Dialogue enhance mode}
+    - {hi: अलग सबवूफ़र, mr: वेगळा सबवूफर, en: Separate subwoofer}
+    - {hi: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', en: 'Bluetooth, HDMI ARC, optical in'}
+    - {hi: 4 साउंड मोड, mr: 4 साउंड मोड, en: 4 sound modes}
+  test_data: true
+- sku: SB-ARK-20
+  category: soundbar
+  brand: Arka
+  model: Arka Soundbar 2.0
+  title:
+    hi: Arka Soundbar 2.0
+    mr: Arka Soundbar 2.0
+    en: Arka Soundbar 2.0
+  specs:
+    speaker_w: 60
+    dolby_atmos: false
+    dialogue_enhance: false
+    channels: '2.0'
+    sound_modes: 3
+    bluetooth: true
+    hdmi_arc: false
+    optical_in: true
+    subwoofer: false
+  dims:
+    width_mm: 800
+    height_mm: 62
+    depth_mm: 75
+    weight_kg: 1.9
+  image: products/SB-ARK-20.png
+  info:
+    series: Beat
+    year: 2025
+    model_number: AK-SB20-25
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: साउंडबार, mr: साउंडबार, en: Soundbar}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    features:
+    - {hi: '60 W आउटपुट, 2.0 चैनल', mr: '60 W आउटपुट, 2.0 चॅनेल', en: '60 W output, 2.0 channel'}
+    - {hi: 'ब्लूटूथ, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, ऑप्टिकल इनपुट', en: 'Bluetooth, optical in'}
+    - {hi: 3 साउंड मोड, mr: 3 साउंड मोड, en: 3 sound modes}
+  test_data: true
+- sku: SB-MER-31
+  category: soundbar
+  brand: Meru
+  model: Meru Soundbar 3.1
+  title:
+    hi: Meru Soundbar 3.1
+    mr: Meru Soundbar 3.1
+    en: Meru Soundbar 3.1
+  specs:
+    speaker_w: 240
+    dolby_atmos: false
+    dialogue_enhance: true
+    channels: '3.1'
+    sound_modes: 5
+    bluetooth: true
+    hdmi_arc: true
+    optical_in: true
+    subwoofer: true
+  dims:
+    width_mm: 950
+    height_mm: 60
+    depth_mm: 95
+    weight_kg: 3.6
+  image: products/SB-MER-31.png
+  info:
+    series: SoundStage
+    year: 2026
+    model_number: MR-SB31-26
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: साउंडबार, mr: साउंडबार, en: Soundbar}
+    - {hi: सबवूफ़र, mr: सबवूफर, en: Subwoofer}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: HDMI केबल, mr: HDMI केबल, en: HDMI cable}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    features:
+    - {hi: '240 W आउटपुट, 3.1 चैनल', mr: '240 W आउटपुट, 3.1 चॅनेल', en: '240 W output, 3.1 channel'}
+    - {hi: डायलॉग एन्हांस मोड, mr: डायलॉग एन्हान्स मोड, en: Dialogue enhance mode}
+    - {hi: अलग सबवूफ़र, mr: वेगळा सबवूफर, en: Separate subwoofer}
+    - {hi: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', en: 'Bluetooth, HDMI ARC, optical in'}
+    - {hi: 5 साउंड मोड, mr: 5 साउंड मोड, en: 5 sound modes}
+  test_data: true
+- sku: SB-NOV-512
+  category: soundbar
+  brand: Novex
+  model: Novex Soundbar 5.1.2
+  title:
+    hi: Novex Soundbar 5.1.2
+    mr: Novex Soundbar 5.1.2
+    en: Novex Soundbar 5.1.2
+  specs:
+    speaker_w: 450
+    dolby_atmos: true
+    dialogue_enhance: true
+    channels: 5.1.2
+    sound_modes: 6
+    bluetooth: true
+    hdmi_arc: true
+    optical_in: true
+    subwoofer: true
+  dims:
+    width_mm: 1100
+    height_mm: 64
+    depth_mm: 120
+    weight_kg: 5.2
+  image: products/SB-NOV-512.png
+  info:
+    series: Atmos
+    year: 2026
+    model_number: NX-SB512-26
+    colours: [Black]
+    warranty: {years: 1}
+    in_box:
+    - {hi: साउंडबार, mr: साउंडबार, en: Soundbar}
+    - {hi: सबवूफ़र, mr: सबवूफर, en: Subwoofer}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: HDMI केबल, mr: HDMI केबल, en: HDMI cable}
+    - {hi: पावर केबल, mr: पॉवर केबल, en: Power cable}
+    features:
+    - {hi: '450 W आउटपुट, 5.1.2 चैनल', mr: '450 W आउटपुट, 5.1.2 चॅनेल', en: '450 W output, 5.1.2 channel'}
+    - {hi: Dolby Atmos साउंड, mr: Dolby Atmos साउंड, en: Dolby Atmos sound}
+    - {hi: डायलॉग एन्हांस मोड, mr: डायलॉग एन्हान्स मोड, en: Dialogue enhance mode}
+    - {hi: अलग सबवूफ़र, mr: वेगळा सबवूफर, en: Separate subwoofer}
+    - {hi: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', mr: 'ब्लूटूथ, HDMI ARC, ऑप्टिकल इनपुट', en: 'Bluetooth, HDMI ARC, optical in'}
   test_data: true
 - sku: AC-ARK-10-3S
   category: ac
@@ -360,6 +1428,10 @@
     wifi: false
     noise_db: 42
     refrigerant: R32
+    cooling_capacity_w: 3450
+    iseer: 4.1
+    copper_condenser: false
+    filter: Anti-dust filter
   dims:
     width_mm: 850
     height_mm: 290
@@ -369,6 +1441,23 @@
     kwh_year: 820
     star: 3
   image: products/AC-ARK-10-3S.png
+  info:
+    series: Breeze
+    year: 2025
+    model_number: AK-103S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 5}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.0 टन, 3-स्टार, इन्वर्टर', mr: '1.0 टन, 3-स्टार, इन्व्हर्टर', en: '1.0 ton, 3-star, inverter'}
+    - {hi: '3450 W कूलिंग, ISEER 4.1', mr: '3450 W कूलिंग, ISEER 4.1', en: '3450 W cooling, ISEER 4.1'}
+    - {hi: 820 kWh/साल बिजली खपत, mr: 820 kWh/वर्ष वीज वापर, en: 820 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 42 dB, mr: आवाजाची पातळी 42 dB, en: Noise level 42 dB}
+    - {hi: 'एंटी-डस्ट फ़िल्टर, R32 गैस', mr: 'अँटी-डस्ट फिल्टर, R32 गॅस', en: 'Anti-dust filter, R32 gas'}
   test_data: true
 - sku: AC-MER-15-3S
   category: ac
@@ -385,6 +1474,10 @@
     wifi: false
     noise_db: 42
     refrigerant: R32
+    cooling_capacity_w: 5050
+    iseer: 4.1
+    copper_condenser: true
+    filter: Anti-dust filter
   dims:
     width_mm: 970
     height_mm: 300
@@ -394,6 +1487,23 @@
     kwh_year: 1050
     star: 3
   image: products/AC-MER-15-3S.png
+  info:
+    series: Glacier
+    year: 2025
+    model_number: MR-153S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.5 टन, 3-स्टार, इन्वर्टर', mr: '1.5 टन, 3-स्टार, इन्व्हर्टर', en: '1.5 ton, 3-star, inverter'}
+    - {hi: '5050 W कूलिंग, ISEER 4.1', mr: '5050 W कूलिंग, ISEER 4.1', en: '5050 W cooling, ISEER 4.1'}
+    - {hi: 1050 kWh/साल बिजली खपत, mr: 1050 kWh/वर्ष वीज वापर, en: 1050 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 42 dB, mr: आवाजाची पातळी 42 dB, en: Noise level 42 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
   test_data: true
 - sku: AC-MER-15-5S
   category: ac
@@ -410,6 +1520,10 @@
     wifi: false
     noise_db: 38
     refrigerant: R32
+    cooling_capacity_w: 5150
+    iseer: 5.2
+    copper_condenser: true
+    filter: PM 2.5 filter
   dims:
     width_mm: 970
     height_mm: 300
@@ -419,6 +1533,23 @@
     kwh_year: 820
     star: 5
   image: products/AC-MER-15-5S.png
+  info:
+    series: Glacier
+    year: 2025
+    model_number: MR-155S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
+    - {hi: '5150 W कूलिंग, ISEER 5.2', mr: '5150 W कूलिंग, ISEER 5.2', en: '5150 W cooling, ISEER 5.2'}
+    - {hi: 820 kWh/साल बिजली खपत, mr: 820 kWh/वर्ष वीज वापर, en: 820 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
   test_data: true
 - sku: AC-NOV-15-5S
   category: ac
@@ -435,6 +1566,10 @@
     wifi: true
     noise_db: 38
     refrigerant: R32
+    cooling_capacity_w: 5200
+    iseer: 5.4
+    copper_condenser: true
+    filter: PM 2.5 filter
   dims:
     width_mm: 990
     height_mm: 310
@@ -444,6 +1579,23 @@
     kwh_year: 790
     star: 5
   image: products/AC-NOV-15-5S.png
+  info:
+    series: Polar
+    year: 2025
+    model_number: NX-155SW-25
+    colours: [White]
+    warranty: {years: 2, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
+    - {hi: '5200 W कूलिंग, ISEER 5.4', mr: '5200 W कूलिंग, ISEER 5.4', en: '5200 W cooling, ISEER 5.4'}
+    - {hi: 790 kWh/साल बिजली खपत, mr: 790 kWh/वर्ष वीज वापर, en: 790 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
+    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
   test_data: true
 - sku: AC-ARK-20-3S
   category: ac
@@ -460,6 +1612,10 @@
     wifi: false
     noise_db: 42
     refrigerant: R32
+    cooling_capacity_w: 6700
+    iseer: 4.1
+    copper_condenser: true
+    filter: Anti-dust filter
   dims:
     width_mm: 1080
     height_mm: 330
@@ -469,6 +1625,23 @@
     kwh_year: 1450
     star: 3
   image: products/AC-ARK-20-3S.png
+  info:
+    series: Breeze
+    year: 2025
+    model_number: AK-203S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 5}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '2.0 टन, 3-स्टार, इन्वर्टर', mr: '2.0 टन, 3-स्टार, इन्व्हर्टर', en: '2.0 ton, 3-star, inverter'}
+    - {hi: '6700 W कूलिंग, ISEER 4.1', mr: '6700 W कूलिंग, ISEER 4.1', en: '6700 W cooling, ISEER 4.1'}
+    - {hi: 1450 kWh/साल बिजली खपत, mr: 1450 kWh/वर्ष वीज वापर, en: 1450 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 42 dB, mr: आवाजाची पातळी 42 dB, en: Noise level 42 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
   test_data: true
 - sku: AC-MER-20-5S
   category: ac
@@ -485,6 +1658,10 @@
     wifi: false
     noise_db: 38
     refrigerant: R32
+    cooling_capacity_w: 6800
+    iseer: 5.2
+    copper_condenser: true
+    filter: PM 2.5 filter
   dims:
     width_mm: 1080
     height_mm: 330
@@ -494,6 +1671,483 @@
     kwh_year: 1150
     star: 5
   image: products/AC-MER-20-5S.png
+  info:
+    series: Glacier
+    year: 2025
+    model_number: MR-205S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '2.0 टन, 5-स्टार, इन्वर्टर', mr: '2.0 टन, 5-स्टार, इन्व्हर्टर', en: '2.0 ton, 5-star, inverter'}
+    - {hi: '6800 W कूलिंग, ISEER 5.2', mr: '6800 W कूलिंग, ISEER 5.2', en: '6800 W cooling, ISEER 5.2'}
+    - {hi: 1150 kWh/साल बिजली खपत, mr: 1150 kWh/वर्ष वीज वापर, en: 1150 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+  test_data: true
+- sku: AC-MER-10-3S
+  category: ac
+  brand: Meru
+  model: Meru 1.0T 3-star
+  title:
+    hi: Meru 1.0T 3-star
+    mr: Meru 1.0T 3-star
+    en: Meru 1.0T 3-star
+  specs:
+    ton: 1.0
+    star: 3
+    inverter: true
+    wifi: false
+    noise_db: 40
+    refrigerant: R32
+    cooling_capacity_w: 3500
+    iseer: 4.2
+    copper_condenser: true
+    filter: Anti-dust filter
+  dims:
+    width_mm: 830
+    height_mm: 290
+    depth_mm: 205
+    weight_kg: 10.2
+  energy:
+    kwh_year: 800
+    star: 3
+  image: products/AC-MER-10-3S.png
+  info:
+    series: Glacier
+    year: 2025
+    model_number: MR-103S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.0 टन, 3-स्टार, इन्वर्टर', mr: '1.0 टन, 3-स्टार, इन्व्हर्टर', en: '1.0 ton, 3-star, inverter'}
+    - {hi: '3500 W कूलिंग, ISEER 4.2', mr: '3500 W कूलिंग, ISEER 4.2', en: '3500 W cooling, ISEER 4.2'}
+    - {hi: 800 kWh/साल बिजली खपत, mr: 800 kWh/वर्ष वीज वापर, en: 800 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 40 dB, mr: आवाजाची पातळी 40 dB, en: Noise level 40 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+  test_data: true
+- sku: AC-ARK-15-3S
+  category: ac
+  brand: Arka
+  model: Arka 1.5T 3-star
+  title:
+    hi: Arka 1.5T 3-star
+    mr: Arka 1.5T 3-star
+    en: Arka 1.5T 3-star
+  specs:
+    ton: 1.5
+    star: 3
+    inverter: true
+    wifi: false
+    noise_db: 44
+    refrigerant: R32
+    cooling_capacity_w: 5000
+    iseer: 4.1
+    copper_condenser: false
+    filter: Anti-dust filter
+  dims:
+    width_mm: 960
+    height_mm: 300
+    depth_mm: 215
+    weight_kg: 11.6
+  energy:
+    kwh_year: 1060
+    star: 3
+  image: products/AC-ARK-15-3S.png
+  info:
+    series: Breeze
+    year: 2025
+    model_number: AK-153S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 5}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.5 टन, 3-स्टार, इन्वर्टर', mr: '1.5 टन, 3-स्टार, इन्व्हर्टर', en: '1.5 ton, 3-star, inverter'}
+    - {hi: '5000 W कूलिंग, ISEER 4.1', mr: '5000 W कूलिंग, ISEER 4.1', en: '5000 W cooling, ISEER 4.1'}
+    - {hi: 1060 kWh/साल बिजली खपत, mr: 1060 kWh/वर्ष वीज वापर, en: 1060 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 44 dB, mr: आवाजाची पातळी 44 dB, en: Noise level 44 dB}
+    - {hi: 'एंटी-डस्ट फ़िल्टर, R32 गैस', mr: 'अँटी-डस्ट फिल्टर, R32 गॅस', en: 'Anti-dust filter, R32 gas'}
+  test_data: true
+- sku: AC-ARK-10-5S
+  category: ac
+  brand: Arka
+  model: Arka 1.0T 5-star
+  title:
+    hi: Arka 1.0T 5-star
+    mr: Arka 1.0T 5-star
+    en: Arka 1.0T 5-star
+  specs:
+    ton: 1.0
+    star: 5
+    inverter: true
+    wifi: false
+    noise_db: 38
+    refrigerant: R32
+    cooling_capacity_w: 3400
+    iseer: 5.1
+    copper_condenser: true
+    filter: Anti-dust filter
+  dims:
+    width_mm: 850
+    height_mm: 290
+    depth_mm: 210
+    weight_kg: 10.8
+  energy:
+    kwh_year: 660
+    star: 5
+  image: products/AC-ARK-10-5S.png
+  info:
+    series: Breeze
+    year: 2026
+    model_number: AK-105S-26
+    colours: [White]
+    warranty: {years: 1, compressor_years: 5}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.0 टन, 5-स्टार, इन्वर्टर', mr: '1.0 टन, 5-स्टार, इन्व्हर्टर', en: '1.0 ton, 5-star, inverter'}
+    - {hi: '3400 W कूलिंग, ISEER 5.1', mr: '3400 W कूलिंग, ISEER 5.1', en: '3400 W cooling, ISEER 5.1'}
+    - {hi: 660 kWh/साल बिजली खपत, mr: 660 kWh/वर्ष वीज वापर, en: 660 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 38 dB, mr: आवाजाची पातळी 38 dB, en: Noise level 38 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+  test_data: true
+- sku: AC-MER-10-5S
+  category: ac
+  brand: Meru
+  model: Meru 1.0T 5-star
+  title:
+    hi: Meru 1.0T 5-star
+    mr: Meru 1.0T 5-star
+    en: Meru 1.0T 5-star
+  specs:
+    ton: 1.0
+    star: 5
+    inverter: true
+    wifi: false
+    noise_db: 36
+    refrigerant: R32
+    cooling_capacity_w: 3500
+    iseer: 5.3
+    copper_condenser: true
+    filter: PM 2.5 filter
+  dims:
+    width_mm: 830
+    height_mm: 290
+    depth_mm: 205
+    weight_kg: 10.5
+  energy:
+    kwh_year: 635
+    star: 5
+  image: products/AC-MER-10-5S.png
+  info:
+    series: Glacier
+    year: 2025
+    model_number: MR-105S-25
+    colours: [White]
+    warranty: {years: 1, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.0 टन, 5-स्टार, इन्वर्टर', mr: '1.0 टन, 5-स्टार, इन्व्हर्टर', en: '1.0 ton, 5-star, inverter'}
+    - {hi: '3500 W कूलिंग, ISEER 5.3', mr: '3500 W कूलिंग, ISEER 5.3', en: '3500 W cooling, ISEER 5.3'}
+    - {hi: 635 kWh/साल बिजली खपत, mr: 635 kWh/वर्ष वीज वापर, en: 635 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 36 dB, mr: आवाजाची पातळी 36 dB, en: Noise level 36 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+  test_data: true
+- sku: AC-ARK-15-4S
+  category: ac
+  brand: Arka
+  model: Arka 1.5T 4-star
+  title:
+    hi: Arka 1.5T 4-star
+    mr: Arka 1.5T 4-star
+    en: Arka 1.5T 4-star
+  specs:
+    ton: 1.5
+    star: 4
+    inverter: true
+    wifi: false
+    noise_db: 41
+    refrigerant: R32
+    cooling_capacity_w: 5100
+    iseer: 4.7
+    copper_condenser: true
+    filter: Anti-dust filter
+  dims:
+    width_mm: 960
+    height_mm: 300
+    depth_mm: 215
+    weight_kg: 11.9
+  energy:
+    kwh_year: 915
+    star: 4
+  image: products/AC-ARK-15-4S.png
+  info:
+    series: Breeze
+    year: 2026
+    model_number: AK-154S-26
+    colours: [White]
+    warranty: {years: 1, compressor_years: 5}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.5 टन, 4-स्टार, इन्वर्टर', mr: '1.5 टन, 4-स्टार, इन्व्हर्टर', en: '1.5 ton, 4-star, inverter'}
+    - {hi: '5100 W कूलिंग, ISEER 4.7', mr: '5100 W कूलिंग, ISEER 4.7', en: '5100 W cooling, ISEER 4.7'}
+    - {hi: 915 kWh/साल बिजली खपत, mr: 915 kWh/वर्ष वीज वापर, en: 915 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 41 dB, mr: आवाजाची पातळी 41 dB, en: Noise level 41 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+  test_data: true
+- sku: AC-NOV-10-5S
+  category: ac
+  brand: Novex
+  model: Novex 1.0T 5-star
+  title:
+    hi: Novex 1.0T 5-star
+    mr: Novex 1.0T 5-star
+    en: Novex 1.0T 5-star
+  specs:
+    ton: 1.0
+    star: 5
+    inverter: true
+    wifi: true
+    noise_db: 34
+    refrigerant: R32
+    cooling_capacity_w: 3550
+    iseer: 5.5
+    copper_condenser: true
+    filter: PM 2.5 filter
+  dims:
+    width_mm: 880
+    height_mm: 295
+    depth_mm: 215
+    weight_kg: 11.0
+  energy:
+    kwh_year: 610
+    star: 5
+  image: products/AC-NOV-10-5S.png
+  info:
+    series: Polar
+    year: 2026
+    model_number: NX-105SW-26
+    colours: [White]
+    warranty: {years: 2, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.0 टन, 5-स्टार, इन्वर्टर', mr: '1.0 टन, 5-स्टार, इन्व्हर्टर', en: '1.0 ton, 5-star, inverter'}
+    - {hi: '3550 W कूलिंग, ISEER 5.5', mr: '3550 W कूलिंग, ISEER 5.5', en: '3550 W cooling, ISEER 5.5'}
+    - {hi: 610 kWh/साल बिजली खपत, mr: 610 kWh/वर्ष वीज वापर, en: 610 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 34 dB, mr: आवाजाची पातळी 34 dB, en: Noise level 34 dB}
+    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+  test_data: true
+- sku: AC-MER-15-5SW
+  category: ac
+  brand: Meru
+  model: Meru 1.5T 5-star Wi-Fi
+  title:
+    hi: Meru 1.5T 5-star Wi-Fi
+    mr: Meru 1.5T 5-star Wi-Fi
+    en: Meru 1.5T 5-star Wi-Fi
+  specs:
+    ton: 1.5
+    star: 5
+    inverter: true
+    wifi: true
+    noise_db: 37
+    refrigerant: R32
+    cooling_capacity_w: 5200
+    iseer: 5.3
+    copper_condenser: true
+    filter: PM 2.5 filter
+  dims:
+    width_mm: 970
+    height_mm: 300
+    depth_mm: 220
+    weight_kg: 12.2
+  energy:
+    kwh_year: 810
+    star: 5
+  image: products/AC-MER-15-5SW.png
+  info:
+    series: Glacier
+    year: 2026
+    model_number: MR-155SW-26
+    colours: [White]
+    warranty: {years: 1, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
+    - {hi: '5200 W कूलिंग, ISEER 5.3', mr: '5200 W कूलिंग, ISEER 5.3', en: '5200 W cooling, ISEER 5.3'}
+    - {hi: 810 kWh/साल बिजली खपत, mr: 810 kWh/वर्ष वीज वापर, en: 810 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 37 dB, mr: आवाजाची पातळी 37 dB, en: Noise level 37 dB}
+    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+  test_data: true
+- sku: AC-ARK-20-5S
+  category: ac
+  brand: Arka
+  model: Arka 2.0T 5-star
+  title:
+    hi: Arka 2.0T 5-star
+    mr: Arka 2.0T 5-star
+    en: Arka 2.0T 5-star
+  specs:
+    ton: 2.0
+    star: 5
+    inverter: true
+    wifi: false
+    noise_db: 40
+    refrigerant: R32
+    cooling_capacity_w: 6600
+    iseer: 5.1
+    copper_condenser: true
+    filter: Anti-dust filter
+  dims:
+    width_mm: 1080
+    height_mm: 330
+    depth_mm: 235
+    weight_kg: 13.5
+  energy:
+    kwh_year: 1165
+    star: 5
+  image: products/AC-ARK-20-5S.png
+  info:
+    series: Breeze
+    year: 2026
+    model_number: AK-205S-26
+    colours: [White]
+    warranty: {years: 1, compressor_years: 5}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '2.0 टन, 5-स्टार, इन्वर्टर', mr: '2.0 टन, 5-स्टार, इन्व्हर्टर', en: '2.0 ton, 5-star, inverter'}
+    - {hi: '6600 W कूलिंग, ISEER 5.1', mr: '6600 W कूलिंग, ISEER 5.1', en: '6600 W cooling, ISEER 5.1'}
+    - {hi: 1165 kWh/साल बिजली खपत, mr: 1165 kWh/वर्ष वीज वापर, en: 1165 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 40 dB, mr: आवाजाची पातळी 40 dB, en: Noise level 40 dB}
+    - {hi: 'कॉपर कंडेंसर, R32 गैस', mr: 'कॉपर कंडेन्सर, R32 गॅस', en: 'Copper condenser, R32 gas'}
+  test_data: true
+- sku: AC-NOV-15-5SP
+  category: ac
+  brand: Novex
+  model: Novex 1.5T 5-star Pro
+  title:
+    hi: Novex 1.5T 5-star Pro
+    mr: Novex 1.5T 5-star Pro
+    en: Novex 1.5T 5-star Pro
+  specs:
+    ton: 1.5
+    star: 5
+    inverter: true
+    wifi: true
+    noise_db: 32
+    refrigerant: R32
+    cooling_capacity_w: 5280
+    iseer: 5.6
+    copper_condenser: true
+    filter: Anti-bacterial filter
+  dims:
+    width_mm: 1010
+    height_mm: 315
+    depth_mm: 235
+    weight_kg: 13.2
+  energy:
+    kwh_year: 770
+    star: 5
+  image: products/AC-NOV-15-5SP.png
+  info:
+    series: Polar Pro
+    year: 2026
+    model_number: NX-155SP-26
+    colours: [White, Champagne Gold]
+    warranty: {years: 2, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '1.5 टन, 5-स्टार, इन्वर्टर', mr: '1.5 टन, 5-स्टार, इन्व्हर्टर', en: '1.5 ton, 5-star, inverter'}
+    - {hi: '5280 W कूलिंग, ISEER 5.6', mr: '5280 W कूलिंग, ISEER 5.6', en: '5280 W cooling, ISEER 5.6'}
+    - {hi: 770 kWh/साल बिजली खपत, mr: 770 kWh/वर्ष वीज वापर, en: 770 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 32 dB, mr: आवाजाची पातळी 32 dB, en: Noise level 32 dB}
+    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
+  test_data: true
+- sku: AC-NOV-20-5S
+  category: ac
+  brand: Novex
+  model: Novex 2.0T 5-star
+  title:
+    hi: Novex 2.0T 5-star
+    mr: Novex 2.0T 5-star
+    en: Novex 2.0T 5-star
+  specs:
+    ton: 2.0
+    star: 5
+    inverter: true
+    wifi: true
+    noise_db: 37
+    refrigerant: R32
+    cooling_capacity_w: 7000
+    iseer: 5.4
+    copper_condenser: true
+    filter: PM 2.5 filter
+  dims:
+    width_mm: 1100
+    height_mm: 335
+    depth_mm: 240
+    weight_kg: 14.2
+  energy:
+    kwh_year: 1100
+    star: 5
+  image: products/AC-NOV-20-5S.png
+  info:
+    series: Polar
+    year: 2026
+    model_number: NX-205SW-26
+    colours: [White]
+    warranty: {years: 2, compressor_years: 10}
+    in_box:
+    - {hi: इनडोर यूनिट, mr: इनडोअर युनिट, en: Indoor unit}
+    - {hi: आउटडोर यूनिट, mr: आउटडोअर युनिट, en: Outdoor unit}
+    - {hi: रिमोट और बैटरी, mr: रिमोट आणि बॅटरी, en: Remote with batteries}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '2.0 टन, 5-स्टार, इन्वर्टर', mr: '2.0 टन, 5-स्टार, इन्व्हर्टर', en: '2.0 ton, 5-star, inverter'}
+    - {hi: '7000 W कूलिंग, ISEER 5.4', mr: '7000 W कूलिंग, ISEER 5.4', en: '7000 W cooling, ISEER 5.4'}
+    - {hi: 1100 kWh/साल बिजली खपत, mr: 1100 kWh/वर्ष वीज वापर, en: 1100 kWh/year energy use}
+    - {hi: आवाज़ का स्तर 37 dB, mr: आवाजाची पातळी 37 dB, en: Noise level 37 dB}
+    - {hi: फ़ोन से Wi-Fi कंट्रोल, mr: फोनवरून Wi-Fi कंट्रोल, en: Wi-Fi control from your phone}
   test_data: true
 - sku: WM-ARK-65-TL
   category: wm
@@ -509,6 +2163,10 @@
     heater: false
     rpm: 700
     quick_wash: true
+    programmes: 8
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: false
   dims:
     width_mm: 540
     depth_mm: 560
@@ -517,6 +2175,21 @@
   energy:
     kwh_year: 120
   image: products/WM-ARK-65-TL.png
+  info:
+    series: Splash
+    year: 2025
+    model_number: AK-TL65-25
+    colours: [Grey]
+    warranty: {years: 2, motor_years: 5}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: 6.5 किलो टॉप लोड, mr: 6.5 किलो टॉप लोड, en: 6.5 kg top load}
+    - {hi: 700 RPM स्पिन स्पीड, mr: 700 RPM स्पिन स्पीड, en: 700 RPM spin speed}
+    - {hi: '8 वॉश प्रोग्राम, क्विक वॉश', mr: '8 वॉश प्रोग्राम, क्विक वॉश', en: '8 wash programmes, quick wash'}
+    - {hi: 120 kWh/साल बिजली खपत, mr: 120 kWh/वर्ष वीज वापर, en: 120 kWh/year energy use}
   test_data: true
 - sku: WM-MER-7-TL
   category: wm
@@ -532,6 +2205,10 @@
     heater: false
     rpm: 740
     quick_wash: true
+    programmes: 10
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: true
   dims:
     width_mm: 560
     depth_mm: 580
@@ -540,6 +2217,21 @@
   energy:
     kwh_year: 125
   image: products/WM-MER-7-TL.png
+  info:
+    series: AquaCare
+    year: 2025
+    model_number: MR-TL70-25
+    colours: [Silver]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '7 किलो टॉप लोड, इन्वर्टर मोटर', mr: '7 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '7 kg top load, inverter motor'}
+    - {hi: 740 RPM स्पिन स्पीड, mr: 740 RPM स्पिन स्पीड, en: 740 RPM spin speed}
+    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
+    - {hi: 125 kWh/साल बिजली खपत, mr: 125 kWh/वर्ष वीज वापर, en: 125 kWh/year energy use}
   test_data: true
 - sku: WM-ARK-7-FL
   category: wm
@@ -555,6 +2247,10 @@
     heater: true
     rpm: 1000
     quick_wash: true
+    programmes: 15
+    wash_tech: Tumble drum
+    steam: false
+    inverter_motor: true
   dims:
     width_mm: 595
     depth_mm: 550
@@ -563,6 +2259,22 @@
   energy:
     kwh_year: 100
   image: products/WM-ARK-7-FL.png
+  info:
+    series: Splash
+    year: 2025
+    model_number: AK-FL70-25
+    colours: [Silver]
+    warranty: {years: 2, motor_years: 5}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '7 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '7 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '7 kg front load, inverter motor'}
+    - {hi: 1000 RPM स्पिन स्पीड, mr: 1000 RPM स्पिन स्पीड, en: 1000 RPM spin speed}
+    - {hi: इन-बिल्ट हीटर, mr: इन-बिल्ट हीटर, en: In-built heater}
+    - {hi: '15 वॉश प्रोग्राम, क्विक वॉश', mr: '15 वॉश प्रोग्राम, क्विक वॉश', en: '15 wash programmes, quick wash'}
+    - {hi: 100 kWh/साल बिजली खपत, mr: 100 kWh/वर्ष वीज वापर, en: 100 kWh/year energy use}
   test_data: true
 - sku: WM-MER-8-FL
   category: wm
@@ -578,6 +2290,10 @@
     heater: true
     rpm: 1200
     quick_wash: true
+    programmes: 15
+    wash_tech: Tumble drum
+    steam: true
+    inverter_motor: true
   dims:
     width_mm: 600
     depth_mm: 565
@@ -586,6 +2302,22 @@
   energy:
     kwh_year: 105
   image: products/WM-MER-8-FL.png
+  info:
+    series: AquaCare
+    year: 2025
+    model_number: MR-FL80S-25
+    colours: [Silver, Middle Black]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '8 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '8 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '8 kg front load, inverter motor'}
+    - {hi: 1200 RPM स्पिन स्पीड, mr: 1200 RPM स्पिन स्पीड, en: 1200 RPM spin speed}
+    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
+    - {hi: '15 वॉश प्रोग्राम, क्विक वॉश', mr: '15 वॉश प्रोग्राम, क्विक वॉश', en: '15 wash programmes, quick wash'}
+    - {hi: 105 kWh/साल बिजली खपत, mr: 105 kWh/वर्ष वीज वापर, en: 105 kWh/year energy use}
   test_data: true
 - sku: WM-MER-10-TL
   category: wm
@@ -601,6 +2333,10 @@
     heater: false
     rpm: 780
     quick_wash: true
+    programmes: 12
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: true
   dims:
     width_mm: 600
     depth_mm: 620
@@ -609,6 +2345,21 @@
   energy:
     kwh_year: 160
   image: products/WM-MER-10-TL.png
+  info:
+    series: AquaCare
+    year: 2025
+    model_number: MR-TL100-25
+    colours: [Grey]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '10 किलो टॉप लोड, इन्वर्टर मोटर', mr: '10 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '10 kg top load, inverter motor'}
+    - {hi: 780 RPM स्पिन स्पीड, mr: 780 RPM स्पिन स्पीड, en: 780 RPM spin speed}
+    - {hi: '12 वॉश प्रोग्राम, क्विक वॉश', mr: '12 वॉश प्रोग्राम, क्विक वॉश', en: '12 wash programmes, quick wash'}
+    - {hi: 160 kWh/साल बिजली खपत, mr: 160 kWh/वर्ष वीज वापर, en: 160 kWh/year energy use}
   test_data: true
 - sku: WM-NOV-9-FL
   category: wm
@@ -624,6 +2375,10 @@
     heater: true
     rpm: 1400
     quick_wash: true
+    programmes: 16
+    wash_tech: Tumble drum
+    steam: true
+    inverter_motor: true
   dims:
     width_mm: 600
     depth_mm: 600
@@ -632,6 +2387,448 @@
   energy:
     kwh_year: 110
   image: products/WM-NOV-9-FL.png
+  info:
+    series: SteamPro
+    year: 2025
+    model_number: NX-FL90S-25
+    colours: [Black Steel]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '9 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '9 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '9 kg front load, inverter motor'}
+    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
+    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
+    - {hi: '16 वॉश प्रोग्राम, क्विक वॉश', mr: '16 वॉश प्रोग्राम, क्विक वॉश', en: '16 wash programmes, quick wash'}
+    - {hi: 110 kWh/साल बिजली खपत, mr: 110 kWh/वर्ष वीज वापर, en: 110 kWh/year energy use}
+  test_data: true
+- sku: WM-ARK-7-TL
+  category: wm
+  brand: Arka
+  model: Arka 7 kg Top
+  title:
+    hi: Arka 7 kg Top
+    mr: Arka 7 kg Top
+    en: Arka 7 kg Top
+  specs:
+    capacity_kg: 7
+    load: top
+    heater: false
+    rpm: 720
+    quick_wash: true
+    programmes: 8
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: false
+  dims:
+    width_mm: 545
+    depth_mm: 565
+    height_mm: 955
+    weight_kg: 31
+  energy:
+    kwh_year: 128
+  image: products/WM-ARK-7-TL.png
+  info:
+    series: Splash
+    year: 2025
+    model_number: AK-TL70-25
+    colours: [Grey]
+    warranty: {years: 2, motor_years: 5}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: 7 किलो टॉप लोड, mr: 7 किलो टॉप लोड, en: 7 kg top load}
+    - {hi: 720 RPM स्पिन स्पीड, mr: 720 RPM स्पिन स्पीड, en: 720 RPM spin speed}
+    - {hi: '8 वॉश प्रोग्राम, क्विक वॉश', mr: '8 वॉश प्रोग्राम, क्विक वॉश', en: '8 wash programmes, quick wash'}
+    - {hi: 128 kWh/साल बिजली खपत, mr: 128 kWh/वर्ष वीज वापर, en: 128 kWh/year energy use}
+  test_data: true
+- sku: WM-ARK-6-FL
+  category: wm
+  brand: Arka
+  model: Arka 6 kg Front
+  title:
+    hi: Arka 6 kg Front
+    mr: Arka 6 kg Front
+    en: Arka 6 kg Front
+  specs:
+    capacity_kg: 6
+    load: front
+    heater: true
+    rpm: 1000
+    quick_wash: true
+    programmes: 12
+    wash_tech: Tumble drum
+    steam: false
+    inverter_motor: false
+  dims:
+    width_mm: 595
+    depth_mm: 450
+    height_mm: 850
+    weight_kg: 56
+  energy:
+    kwh_year: 92
+  image: products/WM-ARK-6-FL.png
+  info:
+    series: Splash
+    year: 2025
+    model_number: AK-FL60-25
+    colours: [White]
+    warranty: {years: 2, motor_years: 5}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: 6 किलो फ्रंट लोड, mr: 6 किलो फ्रंट लोड, en: 6 kg front load}
+    - {hi: 1000 RPM स्पिन स्पीड, mr: 1000 RPM स्पिन स्पीड, en: 1000 RPM spin speed}
+    - {hi: इन-बिल्ट हीटर, mr: इन-बिल्ट हीटर, en: In-built heater}
+    - {hi: '12 वॉश प्रोग्राम, क्विक वॉश', mr: '12 वॉश प्रोग्राम, क्विक वॉश', en: '12 wash programmes, quick wash'}
+    - {hi: 92 kWh/साल बिजली खपत, mr: 92 kWh/वर्ष वीज वापर, en: 92 kWh/year energy use}
+  test_data: true
+- sku: WM-ARK-8-TL
+  category: wm
+  brand: Arka
+  model: Arka 8 kg Top
+  title:
+    hi: Arka 8 kg Top
+    mr: Arka 8 kg Top
+    en: Arka 8 kg Top
+  specs:
+    capacity_kg: 8
+    load: top
+    heater: false
+    rpm: 740
+    quick_wash: true
+    programmes: 10
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: true
+  dims:
+    width_mm: 580
+    depth_mm: 600
+    height_mm: 980
+    weight_kg: 36
+  energy:
+    kwh_year: 140
+  image: products/WM-ARK-8-TL.png
+  info:
+    series: Splash
+    year: 2026
+    model_number: AK-TL80-26
+    colours: [Grey]
+    warranty: {years: 2, motor_years: 5}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '8 किलो टॉप लोड, इन्वर्टर मोटर', mr: '8 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '8 kg top load, inverter motor'}
+    - {hi: 740 RPM स्पिन स्पीड, mr: 740 RPM स्पिन स्पीड, en: 740 RPM spin speed}
+    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
+    - {hi: 140 kWh/साल बिजली खपत, mr: 140 kWh/वर्ष वीज वापर, en: 140 kWh/year energy use}
+  test_data: true
+- sku: WM-MER-75-TL
+  category: wm
+  brand: Meru
+  model: Meru 7.5 kg Top
+  title:
+    hi: Meru 7.5 kg Top
+    mr: Meru 7.5 kg Top
+    en: Meru 7.5 kg Top
+  specs:
+    capacity_kg: 7.5
+    load: top
+    heater: false
+    rpm: 760
+    quick_wash: true
+    programmes: 10
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: true
+  dims:
+    width_mm: 560
+    depth_mm: 590
+    height_mm: 960
+    weight_kg: 33
+  energy:
+    kwh_year: 132
+  image: products/WM-MER-75-TL.png
+  info:
+    series: AquaCare
+    year: 2026
+    model_number: MR-TL75-26
+    colours: [Silver]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '7.5 किलो टॉप लोड, इन्वर्टर मोटर', mr: '7.5 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '7.5 kg top load, inverter motor'}
+    - {hi: 760 RPM स्पिन स्पीड, mr: 760 RPM स्पिन स्पीड, en: 760 RPM spin speed}
+    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
+    - {hi: 132 kWh/साल बिजली खपत, mr: 132 kWh/वर्ष वीज वापर, en: 132 kWh/year energy use}
+  test_data: true
+- sku: WM-ARK-9-TL
+  category: wm
+  brand: Arka
+  model: Arka 9 kg Top
+  title:
+    hi: Arka 9 kg Top
+    mr: Arka 9 kg Top
+    en: Arka 9 kg Top
+  specs:
+    capacity_kg: 9
+    load: top
+    heater: false
+    rpm: 760
+    quick_wash: true
+    programmes: 10
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: true
+  dims:
+    width_mm: 590
+    depth_mm: 610
+    height_mm: 985
+    weight_kg: 38
+  energy:
+    kwh_year: 152
+  image: products/WM-ARK-9-TL.png
+  info:
+    series: Splash
+    year: 2025
+    model_number: AK-TL90-25
+    colours: [Grey]
+    warranty: {years: 2, motor_years: 5}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '9 किलो टॉप लोड, इन्वर्टर मोटर', mr: '9 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '9 kg top load, inverter motor'}
+    - {hi: 760 RPM स्पिन स्पीड, mr: 760 RPM स्पिन स्पीड, en: 760 RPM spin speed}
+    - {hi: '10 वॉश प्रोग्राम, क्विक वॉश', mr: '10 वॉश प्रोग्राम, क्विक वॉश', en: '10 wash programmes, quick wash'}
+    - {hi: 152 kWh/साल बिजली खपत, mr: 152 kWh/वर्ष वीज वापर, en: 152 kWh/year energy use}
+  test_data: true
+- sku: WM-MER-7-FL
+  category: wm
+  brand: Meru
+  model: Meru 7 kg Front
+  title:
+    hi: Meru 7 kg Front
+    mr: Meru 7 kg Front
+    en: Meru 7 kg Front
+  specs:
+    capacity_kg: 7
+    load: front
+    heater: true
+    rpm: 1200
+    quick_wash: true
+    programmes: 15
+    wash_tech: Tumble drum
+    steam: true
+    inverter_motor: true
+  dims:
+    width_mm: 595
+    depth_mm: 520
+    height_mm: 850
+    weight_kg: 60
+  energy:
+    kwh_year: 98
+  image: products/WM-MER-7-FL.png
+  info:
+    series: AquaCare
+    year: 2025
+    model_number: MR-FL70S-25
+    colours: [Silver]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '7 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '7 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '7 kg front load, inverter motor'}
+    - {hi: 1200 RPM स्पिन स्पीड, mr: 1200 RPM स्पिन स्पीड, en: 1200 RPM spin speed}
+    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
+    - {hi: '15 वॉश प्रोग्राम, क्विक वॉश', mr: '15 वॉश प्रोग्राम, क्विक वॉश', en: '15 wash programmes, quick wash'}
+    - {hi: 98 kWh/साल बिजली खपत, mr: 98 kWh/वर्ष वीज वापर, en: 98 kWh/year energy use}
+  test_data: true
+- sku: WM-MER-9-FL
+  category: wm
+  brand: Meru
+  model: Meru 9 kg Front
+  title:
+    hi: Meru 9 kg Front
+    mr: Meru 9 kg Front
+    en: Meru 9 kg Front
+  specs:
+    capacity_kg: 9
+    load: front
+    heater: true
+    rpm: 1400
+    quick_wash: true
+    programmes: 16
+    wash_tech: Tumble drum
+    steam: true
+    inverter_motor: true
+  dims:
+    width_mm: 600
+    depth_mm: 600
+    height_mm: 850
+    weight_kg: 66
+  energy:
+    kwh_year: 112
+  image: products/WM-MER-9-FL.png
+  info:
+    series: AquaCare
+    year: 2026
+    model_number: MR-FL90S-26
+    colours: [Middle Black]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '9 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '9 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '9 kg front load, inverter motor'}
+    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
+    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
+    - {hi: '16 वॉश प्रोग्राम, क्विक वॉश', mr: '16 वॉश प्रोग्राम, क्विक वॉश', en: '16 wash programmes, quick wash'}
+    - {hi: 112 kWh/साल बिजली खपत, mr: 112 kWh/वर्ष वीज वापर, en: 112 kWh/year energy use}
+  test_data: true
+- sku: WM-NOV-8-FL
+  category: wm
+  brand: Novex
+  model: Novex 8 kg Front
+  title:
+    hi: Novex 8 kg Front
+    mr: Novex 8 kg Front
+    en: Novex 8 kg Front
+  specs:
+    capacity_kg: 8
+    load: front
+    heater: true
+    rpm: 1400
+    quick_wash: true
+    programmes: 16
+    wash_tech: Tumble drum
+    steam: true
+    inverter_motor: true
+  dims:
+    width_mm: 600
+    depth_mm: 565
+    height_mm: 850
+    weight_kg: 63
+  energy:
+    kwh_year: 102
+  image: products/WM-NOV-8-FL.png
+  info:
+    series: SteamPro
+    year: 2025
+    model_number: NX-FL80S-25
+    colours: [Black Steel]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '8 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '8 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '8 kg front load, inverter motor'}
+    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
+    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
+    - {hi: '16 वॉश प्रोग्राम, क्विक वॉश', mr: '16 वॉश प्रोग्राम, क्विक वॉश', en: '16 wash programmes, quick wash'}
+    - {hi: 102 kWh/साल बिजली खपत, mr: 102 kWh/वर्ष वीज वापर, en: 102 kWh/year energy use}
+  test_data: true
+- sku: WM-MER-12-TL
+  category: wm
+  brand: Meru
+  model: Meru 12 kg Top
+  title:
+    hi: Meru 12 kg Top
+    mr: Meru 12 kg Top
+    en: Meru 12 kg Top
+  specs:
+    capacity_kg: 12
+    load: top
+    heater: true
+    rpm: 800
+    quick_wash: true
+    programmes: 12
+    wash_tech: Pulsator
+    steam: false
+    inverter_motor: true
+  dims:
+    width_mm: 650
+    depth_mm: 670
+    height_mm: 1060
+    weight_kg: 46
+  energy:
+    kwh_year: 185
+  image: products/WM-MER-12-TL.png
+  info:
+    series: AquaCare
+    year: 2026
+    model_number: MR-TL120-26
+    colours: [Grey]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: रैट मेश, mr: रॅट मेश, en: Anti-rat mesh}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '12 किलो टॉप लोड, इन्वर्टर मोटर', mr: '12 किलो टॉप लोड, इन्व्हर्टर मोटर', en: '12 kg top load, inverter motor'}
+    - {hi: 800 RPM स्पिन स्पीड, mr: 800 RPM स्पिन स्पीड, en: 800 RPM spin speed}
+    - {hi: इन-बिल्ट हीटर, mr: इन-बिल्ट हीटर, en: In-built heater}
+    - {hi: '12 वॉश प्रोग्राम, क्विक वॉश', mr: '12 वॉश प्रोग्राम, क्विक वॉश', en: '12 wash programmes, quick wash'}
+    - {hi: 185 kWh/साल बिजली खपत, mr: 185 kWh/वर्ष वीज वापर, en: 185 kWh/year energy use}
+  test_data: true
+- sku: WM-NOV-105-FL
+  category: wm
+  brand: Novex
+  model: Novex 10.5 kg Front
+  title:
+    hi: Novex 10.5 kg Front
+    mr: Novex 10.5 kg Front
+    en: Novex 10.5 kg Front
+  specs:
+    capacity_kg: 10.5
+    load: front
+    heater: true
+    rpm: 1400
+    quick_wash: true
+    programmes: 18
+    wash_tech: Tumble drum
+    steam: true
+    inverter_motor: true
+  dims:
+    width_mm: 600
+    depth_mm: 640
+    height_mm: 850
+    weight_kg: 72
+  energy:
+    kwh_year: 125
+  image: products/WM-NOV-105-FL.png
+  info:
+    series: SteamPro
+    year: 2026
+    model_number: NX-FL105S-26
+    colours: [Black Steel]
+    warranty: {years: 2, motor_years: 10}
+    in_box:
+    - {hi: ड्रेन पाइप, mr: ड्रेन पाइप, en: Drain hose}
+    - {hi: ट्रांज़िट बोल्ट कैप, mr: ट्रान्झिट बोल्ट कॅप, en: Transit bolt caps}
+    - {hi: 'यूज़र मैनुअल, वारंटी कार्ड', mr: 'युजर मॅन्युअल, वॉरंटी कार्ड', en: 'User manual, warranty card'}
+    features:
+    - {hi: '10.5 किलो फ्रंट लोड, इन्वर्टर मोटर', mr: '10.5 किलो फ्रंट लोड, इन्व्हर्टर मोटर', en: '10.5 kg front load, inverter motor'}
+    - {hi: 1400 RPM स्पिन स्पीड, mr: 1400 RPM स्पिन स्पीड, en: 1400 RPM spin speed}
+    - {hi: 'स्टीम वॉश, इन-बिल्ट हीटर', mr: 'स्टीम वॉश, इन-बिल्ट हीटर', en: 'Steam wash, in-built heater'}
+    - {hi: '18 वॉश प्रोग्राम, क्विक वॉश', mr: '18 वॉश प्रोग्राम, क्विक वॉश', en: '18 wash programmes, quick wash'}
+    - {hi: 125 kWh/साल बिजली खपत, mr: 125 kWh/वर्ष वीज वापर, en: 125 kWh/year energy use}
   test_data: true
 - sku: LP-ARK-E-8
   category: laptop
@@ -649,11 +2846,33 @@
     weight_kg: 1.6
     battery_h: 9
     screen_in: 14
+    cpu: Intel Core i3-1315U
+    display_panel: IPS
+    refresh_hz: 60
+    os: Windows 11 Home
+    ports: [USB-C, USB-A x2, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
   dims:
     width_mm: 315
     height_mm: 210
     weight_kg: 1.6
+    depth_mm: 17.9
   image: products/LP-ARK-E-8.png
+  info:
+    series: Book
+    year: 2025
+    model_number: AK-B14-E8-25
+    colours: [Silver]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core i3-1315U प्रोसेसर, mr: Intel Core i3-1315U प्रोसेसर, en: Intel Core i3-1315U processor}
+    - {hi: '8 GB RAM, 256 GB SSD स्टोरेज', mr: '8 GB RAM, 256 GB SSD स्टोरेज', en: '8 GB RAM, 256 GB NVMe SSD'}
+    - {hi: '14 इंच IPS स्क्रीन, 60 Hz', mr: '14 इंच IPS स्क्रीन, 60 Hz', en: '14-inch IPS screen, 60 Hz'}
+    - {hi: '1.6 किलो, 9 घंटे बैटरी', mr: '1.6 किलो, 9 तास बॅटरी', en: '1.6 kg, 9 h battery'}
   test_data: true
 - sku: LP-ARK-M-8
   category: laptop
@@ -671,11 +2890,33 @@
     weight_kg: 1.7
     battery_h: 8
     screen_in: 15.6
+    cpu: Intel Core i5-1334U
+    display_panel: IPS
+    refresh_hz: 60
+    os: Windows 11 Home
+    ports: [USB-C, USB-A x2, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
   dims:
     width_mm: 351
     height_mm: 234
     weight_kg: 1.7
+    depth_mm: 19.9
   image: products/LP-ARK-M-8.png
+  info:
+    series: Book
+    year: 2025
+    model_number: AK-B15-M8-25
+    colours: [Grey]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core i5-1334U प्रोसेसर, mr: Intel Core i5-1334U प्रोसेसर, en: Intel Core i5-1334U processor}
+    - {hi: '8 GB RAM, 512 GB SSD स्टोरेज', mr: '8 GB RAM, 512 GB SSD स्टोरेज', en: '8 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '15.6 इंच IPS स्क्रीन, 60 Hz', mr: '15.6 इंच IPS स्क्रीन, 60 Hz', en: '15.6-inch IPS screen, 60 Hz'}
+    - {hi: '1.7 किलो, 8 घंटे बैटरी', mr: '1.7 किलो, 8 तास बॅटरी', en: '1.7 kg, 8 h battery'}
   test_data: true
 - sku: LP-MER-M-16
   category: laptop
@@ -693,11 +2934,33 @@
     weight_kg: 1.5
     battery_h: 10
     screen_in: 14
+    cpu: AMD Ryzen 5 7535U
+    display_panel: IPS
+    refresh_hz: 60
+    os: Windows 11 Home
+    ports: [USB-C x2, USB-A, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
   dims:
     width_mm: 315
     height_mm: 210
     weight_kg: 1.5
+    depth_mm: 16.9
   image: products/LP-MER-M-16.png
+  info:
+    series: Air
+    year: 2025
+    model_number: MR-A14-M16-25
+    colours: [Silver, Space Grey]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: AMD Ryzen 5 7535U प्रोसेसर, mr: AMD Ryzen 5 7535U प्रोसेसर, en: AMD Ryzen 5 7535U processor}
+    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '14 इंच IPS स्क्रीन, 60 Hz', mr: '14 इंच IPS स्क्रीन, 60 Hz', en: '14-inch IPS screen, 60 Hz'}
+    - {hi: '1.5 किलो, 10 घंटे बैटरी', mr: '1.5 किलो, 10 तास बॅटरी', en: '1.5 kg, 10 h battery'}
   test_data: true
 - sku: LP-MER-H-16U
   category: laptop
@@ -715,11 +2978,33 @@
     weight_kg: 1.2
     battery_h: 14
     screen_in: 14
+    cpu: Intel Core Ultra 7 258V
+    display_panel: OLED
+    refresh_hz: 120
+    os: Windows 11 Home
+    ports: [Thunderbolt 4 x2, USB-A, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
   dims:
     width_mm: 315
     height_mm: 210
     weight_kg: 1.2
+    depth_mm: 14.9
   image: products/LP-MER-H-16U.png
+  info:
+    series: Air Ultra
+    year: 2025
+    model_number: MR-AU14-H16-25
+    colours: [Space Grey]
+    warranty: {years: 2, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core Ultra 7 258V प्रोसेसर, mr: Intel Core Ultra 7 258V प्रोसेसर, en: Intel Core Ultra 7 258V processor}
+    - {hi: '16 GB RAM, 1 TB SSD स्टोरेज', mr: '16 GB RAM, 1 TB SSD स्टोरेज', en: '16 GB RAM, 1 TB NVMe SSD'}
+    - {hi: '14 इंच OLED स्क्रीन, 120 Hz', mr: '14 इंच OLED स्क्रीन, 120 Hz', en: '14-inch OLED screen, 120 Hz'}
+    - {hi: '1.2 किलो, 14 घंटे बैटरी', mr: '1.2 किलो, 14 तास बॅटरी', en: '1.2 kg, 14 h battery'}
   test_data: true
 - sku: LP-NOV-H-16G
   category: laptop
@@ -737,11 +3022,35 @@
     weight_kg: 2.1
     battery_h: 6
     screen_in: 16
+    cpu: Intel Core i7-14650HX
+    gpu_model: NVIDIA GeForce RTX 4060
+    display_panel: IPS
+    refresh_hz: 165
+    os: Windows 11 Home
+    ports: [USB-C, USB-A x3, HDMI, LAN, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
   dims:
     width_mm: 360
     height_mm: 240
     weight_kg: 2.1
+    depth_mm: 22.9
   image: products/LP-NOV-H-16G.png
+  info:
+    series: Pro
+    year: 2025
+    model_number: NX-P16-H16-25
+    colours: [Eclipse Black]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core i7-14650HX प्रोसेसर, mr: Intel Core i7-14650HX प्रोसेसर, en: Intel Core i7-14650HX processor}
+    - {hi: '16 GB RAM, 1 TB SSD स्टोरेज', mr: '16 GB RAM, 1 TB SSD स्टोरेज', en: '16 GB RAM, 1 TB NVMe SSD'}
+    - {hi: '16 इंच IPS स्क्रीन, 165 Hz', mr: '16 इंच IPS स्क्रीन, 165 Hz', en: '16-inch IPS screen, 165 Hz'}
+    - {hi: '2.1 किलो, 6 घंटे बैटरी', mr: '2.1 किलो, 6 तास बॅटरी', en: '2.1 kg, 6 h battery'}
+    - {hi: NVIDIA GeForce RTX 4060 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 4060 ग्राफिक्स, en: NVIDIA GeForce RTX 4060 graphics}
   test_data: true
 - sku: LP-NOV-H-32G
   category: laptop
@@ -759,9 +3068,480 @@
     weight_kg: 2.3
     battery_h: 5
     screen_in: 16
+    cpu: Intel Core i9-14900HX
+    gpu_model: NVIDIA GeForce RTX 4070
+    display_panel: IPS
+    refresh_hz: 240
+    os: Windows 11 Home
+    ports: [Thunderbolt 4, USB-A x3, HDMI, LAN, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
   dims:
     width_mm: 360
     height_mm: 240
     weight_kg: 2.3
+    depth_mm: 24.9
   image: products/LP-NOV-H-32G.png
+  info:
+    series: Pro
+    year: 2025
+    model_number: NX-P16-H32-25
+    colours: [Eclipse Black]
+    warranty: {years: 2, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core i9-14900HX प्रोसेसर, mr: Intel Core i9-14900HX प्रोसेसर, en: Intel Core i9-14900HX processor}
+    - {hi: '32 GB RAM, 1 TB SSD स्टोरेज', mr: '32 GB RAM, 1 TB SSD स्टोरेज', en: '32 GB RAM, 1 TB NVMe SSD'}
+    - {hi: '16 इंच IPS स्क्रीन, 240 Hz', mr: '16 इंच IPS स्क्रीन, 240 Hz', en: '16-inch IPS screen, 240 Hz'}
+    - {hi: '2.3 किलो, 5 घंटे बैटरी', mr: '2.3 किलो, 5 तास बॅटरी', en: '2.3 kg, 5 h battery'}
+    - {hi: NVIDIA GeForce RTX 4070 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 4070 ग्राफिक्स, en: NVIDIA GeForce RTX 4070 graphics}
+  test_data: true
+- sku: LP-ARK-E-8L
+  category: laptop
+  brand: Arka
+  model: Arka Book 14 Lite
+  title:
+    hi: Arka Book 14 Lite
+    mr: Arka Book 14 Lite
+    en: Arka Book 14 Lite
+  specs:
+    cpu_tier: entry
+    ram_gb: 8
+    storage_gb: 256
+    gpu: none
+    weight_kg: 1.45
+    battery_h: 8
+    screen_in: 14
+    cpu: Intel Core 3 100U
+    display_panel: IPS
+    refresh_hz: 60
+    os: Windows 11 Home
+    ports: [USB-C, USB-A x2, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 316
+    height_mm: 220
+    weight_kg: 1.45
+    depth_mm: 17.9
+  image: products/LP-ARK-E-8L.png
+  info:
+    series: Book
+    year: 2025
+    model_number: AK-B14L-E8-25
+    colours: [Silver]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core 3 100U प्रोसेसर, mr: Intel Core 3 100U प्रोसेसर, en: Intel Core 3 100U processor}
+    - {hi: '8 GB RAM, 256 GB SSD स्टोरेज', mr: '8 GB RAM, 256 GB SSD स्टोरेज', en: '8 GB RAM, 256 GB NVMe SSD'}
+    - {hi: '14 इंच IPS स्क्रीन, 60 Hz', mr: '14 इंच IPS स्क्रीन, 60 Hz', en: '14-inch IPS screen, 60 Hz'}
+    - {hi: '1.45 किलो, 8 घंटे बैटरी', mr: '1.45 किलो, 8 तास बॅटरी', en: '1.45 kg, 8 h battery'}
+  test_data: true
+- sku: LP-MER-E-8
+  category: laptop
+  brand: Meru
+  model: Meru Air 13
+  title:
+    hi: Meru Air 13
+    mr: Meru Air 13
+    en: Meru Air 13
+  specs:
+    cpu_tier: entry
+    ram_gb: 8
+    storage_gb: 512
+    gpu: none
+    weight_kg: 1.25
+    battery_h: 12
+    screen_in: 13.3
+    cpu: Intel Core 3 100U
+    display_panel: IPS
+    refresh_hz: 60
+    os: Windows 11 Home
+    ports: [USB-C x2, USB-A, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 302
+    height_mm: 204
+    weight_kg: 1.25
+    depth_mm: 15.9
+  image: products/LP-MER-E-8.png
+  info:
+    series: Air
+    year: 2025
+    model_number: MR-A13-E8-25
+    colours: [Silver, Space Grey]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core 3 100U प्रोसेसर, mr: Intel Core 3 100U प्रोसेसर, en: Intel Core 3 100U processor}
+    - {hi: '8 GB RAM, 512 GB SSD स्टोरेज', mr: '8 GB RAM, 512 GB SSD स्टोरेज', en: '8 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '13.3 इंच IPS स्क्रीन, 60 Hz', mr: '13.3 इंच IPS स्क्रीन, 60 Hz', en: '13.3-inch IPS screen, 60 Hz'}
+    - {hi: '1.25 किलो, 12 घंटे बैटरी', mr: '1.25 किलो, 12 तास बॅटरी', en: '1.25 kg, 12 h battery'}
+  test_data: true
+- sku: LP-ARK-E-16
+  category: laptop
+  brand: Arka
+  model: Arka Book 15 Plus
+  title:
+    hi: Arka Book 15 Plus
+    mr: Arka Book 15 Plus
+    en: Arka Book 15 Plus
+  specs:
+    cpu_tier: entry
+    ram_gb: 16
+    storage_gb: 512
+    gpu: none
+    weight_kg: 1.7
+    battery_h: 7
+    screen_in: 15.6
+    cpu: AMD Ryzen 5 7520U
+    display_panel: IPS
+    refresh_hz: 60
+    os: Windows 11 Home
+    ports: [USB-C, USB-A x2, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 358
+    height_mm: 235
+    weight_kg: 1.7
+    depth_mm: 19.9
+  image: products/LP-ARK-E-16.png
+  info:
+    series: Book
+    year: 2025
+    model_number: AK-B15P-E16-25
+    colours: [Grey]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: AMD Ryzen 5 7520U प्रोसेसर, mr: AMD Ryzen 5 7520U प्रोसेसर, en: AMD Ryzen 5 7520U processor}
+    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '15.6 इंच IPS स्क्रीन, 60 Hz', mr: '15.6 इंच IPS स्क्रीन, 60 Hz', en: '15.6-inch IPS screen, 60 Hz'}
+    - {hi: '1.7 किलो, 7 घंटे बैटरी', mr: '1.7 किलो, 7 तास बॅटरी', en: '1.7 kg, 7 h battery'}
+  test_data: true
+- sku: LP-ARK-M-16
+  category: laptop
+  brand: Arka
+  model: Arka Book 15 Pro
+  title:
+    hi: Arka Book 15 Pro
+    mr: Arka Book 15 Pro
+    en: Arka Book 15 Pro
+  specs:
+    cpu_tier: mid
+    ram_gb: 16
+    storage_gb: 512
+    gpu: none
+    weight_kg: 1.65
+    battery_h: 9
+    screen_in: 15.6
+    cpu: Intel Core 5 120U
+    display_panel: IPS
+    refresh_hz: 120
+    os: Windows 11 Home
+    ports: [USB-C x2, USB-A x2, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 358
+    height_mm: 235
+    weight_kg: 1.65
+    depth_mm: 18.5
+  image: products/LP-ARK-M-16.png
+  info:
+    series: Book
+    year: 2026
+    model_number: AK-B15R-M16-26
+    colours: [Grey]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core 5 120U प्रोसेसर, mr: Intel Core 5 120U प्रोसेसर, en: Intel Core 5 120U processor}
+    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '15.6 इंच IPS स्क्रीन, 120 Hz', mr: '15.6 इंच IPS स्क्रीन, 120 Hz', en: '15.6-inch IPS screen, 120 Hz'}
+    - {hi: '1.65 किलो, 9 घंटे बैटरी', mr: '1.65 किलो, 9 तास बॅटरी', en: '1.65 kg, 9 h battery'}
+  test_data: true
+- sku: LP-ARK-H-16G
+  category: laptop
+  brand: Arka
+  model: Arka Gamer 15
+  title:
+    hi: Arka Gamer 15
+    mr: Arka Gamer 15
+    en: Arka Gamer 15
+  specs:
+    cpu_tier: high
+    ram_gb: 16
+    storage_gb: 512
+    gpu: dedicated
+    weight_kg: 2.25
+    battery_h: 5
+    screen_in: 15.6
+    cpu: AMD Ryzen 7 7435HS
+    gpu_model: NVIDIA GeForce RTX 4050
+    display_panel: IPS
+    refresh_hz: 144
+    os: Windows 11 Home
+    ports: [USB-C, USB-A x3, HDMI, LAN, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 360
+    height_mm: 256
+    weight_kg: 2.25
+    depth_mm: 24.9
+  image: products/LP-ARK-H-16G.png
+  info:
+    series: Gamer
+    year: 2025
+    model_number: AK-G15-H16-25
+    colours: [Black]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: AMD Ryzen 7 7435HS प्रोसेसर, mr: AMD Ryzen 7 7435HS प्रोसेसर, en: AMD Ryzen 7 7435HS processor}
+    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '15.6 इंच IPS स्क्रीन, 144 Hz', mr: '15.6 इंच IPS स्क्रीन, 144 Hz', en: '15.6-inch IPS screen, 144 Hz'}
+    - {hi: '2.25 किलो, 5 घंटे बैटरी', mr: '2.25 किलो, 5 तास बॅटरी', en: '2.25 kg, 5 h battery'}
+    - {hi: NVIDIA GeForce RTX 4050 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 4050 ग्राफिक्स, en: NVIDIA GeForce RTX 4050 graphics}
+  test_data: true
+- sku: LP-MER-M-16L
+  category: laptop
+  brand: Meru
+  model: Meru Air 15
+  title:
+    hi: Meru Air 15
+    mr: Meru Air 15
+    en: Meru Air 15
+  specs:
+    cpu_tier: mid
+    ram_gb: 16
+    storage_gb: 512
+    gpu: none
+    weight_kg: 1.6
+    battery_h: 11
+    screen_in: 15.3
+    cpu: Intel Core Ultra 5 225U
+    display_panel: IPS
+    refresh_hz: 120
+    os: Windows 11 Home
+    ports: [USB-C x2, USB-A, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 340
+    height_mm: 237
+    weight_kg: 1.6
+    depth_mm: 16.9
+  image: products/LP-MER-M-16L.png
+  info:
+    series: Air
+    year: 2026
+    model_number: MR-A15-M16-26
+    colours: [Silver, Space Grey]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core Ultra 5 225U प्रोसेसर, mr: Intel Core Ultra 5 225U प्रोसेसर, en: Intel Core Ultra 5 225U processor}
+    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '15.3 इंच IPS स्क्रीन, 120 Hz', mr: '15.3 इंच IPS स्क्रीन, 120 Hz', en: '15.3-inch IPS screen, 120 Hz'}
+    - {hi: '1.6 किलो, 11 घंटे बैटरी', mr: '1.6 किलो, 11 तास बॅटरी', en: '1.6 kg, 11 h battery'}
+  test_data: true
+- sku: LP-NOV-M-16G
+  category: laptop
+  brand: Novex
+  model: Novex Play 15
+  title:
+    hi: Novex Play 15
+    mr: Novex Play 15
+    en: Novex Play 15
+  specs:
+    cpu_tier: mid
+    ram_gb: 16
+    storage_gb: 512
+    gpu: dedicated
+    weight_kg: 2.1
+    battery_h: 6
+    screen_in: 15.6
+    cpu: AMD Ryzen 5 8645HS
+    gpu_model: NVIDIA GeForce RTX 5050
+    display_panel: IPS
+    refresh_hz: 144
+    os: Windows 11 Home
+    ports: [USB-C, USB-A x3, HDMI, LAN, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 360
+    height_mm: 256
+    weight_kg: 2.1
+    depth_mm: 22.9
+  image: products/LP-NOV-M-16G.png
+  info:
+    series: Play
+    year: 2026
+    model_number: NX-PL15-M16-26
+    colours: [Eclipse Black]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: AMD Ryzen 5 8645HS प्रोसेसर, mr: AMD Ryzen 5 8645HS प्रोसेसर, en: AMD Ryzen 5 8645HS processor}
+    - {hi: '16 GB RAM, 512 GB SSD स्टोरेज', mr: '16 GB RAM, 512 GB SSD स्टोरेज', en: '16 GB RAM, 512 GB NVMe SSD'}
+    - {hi: '15.6 इंच IPS स्क्रीन, 144 Hz', mr: '15.6 इंच IPS स्क्रीन, 144 Hz', en: '15.6-inch IPS screen, 144 Hz'}
+    - {hi: '2.1 किलो, 6 घंटे बैटरी', mr: '2.1 किलो, 6 तास बॅटरी', en: '2.1 kg, 6 h battery'}
+    - {hi: NVIDIA GeForce RTX 5050 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 5050 ग्राफिक्स, en: NVIDIA GeForce RTX 5050 graphics}
+  test_data: true
+- sku: LP-MER-H-16F
+  category: laptop
+  brand: Meru
+  model: Meru Flip 14
+  title:
+    hi: Meru Flip 14
+    mr: Meru Flip 14
+    en: Meru Flip 14
+  specs:
+    cpu_tier: high
+    ram_gb: 16
+    storage_gb: 1024
+    gpu: none
+    weight_kg: 1.35
+    battery_h: 12
+    screen_in: 14
+    cpu: Intel Core Ultra 7 256V
+    display_panel: OLED
+    refresh_hz: 60
+    os: Windows 11 Home
+    ports: [Thunderbolt 4 x2, USB-A, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: true
+  dims:
+    width_mm: 316
+    height_mm: 220
+    weight_kg: 1.35
+    depth_mm: 15.9
+  image: products/LP-MER-H-16F.png
+  info:
+    series: Flip
+    year: 2026
+    model_number: MR-F14-H16-26
+    colours: [Space Grey]
+    warranty: {years: 1, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: स्टाइलस पेन, mr: स्टायलस पेन, en: Stylus pen}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core Ultra 7 256V प्रोसेसर, mr: Intel Core Ultra 7 256V प्रोसेसर, en: Intel Core Ultra 7 256V processor}
+    - {hi: '16 GB RAM, 1 TB SSD स्टोरेज', mr: '16 GB RAM, 1 TB SSD स्टोरेज', en: '16 GB RAM, 1 TB NVMe SSD'}
+    - {hi: '14 इंच OLED टच स्क्रीन, 60 Hz', mr: '14 इंच OLED टच स्क्रीन, 60 Hz', en: '14-inch OLED touch screen, 60 Hz'}
+    - {hi: '1.35 किलो, 12 घंटे बैटरी', mr: '1.35 किलो, 12 तास बॅटरी', en: '1.35 kg, 12 h battery'}
+  test_data: true
+- sku: LP-MER-H-32U
+  category: laptop
+  brand: Meru
+  model: Meru Air Ultra 16
+  title:
+    hi: Meru Air Ultra 16
+    mr: Meru Air Ultra 16
+    en: Meru Air Ultra 16
+  specs:
+    cpu_tier: high
+    ram_gb: 32
+    storage_gb: 1024
+    gpu: none
+    weight_kg: 1.5
+    battery_h: 15
+    screen_in: 16
+    cpu: Intel Core Ultra 9 288V
+    display_panel: OLED
+    refresh_hz: 120
+    os: Windows 11 Home
+    ports: [Thunderbolt 4 x2, USB-A, HDMI, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 355
+    height_mm: 248
+    weight_kg: 1.5
+    depth_mm: 15.5
+  image: products/LP-MER-H-32U.png
+  info:
+    series: Air Ultra
+    year: 2026
+    model_number: MR-AU16-H32-26
+    colours: [Space Grey]
+    warranty: {years: 2, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: Intel Core Ultra 9 288V प्रोसेसर, mr: Intel Core Ultra 9 288V प्रोसेसर, en: Intel Core Ultra 9 288V processor}
+    - {hi: '32 GB RAM, 1 TB SSD स्टोरेज', mr: '32 GB RAM, 1 TB SSD स्टोरेज', en: '32 GB RAM, 1 TB NVMe SSD'}
+    - {hi: '16 इंच OLED स्क्रीन, 120 Hz', mr: '16 इंच OLED स्क्रीन, 120 Hz', en: '16-inch OLED screen, 120 Hz'}
+    - {hi: '1.5 किलो, 15 घंटे बैटरी', mr: '1.5 किलो, 15 तास बॅटरी', en: '1.5 kg, 15 h battery'}
+  test_data: true
+- sku: LP-NOV-H-32S
+  category: laptop
+  brand: Novex
+  model: Novex Studio 14
+  title:
+    hi: Novex Studio 14
+    mr: Novex Studio 14
+    en: Novex Studio 14
+  specs:
+    cpu_tier: high
+    ram_gb: 32
+    storage_gb: 1024
+    gpu: dedicated
+    weight_kg: 1.7
+    battery_h: 9
+    screen_in: 14.5
+    cpu: AMD Ryzen AI 9 HX 370
+    gpu_model: NVIDIA GeForce RTX 5060
+    display_panel: OLED
+    refresh_hz: 120
+    os: Windows 11 Home
+    ports: [USB-C x2, USB-A, HDMI, SD card, Audio jack]
+    ssd_type: NVMe SSD
+    touchscreen: false
+  dims:
+    width_mm: 322
+    height_mm: 225
+    weight_kg: 1.7
+    depth_mm: 17.9
+  image: products/LP-NOV-H-32S.png
+  info:
+    series: Studio
+    year: 2026
+    model_number: NX-S14-H32-26
+    colours: [Eclipse Black]
+    warranty: {years: 2, battery_years: 1}
+    in_box:
+    - {hi: चार्जर, mr: चार्जर, en: Charger}
+    - {hi: 'यूज़र गाइड, वारंटी कार्ड', mr: 'युजर गाइड, वॉरंटी कार्ड', en: 'User guide, warranty card'}
+    features:
+    - {hi: AMD Ryzen AI 9 HX 370 प्रोसेसर, mr: AMD Ryzen AI 9 HX 370 प्रोसेसर, en: AMD Ryzen AI 9 HX 370 processor}
+    - {hi: '32 GB RAM, 1 TB SSD स्टोरेज', mr: '32 GB RAM, 1 TB SSD स्टोरेज', en: '32 GB RAM, 1 TB NVMe SSD'}
+    - {hi: '14.5 इंच OLED स्क्रीन, 120 Hz', mr: '14.5 इंच OLED स्क्रीन, 120 Hz', en: '14.5-inch OLED screen, 120 Hz'}
+    - {hi: '1.7 किलो, 9 घंटे बैटरी', mr: '1.7 किलो, 9 तास बॅटरी', en: '1.7 kg, 9 h battery'}
+    - {hi: NVIDIA GeForce RTX 5060 ग्राफ़िक्स, mr: NVIDIA GeForce RTX 5060 ग्राफिक्स, en: NVIDIA GeForce RTX 5060 graphics}
   test_data: true

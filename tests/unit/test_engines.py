@@ -58,7 +58,7 @@ async def test_hisaab_tv_golden(rt):
     codes = [ln.code for ln in cs.lines]
     assert codes == ["TV-MER-55-QL120", "TV_WALLMOUNT_S", "TV_INSTALL_WALL", "TV_EW2_S"]
     assert "price:TV-MER-55-QL120@RD-JUHU" in cs.sources and "charge:TV_WALLMOUNT_S" in cs.sources
-    assert cs.optional_count == 1  # HDMI hidden by default
+    assert cs.optional_count == 2  # HDMI cable + spike guard hidden by default
 
 
 async def test_hisaab_ac_golden(rt):

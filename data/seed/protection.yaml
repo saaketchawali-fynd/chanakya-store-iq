@@ -14,3 +14,8 @@
 - {code: LP_ADP1, category: laptop, years: 1, price: 3999, suggest_if: {slot: carry, eq: daily},
    title: {hi: "1 साल एक्सीडेंटल डैमेज", mr: "1 वर्ष अपघाती नुकसान", en: "1-year accidental damage"},
    reason: {hi: "roz college le jayenge", mr: "रोज कॉलेजला नेणार", en: "carried to college daily"}, test_data: true}
+# --- added plans
+- {code: TV_SDP1_XL, category: tv, years: 1, price: 6999, filter: {size_in_min: 75}, suggest_if: {slot: content, has: kids},
+   title: {hi: "resQ 1 साल स्क्रीन डैमेज कवर", mr: "resQ 1 वर्ष स्क्रीन डॅमेज कव्हर", en: "resQ 1-year screen damage cover"}, reason: {hi: "bachche + bada screen", mr: "मुलं + मोठी स्क्रीन", en: "kids and a big screen"}, test_data: true}
+- {code: LP_EW1, category: laptop, years: 1, price: 2999, suggest_if: {slot: user, eq: professional},
+   title: {hi: "resQ 1 साल अतिरिक्त वारंटी", mr: "resQ 1 वर्ष अतिरिक्त वॉरंटी", en: "resQ 1-year extended warranty"}, reason: {hi: "kaam ka laptop, rukna nahi chahiye", mr: "कामाचा लॅपटॉप, बंद पडू नये", en: "work laptop, no downtime"}, test_data: true}

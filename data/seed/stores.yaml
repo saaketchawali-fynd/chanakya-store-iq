@@ -1,3 +1,4 @@
 # TEST DATA ONLY
 - {id: RD-JUHU, name: "Reliance Digital Juhu (TEST)", city: Mumbai, test_data: true}
 - {id: RD-BELAPUR, name: "Reliance Digital CBD Belapur (TEST)", city: Navi Mumbai, test_data: true}
+- {id: RD-ANDHERI, name: "Reliance Digital Citi Mall Andheri West (TEST)", city: Mumbai, test_data: true}
