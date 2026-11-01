@@ -67,6 +67,17 @@ async def test_english_associate_gets_no_copy(h):
     assert out[0].card.lang == "en" and out[0].card_copy is None
 
 
+async def test_product_card_is_one_english_card_for_both(h):
+    await h.tap("g:new")
+    await h.tap("s:C1:lang:mr")  # Hindi associate, Marathi customer
+    for photo in ("label_meru55.jpg", "label_meru55.jpg"):  # before and after the home is understood
+        out = await h.photo(photo)
+        m = next(m for m in out if m.card and m.card.template == "product")
+        assert m.card.lang == "en" and m.card_copy is None and m.copy_caption is None
+        assert sum(1 for x in out if x.card) == 1  # never a second product card in another language
+        await h.voice("assess_1")
+
+
 async def test_offer_and_tryon_have_copies(h):
     await to_options(h, photo="room_living.jpg")
     out = await h.tap("s:C1:tryon")

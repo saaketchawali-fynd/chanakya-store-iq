@@ -49,13 +49,20 @@ def _group(name: str) -> str:
         return "python"
     if "chrom" in n or "headless" in n:
         return "chromium"
-    if n == "node":
-        return "node"  # the Playwright driver
-    return "other"
+    return n or "other"  # e.g. node: the Playwright driver
+
+
+def _kb(text: str, key: str) -> int | None:
+    for line in text.splitlines():
+        if line.startswith(key):
+            return int(line.split()[1])
+    return None
 
 
 def by_process() -> dict[str, int]:
-    """Resident memory (MB) summed per kind of process: python, chromium, node (Playwright driver), other."""
+    """Memory (MB) per kind of process: python, chromium, node (the Playwright driver), others by name.
+    Proportional (Pss) where Linux gives it: Chromium's processes share memory, which plain RSS counts once per
+    process, so the parts would add up to more than the instance uses."""
     out: dict[str, int] = {}
     proc = ROOT / "proc"
     if not proc.is_dir():
@@ -64,17 +71,21 @@ def by_process() -> dict[str, int]:
         if not d.name.isdigit():
             continue
         try:
-            name, rss = "", 0
-            for line in (d / "status").read_text().splitlines():
-                if line.startswith("Name:"):
-                    name = line.split(None, 1)[1].strip() if len(line.split()) > 1 else ""
-                elif line.startswith("VmRSS:"):
-                    rss = int(line.split()[1]) * 1024
-            if rss:
+            status = (d / "status").read_text()
+            name = next((ln.split(None, 1)[1].strip() for ln in status.splitlines()
+                         if ln.startswith("Name:") and len(ln.split()) > 1), "")
+            try:
+                kb = _kb((d / "smaps_rollup").read_text(), "Pss:")
+            except OSError:
+                kb = None
+            kb = kb if kb is not None else _kb(status, "VmRSS:")
+            if kb:
                 g = _group(name)
-                out[g] = out.get(g, 0) + rss
+                out[g] = out.get(g, 0) + kb * 1024
         except (OSError, ValueError, IndexError):
             continue
+    small = sum(v for v in out.values() if v < 5e6)
+    out = {k: v for k, v in out.items() if v >= 5e6} | ({"other": small} if small else {})
     return {k: round(v / 1e6) for k, v in sorted(out.items())}
 
 

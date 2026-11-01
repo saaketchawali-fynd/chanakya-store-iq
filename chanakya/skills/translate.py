@@ -205,7 +205,7 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     nxt = next((b for b in ms if b.id not in said), None)
     if nxt is None and first:
         # no home facts match yet: show the product from the data, and steer back to the home questions
-        card, copy = await C.dual_async(ctx, lambda: product_card(ctx, p))
+        card = await product_card_en(ctx, p)
         slot = C.pick_next_slot(ctx)
         btns = [ctx.b("b_next_q", ctx.sid("go")), ctx.b("b_compare", ctx.sid("compare")),
                 ctx.b("b_options", ctx.sid("options"))]
@@ -216,8 +216,8 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         if slot and not C.known_cites(ctx):
             ctx.asking.add(slot)
         if not cites:
-            return ctx.reply(C.with_copy(ctx, info_reply(ctx, say, btns, card=card), copy))
-        return ctx.reply(C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy))
+            return ctx.reply(info_reply(ctx, say, btns, card=card))
+        return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
     if nxt is None or len(said) >= 2:
         return await ignore_line(ctx, p, ms)
     lang = ctx.clang
@@ -236,15 +236,15 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         ctx.b("b_not_really", ctx.sid("bt", "no", nxt.id)),
         ctx.b("b_compare", ctx.sid("compare")),
     ]
-    card = copy = None
+    card = None
     if first:
-        card, copy = await C.dual_async(ctx, lambda: product_card(ctx, p))
+        card = await product_card_en(ctx, p)
         if not state.options_gate_open(ctx.session, ctx.pack):  # judge the fit only once the home is understood
             n = state.missing_for_options(ctx.session, ctx.pack)
             why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
             btns = [btns[0], btns[1], ctx.b("b_next_q", ctx.sid("go"))]
     cites = [c for c in nxt.cites if P.known(ctx.session.home, c)] or nxt.cites
-    return ctx.reply(C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy))
+    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
 
 
 async def benefit_reply(ctx: SkillContext, answer: str, rule_id: str | None) -> Reply:
@@ -294,6 +294,12 @@ async def pros_cons(ctx: SkillContext, p, lang: str) -> tuple[list[str], list[st
         elif c.match < 0.75 and c.rule_id in cons_t:
             cons.append(await fill(ctx, ctx.pick(cons_t[c.rule_id], lang), p, lang))
     return pros[:4], cons[:3], f.score
+
+
+async def product_card_en(ctx: SkillContext, p) -> Card:
+    """The product details card: one card in English for the customer and the associate (no copy)."""
+    with ctx.as_lang("en"):
+        return await product_card(ctx, p)
 
 
 async def product_card(ctx: SkillContext, p) -> Card:

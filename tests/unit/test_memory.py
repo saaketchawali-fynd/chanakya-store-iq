@@ -52,7 +52,8 @@ def test_memory_by_process_kind(tmp_path, monkeypatch):
                           (30, "node", 50_000), (1, "sh", 1_000)):
         _write(tmp_path, f"proc/{pid}/status", f"Name:\t{name}\nState:\tS\nVmRSS:\t{kb} kB\n")
     _write(tmp_path, "proc/99/status", "Name:\tkthreadd\n")  # no VmRSS: skipped
-    assert memory.by_process() == {"chromium": 154, "node": 51, "other": 1, "python": 205}
+    _write(tmp_path, "proc/41/smaps_rollup", "Rss:\t60000 kB\nPss:\t30000 kB\n")  # shared pages counted once
+    assert memory.by_process() == {"chromium": 123, "node": 51, "other": 1, "python": 205}
 
 
 @pytest.fixture
