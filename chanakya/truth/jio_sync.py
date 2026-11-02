@@ -107,6 +107,25 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
     return products, offers, plans, errors
 
 
+KEY_SPEC = {"tv": "size_in", "ac": "ton", "wm": "capacity_kg", "fridge": "capacity_l", "laptop": "ram_gb"}
+
+
+def catalog_report(products: list[dict]) -> dict:
+    """For checking the mapping on /health: the backend categories behind each Chanakya category, and how many
+    products carry the spec the fit logic needs most (and from where)."""
+    cats: dict[str, dict[str, int]] = {}
+    cover: dict[str, dict[str, int]] = {}
+    for r in products:
+        c = r["category"]
+        for name in r["info"].get("categories") or ["?"]:
+            cats.setdefault(c, {})[name] = cats.setdefault(c, {}).get(name, 0) + 1
+        src = r["info"]["spec_source"].get(KEY_SPEC[c])
+        k = "missing" if not src else ("name" if src == "name" else "attributes")
+        cover.setdefault(c, {"attributes": 0, "name": 0, "missing": 0})[k] += 1
+    return {"backend_categories": {c: dict(sorted(v.items(), key=lambda x: -x[1])[:15]) for c, v in cats.items()},
+            "key_spec": {c: {"spec": KEY_SPEC[c], **v} for c, v in cover.items()}}
+
+
 async def write(s: Settings, products: list[dict], offers: list[dict], plans: list[dict], meta: dict) -> None:
     uat = "jiox5" in s.jio_domain
     async with db.session() as ses:
@@ -153,7 +172,8 @@ async def sync(s: Settings, facts) -> dict:
                   "promotion_errors": errors}
         for r in products:
             counts[r["category"]] = counts.get(r["category"], 0) + 1
-        meta = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "counts": counts, "domain": s.jio_domain}
+        meta = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "counts": counts, "domain": s.jio_domain,
+                "catalog": catalog_report(products)}
         await write(s, products, offers, plans, meta)
         await facts.refresh()
         STATUS.update(last_ok_at=meta["at"], last_error=None, counts=counts)

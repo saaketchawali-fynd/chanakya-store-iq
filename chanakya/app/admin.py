@@ -37,7 +37,7 @@ async def _data(s, rt) -> dict:
             meta = None
         out.update(domain=s.jio_domain, token_set=st["configured"], syncing=st["running"],
                    last_sync=(meta or {}).get("at"), counts=(meta or {}).get("counts") or st["counts"],
-                   last_error=st["last_error"])
+                   last_error=st["last_error"], catalog=(meta or {}).get("catalog"))
     return out
 
 

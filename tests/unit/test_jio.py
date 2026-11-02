@@ -151,6 +151,9 @@ async def test_sync_loads_only_backend_data(tmp_path, jio_backend):
         assert (sony.price, sony.mrp) == (1000, 68900) and not sony.stock_known and sony.in_stock
         assert [o.title["en"] for o in snap.offers] == ["Flat 10% off"]
         assert {pl.code for pl in snap.protection} == {"600562736", "600562710"}
+        meta = await jio_sync.last_meta()
+        assert meta["catalog"]["backend_categories"]["fridge"] == {"Frost Free": 3, "Side by side refrigerators": 2}
+        assert meta["catalog"]["key_spec"]["tv"] == {"spec": "size_in", "attributes": 4, "name": 0, "missing": 1}
     finally:
         await h.close()
 
