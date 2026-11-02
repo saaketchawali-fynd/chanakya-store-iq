@@ -27,14 +27,21 @@ async def test_golden_path(tmp_path):
         out = await step(h.say, "namaste")
         assert [b.id for b in out[0].buttons] == ["g:alang:en", "g:alang:hi", "g:alang:mr"]
         assert not any(m.card for m in out) and "Namaste" not in out[0].body and "Bhasha" not in out[0].body
-        # 1 brief (Hindi chosen): focus, offers as structured rows, stock
+        # 1 shift start, one step at a time (Hindi chosen): the pre-read (stock, offers, keep in mind) → the clip →
+        #   ready → only then the customer button
         out = await step(h.tap, "g:alang:hi")
         brief = next(m for m in out if m.card and m.card.template == "brief")
+        assert brief.card.lang == "en"  # one card, in English
         assert any("Meru 55 QLED Pro" in c["text"] for c in brief.card.data["changes"])
+        assert brief.card.data["stock"]["n"] and brief.card.data["stock"]["tiles"]
         offs = brief.card.data["offers"]
         assert offs and all(o["badge"] and o["title"] and o["till"] for o in offs)
         assert offs[0]["kind"] == "ends"  # the offers ending soonest come first
-        assert [b.title for b in brief.buttons] == ["Clip dekho", "Aaj ka sawaal", "Naya customer"]
+        assert [b.title for b in brief.buttons] == ["Aage: aaj ka clip"]  # one step, not every option at once
+        out = await step(h.tap, brief.buttons[0].id)
+        assert any(m.kind == "video" for m in out) and button_ids(out) == ["g:ready:translate"]
+        out = await step(h.tap, "g:ready:translate")
+        assert button_ids(out) == ["g:new"] and out[0].footer  # ready: the customer button, and voice any time
         # 2 new customer: the opener (welcome line + product list, the associate's department first)
         out = await step(h.tap, "g:new")
         rows = [r.id for sec in out[0].sections for r in sec.rows]
@@ -101,7 +108,8 @@ async def test_golden_path(tmp_path):
             'BMeru 55" QLED Pro',
             'CMeru 65" QLED Pro',
         ]
-        assert button_ids(out) == ["s:C1:demo", "s:C1:tryon", "s:C1:prefer"]
+        assert button_ids(out) == ["s:C1:demo", "s:C1:ofs", "s:C1:tryon"]  # offers next to the products
+        assert all(o["offer"]["text"] for o in card.data["options"])  # every option shows its offer (or none)
         assert "₹" not in texts(out) and "price" not in str(card.data)
         assert card.data["grid"] and card.data["options"][1]["points"]  # built from this home's answers
         # 10b Ghar mein dekho → straight to the picture: B solid, C as the outline

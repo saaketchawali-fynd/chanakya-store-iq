@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 TZ=Asia/Kolkata
 # so memory falls back after a try-on instead of staying at its peak on the 512 MB instance
 ENV MALLOC_ARENA_MAX=2 MALLOC_MMAP_THRESHOLD_=131072 MALLOC_TRIM_THRESHOLD_=131072
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ffmpeg fonts-noto-core fonts-noto-color-emoji libraqm0 libglib2.0-0 curl && rm -rf /var/lib/apt/lists/*
+      ffmpeg fonts-inter fonts-noto-core fonts-noto-color-emoji libraqm0 libglib2.0-0 curl && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir uv
 WORKDIR /app
 COPY pyproject.toml uv.lock* ./

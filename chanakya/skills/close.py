@@ -30,6 +30,10 @@ async def offers(ctx: SkillContext) -> Reply:
     """Close, in order: (replacing → is the old one working?) → how will they pay? → (card/EMI → which bank?) →
     the offer card with the full cost today. Only offers from the data, only those this payment gets."""
     s = ctx.session
+    if s.option_labels and (not s.chosen_sku or (s.cost_snapshot or {}).get("sku") != s.chosen_sku):
+        from chanakya.skills.recommend import offers_view  # the offers on the products shown (never skips the cost)
+
+        return await offers_view(ctx)
     if not state.price_gate_open(s, ctx.pack):
         ctx.x["pending_after_override"] = "offers"
         return gate_price_reply(ctx)
@@ -176,14 +180,14 @@ async def quote(ctx: SkillContext, alt: bool = False) -> Reply:
             fq = b2 if (alt and b2) else b1
         return offer_card(ctx, p, r, fq, extras, total_str, pay, bank)
 
-    card, copy = await C.dual_async(ctx, build)
+    card = await C.english_async(ctx, build)
     cites = C.known_cites(ctx, ["exchange_old", "mounting", "outdoor_spot", "family_size", "power_cuts", "carry"])
     btns = [
         ctx.b("b_book_delivery", ctx.sid("delivery")),
         ctx.b("b_not_today", ctx.sid("nottoday")),
         ctx.b("b_send_customer", ctx.sid("sendoffer")),
     ]
-    return ctx.reply(C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy))
+    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
 
 
 def _also(ctx: SkillContext, p, applied_ids: set[str], pay: str) -> list[dict]:

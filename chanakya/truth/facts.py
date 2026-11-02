@@ -271,7 +271,7 @@ class FactsService:
                 kind = "back_in_stock"
             elif st.qty == 0 and st.qty_yesterday > 0:
                 kind = "out_of_stock"
-            elif 0 < st.qty <= 2:
+            elif 0 < st.qty <= 2 and (p.info or {}).get("source") != "jio":  # Jio gives availability, not counts
                 kind = "low"
             if kind:
                 out.append(

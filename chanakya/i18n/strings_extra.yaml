@@ -105,8 +105,8 @@ approval_offers: {hi: "Manager: ye valid offers dikhaiye — {offers}", mr: "म
 approval_sent: {hi: "Manager ko bhej diya ✓ Tab tak data ke offers dikhaiye.", mr: "मॅनेजरला पाठवलं ✓ तोपर्यंत डेटामधले ऑफर दाखवा.", en: "Sent to the manager ✓ Meanwhile, show the offers in the data."}
 ask_bank: {hi: "Customer ka card kaunsa hai?", mr: "ग्राहकाचं कार्ड कोणतं आहे?", en: "Which card does the customer have?"}
 benefits_done: {hi: "Is ghar ke liye zaroori fayde ho gaye. Ab options?", mr: "या घरासाठी महत्त्वाचे फायदे सांगून झाले. आता पर्याय?", en: "That covers the benefits that matter here. Options now?"}
-brief_back: {hi: "{model} wapas stock mein ({qty})", mr: "{model} पुन्हा स्टॉकमध्ये ({qty})", en: "{model} back in stock ({qty})"}
-brief_out: {hi: "{model} stock khatam", mr: "{model} स्टॉक संपला", en: "{model} out of stock"}
+brief_back: {hi: "{model} wapas stock mein", mr: "{model} पुन्हा स्टॉकमध्ये", en: "{model} back in stock since yesterday"}
+brief_out: {hi: "{model} stock khatam", mr: "{model} स्टॉक संपला", en: "{model} out of stock since yesterday"}
 brief_low: {hi: "{model} sirf {qty} bache", mr: "{model} फक्त {qty} उरले", en: "{model}: only {qty} left"}
 brief_caption: {hi: "{name} ji, aaj {cat} mein {n} badlav.", mr: "{name}, आज {cat} मध्ये {n} बदल.", en: "{name}, {n} changes in {cat} today."}
 brief_caption_tasks: {hi: "{n} customer wapas aa sakte hain.", mr: "{n} ग्राहक परत येऊ शकतात.", en: "{n} customers may come back."}

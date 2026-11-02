@@ -1,5 +1,5 @@
 """Customer-facing visuals and the details the associate asked for after the first phone test:
-- every customer-facing visual in English, plus one copy in the associate's language (none when that is English);
+- every visual is ONE card in English for the customer and the associate (no copy in another language);
 - the options card built from this home (needs grid, benefits with proof), never a generic feature list;
 - the bill: 'Show customer' always leaves the associate a next step;
 - units and technical terms in English in every language; Devanagari for Hindi customer wording;
@@ -28,12 +28,12 @@ async def session(h):
     return await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
 
 
-async def test_options_card_is_english_with_a_copy_and_built_from_this_home(h):
+async def test_options_card_is_one_english_card_built_from_this_home(h):
     out = await to_options(h)
     m = out[0]
     check_floor(out)
     assert m.card.template == "options" and m.card.lang == "en"
-    assert m.card_copy is not None and m.card_copy.lang == "hi" and m.copy_caption  # the associate's language
+    assert sum(1 for x in out if x.card or x.image_bytes) == 1  # one card, no copy in the associate's language
     d = m.card.data
     best = next(o for o in d["options"] if o["is_best"])
     assert best["points"] and all(p["text"] for p in best["points"])
@@ -52,7 +52,7 @@ async def test_show_customer_keeps_a_next_step_and_bill_is_english(h):
     await h.tap("s:C1:shown")
     out = await pick(h)
     k = next(m for m in out if m.card and m.card.template == "kharcha")
-    assert k.card.lang == "en" and k.card_copy and k.card_copy.lang == "hi"
+    assert k.card.lang == "en" and sum(1 for x in out if x.card and x.card.template == "kharcha") == 1
     out = await h.tap("s:C1:cost_show")
     check_floor(out)
     m = out[0]
@@ -61,10 +61,10 @@ async def test_show_customer_keeps_a_next_step_and_bill_is_english(h):
     assert m.footer
 
 
-async def test_english_associate_gets_no_copy(h):
+async def test_english_associate_gets_the_same_one_card(h):
     await h.say("lang en")
     out = await to_options(h, clang="en")
-    assert out[0].card.lang == "en" and out[0].card_copy is None
+    assert out[0].card.lang == "en" and sum(1 for x in out if x.card) == 1
 
 
 async def test_product_card_is_one_english_card_for_both(h):
@@ -73,23 +73,21 @@ async def test_product_card_is_one_english_card_for_both(h):
     for photo in ("label_meru55.jpg", "label_meru55.jpg"):  # before and after the home is understood
         out = await h.photo(photo)
         m = next(m for m in out if m.card and m.card.template == "product")
-        assert m.card.lang == "en" and m.card_copy is None and m.copy_caption is None
+        assert m.card.lang == "en"
         assert sum(1 for x in out if x.card) == 1  # never a second product card in another language
         await h.voice("assess_1")
 
 
-async def test_offer_and_tryon_have_copies(h):
+async def test_offer_and_tryon_are_one_english_visual(h):
     await to_options(h, photo="room_living.jpg")
     out = await h.tap("s:C1:tryon")
-    img = next(m for m in out if m.image_bytes)
-    assert img.image_copy and img.image_copy != img.image_bytes  # same drawing, words in the associate's language
+    assert sum(1 for m in out if m.image_bytes) == 1  # one picture, no relabelled copy
     await h.tap("s:C1:shown")
     await pick(h)
     await h.tap("s:C1:offers")
     out = await h.tap("s:C1:pay:upi")
     oc = next(m for m in out if m.card and m.card.template == "offer")
-    assert oc.card.lang == "en" and oc.card_copy.lang == "hi"
-    assert oc.card.data["total_str"] == oc.card_copy.data["total_str"]  # same numbers in both
+    assert oc.card.lang == "en" and sum(1 for m in out if m.card and m.card.template == "offer") == 1
 
 
 def test_units_and_terms_stay_english_in_display_text():

@@ -1,85 +1,115 @@
-{% extends "base.html" %}
-{# Before the shift (associate): today's focus, live offers (one highlighted row each: badge, offer, how much and on
-   what, till when), what to keep in mind, stock changes, follow-ups. #}
-{% set offs = offers|aslist %}{% set chs = changes|aslist %}{% set kp = keep|aslist %}
-{% block style %}
-  .date { margin-top: 10px; font-size: 27px; color: #C6CFE2; }
-  .focus { display: flex; gap: 22px; align-items: flex-start; border-radius: 30px; padding: 26px 30px;
-           background: linear-gradient(135deg, #FFF3E6 0%, #FDE6D0 100%); border: 2px solid #F6D2AE; }
-  .focus .bubble { width: 62px; height: 62px; background: var(--saffron); color: #fff; }
-  .focus .k { font-size: 22px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--saffron-deep); }
-  .focus .k.dv { font-size: 24px; letter-spacing: 0; text-transform: none; }
-  .focus .s { font-size: 40px; font-weight: 800; color: var(--ink); line-height: 1.2; margin-top: 2px; }
-  .focus .tip { font-size: 27px; color: #6B4A2B; line-height: 1.36; margin-top: 8px; }
-  .offs { padding: 8px 26px 14px; }
-  .off { display: flex; gap: 18px; align-items: center; padding: 18px 8px; }
-  .off + .off { border-top: 2px solid var(--line); }
-  .pill { flex: none; min-width: 128px; text-align: center; font-size: 19px; font-weight: 800; letter-spacing: .8px;
-          text-transform: uppercase; padding: 8px 12px; border-radius: 12px; line-height: 1.25; }
-  .pill.dv { font-size: 21px; letter-spacing: 0; text-transform: none; }
-  .pill.ends { background: #FBE4E1; color: var(--red); }
-  .pill.new { background: #E8ECF5; color: var(--indigo); }
-  .pill.live { background: var(--green-pale); color: var(--green-deep); }
+<!doctype html>
+{# Before the shift — step 1 of 3, the pre-read (English). Clean and light: today's stock (how many can be sold, the
+   biggest groups by the key spec with their price span, changes since yesterday), the live offers, and what to keep
+   in mind. Every number comes from the data. #}
+{% set st = stock or {} %}{% set tiles = st.tiles|aslist %}{% set chs = changes|aslist %}
+{% set offs = offers|aslist %}{% set kp = keep|aslist %}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --ink: #0B1220; --text: #1F2937; --muted: #6B7280; --faint: #9CA3AF; --line: #E8EAEE; --bg: #F4F5F7;
+          --tile: #F7F8FA; --accent: #4338CA; --accent-pale: #EEF0FF; --green: #047857; --green-pale: #ECFDF5;
+          --amber: #B45309; --amber-pale: #FFF7ED; --rose: #B91C1C; --rose-pale: #FEF2F2; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; background: var(--bg); }
+  body { font-family: "Inter", "Avenir Next", "Helvetica Neue", "Noto Sans", "Noto Sans Devanagari", "Kohinoor Devanagari",
+                      Arial, sans-serif, "Noto Color Emoji", "Apple Color Emoji";
+         color: var(--text); font-size: 30px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  #card { width: 1080px; max-height: 1350px; overflow: hidden; background: var(--bg); position: relative; }
+  #fit { width: 1080px; transform-origin: 0 0; padding: 46px 56px 30px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .ic { display: inline-block; flex: none; vertical-align: middle; }
+
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 600; color: var(--muted); }
+  .pills { display: flex; gap: 10px; }
+  .pill { font-size: 20px; font-weight: 600; padding: 7px 16px; border-radius: 999px; background: var(--accent-pale); color: var(--accent); }
+  .pill.test { background: #F1F2F4; color: var(--faint); letter-spacing: 1px; }
+  h1 { margin-top: 28px; font-size: 60px; line-height: 1.12; font-weight: 700; letter-spacing: -1px; color: var(--ink); }
+  .date { margin-top: 10px; font-size: 28px; color: var(--muted); }
+
+  .sec { margin-top: 28px; }
+  .label { display: flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 700; letter-spacing: 1.8px;
+           text-transform: uppercase; color: var(--muted); margin: 0 4px 14px; }
+  .label .ic { color: var(--accent); }
+  .box { background: #fff; border: 1.5px solid var(--line); border-radius: 30px; padding: 28px 34px; }
+
+  .big { display: flex; align-items: baseline; gap: 16px; }
+  .big .n { font-size: 80px; font-weight: 800; line-height: 1; letter-spacing: -2px; color: var(--ink); }
+  .big .of { font-size: 30px; color: var(--muted); }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+  .tile { background: var(--tile); border-radius: 22px; padding: 16px 22px; }
+  .tile .k { font-size: 32px; font-weight: 700; color: var(--ink); }
+  .tile .c { font-size: 23px; font-weight: 600; color: var(--green); margin-top: 2px; }
+  .tile .s { font-size: 23px; color: var(--muted); margin-top: 2px; }
+  .chg { margin-top: 22px; border-top: 1.5px solid var(--line); padding-top: 14px; }
+  .chg .r { display: flex; align-items: center; gap: 14px; font-size: 25px; padding: 6px 0; color: var(--text); }
+  .dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--faint); }
+  .dot.out_of_stock { background: var(--rose); } .dot.back_in_stock { background: var(--green); } .dot.low { background: var(--amber); }
+
+  .off { display: flex; gap: 20px; align-items: center; padding: 14px 0; }
+  .off + .off { border-top: 1.5px solid var(--line); }
   .off .t { flex: 1; min-width: 0; }
-  .off .ti { font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.28; }
-  .off .de { font-size: 23px; color: var(--muted); line-height: 1.35; margin-top: 3px; }
-  .off .till { flex: none; font-size: 22px; font-weight: 700; color: var(--saffron-deep); background: var(--saffron-pale);
-               padding: 7px 14px; border-radius: 999px; white-space: nowrap; }
-  .off.ends .till { color: var(--red); background: #FBE4E1; }
-  .more { padding: 6px 8px 4px; font-size: 22px; color: var(--faint); }
-  .none { padding: 18px 8px; font-size: 26px; color: var(--muted); }
-  .keep { padding: 16px 30px; }
-  .kp { display: flex; gap: 16px; align-items: flex-start; padding: 9px 0; font-size: 27px; line-height: 1.36; color: var(--text); }
-  .kp .dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--saffron); margin-top: 14px; }
-  .list { padding: 10px 30px; }
-  .it { display: flex; align-items: center; gap: 16px; padding: 12px 0; font-size: 26px; line-height: 1.32; color: var(--text); }
-  .it + .it { border-top: 2px solid var(--line); }
-  .it .em { width: 44px; height: 44px; background: #F2EFEA; color: var(--muted); }
-  .it .em.k-up { background: var(--green-pale); color: var(--green-deep); }
-  .it .em.k-down { background: #FBE4E1; color: var(--red); }
-  .it .em.k-low { background: var(--saffron-pale); color: var(--saffron-deep); }
-  .fu { display: flex; align-items: center; gap: 14px; margin-top: 18px; border-radius: 22px; padding: 16px 24px;
-        background: var(--surface); box-shadow: var(--shadow-sm); font-size: 26px; color: var(--text); }
-  .fu .ic { color: var(--indigo); }
-{% endblock %}
-{% block header %}
-  <div class="kicker{{ L.title|dv }}">{{ L.title }}</div>
-  <h1 class="{{ (greeting or 'Namaste')|dv }}">{{ greeting or 'Namaste' }}</h1>
-  {% if date_line %}<div class="date{{ date_line|dv }}">{{ date_line }}</div>{% endif %}
-{% endblock %}
-{% block content %}
-  {% if focus_step %}
-  <section class="focus">
-    <span class="bubble">{{ icon('target', 32, '', 2.4) }}</span>
-    <div><div class="k{{ L.focus|dv }}">{{ L.focus }}</div><div class="s{{ focus_step|dv }}">{{ focus_step }}</div>
-      {% if focus_tip %}<div class="tip{{ focus_tip|dv }}">{{ focus_tip }}</div>{% endif %}</div>
-  </section>
-  {% endif %}
+  .off .ti { font-size: 29px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+  .off .de { font-size: 23px; color: var(--muted); margin-top: 3px; }
+  .till { flex: none; font-size: 21px; font-weight: 600; padding: 7px 14px; border-radius: 999px; white-space: nowrap;
+          background: var(--accent-pale); color: var(--accent); }
+  .off.ends .till { background: var(--rose-pale); color: var(--rose); }
+  .none { font-size: 27px; color: var(--muted); padding: 4px 0; }
+  .more { font-size: 22px; color: var(--faint); padding-top: 10px; }
+
+  .kp { display: flex; gap: 18px; align-items: flex-start; padding: 7px 0; font-size: 27px; line-height: 1.38; color: var(--text); }
+  .kp .i { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--accent-pale); color: var(--accent);
+           font-size: 21px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+
+  .ft { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; font-size: 21px; color: var(--faint); }
+  .ft .nx { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="card"><div id="fit">
+  <div class="top">
+    <div class="brand">
+      <svg class="ic" width="32" height="32" viewBox="0 0 36 36"><rect width="36" height="36" rx="10" fill="#4338CA"/><path d="M24.6 12.3a8 8 0 1 0 0 11.4" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><circle cx="25.2" cy="18" r="2.3" fill="#fff"/></svg>
+      <span>Chanakya · Before the shift</span>
+    </div>
+    <div class="pills">{% if step %}<span class="pill">{{ step }}</span>{% endif %}<span class="pill test">TEST DATA</span></div>
+  </div>
+  <h1>{{ greeting or 'Good morning' }}</h1>
+  {% if date_line %}<div class="date">{{ date_line }}</div>{% endif %}
+
   <section class="sec">
-    <div class="label{{ L.offers|dv }}">{{ icon('tag', 26) }}{{ L.offers }}</div>
-    <div class="card offs">
+    <div class="label">{{ icon('box', 24) }}In stock today</div>
+    <div class="box">
+      <div class="big num"><span class="n">{{ st.n }}</span><span class="of">{{ st.of }}</span></div>
+      {% if tiles %}<div class="tiles">
+        {% for t in tiles[:4] %}<div class="tile"><div class="k num">{{ t.label }}</div><div class="c num">{{ t.count }}</div><div class="s num">{{ t.span }}</div></div>{% endfor %}
+      </div>{% endif %}
+      {% if chs %}<div class="chg">{% for c in chs[:3] %}<div class="r"><span class="dot {{ c.kind }}"></span><span>{{ c.text }}</span></div>{% endfor %}</div>{% endif %}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="label">{{ icon('tag', 24) }}Offers</div>
+    <div class="box">
       {% for o in offs[:4] %}
-      <div class="off {{ o.kind }}"><span class="pill {{ o.kind }}{{ o.badge|dv }}">{{ o.badge }}</span>
-        <div class="t"><div class="ti{{ o.title|dv }}">{{ o.title }}</div>{% if o.detail %}<div class="de num">{{ o.detail }}</div>{% endif %}</div>
+      <div class="off {{ o.kind }}"><div class="t"><div class="ti">{{ o.title }}</div>{% if o.detail %}<div class="de num">{{ o.detail }}</div>{% endif %}</div>
         <span class="till num">{{ o.till }}</span></div>
       {% endfor %}
       {% if no_offers %}<div class="none">{{ no_offers }}</div>{% endif %}
       {% if offers_more %}<div class="more">{{ offers_more }}</div>{% endif %}
     </div>
   </section>
+
   {% if kp %}
   <section class="sec">
-    <div class="label{{ L.keep|dv }}">{{ icon('shield', 26) }}{{ L.keep }}</div>
-    <div class="card keep">{% for k in kp %}<div class="kp"><span class="dot"></span><span>{{ k }}</span></div>{% endfor %}</div>
+    <div class="label">{{ icon('shield', 24) }}Keep in mind</div>
+    <div class="box">{% for k in kp[:4] %}<div class="kp"><span class="i">{{ loop.index }}</span><span>{{ k }}</span></div>{% endfor %}</div>
   </section>
   {% endif %}
-  {% if chs %}
-  <section class="sec">
-    <div class="label{{ L.changes|dv }}">{{ icon('refresh', 26) }}{{ L.changes }}</div>
-    <div class="card list">
-      {% for c in chs[:3] %}<div class="it">{% set ic = c.icon|icon_name %}<span class="bubble em k-{{ ic }}">{{ icon(ic, 22, '', 2.4) }}</span><span>{{ c.text }}</span></div>{% endfor %}
-    </div>
-  </section>
-  {% endif %}
-  {% if followups_text %}<div class="fu">{{ icon('users', 28) }}<span>{{ followups_text }}</span></div>{% endif %}
-{% endblock %}
+
+  <div class="ft"><span>Chanakya · Store IQ · from the store's live data</span><span class="nx">Next: today's clip ›</span></div>
+</div></div>
+</body>
+</html>

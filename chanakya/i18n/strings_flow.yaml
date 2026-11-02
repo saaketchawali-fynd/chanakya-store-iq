@@ -186,7 +186,6 @@ catalog_unavailable: {hi: "Abhi product list nahi mil rahi (Jio Commerce se). Th
 footer_photo_saved: {hi: "Photo save hui · options isi jagah dikhenge", mr: "फोटो सेव्ह झाला · पर्याय याच जागी दिसतील", en: "Photo saved · the picks will show in this spot"}
 tryon_drawing: {hi: "Jagah naap rahe hain, product laga rahe hain — kuch second.", mr: "जागा मोजतोय, उत्पादन लावतोय — काही सेकंद.", en: "Measuring the spot and placing it: a few seconds."}
 tryon_footer: {hi: "अनुमानित झलक · सही अनुपात में · TEST DATA", mr: "अंदाजे झलक · योग्य प्रमाणात · TEST DATA", en: "Approx. preview · to scale · TEST DATA"}
-copy_caption: {hi: "Aapki copy (Hindi) · customer ko English wali dikhaiye", mr: "तुमची प्रत (मराठी) · ग्राहकाला English प्रत दाखवा", en: "Your copy"}
 install_needs_product: {hi: "Pehle product chuniye — phir installation book karenge.", mr: "आधी उत्पादन निवडा — मग इन्स्टॉलेशन बुक करू.", en: "Choose the product first, then we will book the installation."}
 button_from_closed: {hi: "Ye button pichhle customer ({code}) ka hai — woh baat-cheet khatam ho chuki.", mr: "हे बटण आधीच्या ग्राहकाचं ({code}) आहे — ते संभाषण संपलं.", en: "That button is from an earlier customer ({code}): that conversation is finished."}
 b_task_snooze: {hi: "Kal yaad dilao", mr: "उद्या आठवण करा", en: "Remind tomorrow"}
@@ -199,3 +198,42 @@ readback_nudge: {hi: "Kuch naya nahi mila. Customer se poochh kar tap kijiye —
 expert_expired: {hi: "Expert ka jawab nahi aaya: \"{question}\". Customer ko call karke batayenge — task bana lijiye.", mr: "तज्ज्ञाचं उत्तर आलं नाही: \"{question}\". ग्राहकाला नंतर फोन करून सांगू — टास्क बनवा.", en: "No answer from the expert on \"{question}\". Call the customer back later: make a task."}
 footer_label_hint: {hi: "Label ki photo bhejiye → is ghar ke fayde", mr: "लेबलचा फोटो पाठवा → या घरासाठी फायदे", en: "Send a label photo → benefits for this home"}
 bolo_prefer_personal: {hi: "आपके लिए कौन-सा सही लगा?", mr: "तुमच्यासाठी कोणता योग्य वाटला?", en: "Which one felt right for you?"}
+# ---- shift start, one step at a time: pre-read → clip → ready → customer (user flow, 2 Nov 2026)
+brief_models: {hi: "{n} models", mr: "{n} models", en: "{n} models"}
+brief_of_total: {hi: "of {total} {cat} available today", mr: "of {total} {cat} available today", en: "of {total} {cat} available today"}
+brief_cat_tv: {hi: "TV", mr: "टीव्ही", en: "TVs"}
+brief_cat_ac: {hi: "AC", mr: "AC", en: "ACs"}
+brief_cat_wm: {hi: "washing machine", mr: "वॉशिंग मशीन", en: "washing machines"}
+brief_cat_fridge: {hi: "fridge", mr: "फ्रिज", en: "fridges"}
+brief_cat_laptop: {hi: "laptop", mr: "लॅपटॉप", en: "laptops"}
+brief_keep_plans: {hi: "{n} protection plan uplabdh ({span})", mr: "{n} protection plans उपलब्ध ({span})", en: "{n} protection plans available ({span})"}
+brief_keep_tasks: {hi: "Aaj {n} customer follow-up", mr: "आज {n} ग्राहक फॉलो-अप", en: "{n} customer follow-ups due today"}
+brief_hello_morning: {hi: "Good morning, {name}", mr: "Good morning, {name}", en: "Good morning, {name}"}
+brief_hello_afternoon: {hi: "Good afternoon, {name}", mr: "Good afternoon, {name}", en: "Good afternoon, {name}"}
+brief_hello_evening: {hi: "Good evening, {name}", mr: "Good evening, {name}", en: "Good evening, {name}"}
+brief_step_of: {hi: "Step {n} of 3 · Pre-read", mr: "Step {n} of 3 · Pre-read", en: "Step {n} of 3 · Pre-read"}
+brief_pre_caption: {hi: "Aaj: {n} {cat} stock mein · {n_off} offer chalu\nPadh liya? Ab 20 second ka clip.", mr: "आज: {n} {cat} स्टॉकमध्ये · {n_off} ऑफर चालू\nवाचलं? आता 20 सेकंदांची क्लिप.", en: "Today: {n} {cat} in stock · {n_off} offers live\nRead it? Next, a 20-second clip."}
+b_clip_next: {hi: "Aage: aaj ka clip", mr: "पुढे: आजची क्लिप", en: "Next: today's clip"}
+clip_why_last: {hi: "Aaj ka focus: {step} (pichhli baar {n}/2)", mr: "आजचा फोकस: {step} (मागच्या वेळी {n}/2)", en: "Today's focus: {step} (last time {n}/2)"}
+clip_why_first: {hi: "Aaj ka focus: {step}", mr: "आजचा फोकस: {step}", en: "Today's focus: {step}"}
+clip_then_ready: {hi: "Clip dekh liya? Taiyaar hon to bataiye.", mr: "क्लिप पाहिली? तयार असाल तर सांगा.", en: "Watched it? Tap when you're ready."}
+b_ready: {hi: "Taiyaar hoon ✓", mr: "मी तयार ✓", en: "I'm ready ✓"}
+ready_body: {hi: "Shabash, aap taiyaar hain ✓\nAaj yaad rakhiye: {tip}\nCustomer aaye to 'Naya customer' dabaiye, ya seedha voice note bhejiye.", mr: "छान, तुम्ही तयार आहात ✓\nआज लक्षात ठेवा: {tip}\nग्राहक आला की 'नवीन ग्राहक' दाबा, किंवा थेट व्हॉइस नोट पाठवा.", en: "You're ready ✓\nToday, remember: {tip}\nWhen a customer comes, tap New customer, or just send a voice note."}
+footer_voice_q: {hi: "🎤 Bolkar bhi bata sakte hain: Hindi, English, मराठी", mr: "🎤 बोलूनही सांगू शकता: हिंदी, English, मराठी", en: "🎤 Or just say it: Hindi, English or Marathi"}
+brief_keep_cover: {hi: "Offer {n} of {total} {cat} par lagta hai", mr: "ऑफर {total} पैकी {n} {cat} वर लागू", en: "Offers apply to {n} of the {total} {cat} on sale"}
+brief_keep_days_left: {hi: "{title}: sirf {n} din baaki", mr: "{title}: फक्त {n} दिवस उरले", en: "{title}: only {n} days left"}
+brief_keep_last_day: {hi: "{title}: aaj aakhri din", mr: "{title}: आज शेवटचा दिवस", en: "{title}: today is the last day"}
+# ---- offers with the products (user, 2 Nov 2026): always shown, and one tap away
+offer_none: {hi: "Aaj koi live offer nahi", mr: "आज लाइव्ह ऑफर नाही", en: "No live offer today"}
+offer_more: {hi: "+{n} aur", mr: "+{n} आणखी", en: "+{n} more"}
+b_offers_on: {hi: "Offers dekho", mr: "ऑफर्स बघा", en: "Offers"}
+list_offers: {hi: "Offers", mr: "ऑफर्स", en: "Offers"}
+offers_list_body: {hi: "In products par aaj ke live offers (system se). Ek par tap karein: bolne wali line milegi.", mr: "या उत्पादनांवर आजच्या लाइव्ह ऑफर्स (सिस्टममधून). एकावर टॅप करा: बोलायची ओळ मिळेल.", en: "Live offers on these products today (from the system). Tap one for the line to say."}
+offers_list_footer: {hi: "Sirf system ke offers · koi chhoot apni taraf se nahi", mr: "फक्त सिस्टमच्या ऑफर्स · स्वतःहून सूट नाही", en: "Only the system's offers · never a discount of your own"}
+offers_none_body: {hi: "In products par aaj system mein koi live offer nahi.\nCustomer ko system ka daam hi bataiye, apni taraf se chhoot nahi.", mr: "या उत्पादनांवर आज सिस्टममध्ये लाइव्ह ऑफर नाही.\nग्राहकाला सिस्टमचीच किंमत सांगा, स्वतःहून सूट नाही.", en: "No live offers on these products in the system today.\nQuote the system price only; never a discount of your own."}
+bolo_offer_line: {hi: "इस पर अभी {title} है: {detail}{till}।", mr: "यावर आत्ता {title} आहे: {detail}{till}.", en: "Right now there's {title} on this: {detail}{till}."}
+kyun_offer_line: {hi: "System ka live offer, {product} par lagta hai", mr: "सिस्टमची लाइव्ह ऑफर, {product} वर लागू", en: "A live offer from the system that applies to {product}"}
+# ---- every question: what the answer decides, from today's stock
+kyun_tail_band: {hi: "stock mein {lo}–{hi}, jawab sahi wala chunega", mr: "स्टॉकमध्ये {lo}–{hi}, उत्तर योग्य ते निवडेल", en: "in stock {lo}–{hi}; the answer picks the right one"}
+kyun_tail_rule: {hi: "{need}: stock ke {total} mein se {n} {cat} sahi", mr: "{need}: स्टॉकमधील {total} पैकी {n} {cat} योग्य", en: "{need}: {n} of {total} {cat} in stock qualify"}
+footer_heard: {hi: "Suna: “{text}”", mr: "ऐकलं: “{text}”", en: "Heard: “{text}”"}

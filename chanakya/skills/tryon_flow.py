@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import io
-from dataclasses import replace
 
 from PIL import Image
 
@@ -20,7 +19,7 @@ from chanakya.log import get_log
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
-from chanakya.tryon import TryonProduct, TryonRequest, relabel, run
+from chanakya.tryon import TryonProduct, TryonRequest, run
 
 log = get_log("tryon_flow")
 OLD_TV_SIZES = (24, 32, 40, 43, 50, 55, 65)
@@ -316,12 +315,7 @@ async def job(ctx: SkillContext) -> Reply:
             continue
         await repo.media_put(s.id, "tryon", res.image, "image/jpeg", ctx.now)
         drawn.append([p.sku for p, _ in pl])
-        copy = None
-        if ctx.alang != "en":  # the associate's copy: same drawing, the words in their language
-            copy = await relabel(replace(req, distance_text=dist_text(ctx.alang),
-                                         footer_text=ctx.t("tryon_footer", ctx.alang)), res)
-        res.prepared = res.final = None  # the full-size drawing is not needed any more
-        msgs.append(C.with_copy(ctx, _tryon_message(ctx, pl, res.image), copy))
+        msgs.append(_tryon_message(ctx, pl, res.image))
     ms = int((time.perf_counter() - t0) * 1000)
     from chanakya.app import memory
 

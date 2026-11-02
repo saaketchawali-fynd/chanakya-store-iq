@@ -66,7 +66,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         ctx.x["pending_cost"] = True
         return ctx.reply(C.question_reply(ctx, site))
     ctx.x.pop("pending_cost", None)
-    sheet = await _sheet(ctx, "en")  # the customer's bill is in English; the associate gets a copy in theirs
+    sheet = await _sheet(ctx, "en")  # one bill, in English, for the customer and the associate
     s.cost_snapshot = sheet.model_dump(mode="json")
     state.advance(s, Step.COMPLETE)
     first_price = "first_price_event" not in ctx.x
@@ -82,7 +82,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
 
         who = ctx.x.get("price_first_by") or ("none" if s.demo_done else "associate")
         mark_first_price(ctx, who)
-    card, copy = await _cards(ctx, sheet)
+    card = _card(ctx, sheet)
     used_site = [sid for sid in pack.cost_slots if P.known(s.home, sid)]
     why = ctx.t("kyun_complete")
     site_reason = _site_reason(ctx, sheet)
@@ -95,7 +95,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         ctx.b("b_show_customer", ctx.sid("cost_show")),
     ]
     say = ctx.pick(ctx.packs.common_line("complete_line"), ctx.clang)
-    msg = C.with_copy(ctx, coach_reply(ctx, say, why, cites, btns, card=card), copy)
+    msg = coach_reply(ctx, say, why, cites, btns, card=card)
     if ctx.x.pop("removed_note", None):
         msg.footer = ctx.x.pop("removed_footer", None) or msg.footer
     return ctx.reply(msg)
@@ -170,15 +170,10 @@ async def _sheet(ctx: SkillContext, lang: str) -> hisaab.CostSheet:
     )
 
 
-async def _cards(ctx: SkillContext, sheet: hisaab.CostSheet) -> tuple[Card, Card | None]:
-    """The English bill card + the associate's-language copy (same sheet, line names in their language)."""
+def _card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
+    """The one bill card, in English, for the customer and the associate."""
     with ctx.as_lang("en"):
-        en = kharcha_card(ctx, sheet)
-    if ctx.alang == "en":
-        return en, None
-    local = await _sheet(ctx, ctx.alang)
-    with ctx.as_lang(ctx.alang):
-        return en, kharcha_card(ctx, local)
+        return kharcha_card(ctx, sheet)
 
 
 def kharcha_card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
@@ -251,8 +246,8 @@ async def resend_card(ctx: SkillContext) -> Reply:
         ctx.b("b_remove_item", ctx.sid("cost_rm")),
         ctx.b("b_not_today", ctx.sid("nottoday")),
     ]
-    card, copy = await _cards(ctx, sheet)
-    msg = C.with_copy(ctx, info_reply(ctx, f'"{say}"', btns, card=card), copy)
+    card = _card(ctx, sheet)
+    msg = info_reply(ctx, f'"{say}"', btns, card=card)
     msg.footer = ctx.t("footer_shown_customer")
     return ctx.reply(msg)
 

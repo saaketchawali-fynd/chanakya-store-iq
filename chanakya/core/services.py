@@ -57,26 +57,9 @@ class Services:
         self.violations.extend(vio)
         return out
 
-    async def _send_copy(self, m: OutMessage) -> None:
-        """The associate's-language copy of a customer-facing visual, just before the English one."""
-        try:
-            img = None
-            if m.card_copy is not None and self.channel.renders_cards:
-                img = await self.render(m.card_copy)
-            elif m.image_copy is not None:
-                img = m.image_copy
-            if not img:
-                return
-            mid = await self.channel.upload_media(img, "image/jpeg", "copy.jpg")
-            await self.channel.send(OutMessage(to=m.to, kind="image", media_id=mid, caption=m.copy_caption))
-        except Exception:
-            log.exception("copy_failed", to=m.to)
-
     async def deliver(self, m: OutMessage) -> str | None:
         if m.kind == "image" and not m.caption and m.body:
             m.caption, m.body = m.body, None
-        if m.card_copy is not None or m.image_copy is not None:
-            await self._send_copy(m)
         try:
             if m.card is not None and self.channel.renders_cards:
                 img = await self.render(m.card)

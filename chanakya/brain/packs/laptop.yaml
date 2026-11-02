@@ -15,7 +15,7 @@ slots:
     phase: life
     title: {hi: "Kaun chalayega", mr: "कोण वापरणार", en: "Who uses it"}
     ask: {hi: "लैपटॉप कौन चलाएगा — पढ़ाई के लिए या काम के लिए?", mr: "लॅपटॉप कोण वापरणार — अभ्यासासाठी की कामासाठी?", en: "Who will use the laptop: for study or for work?"}
-    why: {hi: "Use se zaroorat tay hoti hai", mr: "वापरावरून गरज ठरते", en: "The user decides the needs"}
+    why: {hi: "Padhai ya kaam: wazan, battery aur software badal jaata hai", mr: "अभ्यास की काम: वजन, बॅटरी आणि सॉफ्टवेअर बदलतं", en: "Study or work changes the weight, battery and software it needs"}
     quick:
       - {id: student, title: {hi: "Student", mr: "विद्यार्थी", en: "Student"}}
       - {id: professional, title: {hi: "Kaam ke liye", mr: "कामासाठी", en: "For work"}}
@@ -31,7 +31,7 @@ slots:
     phase: life
     title: {hi: "Course/kaam", mr: "कोर्स/काम", en: "Course/work"}
     ask: {hi: "कौन-सा कोर्स या काम है — इंजीनियरिंग, कॉमर्स, डिज़ाइन?", mr: "कोणता कोर्स किंवा काम — इंजिनिअरिंग, कॉमर्स, डिझाइन?", en: "Which course or work: engineering, commerce, design?"}
-    why: {hi: "Course se software aur power tay hota hai", mr: "कोर्सवरून सॉफ्टवेअर आणि पॉवर ठरते", en: "The course decides software and power"}
+    why: {hi: "Engineering/design ko zyada RAM aur graphics; commerce basic par chal jaata hai", mr: "इंजिनिअरिंग/डिझाइनला जास्त RAM आणि ग्राफिक्स; कॉमर्स साध्यावर चालतं", en: "Engineering and design need more RAM and graphics; commerce runs on a basic one"}
     quick:
       - {id: engineering, title: {hi: "Engineering", mr: "इंजिनिअरिंग", en: "Engineering"}}
       - {id: commerce, title: {hi: "Commerce", mr: "कॉमर्स", en: "Commerce"}}

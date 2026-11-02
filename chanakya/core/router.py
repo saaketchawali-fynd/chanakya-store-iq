@@ -452,6 +452,8 @@ async def global_action(ctx: SkillContext, bid: ButtonId) -> Reply:
         return language_picker(ctx)
     if a == "clip":
         return await brief.clip(ctx, bid.get(1, "translate"))
+    if a == "ready":
+        return await brief.ready(ctx, bid.get(1, "translate"))
     if a == "quiz":
         return await brief.quiz(ctx, bid.get(1, "translate"))
     if a == "qa":
@@ -574,6 +576,7 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "cost_show": lambda: complete.resend_card(ctx) if ctx.session.cost_snapshot else complete.show_cost(ctx),
         "cost_drop_optional": lambda: complete.toggle_suggestions(ctx),
         "offers": lambda: close.offers(ctx),
+        "ofs": lambda: recommend.offers_view(ctx),
         "emi": lambda: close.quote(ctx, alt=True),
         "delivery": lambda: close.delivery(ctx),
         "parivaar": lambda: follow.parivaar(ctx),
@@ -592,6 +595,10 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     if action == "lang":
         ctx.session.extra["lang_tapped"] = True
         return await assess.set_customer_lang(ctx, a0 or "hi")
+    if action == "ofd" and a0:
+        if a0 == "none":
+            return await recommend.offers_view(ctx)
+        return await recommend.offer_detail(ctx, a0, a1 or "")
     if action == "slot" and a0 and a1:
         return await assess.tap_slot(ctx, a0, a1)
     if action == "cat" and a0:
@@ -671,6 +678,7 @@ async def _understand_ctx(ctx: SkillContext) -> dict:
             for sd in pack.slots
         ],
         "myths": [{"id": m.id, "belief": m.belief} for m in ctx.packs.all_myths(pack.category)][:30],
+        "brands": sorted({p.brand for p in ctx.facts.products_sync(pack.category) if p.brand})[:40],  # spelling help
         "library": [{"id": f"L{e.id}", "q": e.question} for e in lib][:30],
         "options_shown": opts,
     }
@@ -770,7 +778,12 @@ async def on_speech(ctx: SkillContext) -> Reply:
         return await complete.show_cost(ctx)
     if "request_offers" in intents:
         return await close.offers(ctx)
-    return await assess.on_info(ctx, u, applied=True, gate_before=gate_before, n_new=n_new)
+    r = await assess.on_info(ctx, u, applied=True, gate_before=gate_before, n_new=n_new)
+    if msg.type == "audio" and not n_new and tr.strip() and r.messages:  # nothing new: show what was heard
+        snip = " ".join(tr.split())
+        snip = snip if len(snip) <= 38 else snip[:37].rstrip() + "…"
+        r.messages[0].footer = ctx.t("footer_heard", text=ctx.reg.raw(snip, "voice:transcript"))
+    return r
 
 
 async def on_image(ctx: SkillContext) -> Reply:

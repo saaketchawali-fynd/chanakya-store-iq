@@ -200,23 +200,21 @@ def features(ctx: SkillContext, p, lang: str, n: int = 3) -> list[str]:
     return out or spec_strings(ctx, p, lang, n)
 
 
-def offer_badge(ctx: SkillContext, p, lang: str) -> str | None:
-    """The best offer that needs no particular bank card (instant / brand / festive), if any applies today."""
+def live_offers_for(ctx: SkillContext, p) -> list[tuple]:
+    """Every live offer from the data that applies to this product (bank, cashback and exchange offers included;
+    bundles that need a second product are not), the biggest saving first. [(offer, saving in ₹)]"""
     from chanakya.core.clock import today
     from chanakya.truth.offers import discount
 
-    best, amt = None, 0
+    d = today()
+    out = []
     for o in ctx.facts.snap.offers:
-        if o.bank or o.kind in ("bank", "cashback"):
-            continue
-        if not (o.valid_from <= today() <= o.valid_to) or p.category not in (o.categories or []):
+        if not (o.valid_from <= d <= o.valid_to) or p.category not in (o.categories or []):
             continue
         flt = o.filter or {}
-        if flt.get("skus") and p.sku not in flt["skus"]:
+        if any(k.startswith("with_tv") for k in flt):
             continue
-        if flt.get("brands") and p.brand not in flt["brands"]:
-            continue
-        if any(k.startswith("with_tv") for k in flt) or (o.requires or {}).get("slot"):
+        if (flt.get("skus") and p.sku not in flt["skus"]) or (flt.get("brands") and p.brand not in flt["brands"]):
             continue
         size = p.spec("size_in")
         if ("size_in_min" in flt and (size is None or size < flt["size_in_min"])) or (
@@ -225,7 +223,19 @@ def offer_badge(ctx: SkillContext, p, lang: str) -> str | None:
             continue
         if (o.min_amount or 0) > p.price:
             continue
-        d = discount(o, p.price)
-        if d > amt:
-            best, amt = o, d
-    return ctx.reg.static(pick(best.title, lang)) if best else None
+        out.append((o, discount(o, p.price)))
+    return sorted(out, key=lambda x: (-x[1], x[0].valid_to, x[0].id))
+
+
+def offer_line(ctx: SkillContext, p, lang: str) -> dict:
+    """The offer shown with a product, always: the biggest live offer and its last day (+N more), or plainly that
+    none is live today. From the offer rows only."""
+    from chanakya.truth import fmt
+
+    offs = live_offers_for(ctx, p)
+    if not offs:
+        return {"text": ctx.t("offer_none", lang), "none": True, "more": None}
+    o = offs[0][0]
+    till = ctx.t("brief_offer_till", lang, date=ctx.reg.raw(fmt.date_short(o.valid_to, lang), f"offer:{o.id}:valid_to"))
+    more = ctx.t("offer_more", lang, n=ctx.reg.num(len(offs) - 1, f"offers:{p.sku}:count")) if len(offs) > 1 else None
+    return {"text": f"{ctx.pick(o.title, lang)} · {till}", "none": False, "more": more}

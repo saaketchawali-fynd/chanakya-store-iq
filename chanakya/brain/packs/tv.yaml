@@ -51,7 +51,7 @@ slots:
     phase: life
     title: {hi: "Kamra", mr: "खोली", en: "Room"}
     ask: {hi: "टीवी किस कमरे में लगेगा?", mr: "टीव्ही कोणत्या खोलीत लागेल?", en: "Which room will the TV go in?"}
-    why: {hi: "Kamre se size aur awaaz tay hoti hai", mr: "खोलीवरून साइज आणि आवाज ठरतो", en: "The room decides the size and the sound"}
+    why: {hi: "Bedroom mein TV paas hota hai: hall se aksar ek size chhota", mr: "बेडरूममध्ये टीव्ही जवळ असतो: हॉलपेक्षा साधारण एक साइज लहान", en: "A bedroom TV sits closer: usually a size smaller than the hall"}
     quick:
       - {id: living, title: {hi: "Living room", mr: "हॉल", en: "Living room"}}
       - {id: bedroom, title: {hi: "Bedroom", mr: "बेडरूम", en: "Bedroom"}}
@@ -127,7 +127,7 @@ slots:
     phase: life
     title: {hi: "Live match", mr: "लाइव्ह मॅच", en: "Live sports"}
     ask: {hi: "घर में लाइव क्रिकेट या मैच कितनी बार देखते हैं?", mr: "घरात लाइव्ह क्रिकेट किंवा मॅच किती वेळा पाहता?", en: "How often is live cricket or sports on at home?"}
-    why: {hi: "Tez shot par basic screen mein ball dhundhli hoti hai; isse pata chalta hai motion kitna zaroori", mr: "वेगवान शॉटवर साध्या स्क्रीनमध्ये बॉल धूसर दिसतो; यावरून मोशन किती महत्त्वाचं ते कळतं", en: "On a basic screen the ball blurs on fast shots; this tells us how much motion matters"}
+    why: {hi: "Basic screen par tez shot mein ball dhundhli hoti hai", mr: "साध्या स्क्रीनवर वेगवान शॉटमध्ये बॉल धूसर दिसतो", en: "On a basic screen the ball blurs on fast shots"}
     quick:
       - {id: sports, title: {hi: "Har match", mr: "प्रत्येक मॅच", en: "Every match"}}
       - {id: sports_some, title: {hi: "Kabhi-kabhi", mr: "कधी कधी", en: "Sometimes"}}

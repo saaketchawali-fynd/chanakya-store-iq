@@ -126,9 +126,26 @@ def catalog_report(products: list[dict]) -> dict:
             "key_spec": {c: {"spec": KEY_SPEC[c], **v} for c, v in cover.items()}}
 
 
+async def _yesterday(ses, store_id: str) -> dict[str, int]:
+    """Availability at the end of yesterday (the last sync before today's first), so the brief can say what went
+    out of stock or came back since yesterday. Kept in app_settings as {day, avail}; real data only."""
+    today = clock.today().isoformat()
+    row = await ses.get(AppSetting, "jio_availability")
+    if row is not None and (row.value or {}).get("day") == today:
+        return dict(row.value.get("avail") or {})
+    prev = {r.sku: int(r.qty > 0) for r in (await ses.execute(select(PriceStock).where(PriceStock.store_id == store_id))).scalars()}
+    val = {"day": today, "avail": prev}
+    if row is None:
+        ses.add(AppSetting(key="jio_availability", value=val))
+    else:
+        row.value = val
+    return prev
+
+
 async def write(s: Settings, products: list[dict], offers: list[dict], plans: list[dict], meta: dict) -> None:
     uat = "jiox5" in s.jio_domain
     async with db.session() as ses:
+        before = await _yesterday(ses, s.store_id)
         for m in DATA_TABLES:
             await ses.execute(m.__table__.delete())
         ses.add(Store(id=s.store_id, name=s.store_name, city=""))
@@ -138,7 +155,8 @@ async def write(s: Settings, products: list[dict], offers: list[dict], plans: li
                             test_data=uat))
             avail = 1 if r["sellable"] else 0  # availability only: the documented API gives no per-store counts
             ses.add(PriceStock(sku=r["sku"], store_id=s.store_id, price=r["price"], mrp=r["mrp"], qty=avail,
-                               qty_yesterday=avail, nearby_store_id=None, nearby_qty=0, delivery_days=0))
+                               qty_yesterday=before.get(r["sku"], avail), nearby_store_id=None, nearby_qty=0,
+                               delivery_days=0))
         for o in offers:
             ses.add(Offer(**o))
         codes = set()

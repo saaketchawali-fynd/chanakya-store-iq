@@ -1,23 +1,31 @@
-"""Step 1 — Taiyari (Before the shift): brief card, 45-s clip (or tip), one quiz question."""
+"""Step 1 — Taiyari (Before the shift), one step at a time (user flow, 2 Nov 2026):
+
+1. the pre-read: today's stock, the live offers and what to keep in mind, strictly from the data;
+2. today's clip (the associate's weakest step);
+3. "I'm ready";
+4. then, and only then, the customer button.
+
+The pre-read card is in English (one card, like every visual); the messages are in the associate's language."""
 
 from __future__ import annotations
 
 import re
-from datetime import timedelta
 
 from chanakya.channel.limits import truncate_title
 from chanakya.config import ROOT
 from chanakya.core import repo
 from chanakya.core.buttons import encode
-from chanakya.core.clock import today
+from chanakya.core.clock import now, today
 from chanakya.core.coach import info_reply
-from chanakya.core.contracts import Button, Card, OutMessage, Reply
+from chanakya.core.contracts import Button, Card, HomeCard, OutMessage, Reply
 from chanakya.skills.base import SkillContext
 from chanakya.skills.review import STEPS
 from chanakya.truth import fmt
 
 CLIPS = ROOT / "data" / "clips"
-ICON = {"back_in_stock": "up", "out_of_stock": "down", "low": "low"}
+_EMPTY_HOME = HomeCard()
+SOON_DAYS = 3  # an offer ending within this many days is called out in "keep in mind"
+BADGE_DAYS = 7  # … and marked "ends soon" on its row
 
 
 async def focus_step(ctx: SkillContext) -> tuple[str, int | None]:
@@ -29,6 +37,81 @@ async def focus_step(ctx: SkillContext) -> tuple[str, int | None]:
     return weakest, (rows[0].steps or {}).get(weakest)
 
 
+def _dept(ctx: SkillContext) -> str:
+    st = ctx.staff
+    return st.dept if st and st.dept in ctx.packs.packs else "tv"
+
+
+# ---------------------------------------------------------------- stock (from the catalogue rows only)
+def _bucket(cat: str, p) -> tuple[float, str] | None:
+    """The key spec a customer shops by: TV size, AC tonnage, washer kg, fridge litres, laptop RAM."""
+    if cat == "tv":
+        v = p.spec("size_in")
+        return (float(v), f'{fmt.num(v)}"') if v else None
+    if cat == "ac":
+        v = p.spec("ton")
+        return (float(v), f"{fmt.num(v)} ton") if v else None
+    if cat == "wm":
+        v = p.spec("capacity_kg")
+        return (float(v), f"{fmt.num(v)} kg") if v else None
+    if cat == "fridge":
+        v = p.spec("capacity_l")
+        if not v:
+            return None
+        for hi, label in ((250, "Under 250 L"), (400, "250–399 L"), (600, "400–599 L")):
+            if v < hi:
+                return float(hi), label
+        return 9999.0, "600 L+"
+    if cat == "laptop":
+        v = p.spec("ram_gb")
+        return (float(v), f"{fmt.num(v)} GB RAM") if v else None
+    return None
+
+
+def stock_section(ctx: SkillContext, dept: str) -> dict:
+    """How many models can be sold today, and the four biggest groups by the key spec with their price span."""
+    allp = ctx.facts.products_sync(dept)
+    avail = [p for p in allp if p.qty > 0 or p.nearby_qty > 0]
+    groups: dict[str, list] = {}
+    order: dict[str, float] = {}
+    for p in avail:
+        b = _bucket(dept, p)
+        if b is None:
+            continue
+        order[b[1]] = b[0]
+        groups.setdefault(b[1], []).append(p)
+    top = sorted(groups, key=lambda k: -len(groups[k]))[:4]
+    tiles = []
+    for k in sorted(top, key=lambda k: order[k]):
+        ps = groups[k]
+        lo, hi = min(ps, key=lambda p: p.price), max(ps, key=lambda p: p.price)
+        span = ctx.reg.inr(lo.price, lo.price_source)
+        if hi.price != lo.price:
+            span += " – " + ctx.reg.inr(hi.price, hi.price_source)
+        tiles.append({"label": ctx.reg.raw(k, f"spec:bucket:{dept}"),
+                      "count": ctx.t("brief_models", "en", n=ctx.reg.num(len(ps), f"stock:{dept}:{k}")),
+                      "span": span})
+    cat_word = ctx.t(f"brief_cat_{dept}", "en")
+    return {
+        "n": ctx.reg.num(len(avail), f"stock:{dept}:available"),
+        "of": ctx.t("brief_of_total", "en", total=ctx.reg.num(len(allp), f"catalog:{dept}:count"), cat=cat_word),
+        "tiles": tiles,
+        "_avail": len(avail),
+        "_total": len(allp),
+    }
+
+
+def stock_changes(ctx: SkillContext, changes: list[dict]) -> list[dict]:
+    """Since yesterday: out of stock, back in stock; 'only N left' only where the data has real counts."""
+    out = []
+    for c in changes[:3]:
+        key = {"back_in_stock": "brief_back", "out_of_stock": "brief_out", "low": "brief_low"}[c["kind"]]
+        out.append({"kind": c["kind"], "text": ctx.t(key, "en", model=ctx.reg.raw(c["model"], c["source"]),
+                                                     qty=ctx.reg.num(c["qty"], c["source"]))})
+    return out
+
+
+# ---------------------------------------------------------------- offers (from the offer rows only)
 def _offer_detail(ctx: SkillContext, o) -> str:
     """'10% off · up to ₹5,000 · HDFC cards · on bills over ₹30,000' — every number from the offer row."""
     src = f"offer:{o.id}"
@@ -57,133 +140,165 @@ def _offer_detail(ctx: SkillContext, o) -> str:
     return " · ".join(x for x in parts if not repeats(x))
 
 
-def _offer_rows(ctx: SkillContext, dept: str, d) -> tuple[list[dict], int, int]:
-    """Live offers for the department: ending within 3 days first, then new ones, then the rest."""
+def live_offers(ctx: SkillContext, dept: str) -> list:
+    """Live offers for the department, ending soonest first."""
+    d = today()
     rows = []
     for o in ctx.facts.snap.offers:
-        if not (o.valid_from <= d <= o.valid_to):
-            continue
         cats = o.categories or []
-        if dept not in cats and not (dept == "tv" and "soundbar" in cats):
+        if not (o.valid_from <= d <= o.valid_to) or (dept not in cats and not (dept == "tv" and "soundbar" in cats)):
             continue
         if any(k.startswith("with_tv") for k in (o.filter or {})):
             continue
-        left = (o.valid_to - d).days
-        kind = "ends" if left <= 7 else "new" if (d - o.valid_from).days <= 3 else "live"
-        rows.append((("ends", "new", "live").index(kind), o.valid_to, o, kind))
-    rows.sort(key=lambda r: (r[0], r[1]))
+        rows.append(o)
+    return sorted(rows, key=lambda o: (o.valid_to, ctx.pick(o.title)))
+
+
+def offer_rows(ctx: SkillContext, offers: list) -> list[dict]:
+    d = today()
     out = []
-    for _, _, o, kind in rows:
+    for o in offers:
+        left = (o.valid_to - d).days
+        kind = "ends" if left <= BADGE_DAYS else "new" if (d - o.valid_from).days <= 3 else "live"
         out.append({
             "kind": kind,
             "badge": ctx.t(f"brief_badge_{kind}"),
             "title": ctx.pick(o.title),
             "detail": _offer_detail(ctx, o),
-            "till": ctx.t("brief_offer_till", date=ctx.reg.raw(fmt.date_short(o.valid_to, ctx.lang), f"offer:{o.id}:valid_to")),
-            "_o": o,
+            "till": ctx.t("brief_offer_till", date=ctx.reg.raw(fmt.date_short(o.valid_to, "en"), f"offer:{o.id}:valid_to")),
         })
-    n_end = sum(1 for r in out if r["kind"] == "ends")
-    return out, len(out), n_end
+    return out
+
+
+# ---------------------------------------------------------------- keep in mind (each point is a data fact)
+def _offer_cover(ctx: SkillContext, dept: str, offers: list) -> int:
+    """How many models on sale today at least one live offer applies to (bank offers included; not bundles)."""
+    from chanakya.truth.offers import eligible
+
+    if not offers:
+        return 0
+    d = today()
+    n = 0
+    for p in ctx.facts.products_sync(dept):
+        if p.qty <= 0 and p.nearby_qty <= 0:
+            continue
+        if any(eligible(o, p, ctx.session.home if ctx.session else _EMPTY_HOME, o.bank, bool(o.with_emi), d)
+               for o in offers):
+            n += 1
+    return n
+
+
+async def keep_points(ctx: SkillContext, dept: str, offers: list, n_avail: int, n_tasks: int) -> list[str]:
+    """What the card does not already show, each a fact from the data: how far today's offers reach, an offer's
+    last days, the protection plans on sale, follow-ups due."""
+    d = today()
+    cat = ctx.t(f"brief_cat_{dept}", "en")
+    pts: list[str] = []
+    cover = _offer_cover(ctx, dept, offers)
+    if offers:
+        pts.append(ctx.t("brief_keep_cover", "en", n=ctx.reg.num(cover, f"offers:{dept}:cover"),
+                         total=ctx.reg.num(n_avail, f"stock:{dept}:available"), cat=cat))
+    for o in [o for o in offers if (o.valid_to - d).days <= SOON_DAYS][:1]:
+        left = (o.valid_to - d).days
+        key = "brief_keep_last_day" if left == 0 else "brief_keep_days_left"
+        pts.append(ctx.t(key, "en", title=ctx.pick(o.title, "en"), n=ctx.reg.num(left, f"offer:{o.id}:valid_to")))
+    plans = await ctx.facts.protection(dept)
+    if plans:
+        lo, hi = min(p.price for p in plans), max(p.price for p in plans)
+        src = f"protection:{dept}"
+        span = ctx.reg.inr(lo, src) + (" – " + ctx.reg.inr(hi, src) if hi != lo else "")
+        pts.append(ctx.t("brief_keep_plans", "en", n=ctx.reg.num(len(plans), src), span=span))
+    if n_tasks:
+        pts.append(ctx.t("brief_keep_tasks", "en", n=ctx.reg.num(n_tasks, "tasks:today")))
+    return pts[:4]
+
+
+def _greeting(ctx: SkillContext, name: str) -> str:
+    h = now().hour
+    key = "brief_hello_morning" if h < 12 else "brief_hello_afternoon" if h < 17 else "brief_hello_evening"
+    return ctx.t(key, "en", name=name)
 
 
 async def brief(ctx: SkillContext) -> Reply:
-    """Before the shift: today's focus, the live offers (clearly, one row each), what to keep in mind, stock."""
+    """Step 1 of the shift start: the pre-read card, then one button: today's clip."""
     staff = ctx.staff
     msgs: list[OutMessage] = []
     if staff.last_brief_date is None and staff.streak == 0 and not ctx.scratch.get("welcomed"):
         msgs.append(info_reply(ctx, ctx.t("welcome_new_staff", name=staff.name)))
-    dept = staff.dept if staff.dept in ctx.packs.packs else "tv"
+    dept = _dept(ctx)
     d = today()
     changes = await ctx.facts.stock_changes(staff.store_id, dept)
     order = {"out_of_stock": 0, "back_in_stock": 1, "low": 2}
     changes = sorted(changes, key=lambda c: order[c["kind"]])
-    change_rows = []
-    for c in changes[:3]:
-        key = {"back_in_stock": "brief_back", "out_of_stock": "brief_out", "low": "brief_low"}[c["kind"]]
-        change_rows.append({"icon": ICON[c["kind"]],
-                            "text": ctx.t(key, model=ctx.reg.raw(c["model"], c["source"]), qty=ctx.reg.num(c["qty"], c["source"]))})
-    offers, n_off, n_end = _offer_rows(ctx, dept, d)
-    shown = offers[:4]
-    keep = []
-    ending = next((o for o in offers if o["kind"] == "ends"), None)
-    if ending:
-        o = ending["_o"]
-        keep.append(ctx.t("brief_rule_offer_end", title=ctx.pick(o.title),
-                          date=ctx.reg.raw(fmt.date_short(o.valid_to, ctx.lang), f"offer:{o.id}:valid_to")))
-    if any(c["kind"] == "low" for c in changes):
-        keep.append(ctx.t("brief_rule_stock"))
-    keep.append(ctx.t("brief_rule_price"))
-    for r in offers:
-        r.pop("_o", None)
+    stock = stock_section(ctx, dept)
+    offers = live_offers(ctx, dept)
+    with ctx.as_lang("en"):
+        rows = offer_rows(ctx, offers[:4])
     tasks = [t for t in await repo.tasks_open(ctx.actor_wa_id) if t.due_at and repo.aware(t.due_at).date() <= d]
-    focus, last = await focus_step(ctx)
-    step_name = ctx.t(f"step_{focus}")
-    followups = (
-        ctx.t("brief_followups", n=ctx.reg.num(len(tasks), "tasks:today")) if tasks else ctx.t("brief_no_followups")
-    )
-    focus_text = (
-        ctx.t("brief_focus_last", step=step_name, n=ctx.reg.num(last, "score:last"))
-        if last is not None
-        else ctx.t("brief_focus", step=step_name)
-    )
-    store = ctx.facts.store_name(staff.store_id).replace(" (TEST)", "")
-    date_line = ctx.t("brief_date_line", day=ctx.reg.raw(f"{fmt.day_name(d, ctx.lang, roman=True)} {fmt.date_short(d, ctx.lang)}", "clock:date"),
-                      store=ctx.reg.raw(store.replace("Reliance Digital ", ""), "store"))
-    date_line = f"{date_line} · {followups}"
-    more = ctx.t("brief_offers_more", n=ctx.reg.num(n_off - len(shown), "offers:more")) if n_off > len(shown) else None
+    keep = await keep_points(ctx, dept, offers, stock["_avail"], len(tasks))
+    store = ctx.facts.store_name(staff.store_id).replace(" (TEST)", "").replace("Reliance Digital ", "")
+    day = f"{fmt.day_name(d, 'en')} {fmt.date_short(d, 'en')}"
     card = Card(
         template="brief",
-        lang=ctx.lang,
+        lang="en",
         data={  # type: ignore[arg-type]
-            "greeting": ctx.t("brief_greeting", name=staff.name),
-            "date_line": date_line,
-            "focus_step": step_name,
-            "focus_text": focus_text,
-            "focus_tip": ctx.t(f"tip_{focus}"),
-            "offers": shown,
-            "offers_more": more,
-            "no_offers": None if offers else ctx.t("brief_no_offers"),
-            "keep": keep[:3],
-            "changes": change_rows,
+            "greeting": _greeting(ctx, staff.name),
+            "date_line": ctx.reg.raw(f"{day} · {store}", "clock:date"),
+            "cat": ctx.t(f"brief_cat_{dept}", "en"),
+            "stock": {k: v for k, v in stock.items() if not k.startswith("_")},
+            "changes": stock_changes(ctx, changes),
+            "offers": rows,
+            "offers_more": (ctx.t("brief_offers_more", "en", n=ctx.reg.num(len(offers) - len(rows), "offers:more"))
+                            if len(offers) > len(rows) else None),
+            "no_offers": None if offers else ctx.t("brief_no_offers", "en"),
+            "keep": keep,
+            "step": ctx.t("brief_step_of", "en", n="1"),
         },
     )
-    line1 = ctx.t("brief_caption2", n_off=ctx.reg.num(n_off, "offers:live"), n_end=ctx.reg.num(n_end, "offers:ending"),
-                  n_stock=ctx.reg.num(len(changes), "stock:changes"))
-    if tasks:
-        line1 += " · " + ctx.t("brief_followups", n=ctx.reg.num(len(tasks), "tasks:today"))
-    caption = "\n".join([line1, focus_text])
-    btns = [
-        ctx.b("b_clip", encode("g", "clip", focus)),
-        ctx.b("b_quiz", encode("g", "quiz", focus)),
-        ctx.b("b_new_customer", encode("g", "new")),
-    ]
-    msgs.append(info_reply(ctx, caption, btns, card=card))
+    ctx.reg.static(card.data["step"])
+    caption = ctx.t("brief_pre_caption", n=stock["n"], cat=ctx.t(f"brief_cat_{dept}"),
+                    n_off=ctx.reg.num(len(offers), "offers:live"))
+    focus, _ = await focus_step(ctx)
+    msgs.append(info_reply(ctx, caption, [ctx.b("b_clip_next", encode("g", "clip", focus))], card=card))
     staff.last_brief_date = d
+    ctx.ev("brief_shown", dept=dept, available=stock["_avail"], offers=len(offers), changes=len(changes))
     return ctx.reply(*msgs)
 
 
 async def clip(ctx: SkillContext, step: str) -> Reply:
+    """Step 2: today's clip (the weakest step), then 'I'm ready'."""
+    step = step if step in STEPS else "translate"
+    _, last = await focus_step(ctx)
     f = CLIPS / f"{step}_{ctx.lang}.mp4"
     if not f.exists():
         f = CLIPS / f"{step}.mp4"
-    btns = [ctx.b("b_quiz", encode("g", "quiz", step)), ctx.b("b_new_customer", encode("g", "new"))]
+    why = (ctx.t("clip_why_last", step=ctx.t(f"step_{step}"), n=ctx.reg.num(last, "score:last"))
+           if last is not None else ctx.t("clip_why_first", step=ctx.t(f"step_{step}")))
+    btns = [ctx.b("b_ready", encode("g", "ready", step))]
+    ctx.ev("clip_sent", focus=step)
     if f.exists():
         mid = await ctx.svc.channel.upload_media(f.read_bytes(), "video/mp4", f.name)
         return ctx.reply(
-            OutMessage(
-                to=ctx.actor_wa_id,
-                kind="video",
-                media_id=mid,
-                caption=ctx.t("clip_caption", step=ctx.t(f"step_{step}")),
-            ),
-            info_reply(ctx, ctx.t("after_clip"), btns),
+            OutMessage(to=ctx.actor_wa_id, kind="video", media_id=mid, caption=why, allowed_numbers=ctx.reg.allowed()),
+            info_reply(ctx, ctx.t("clip_then_ready"), btns),
         )
-    key = f"tip_{step}" if f"tip_{step}" else "tip_translate"
-    return ctx.reply(info_reply(ctx, ctx.t("tip_card", step=ctx.t(f"step_{step}"), tip=ctx.t(key)), btns))
+    return ctx.reply(info_reply(ctx, why + "\n" + ctx.t("tip_card", step=ctx.t(f"step_{step}"), tip=ctx.t(f"tip_{step}")),
+                                btns))
 
 
+async def ready(ctx: SkillContext, step: str) -> Reply:
+    """Step 3: ready for the floor. Only now the customer button (or simply a voice note)."""
+    step = step if step in STEPS else "translate"
+    ctx.ev("shift_ready", focus=step)
+    body = ctx.t("ready_body", step=ctx.t(f"step_{step}"), tip=ctx.t(f"tip_{step}"))
+    m = info_reply(ctx, body, [ctx.b("b_new_customer", encode("g", "new"))])
+    m.footer = ctx.t("footer_voice_q")
+    return ctx.reply(m)
+
+
+# ---------------------------------------------------------------- the quiz (kept for old buttons; not in the flow)
 def _quiz_for(ctx: SkillContext, step: str):
-    pack = ctx.packs.get(ctx.staff.dept if ctx.staff and ctx.staff.dept in ctx.packs.packs else "tv")
+    pack = ctx.packs.get(_dept(ctx))
     qs = pack.quiz if pack else []
     return next((q for q in qs if q.step == step), qs[0] if qs else None)
 
@@ -214,5 +329,4 @@ async def answer(ctx: SkillContext, qid: str, aid: str) -> Reply:
 
 def help_reply(ctx: SkillContext) -> Reply:
     btns = [ctx.b("b_new_customer", encode("g", "new")), ctx.b("b_status", encode("g", "status"))]
-    _ = timedelta
     return ctx.reply(info_reply(ctx, ctx.t("help_body"), btns))

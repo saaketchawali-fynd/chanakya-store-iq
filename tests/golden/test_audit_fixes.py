@@ -59,7 +59,7 @@ async def test_unclear_text_at_the_read_back_does_not_resend_the_cards(h):
     out = await h.tap("s:C1:photo_no")
     assert any(m.card for m in out)  # the read-back with the Home Card
     out = await h.say("ok")
-    assert not any(m.card or m.card_copy for m in out)
+    assert not any(m.card for m in out)
     assert button_ids(out) == ["s:C1:readback_ok", "s:C1:readback_edit"]
 
 

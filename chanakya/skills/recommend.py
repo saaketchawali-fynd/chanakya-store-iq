@@ -121,6 +121,7 @@ def options_card(ctx: SkillContext, opts) -> Card:
                 "image": p.image,
                 "is_best": o.role == "best",
                 "dims_text": PV.dims_text(ctx, p),
+                "offer": PV.offer_line(ctx, p, cl),
             }
         )
     labelled = sorted(((o.label, o.product) for o in opts.options), key=lambda x: x[0])
@@ -161,18 +162,16 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
         tag = f" ({ctx.t('best_pick')})" if o.role == "best" else ""
         lines.append(f"*{o.label}* {name}{tag}: {reason_a}{extra}")
         btns.append(C.option_button(ctx, o.label, p))
-    card, copy = C.dual(ctx, lambda: options_card(ctx, opts))
+    card = C.english(ctx, lambda: options_card(ctx, opts))
     demo = pick_demo(opts, s.home, pack, ctx.facts.snap.guides)
     if demo:
         d, other, _ = demo
         s.demo_recipe = d.id
         ctx.x["demo_other"] = other
         ctx.x["demos_sent"] = [d.id]
-    btns = [ctx.b("b_demo_next", ctx.sid("demo"))]
-    if pack.placeable:
-        btns.append(ctx.b("b_tryon", ctx.sid("tryon")))
-    btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
-    m1 = C.with_copy(ctx, info_reply(ctx, "\n".join(lines), btns, card=card), copy)
+    btns = [ctx.b("b_demo_next", ctx.sid("demo")), ctx.b("b_offers_on", ctx.sid("ofs"))]  # offers with the products
+    btns.append(ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")))
+    m1 = info_reply(ctx, "\n".join(lines), btns, card=card)
     m1.footer = ctx.t("footer_label_hint")[:60]  # Translate: a label photo gives the benefits for this home
     if ctx.x.pop("rerank_note", None):
         m1.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
@@ -365,3 +364,76 @@ def tryon_buttons(ctx: SkillContext, skus: list[str]) -> list[Button]:
         out.append(Button(id=ctx.sid("tpick", sku), title=ctx.t("tryon_like", size=size)[:20]))
     out.append(ctx.b("b_other_wall", ctx.sid("photo")))
     return out
+
+
+async def offers_view(ctx: SkillContext) -> Reply:
+    """'Offers' next to the products: every live offer on each option (or the product being looked at), as one
+    list; one tap gives the line to say. Only offers from the data; nothing is invented when there are none."""
+    from chanakya.channel.limits import truncate, truncate_title
+    from chanakya.core.contracts import ListRow, ListSection, OutMessage
+    from chanakya.skills.brief import _offer_detail
+    from chanakya.truth import fmt
+
+    s = ctx.session
+    items = sorted(s.option_labels.items()) if s.option_labels else []
+    if not items and s.chosen_sku:
+        items = [("", s.chosen_sku)]
+    if not items and ctx.x.get("label_sku"):  # a scanned product
+        items = [("", ctx.x["label_sku"])]
+    if not items:
+        return await show_options(ctx)
+    rows, n_off = [], 0
+    for lab, sku in items:
+        p = ctx.facts.product_sync(sku)
+        if p is None:
+            continue
+        head = f"{lab} · " if lab else ""
+        offs = PV.live_offers_for(ctx, p)
+        if not offs:
+            rows.append(ListRow(id=ctx.sid("ofd", "none", lab or "x"), title=truncate(head + p.short_name(), 24),
+                                description=truncate(ctx.t("offer_none"), 72)))
+            continue
+        for o, _ in offs[: max(1, 9 // len(items))]:
+            n_off += 1
+            till = ctx.t("brief_offer_till", date=ctx.reg.raw(fmt.date_short(o.valid_to, ctx.lang), f"offer:{o.id}:valid_to"))
+            desc = " · ".join(x for x in (p.short_name(), _offer_detail(ctx, o), till) if x)
+            rows.append(ListRow(id=ctx.sid("ofd", o.id, lab or "x"), title=truncate(head + ctx.pick(o.title, "en"), 24),
+                                description=truncate(desc, 72)))
+    for r in rows[:10]:
+        ctx.reg.raw(r.title + " " + (r.description or ""), "offers:list")
+    ctx.ev("offers_viewed", skus=[sku for _, sku in items], offers=n_off)
+    if not n_off:
+        btns = [ctx.b("b_demo_next", ctx.sid("demo")) if s.shortlist else ctx.b("b_options", ctx.sid("options")),
+                ctx.b("b_they_chose", ctx.sid("prefer")) if s.option_labels else ctx.b("b_next_q", ctx.sid("go"))]
+        return ctx.reply(info_reply(ctx, ctx.t("offers_none_body"), btns))
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("offers_list_body"),
+                                list_button=truncate_title(ctx.t("list_offers")), sections=[ListSection(rows=rows[:10])],
+                                footer=ctx.t("offers_list_footer"), allowed_numbers=ctx.reg.allowed()))
+
+
+async def offer_detail(ctx: SkillContext, offer_id: str, label: str) -> Reply:
+    """One offer, tapped from the list: what it gives and till when (from its row), and the line to say."""
+    from chanakya.skills.brief import _offer_detail
+    from chanakya.truth import fmt
+
+    s = ctx.session
+    o = next((x for x in ctx.facts.snap.offers if x.id == offer_id), None)
+    if o is None:
+        return await offers_view(ctx)
+    sku = s.option_labels.get(label) or s.chosen_sku or ctx.x.get("label_sku")
+    p = ctx.facts.product_sync(sku) if sku else None
+    cl = ctx.clang
+    with ctx.as_lang(cl):
+        detail = _offer_detail(ctx, o)
+        till = ctx.t("brief_offer_till", date=ctx.reg.raw(fmt.date_short(o.valid_to, cl), f"offer:{o.id}:valid_to"))
+    title = ctx.pick(o.title, cl)
+    detail = detail.replace(" · ", ", ")  # a line to say, not a label
+    say = ctx.tc("bolo_offer_line", title=title, detail=(detail + ", ") if detail else "", till=till)
+    why = ctx.t("kyun_offer_line", product=C.product_name(ctx, p) if p else "")
+    btns = [ctx.b("b_offers_on", ctx.sid("ofs"))]
+    if s.shortlist and not s.demo_done:
+        btns.insert(0, ctx.b("b_demo_next", ctx.sid("demo")))
+    if s.option_labels:
+        btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
+    ctx.ev("offer_explained", offer=o.id, sku=sku)
+    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns[:3]))

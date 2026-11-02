@@ -73,6 +73,13 @@
   .cell.near { background: var(--saffron-pale); color: var(--saffron-deep); }
   .cell.no { color: var(--faint); font-weight: 600; }
   .ph { color: #C9C2B6; }
+  .ofr { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 23px; font-weight: 700; line-height: 1.3;
+         color: var(--saffron-deep); }
+  .ofr .ic { color: var(--saffron); }
+  .ofr.none { color: var(--faint); font-weight: 600; }
+  .ofr.none .ic { color: var(--faint); }
+  .ofr .mo { font-weight: 600; color: var(--muted); }
+  .opt .ofr { font-size: 21px; margin-top: 8px; }
 {% endblock %}
 {% block hd_class %}{% if best %} lift{% endif %}{% endblock %}
 {% block header %}
@@ -100,6 +107,8 @@
       </div>
       {% elif best.reason %}<div class="why"><div class="pt"><span class="bubble">{{ icon('check', 22, '', 2.8) }}</span><span class="t">{{ best.reason }}</span></div></div>
       {% endif %}
+      {% set of = best.offer or {} %}
+      {% if of.text %}<div class="ofr{% if of.none %} none{% endif %}{{ of.text|dv }}">{{ icon('tag', 24) }}<span>{{ of.text }}{% if of.more %} <span class="mo">· {{ of.more }}</span>{% endif %}</span></div>{% endif %}
       {% if best.stock_line or best.dims_text %}
       <div class="meta">
         {% if best.stock_line %}<span>{{ icon('store', 24) }}{{ best.stock_line }}</span>{% endif %}
@@ -119,6 +128,8 @@
         {% set rl = L['role_' ~ o.role] if o.role in ('value', 'step') else '' %}
         {% if rl %}<span class="role {{ o.role }}{{ rl|dv }}">{{ rl }}</span>{% endif %}{% if o.stock_line %}<span class="stk">{{ o.stock_line }}</span>{% endif %}
         {% for d in (o.diffs|aslist)[:2] %}<div class="df num">{{ d.label }} · <b>{{ d.value }}</b></div>{% endfor %}
+        {% set of = o.offer or {} %}
+        {% if of.text %}<div class="ofr{% if of.none %} none{% endif %}{{ of.text|dv }}">{{ icon('tag', 20) }}<span>{{ of.text }}</span></div>{% endif %}
       </div>
     </div>
     {% endfor %}

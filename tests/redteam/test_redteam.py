@@ -64,12 +64,20 @@ async def test_04_price_first_rescue(h):
     assert evs[0].payload["low"] == 27990 and evs[1].payload["who"] == "customer"
 
 
-async def test_05_offers_before_demo_locked(h):
+async def test_05_offers_before_demo_show_terms_never_the_price(h):
+    """Offers sit next to the products (user, 2 Nov 2026): before the demo, 'offers' lists each option's live offer
+    terms from the data. The product price, the total and the offer card stay locked until the demo and the cost."""
+    from chanakya.truth import fmt
+
     await to_options(h)
     out = await h.say("offers")
     check_floor(out)
-    assert "Daam demo ke baad" in out[0].body and "₹" not in texts(out)
-    assert not await repo.events_for((await session(h)).id, ["offers_shown", "cost_shared"])
+    s = await session(h)
+    shown = texts(out) + " ".join(f"{r.title} {r.description}" for m in out for sec in (m.sections or []) for r in sec.rows)
+    prices = {fmt.inr(h.rt.facts.product_sync(sku).price) for sku in s.option_labels.values()}
+    assert out[0].kind == "list" and not any(pr in shown for pr in prices)
+    assert not any(m.card for m in out)
+    assert not await repo.events_for(s.id, ["offers_shown", "cost_shared"])
 
 
 async def test_06_override_allowed_and_logged(h):
@@ -273,12 +281,8 @@ async def test_languages(h, assoc, cust):
     check_floor(out)
     await h.tap("s:C1:shown")
     out = await pick(h)
-    k = out[-1]  # the customer's bill is in English; the associate gets one copy in their own language
+    k = out[-1]  # one bill, in English, for the customer and the associate (no copy in another language)
     assert k.card.lang == "en" and k.card.data["zaroori_total_str"] == "₹65,288"
-    if assoc == "en":
-        assert k.card_copy is None
-    else:
-        assert k.card_copy.lang == assoc and k.card_copy.data["zaroori_total_str"] == "₹65,288"
 
 
 async def test_language_picker_then_single_language(tmp_path):
@@ -287,7 +291,8 @@ async def test_language_picker_then_single_language(tmp_path):
         out = await hh.tap("g:new")  # any first message gets the picker, nothing else
         assert len(out) == 1 and [b.title for b in out[0].buttons] == ["English", "हिंदी", "मराठी"]
         out = await hh.tap("g:alang:mr")
-        assert any(m.card and m.card.template == "brief" and m.card.lang == "mr" for m in out)
+        b = next(m for m in out if m.card and m.card.template == "brief")
+        assert b.card.lang == "en" and "क्लिप" in b.buttons[0].title  # English card, Marathi messages
         out = await hh.tap("g:new")
         assert "नवीन ग्राहक" in out[0].body  # Marathi from now on
         out = await hh.tap("s:C1:lang:hi")  # customer speaks Hindi: only the Bolo line follows the customer

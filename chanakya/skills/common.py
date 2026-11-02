@@ -76,11 +76,53 @@ def question_reply(
     ctx.asking.add(slot_id)
     say = say_override or ctx.pick(sd.ask, ctx.clang)
     why = why_override or ctx.pick(sd.why)
+    if not why_override:
+        tail = question_tail(ctx, slot_id)
+        if tail:
+            why = f"{why.rstrip('.')} · {tail}"
     btns = buttons if buttons is not None else quick_buttons(ctx, slot_id)
     ctx.x["questions_asked"] = questions_asked(ctx) + 1
     ctx.x["last_question"] = slot_id
     ctx.ev("question_asked", slot=slot_id)
-    return coach_reply(ctx, say, why, (extra_cites or []) + [slot_id], btns)
+    # voice first: every question says it can simply be answered by voice (any of the three languages)
+    return coach_reply(ctx, say, why, (extra_cites or []) + [slot_id], btns, footer=ctx.t("footer_voice_q"))
+
+
+BAND_SPEC = {"size_band": ("size_in", "inch"), "ton_band": ("ton", "ton")}
+
+
+def question_tail(ctx: SkillContext, slot_id: str) -> str | None:
+    """What this answer decides, in numbers from today's stock (the reason the question is worth asking):
+    'Sunny room: 41 of 98 TVs in stock qualify' / 'In stock: 32–85 inch; the answer picks the right size'."""
+    pack = ctx.pack
+    rules = [r for r in pack.fit_rules if r.slot == slot_id and (r.kind in BAND_SPEC or r.spec_any)]
+    if not rules or ctx.session is None:
+        return None
+    avail = [p for p in ctx.facts.products_sync(pack.category) if p.qty > 0 or p.nearby_qty > 0]
+    if len(avail) < 3:
+        return None
+    r = max(rules, key=lambda r: r.weight)
+    cat = ctx.t(f"brief_cat_{pack.category}")
+    if r.kind in BAND_SPEC:
+        key, unit = BAND_SPEC[r.kind]
+        vals = sorted({float(p.spec(key)) for p in avail if p.spec(key)})
+        if len(vals) < 2:
+            return None
+        src = f"stock:{pack.category}:{key}"
+        return ctx.t("kyun_tail_band", lo=ctx.reg.num(vals[0], src), hi=ctx.reg.num(vals[-1], src, unit))
+    g = ctx.facts.snap.guides
+    n = sum(1 for p in avail if P.eval_spec_any(p, ctx.session.home, r.spec_any, pack, g))
+    vals = (r.when or {}).get("in") or (r.when or {}).get("has_any") or []
+    sd = pack.slot(slot_id)
+    if vals and sd is not None:  # the answer that switches the rule on, in the associate's words
+        need = value_title(sd, vals[0], ctx.lang) if ctx.lang != "hi" else sd.value_title(vals[0], "hi")
+    else:
+        nd = pack.needs.get(r.id)
+        need = ctx.pick(nd, "en" if ctx.lang == "hi" else ctx.lang) if nd else None
+    if not need or "{" in need or n == len(avail):
+        return None  # every model meets it: the answer ranks, it does not narrow
+    return ctx.t("kyun_tail_rule", need=need, n=ctx.reg.num(n, f"stock:{pack.category}:{r.id}"),
+                 total=ctx.reg.num(len(avail), f"stock:{pack.category}:available"), cat=cat)
 
 
 def category_message(ctx: SkillContext) -> OutMessage:
@@ -226,8 +268,8 @@ def readback(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     say = ctx.tc(key if i18n.has(key) else "bolo_readback", facts=readback_facts(ctx, ctx.clang))
     btns = [ctx.b("b_readback_ok", ctx.sid("readback_ok")), ctx.b("b_readback_edit", ctx.sid("readback_edit"))]
     cites = [s for s in ctx.pack.required_slots if P.known(ctx.session.home, s)] or known_cites(ctx)
-    en, cp = dual(ctx, lambda: home_card(ctx))
-    return with_copy(ctx, coach_reply(ctx, say, ctx.t("kyun_readback"), cites, btns, card=en, footer=footer), cp)
+    return coach_reply(ctx, say, ctx.t("kyun_readback"), cites, btns, card=english(ctx, lambda: home_card(ctx)),
+                       footer=footer)
 
 
 def doubts(ctx: SkillContext, footer: str | None = None) -> OutMessage:
@@ -372,12 +414,10 @@ def home_card_message(ctx: SkillContext, force: bool = False) -> OutMessage | No
         btns = [ctx.b("b_photo", ctx.sid("photo"))]
         if state.options_gate_open(s, pack) and not s.shortlist:
             btns.append(ctx.b("b_options", ctx.sid("options")))
-        en, cp = dual(ctx, lambda: home_card(ctx))
-        return with_copy(ctx, info_reply(ctx, body, btns, card=en), cp)
+        return info_reply(ctx, body, btns, card=english(ctx, lambda: home_card(ctx)))
     body = ctx.t("home_card_caption", known=k, total=tt)
     btns = [ctx.b("b_options", ctx.sid("options"))] if state.options_gate_open(s, pack) and not s.shortlist else None
-    en, cp = dual(ctx, lambda: home_card(ctx))
-    return with_copy(ctx, info_reply(ctx, body, btns, card=en), cp)
+    return info_reply(ctx, body, btns, card=english(ctx, lambda: home_card(ctx)))
 
 
 def budget_list(ctx: SkillContext, body: str | None = None) -> OutMessage:
@@ -433,36 +473,16 @@ def who_title(ctx: SkillContext, lang: str) -> str | None:
     return ctx.pick(d, lang) if d else None
 
 
-# ---------------------------------------------------------------- customer-facing visuals: English + one copy
-def dual(ctx: SkillContext, build) -> tuple:
-    """(English visual, copy in the associate's language or None). `build()` reads ctx.lang / ctx.clang."""
+# ---------------------------------------------------------------- visuals: ONE card, in English (user rule, 2 Nov 2026)
+def english(ctx: SkillContext, build):
+    """The one visual for customer and associate, built in English. `build()` reads ctx.lang / ctx.clang."""
     with ctx.as_lang("en"):
-        en = build()
-    if ctx.alang == "en":
-        return en, None
-    with ctx.as_lang(ctx.alang):
-        return en, build()
+        return build()
 
 
-async def dual_async(ctx: SkillContext, build) -> tuple:
+async def english_async(ctx: SkillContext, build):
     with ctx.as_lang("en"):
-        en = await build()
-    if ctx.alang == "en":
-        return en, None
-    with ctx.as_lang(ctx.alang):
-        return en, await build()
-
-
-def with_copy(ctx: SkillContext, msg: OutMessage, copy) -> OutMessage:
-    """Attach the associate's-language copy (a Card or image bytes) to a message carrying the English visual."""
-    if copy is None:
-        return msg
-    if isinstance(copy, (bytes, bytearray)):
-        msg.image_copy = bytes(copy)
-    else:
-        msg.card_copy = copy
-    msg.copy_caption = ctx.t("copy_caption", ctx.alang)
-    return msg
+        return await build()
 
 
 @lru_cache

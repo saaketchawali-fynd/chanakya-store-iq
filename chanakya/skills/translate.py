@@ -310,7 +310,7 @@ async def product_card(ctx: SkillContext, p) -> Card:
     s = ctx.session
     stock = C.stock_line(ctx, p, lang)
     data = {"title": C.product_title(ctx, p, lang), "image": p.image, "key_specs": PV.key_specs(ctx, p, lang, 6),
-            "features": PV.features(ctx, p, lang, 4), "stock_line": stock, "offer_text": PV.offer_badge(ctx, p, lang),
+            "features": PV.features(ctx, p, lang, 4), "stock_line": stock, "offer_text": PV.offer_line(ctx, p, lang)["text"],
             "price_str": ctx.reg.inr(p.price, p.price_source) if state.price_gate_open(s, ctx.pack) else None}
     mn = (p.info or {}).get("model_number")
     if mn:
@@ -396,7 +396,7 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
         found["winner"] = winner
         return Card(template="compare", lang=lang, data=data)  # type: ignore[arg-type]
 
-    card, copy = await C.dual_async(ctx, build)
+    card = await C.english_async(ctx, build)
     winner = found.get("winner")
     ctx.ev("compare_shown", a=a.sku, b=b.sku, winner=winner.sku if winner else None)
     if winner:
@@ -407,7 +407,7 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
     btns = [C.option_button(ctx, "1", a), C.option_button(ctx, "2", b), ctx.b("b_tryon", ctx.sid("tryon"))]
     btns[0] = btns[0].model_copy(update={"id": ctx.sid("tpick", a.sku)})
     btns[1] = btns[1].model_copy(update={"id": ctx.sid("tpick", b.sku)})
-    return ctx.reply(C.with_copy(ctx, info_reply(ctx, body, btns, card=card), copy))
+    return ctx.reply(info_reply(ctx, body, btns, card=card))
 
 
 async def compare_prompt(ctx: SkillContext) -> Reply:

@@ -24,6 +24,14 @@ async def show(ctx: SkillContext, category: str | None = None, page: int = 0) ->
     if not ctx.facts.snap.products:  # nothing loaded from the backend (yet)
         return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
     items_all = [p for p in ctx.facts.products_sync(cat) if p.qty > 0 or p.nearby_qty > 0]
+    pack = ctx.packs.get(cat)
+    if s and s.home.slots and s.home.category == cat and pack:  # this customer's best fits first, not price order
+        from chanakya.brain.fit import fit
+
+        g = ctx.facts.snap.guides
+        scored = {p.sku: fit(p, s.home, pack, g) for p in items_all}
+        items_all = [p for p in items_all if not scored[p.sku].excluded]
+        items_all.sort(key=lambda p: (-scored[p.sku].score, p.price))
     if s and s.option_labels:  # the customer's three picks first
         picks = list(s.option_labels.values())
         items_all.sort(key=lambda p: (p.sku not in picks, picks.index(p.sku) if p.sku in picks else 0))
@@ -31,30 +39,30 @@ async def show(ctx: SkillContext, category: str | None = None, page: int = 0) ->
     items = items_all[page * PAGE : (page + 1) * PAGE]
     show_price = s is None or state.price_gate_open(s, ctx.pack)
     rows = []
-    for p in items:
-        stock = C.stock_line(ctx, p)
-        rows.append(
-            {
-                "title": ctx.reg.raw(p.model, f"product:{p.sku}"),
-                "image": p.image,
-                "specs": PV.spec_strings(ctx, p, ctx.lang, 3),
-                "stock_line": stock,
-                "offer_badge": PV.offer_badge(ctx, p, ctx.lang),
-                "price_str": ctx.reg.inr(p.price, p.price_source) if show_price else None,
-            }
+    with ctx.as_lang("en"):  # one card, in English
+        for p in items:
+            of = PV.offer_line(ctx, p, "en")
+            rows.append(
+                {
+                    "title": ctx.reg.raw(p.model, f"product:{p.sku}"),
+                    "image": p.image,
+                    "specs": PV.spec_strings(ctx, p, "en", 3),
+                    "stock_line": C.stock_line(ctx, p),
+                    "offer_badge": None if of["none"] else of["text"],
+                    "price_str": ctx.reg.inr(p.price, p.price_source) if show_price else None,
+                }
+            )
+        card = Card(
+            template="catalog",
+            lang="en",
+            data={  # type: ignore[arg-type]
+                "title": ctx.t("catalog_title", cat=ctx.pick(pack.label)),
+                "subtitle": ctx.t("catalog_sub_price" if show_price else "catalog_sub_noprice"),
+                "items": rows,
+            },
         )
-    label = ctx.pick(ctx.packs.get(cat).label)
+    label = ctx.pick(pack.label)
     n = ctx.reg.num(len(items_all), "catalog:count")
-    subtitle = ctx.t("catalog_sub_price" if show_price else "catalog_sub_noprice")
-    card = Card(
-        template="catalog",
-        lang=ctx.lang,
-        data={  # type: ignore[arg-type]
-            "title": ctx.t("catalog_title", cat=label),
-            "subtitle": subtitle,
-            "items": rows,
-        },
-    )
     btns = []
     if (page + 1) * PAGE < len(items_all):
         btns.append(ctx.b("b_more", encode("g", "catalog", cat, page + 1)))

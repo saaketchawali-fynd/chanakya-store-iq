@@ -16,14 +16,29 @@ Return JSON that matches the schema. Rules:
 5. claim_id: if the customer believes something partly true that matches an item in MYTHS, return its id.
 6. library_id: if the associate asks a question that matches an item in LIBRARY, return its id.
 7. If the associate asks a product question you cannot map, put it in question_for_expert (one sentence).
-8. transcript: write exactly what was said; keep English product words (4K, QLED, inverter, EMI) in Latin
-   script; Hindi in Roman script as spoken; Marathi in Devanagari.
+8. transcript: write exactly what was said, word for word, in the language spoken; keep English product words
+   (4K, QLED, OLED, inverter, EMI, ton, kg, litre, Hz) and brand names (see BRANDS in CONTEXT) in Latin script;
+   Hindi in Roman script as spoken; Marathi in Devanagari. If a word is unclear, write what you heard; never
+   fill gaps with guesses. A noisy shop floor is normal: ignore background voices and announcements.
 9. customer_language: only if the associate states the customer's language ("customer Marathi bolte hain").
-10. intents: include every intent that applies."""
+10. intents: include every intent that applies. "request_options" when the associate asks to see, suggest or
+   shortlist products ("options dikhao", "kaunsa achha rahega", "suggest kar", "काय घ्यावं", "show me TVs").
+11. Spoken numbers in any of the three languages, always as digits:
+   Hindi: ek 1, do 2, teen 3, chaar 4, paanch 5, chhe 6, saat 7, aath 8, nau 9, das 10, gyarah 11, barah 12,
+   pandrah 15, bees 20, pachees 25, tees 30, chaalis 40, pachaas 50, saath 60, sattar 70, assi 80, nabbe 90,
+   sau 100; dedh 1.5, dhai 2.5, saadhe N = N.5, sava N = N.25, paune N = N-0.25; hazaar 1000, lakh 100000
+   ("saadhe teen lakh" = 350000, "pachpan hazaar" = 55000, "dedh ton" = 1.5).
+   Marathi: एक 1, दोन 2, तीन 3, चार 4, पाच 5, सहा 6, सात 7, आठ 8, नऊ 9, दहा 10, बारा 12, पंधरा 15, वीस 20,
+   पंचवीस 25, तीस 30, चाळीस 40, पन्नास 50, साठ 60, सत्तर 70, ऐंशी 80, नव्वद 90; दीड 1.5, अडीच 2.5, साडे N = N.5,
+   सव्वा N = N.25, पावणे N = N-0.25; हजार 1000, लाख 100000.
+   English and Hinglish: "fifty-five inch" 55, "one and a half ton" 1.5, "50k" 50000.
+   Sizes: inch/इंच; distance: feet/foot/फुट/फूट, metre x 3.3, kadam/पावलं (steps) x 2.5 for feet."""
 
 TRANSCRIBE_SYSTEM = """Write down exactly what is said in this voice note from a shop-floor associate in Mumbai.
 Hindi, Marathi, English or a mix. Hindi in Roman script as spoken, Marathi in Devanagari, English product words
-(4K, QLED, inverter, EMI, ton, kg, litre) in Latin script, numbers as digits. Output the words only, nothing else."""
+(4K, QLED, inverter, EMI, ton, kg, litre, Hz) and brand names in Latin script. Spoken numbers as digits in every
+language (pachpan 55, dedh 1.5, saadhe teen 3.5, पन्नास 50, दीड 1.5, अडीच 2.5, hazaar/हजार 1000, lakh/लाख 100000).
+Ignore background voices. Never add words that were not said. Output the words only, nothing else."""
 
 READ_IMAGE_SYSTEM = """You read photos sent by a store associate. Decide the kind:
 - "label": a product label, energy label, price tag, box or spec sheet. Copy brand, model text and the

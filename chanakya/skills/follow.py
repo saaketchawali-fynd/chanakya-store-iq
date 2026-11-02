@@ -288,7 +288,6 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
         )
 
     card = card_in("en")  # what the family sees: English (the user's rule for every customer-facing visual)
-    copy = card_in(alang) if alang != "en" else None
     s8 = s.id[:8]
     aname = staff.name if staff else "Chanakya"
     from chanakya.channel.limits import truncate_title
@@ -319,8 +318,6 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
                  Button(id=ctx.sid("khatam"), title=ctx.t("b_khatam", alang))]
         body = ctx.t("parivaar_sent", alang, name=nm)
     to_assoc = OutMessage(to=s.associate_wa_id, kind="buttons", body=body, buttons=abtns)
-    if copy is not None:  # the associate sees what was sent, in their language
-        to_assoc.card_copy, to_assoc.copy_caption = copy, ctx.t("copy_caption", alang)
     return ctx.reply(to_customer, to_assoc)
 
 

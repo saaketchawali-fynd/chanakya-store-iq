@@ -132,26 +132,40 @@ CLIP = {
     },
 }
 
-CSS = """*{margin:0;box-sizing:border-box}body{width:720px;height:1280px;font-family:"Noto Sans","Noto Sans Devanagari",
-"Kohinoor Devanagari","Devanagari Sangam MN",sans-serif;background:#F6F3EE;color:#1B2A4A;display:flex;flex-direction:column}
-.top{background:linear-gradient(140deg,#18264A,#2A3F6C);color:#fff;padding:72px 60px 54px;border-radius:0 0 44px 44px}
-.brand{font-size:24px;font-weight:700;opacity:.75;letter-spacing:.5px}.step{margin-top:26px;font-size:28px;font-weight:700;color:#F4A86F}
-.title{margin-top:8px;font-size:58px;font-weight:800;line-height:1.15}.rule{margin-top:14px;font-size:34px;color:#D6DDEB;line-height:1.35}
-.body{flex:1;padding:56px 60px 0}.k{font-size:30px;font-weight:800;color:#B65E1C;letter-spacing:1px;text-transform:uppercase}
-.k.dv{text-transform:none;letter-spacing:0}.pt{display:flex;gap:22px;align-items:flex-start;margin-top:34px;font-size:40px;line-height:1.36;font-weight:600}
-.pt .n{flex:none;width:58px;height:58px;border-radius:50%;background:#E8833A;color:#fff;font-size:30px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
-.pt.dim{opacity:.18}.quote{margin-top:34px;background:#fff;border-radius:32px;padding:44px 42px;font-size:46px;line-height:1.38;
-font-weight:700;box-shadow:0 10px 30px rgba(27,42,74,.10);border-left:12px solid #2E8B57}.avoid{margin-top:34px;background:#FBE4E1;
-color:#9B2F28;border-radius:32px;padding:44px 42px;font-size:44px;line-height:1.38;font-weight:700}.try{margin-top:34px;background:#FDF0E4;
-border-radius:32px;padding:44px 42px;font-size:44px;line-height:1.38;font-weight:700;border:3px solid #F6D2AE}
-.bar{height:10px;background:#E9E3DA;margin:0 60px 70px;border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:#E8833A}"""
+CSS = """*{margin:0;box-sizing:border-box}
+body{width:720px;height:1280px;font-family:"Inter","Avenir Next","Helvetica Neue","Kohinoor Devanagari","Noto Sans",
+"Noto Sans Devanagari",sans-serif;background:#F4F5F7;color:#0B1220;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+.top{padding:64px 56px 0}.row{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:600;color:#6B7280}
+.mk{width:28px;height:28px;border-radius:8px;background:#4338CA;display:inline-block}
+.pill{font-size:19px;font-weight:600;padding:6px 14px;border-radius:999px;background:#EEF0FF;color:#4338CA}
+.step{margin-top:44px;font-size:22px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#4338CA}
+.step.dv{letter-spacing:0;text-transform:none}
+.title{margin-top:6px;font-size:66px;font-weight:700;line-height:1.1;letter-spacing:-1px}
+.rule{margin-top:16px;font-size:31px;color:#4B5563;line-height:1.4}
+.body{flex:1;padding:24px 56px 90px;display:flex;flex-direction:column;justify-content:center}
+.k{font-size:21px;font-weight:700;color:#6B7280;letter-spacing:1.6px;text-transform:uppercase}.k.dv{text-transform:none;letter-spacing:0}
+.pt{display:flex;gap:20px;align-items:flex-start;margin-top:26px;background:#fff;border:1.5px solid #E8EAEE;border-radius:26px;
+padding:26px 28px;font-size:35px;line-height:1.36;font-weight:600}
+.pt .n{flex:none;width:50px;height:50px;border-radius:50%;background:#EEF0FF;color:#4338CA;font-size:25px;font-weight:700;
+display:flex;align-items:center;justify-content:center;margin-top:1px}
+.pt.dim{opacity:.22}
+.quote{margin-top:26px;background:#fff;border:1.5px solid #E8EAEE;border-left:10px solid #4338CA;border-radius:26px;
+padding:38px 36px;font-size:42px;line-height:1.38;font-weight:600}
+.avoid{margin-top:26px;background:#FEF2F2;color:#991B1B;border-radius:26px;padding:38px 36px;font-size:40px;line-height:1.38;font-weight:600}
+.try{margin-top:26px;background:#ECFDF5;color:#065F46;border-radius:26px;padding:38px 36px;font-size:40px;line-height:1.38;font-weight:600}
+.intro{margin-top:26px;font-size:40px;line-height:1.38;font-weight:600;color:#1F2937}
+.bar{height:8px;background:#E5E7EB;margin:0 56px 64px;border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:#4338CA}"""
+CLIP_PILL = {"hi": "Step 2 of 3 · Clip", "mr": "Step 2 of 3 · Clip", "en": "Step 2 of 3 · Clip"}
 
 
 def page(lang: str, step: str, frac: float, inner: str, big_head: bool) -> str:
     e = html.escape
     h = HEAD[lang]
-    top = (f'<div class="top"><div class="brand">Chanakya · Store IQ</div><div class="step">{e(h[0])}</div>'
-           f'<div class="title">{e(t(f"step_{step}", lang))}</div>'
+    dv = " dv" if lang != "en" else ""
+    top = (f'<div class="top"><div class="row"><div class="brand"><span class="mk"></span>Chanakya · Today\'s clip</div>'
+           f'<span class="pill">{e(CLIP_PILL[lang])}</span></div>'
+           f'<div class="step{dv}">{e(h[0])}</div><div class="title">{e(t(f"step_{step}", lang))}</div>'
            + (f'<div class="rule">{e(t(NITI[step], lang))}</div>' if big_head else "") + "</div>")
     return (f'<html><head><meta charset="utf-8"><style>{CSS}</style></head><body>{top}<div class="body">{inner}</div>'
             f'<div class="bar"><i style="width:{frac * 100:.0f}%"></i></div></body></html>')
@@ -163,7 +177,7 @@ def slides(step: str, lang: str) -> list[tuple[str, float]]:
     keep, say, avoid, try_ = CLIP[step][lang]
     h = HEAD[lang]
     dv = " dv" if lang != "en" else ""
-    intro = f'<div class="quote" style="border-left-color:#E8833A;font-size:42px">{e(INTRO[lang])}</div>'
+    intro = f'<div class="intro">{e(INTRO[lang])}</div>'
     out = [(page(lang, step, 0.12, intro, True), 3.2)]
     for shown in (1, 2, 3):  # the three points appear one by one
         pts = "".join(f'<div class="pt{"" if i < shown else " dim"}"><span class="n">{i + 1}</span><span>{e(p)}</span></div>'

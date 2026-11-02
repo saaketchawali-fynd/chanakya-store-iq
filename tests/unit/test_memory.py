@@ -18,7 +18,6 @@ from chanakya.core.contracts import Card
 from chanakya.render import renderer as R
 from chanakya.sim.harness import FIX_IMAGES
 from chanakya.tryon import pipeline
-from tests.helpers import to_options
 
 
 def _write(root, rel, text):
@@ -138,17 +137,6 @@ async def test_tryon_draws_one_at_a_time(monkeypatch):
     req = _req()
     results = await asyncio.gather(*(pipeline.run(req) for _ in range(3)))
     assert all(r.image for r in results) and most == 1  # ~120 MB each at their peak: never two at once
-
-
-async def test_tryon_copy_redraws_only_the_labels(h, monkeypatch):
-    calls = []
-    real = pipeline._prepare
-    monkeypatch.setattr(pipeline, "_prepare", lambda *a: calls.append(1) or real(*a))
-    await to_options(h, photo="room_living.jpg")
-    out = await h.tap("s:C1:tryon")
-    img = next(m for m in out if m.image_bytes)
-    assert img.image_copy and img.image_copy != img.image_bytes  # the Hindi copy
-    assert len(calls) == 1  # one drawing for both, not one per language
 
 
 def test_debug_lists_are_bounded(rt):

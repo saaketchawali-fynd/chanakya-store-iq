@@ -1174,36 +1174,29 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
             "also": [],
             "stamp": "2 Nov 11:00",
         }
-    if template == "brief":
+    if template == "brief":  # the pre-read is English (one card)
         return {
-            "greeting": p("Namaste Ravi ji", "नमस्कार रवी", "Namaste Ravi"),
-            "date_line": p("Somvar 2 Nov · Juhu", "सोमवार 2 Nov · Juhu", "Monday 2 Nov · Juhu"),
-            "focus_step": p("Translate", "सोपं सांगा", "Translate"),
-            "focus_text": p("Focus: Translate", "लक्ष: सोपं सांगा", "Focus: Translate"),
-            "focus_tip": p("Har feature ke saath 'kyunki aapke ghar mein…' jodiye.", "प्रत्येक फीचरसोबत 'कारण तुमच्या घरात…' जोडा.",
-                           "Add 'because in your home…' to every feature."),
+            "greeting": "Good morning, Ravi",
+            "date_line": "Monday 2 Nov · Juhu",
+            "cat": "TVs",
+            "step": "Step 1 of 3 · Pre-read",
+            "stock": {"n": "98", "of": "of 106 TVs available today",
+                      "tiles": [{"label": '32"', "count": "14 models", "span": "₹10,990 – ₹18,490"},
+                                {"label": '43"', "count": "22 models", "span": "₹19,990 – ₹42,990"},
+                                {"label": '55"', "count": "31 models", "span": "₹34,990 – ₹1,24,990"},
+                                {"label": '65"', "count": "12 models", "span": "₹62,990 – ₹2,19,990"}]},
+            "changes": [{"kind": "out_of_stock", "text": "Sony 55 X80L out of stock since yesterday"},
+                        {"kind": "back_in_stock", "text": "Meru 55 QLED Pro back in stock since yesterday"}],
             "offers": [
-                {"kind": "ends", "badge": p("Jaldi khatam", "लवकर संपतो", "Ends soon"),
-                 "title": p("Diwali: Novex TV par ₹10,000", "दिवाळी: Novex TV वर ₹10,000", "Diwali: ₹10,000 off select Novex TVs"),
-                 "detail": p("₹10,000 chhoot", "₹10,000 सूट", "₹10,000 off"), "till": p("8 Nov tak", "8 Nov पर्यंत", "till 8 Nov")},
-                {"kind": "live", "badge": p("Chalu", "चालू", "Live"),
-                 "title": p("HDFC card par 10% chhoot", "HDFC कार्डवर 10% सूट", "10% off on HDFC cards"),
-                 "detail": p("10% chhoot · zyada se zyada ₹5,000 · HDFC card", "10% सूट · जास्तीत जास्त ₹5,000 · HDFC कार्ड",
-                             "10% off · up to ₹5,000 · HDFC cards · on bills over ₹30,000"),
-                 "till": p("15 Nov tak", "15 Nov पर्यंत", "till 15 Nov")},
+                {"kind": "ends", "badge": "Ends soon", "title": "Diwali: ₹10,000 off select Novex TVs",
+                 "detail": "₹10,000 off", "till": "till 4 Nov"},
+                {"kind": "live", "badge": "Live", "title": "10% off on HDFC cards",
+                 "detail": "up to ₹5,000 · on bills over ₹30,000", "till": "till 15 Nov"},
             ],
-            "keep": [
-                p("Diwali offer 8 Nov ko khatam — customer ko tareekh bataiye", "दिवाळी ऑफर 8 Nov ला संपते — ग्राहकाला तारीख सांगा",
-                  "Diwali offer ends 8 Nov: tell customers the date"),
-                p("Daam sirf demo ke baad, offer sirf data se", "किंमत फक्त डेमोनंतर, ऑफर फक्त डेटातून",
-                  "Price only after the demo; offers only from the data"),
-            ],
-            "changes": [
-                {"icon": "up", "text": p("Meru 55 QLED Pro wapas stock mein (3)", "Meru 55 QLED Pro परत स्टॉकमध्ये (3)",
-                                         "Meru 55 QLED Pro back in stock (3)")},
-                {"icon": "low", "text": p("Arka 43 4K: sirf 1 bacha", "Arka 43 4K: फक्त 1 उरला", "Arka 43 4K: only 1 left")},
-            ],
-            "followups_text": p("Aaj 2 follow-up", "आज 2 फॉलो-अप", "2 follow-ups today"),
+            "keep": ["Offers apply to 61 of the 98 TVs on sale",
+                     "Diwali: ₹10,000 off select Novex TVs: only 2 days left",
+                     "8 protection plans available (₹1,499 – ₹6,999)",
+                     "2 customer follow-ups due today"],
         }
     if template == "digest":
         return {
@@ -1397,14 +1390,15 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
                 rows.append(f"{lab}: {d[k]}" if lab else str(d[k]))
     elif tpl == "brief":
         title = d.get("greeting") or title
-        if d.get("niti_line"):
-            rows.append(str(d["niti_line"]))
+        st = d.get("stock") or {}
+        if st.get("n"):
+            rows.append(f"{st.get('n')} {st.get('of') or ''}".strip())
+        rows += [f"{x.get('label')}: {x.get('count')} · {x.get('span')}" for x in st.get("tiles") or []]
         rows += [f"• {c.get('text')}" for c in d.get("changes") or []]
-        rows += [f"• {o.get('text') or (str(o.get('title') or '') + ' · ' + str(o.get('detail') or '') + ' · ' + str(o.get('till') or ''))}"
-                 for o in d.get("offers") or []]
-        for k in ("followups_text", "focus_text"):
-            if d.get(k):
-                rows.append(str(d[k]))
+        rows += [f"• {o.get('title') or ''} · {o.get('detail') or ''} · {o.get('till') or ''}" for o in d.get("offers") or []]
+        if d.get("no_offers"):
+            rows.append(str(d["no_offers"]))
+        rows += [f"• {k}" for k in d.get("keep") or []]
     elif tpl == "digest":
         rows += [f"{k.get('label')}: {k.get('value_str')}" for k in d.get("kpis") or []]
         hm = d.get("heatmap") or {}

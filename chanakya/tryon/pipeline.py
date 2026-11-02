@@ -67,8 +67,6 @@ class TryonResult:
     perspective: bool = False  # True when the wall corners gave a homography
     quads: list[tuple[str, tuple[tuple[float, float], ...]]] = field(default_factory=list)  # (sku, TL TR BR BL)
     label_boxes: list[tuple[str, tuple[int, int, int, int]]] = field(default_factory=list)
-    prepared: _Prepared | None = field(default=None, repr=False)  # kept for relabel(); dropped by the caller
-    final: Image.Image | None = field(default=None, repr=False)
 
 
 def _jpeg(img: Image.Image) -> bytes:
@@ -141,7 +139,6 @@ async def _run(req: TryonRequest, editor, do_harmonise: bool, res: TryonResult) 
         return
     # keep a usable image from here on, even if a later step fails or times out
     res.image = await asyncio.to_thread(_heavy, _annotated, req, prep, prep.composite, res)
-    res.prepared, res.final = prep, prep.composite
     final = prep.composite
     if do_harmonise and editor is not None and prep.category == "tv":
         edited = await harmonise.run(editor, prep.composite)
@@ -153,7 +150,6 @@ async def _run(req: TryonRequest, editor, do_harmonise: bool, res: TryonResult) 
                 res.harmonised = res.verified = True
     if final is not prep.composite:
         res.image = await asyncio.to_thread(_heavy, _annotated, req, prep, final, res)
-        res.final = final
 
 
 async def run(req: TryonRequest, editor=None, harmonise: bool = False, timeout: float = 30) -> TryonResult:
@@ -173,14 +169,3 @@ async def run(req: TryonRequest, editor=None, harmonise: bool = False, timeout: 
     memory.trim()
     return res
 
-
-async def relabel(req: TryonRequest, res: TryonResult, timeout: float = 8) -> bytes | None:
-    """The same drawing with other words (the associate's-language copy): only the labels are drawn again."""
-    if res.prepared is None or res.final is None:
-        return None
-    try:
-        return await asyncio.wait_for(
-            asyncio.to_thread(_heavy, _annotated, req, res.prepared, res.final, TryonResult()), timeout
-        )
-    except Exception:
-        return None
