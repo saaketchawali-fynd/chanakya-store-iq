@@ -45,6 +45,13 @@ def test_categories_from_the_backend():
     assert category_of(item("Reconnect RHSAB1506")) == "ac"
     plan = item("4 Year - resQ Care Plan")
     assert category_of(plan) is None and is_protection(plan)
+    # backend category names seen in the live UAT catalogue that are NOT the product itself
+    for cat_name, name, attrs in (("TV Speakers & Soundbars", "Sony HT-S20R 5.1ch Soundbar for TV", {}),
+                                  ("Laptop Batteries", "HP Laptop Battery 3 Cell", {}),
+                                  ("Laptop Utilities", "Laptop Cooling Stand", {}),
+                                  ("Tablet PCs", "Lenovo Tab laptop-style keyboard", {"ram": "4 GB"}),
+                                  ("DSLR Cameras", "Canon DSLR with TV out", {"display_type": "LCD"})):
+        assert category_of({"categories": [{"name": cat_name}], "name": name, "attributes": attrs}) is None, cat_name
     cats = {}
     for r in mapped():
         cats[r["category"]] = cats.get(r["category"], 0) + 1

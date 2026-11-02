@@ -18,7 +18,7 @@ from chanakya.config import Settings
 from chanakya.core import clock
 from chanakya.log import get_log
 from chanakya.truth import db
-from chanakya.truth.jio import RULES, JioClient, JioError, category_of, is_protection
+from chanakya.truth.jio import PLAN_LABELS, JioClient, JioError, category_of, is_protection
 from chanakya.truth.jio_map import map_product, map_promotions, map_protection
 from chanakya.truth.models import (
     AppSetting,
@@ -43,7 +43,7 @@ def configured(s: Settings) -> bool:
 
 
 def _label_category(label: str) -> str | None:
-    for cat, rx in RULES:
+    for cat, rx in PLAN_LABELS:
         if rx.search(label or ""):
             return cat
     return None

@@ -78,11 +78,18 @@ class JioClient:
 
 
 # ---------------------------------------------------------------- which of Chanakya's categories a product is in
+# Checked against the live UAT catalogue (2 Nov 2026): e.g. "LED Televisions" are TVs but "TV Speakers & Soundbars"
+# are not; "Premium Laptops" are laptops but "Laptop Batteries", "Laptop Utilities" and "Tablet PCs" are not.
 ACCESSORY = re.compile(r"bag|sleeve|cover|stand|mount|accessor|stabili[sz]er|cable|remote|skin|keyboard|mouse|"
-                       r"adapter|charger|cooling pad|battery|warranty|care plan|filter|trolley|bracket", re.I)
-RULES = (("tv", re.compile(r"televisions?\b|\btvs?\b", re.I)), ("ac", re.compile(r"air conditioners?", re.I)),
-         ("wm", re.compile(r"washing machines?|washer", re.I)), ("fridge", re.compile(r"refrigerators?|fridges?", re.I)),
-         ("laptop", re.compile(r"laptops?|notebooks?", re.I)))
+                       r"adapter|charger|cooling pad|batter(?:y|ies)|warranty|care plan|filter|trolley|bracket|"
+                       r"speaker|soundbar|utilit|protector|tablet|camera", re.I)
+RULES = (("tv", re.compile(r"\btelevisions?\b", re.I)), ("ac", re.compile(r"air conditioners?", re.I)),
+         ("wm", re.compile(r"washing machines?", re.I)), ("fridge", re.compile(r"refrigerators?|fridges?", re.I)),
+         ("laptop", re.compile(r"\blaptops?\b|\bnotebooks?\b", re.I)))
+# Categories the backend also files under generic names (fridges under "Frost Free" / "Direct Cool"): the product's
+# own name may decide, with that category's defining attributes. TVs and laptops always have a named category.
+NAME_FALLBACK = ("ac", "wm", "fridge")
+PLAN_LABELS = (("tv", re.compile(r"\btvs?\b|televisions?", re.I)),) + RULES  # resQ plan "covers" labels
 
 
 def _category_names(p: dict) -> list[str]:
@@ -109,7 +116,7 @@ def category_of(p: dict) -> str | None:
             return cat
     attrs, name = p.get("attributes") or {}, p.get("name") or ""
     for cat, rx in RULES:
-        if rx.search(name) and any(attrs.get(k) not in (None, "", "None") for k in DEFINING[cat]):
+        if cat in NAME_FALLBACK and rx.search(name) and any(attrs.get(k) not in (None, "", "None") for k in DEFINING[cat]):
             return cat
     return None
 
