@@ -197,6 +197,7 @@ class Sprite:
     shadow: Image.Image  # RGBA (black, alpha) cast on the wall/floor
     k: float  # px per cm
     margin: float  # cm of canvas left/above the product's top-left corner
+    edge_rgb: np.ndarray | None = None  # the real product's edge colour (photo sprites): for its drawn side faces
 
 
 def _canvas(w_cm: float, h_cm: float, k: float, margin: float, extra_cm: float = 0.0):
@@ -296,6 +297,70 @@ def tv_sprite(w_cm: float, h_cm: float, k: float, light: Light, mount: str = "wa
     else:
         sh_a = _shadow(xx, yy, w_cm, h_cm, k, light, 1.0, 0.035 * w_cm, 0.03 * h_cm + 0.8, r)
     return Sprite(_rgba(rgb, alpha), _shadow_img(sh_a, wall), k, margin)
+
+
+# ---------------------------------------------------------------- the real product, from its photo
+
+SHADOW = {  # (strength, spread, drop, corner radius) as functions of the product size in cm
+    "tv": lambda w, h: (1.0, 0.035 * w, 0.03 * h + 0.8, max(0.3, 0.0035 * w)),
+    "tv_stand": lambda w, h: (0.55, 0.07 * w, 0.06 * h + 2, max(0.3, 0.0035 * w)),
+    "ac": lambda w, h: (0.75, 0.05 * w, 0.05 * h + 1.0, 0.14 * h),
+    "wm": lambda w, h: (0.6, 0.06 * w, 0.02 * h, 0.03 * w),
+    "fridge": lambda w, h: (0.6, 0.05 * w, 0.015 * h, 0.03 * w),
+}
+
+
+def _lit_screen(wp: int, hp: int, light: Light) -> np.ndarray:
+    """A switched-on screen for a TV photographed with its screen off: the picture, lit for the room (slight
+    desaturation, room colour cast, glare veil), an inner edge shadow and a soft diagonal reflection."""
+    content = _cover(screen_source(), max(2, wp), max(2, hp))[:hp, :wp]
+    lum = (content @ LUMA)[..., None]
+    content = lum + (content - lum) * 0.93
+    wall = light.rgb
+    content = content * (wall / max(float(wall.mean()), 1.0)) ** 0.22 * (0.9 + 0.06 * (light.lum / 255.0))
+    veil = 0.035 + 0.075 * (light.lum / 255.0) ** 2
+    content = content * (1 - veil) + wall * veil
+    y, x = np.mgrid[0:hp, 0:wp].astype(np.float32)
+    e = np.minimum(np.minimum(x, wp - 1 - x), np.minimum(y, hp - 1 - y))
+    content *= (1.0 - 0.3 * np.exp(-e / max(1.0, 0.006 * wp)))[..., None]
+    s = x / max(wp, 1) + 0.65 * y / max(hp, 1)
+    amp = 0.05 + 0.05 * (light.lum / 255.0) + (0.02 if light.level == "sunny" else 0.0)
+    refl = amp * np.exp(-(((s - 0.58) / 0.13) ** 2)) * (1 - 0.4 * y / max(hp, 1)) + 0.6 * amp * np.clip(1 - s / 0.75, 0, 1) ** 2
+    return content + (255.0 - content) * np.clip(refl, 0, 0.3)[..., None]
+
+
+def photo_sprite(cut, category: str, w_cm: float, h_cm: float, k: float, light: Light, stand: bool = False) -> Sprite:
+    """The product's own catalogue photo (cut out) at true size: its panel/body mapped to w × h cm, a TV's blank
+    screen switched on, exposure and colour matched to the room, and the same wall shadow as the drawn product."""
+    margin = max(0.16 * w_cm, 8.0) if category == "tv" else max(0.12 * w_cm, 6.0)
+    px0, py0, px1, py1 = cut.panel
+    sx, sy = w_cm * k / max(px1 - px0, 1), h_cm * k / max(py1 - py0, 1)
+    cw, ch = cut.rgba.size
+    extra_cm = max(0.0, (ch - py1) * sy / k)  # a stand below the panel
+    xx, yy, wp, hp = _canvas(w_cm, h_cm, k, margin, extra_cm)
+    prod = cut.rgba.resize((max(1, round(cw * sx)), max(1, round(ch * sy))), Image.Resampling.LANCZOS)
+    arr = np.asarray(prod, dtype=np.float32).copy()
+    rgb, a = arr[..., :3], arr[..., 3]
+    lit = np.ones(a.shape, np.float32)
+    if cut.screen is not None:
+        x0, y0 = round(cut.screen[0] * sx), round(cut.screen[1] * sy)
+        x1, y1 = min(rgb.shape[1], round(cut.screen[2] * sx)), min(rgb.shape[0], round(cut.screen[3] * sy))
+        if x1 - x0 > 4 and y1 - y0 > 4:
+            rgb[y0:y1, x0:x1] = _lit_screen(x1 - x0, y1 - y0, light)
+            lit[y0:y1, x0:x1] = 0.0  # the screen gives its own light
+    wall = light.rgb
+    cast = (wall / max(float(wall.mean()), 1.0)) ** 0.12
+    gain = 0.86 + 0.18 * (light.lum / 255.0)
+    top_down = np.linspace(1.03, 0.95, rgb.shape[0], dtype=np.float32)[:, None]
+    shade = (cast[None, None, :] * (gain * top_down)[..., None])
+    rgb = rgb * (1 - lit[..., None]) + rgb * shade * lit[..., None]
+    out = np.dstack([np.clip(rgb, 0, 255), a]).astype(np.uint8)
+    body = Image.new("RGBA", (wp, hp), (0, 0, 0, 0))
+    body.alpha_composite(Image.fromarray(out, "RGBA"), (max(0, round(margin * k - px0 * sx)), max(0, round(margin * k - py0 * sy))))
+    strength, spread, drop, r = SHADOW["tv_stand" if (category == "tv" and stand) else category](w_cm, h_cm)
+    sh_a = _shadow(xx, yy, w_cm, h_cm, k, light, strength, spread, drop, r)
+    del xx, yy
+    return Sprite(body, _shadow_img(sh_a, wall), k, margin, edge_rgb=np.clip(cut.edge_rgb * cast * gain, 0, 255))
 
 
 # ---------------------------------------------------------------- AC / WM
@@ -439,8 +504,11 @@ def _faces(pose: Pose, p: Placed) -> list[tuple[str, np.ndarray, np.ndarray]]:
     return [(kind, pose.project(c), np.array([(q[2] - nb) / (nf - nb) for q in c])) for kind, c in out]
 
 
-def _face_colour(category: str, kind: str, light: Light, side_sign: float) -> np.ndarray:
+def _face_colour(category: str, kind: str, light: Light, side_sign: float, edge: np.ndarray | None = None) -> np.ndarray:
     wall = light.rgb
+    if edge is not None:  # the real product's own colour (photo sprite)
+        lit = 0.9 if side_sign * light.side >= 0 else 0.76
+        return edge * {"top": 1.02, "bottom": 0.6, "side": lit}[kind]
     if category == "tv":
         frame = np.array([15, 15, 17], np.float32) + wall * 0.05
         return {"top": frame + wall * 0.12, "bottom": frame * 0.8, "side": frame * 1.2 + wall * 0.05}[kind]
@@ -726,13 +794,21 @@ def compose(
         k = float(min(max(k, 0.5), 40.0))
         margin = max(0.16 * w, 8.0)  # the widest sprite margin (TV): canvas ≈ (w + 2m) × (h + 2m) cm at k px/cm
         k = min(k, (MAX_SPRITE_PX / ((w + 2 * margin) * (h + 2 * margin + STAND_GAP_CM + 2))) ** 0.5)
-        if category == "ac":
+        sp = None
+        if getattr(p, "photo", None):  # the real product, from its catalogue photo, when it cuts out cleanly
+            from chanakya.tryon.photo import cutout
+
+            stand = category == "tv" and p.mount == "stand"
+            cut = cutout(p.photo, category, w / h, keep_stand=stand)
+            if cut is not None:
+                sp = photo_sprite(cut, category, w, h, k, light, stand)
+        if sp is None and category == "ac":
             sp = ac_sprite(w, h, k, light)
-        elif category == "wm":
+        elif sp is None and category == "wm":
             sp = wm_sprite(w, h, k, light)
-        elif category == "fridge":
+        elif sp is None and category == "fridge":
             sp = fridge_sprite(w, h, k, light, getattr(p, "door", None) or "double")
-        else:
+        elif sp is None:
             sp = tv_sprite(w, h, k, light, p.mount)
         res = warp(sp.shadow, _sprite_h(wall_h, p, sp), out.size)  # cast on the wall
         if res is not None:
@@ -746,7 +822,7 @@ def compose(
         if three_d:
             faces = _faces(pose, p)
             cols = [
-                _face_colour(category, kind, light, -1.0 if quad[:, 0].mean() < pts[:, 0].mean() else 1.0)
+                _face_colour(category, kind, light, -1.0 if quad[:, 0].mean() < pts[:, 0].mean() else 1.0, sp.edge_rgb)
                 for kind, quad, _ in faces
             ]
             out = _draw_faces(out, faces, cols, mask)

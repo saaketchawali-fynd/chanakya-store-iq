@@ -120,7 +120,9 @@ async def expert_message(ctx: SkillContext) -> Reply:
     open_q = await repo.expert_q_open(ctx.actor_wa_id)
     if not open_q:
         return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
-    q = open_q[0]
+    picked = await repo.setting_get(f"expert_answering:{ctx.actor_wa_id}")
+    q = next((x for x in open_q if x.id == picked), open_q[0])  # the question they tapped 'answer' on
+    await repo.setting_set(f"expert_answering:{ctx.actor_wa_id}", None)
     assoc = await repo.staff_by_wa(q.associate_wa_id)
     alang = assoc.lang if assoc else "hi"
     s = await ctx.svc.sessions.get(q.session_id) if q.session_id else None
@@ -148,10 +150,14 @@ async def expert_message(ctx: SkillContext) -> Reply:
     ctx.reg.raw(ans.for_associate + " " + (ans.bolo or ""), src)
     await repo.expert_q_update(q.id, status="answered", answered_at=ctx.now, answer=ans.model_dump())
     ctx.ev("expert_answered", sources=[src], qid=q.id)
+    ctx.reg.static(q.question)
     body = ctx.t("expert_answer", alang, expert=ctx.staff.name, text=ans.for_associate)
+    body = f"❓ {q.question[:90]}\n{body}"  # which question this answers
     if ans.bolo:
         body += f'\n{ctx.t("label_bolo", alang)}: "{ans.bolo}"'
-    to_assoc = info_reply(ctx, body, to=q.associate_wa_id)
+    nxt = [Button(id=encode("s", s.code, "go"), title=ctx.t("b_go", alang))] if s else []
+    to_assoc = info_reply(ctx, body, nxt, to=q.associate_wa_id)
+    to_assoc.session_id = s.id if s else None
     to_expert = info_reply(
         ctx,
         ctx.t("expert_save_ask"),
@@ -168,7 +174,9 @@ async def expert_button(ctx: SkillContext, qid: str, action: str) -> Reply:
     if q is None:
         return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
     if action == "answer":
-        return ctx.reply(info_reply(ctx, ctx.t("expert_answer_prompt")))
+        await repo.setting_set(f"expert_answering:{ctx.actor_wa_id}", q.id)
+        ctx.reg.static(q.question)
+        return ctx.reply(info_reply(ctx, f"{ctx.t('expert_answer_prompt')}\n❓ {q.question[:120]}"))
     if action == "dunno":
         await repo.expert_q_update(q.id, status="expired")
         assoc = await repo.staff_by_wa(q.associate_wa_id)
@@ -189,14 +197,21 @@ async def sla_tick(now, send) -> None:
     """90 s → remind the expert once and tell the associate; 15 min → expire."""
     from chanakya.i18n.lang import t
 
+    told: set[tuple[str, str | None]] = set()  # one 'expert is busy' per associate and customer per tick
     for q in await repo.expert_q_open():
         age = (now - repo.aware(q.asked_at)).total_seconds()
         assoc = await repo.staff_by_wa(q.associate_wa_id)
         alang = assoc.lang if assoc else "hi"
         if age >= 900:
             await repo.expert_q_update(q.id, status="expired")
+            await send(OutMessage(to=q.associate_wa_id, kind="text",
+                                  body=t("expert_expired", alang, question=q.question[:80])))
+            continue
+        if age >= 90 and not q.reminded and (q.associate_wa_id, q.session_id) in told:
+            await repo.expert_q_update(q.id, reminded=True)
             continue
         if age >= 90 and not q.reminded:
+            told.add((q.associate_wa_id, q.session_id))
             await repo.expert_q_update(q.id, reminded=True)
             if q.expert_wa_id:
                 ex = await repo.staff_by_wa(q.expert_wa_id)

@@ -56,7 +56,7 @@ async def set_customer_lang(ctx: SkillContext, lang: str) -> Reply:
         lang = ctx.lang
     ctx.session.home.customer_lang = lang  # type: ignore[assignment]
     ctx.ev("customer_lang_set", lang=lang)
-    note = ctx.t("clang_set", lang=ctx.t(f"lang_name_{lang}"))
+    note = ctx.t("clang_set", language=ctx.t(f"lang_name_{lang}"))
     msg = C.next_question_or_options(ctx)
     msg.footer = note[:60]
     return ctx.reply(msg)
@@ -104,7 +104,8 @@ def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voic
 
 
 async def on_info(
-    ctx: SkillContext, u: Understanding, source: str = "voice", applied: bool = False, gate_before: bool | None = None
+    ctx: SkillContext, u: Understanding, source: str = "voice", applied: bool = False, gate_before: bool | None = None,
+    n_new: int | None = None,
 ) -> Reply:
     """Default rule (7.4 #10): apply, then need-validation or the next question (+ Home Card / budget list)."""
     s = ctx.session
@@ -112,7 +113,10 @@ async def on_info(
     if gate_before is None:
         gate_before = state.options_gate_open(s, pack)
     if not applied:
-        apply_understanding(ctx, u, source)
+        n_new = apply_understanding(ctx, u, source)
+    if n_new == 0 and not u.customer_request and ctx.x.get("readback_shown") and not ctx.x.get("readback_done") \
+            and not s.shortlist and C.pick_next_slot(ctx) is None:
+        return ctx.reply(C.readback_nudge(ctx))  # nothing new: don't resend the read-back and its cards
     msgs = []
     if u.customer_request and not s.extra.get("need_validated"):
         s.extra["need_validated"] = True
@@ -178,6 +182,11 @@ async def tap_slot(ctx: SkillContext, slot: str, val: str) -> Reply:
         from chanakya.skills import complete
 
         return await complete.show_cost(ctx)
+    if ctx.x.get("pending_install") and slot in pack.site_needs:
+        apply_understanding(ctx, u, "tap")
+        from chanakya.skills import follow
+
+        return await follow.sold(ctx)
     if ctx.x.get("pending_close") and slot == "exchange_old":
         apply_understanding(ctx, u, "tap")
         ctx.x.pop("pending_close", None)

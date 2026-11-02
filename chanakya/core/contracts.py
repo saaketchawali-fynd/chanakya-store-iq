@@ -81,6 +81,7 @@ class OutMessage(BaseModel):
     card_copy: Card | None = None
     image_copy: bytes | None = None
     copy_caption: str | None = None
+    session_id: str | None = None  # internal: the customer session this message (and its buttons) belongs to
     media_id: str | None = None  # pre-uploaded media
     caption: str | None = None  # image/video/document caption (≤ 3 lines)
     filename: str | None = None  # document

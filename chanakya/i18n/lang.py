@@ -24,9 +24,16 @@ class _SafeDict(dict):
 _EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF\u2B50\u23F0-\u23FF\uFE0F]")
 
 
+_CHECK = "[\u2713\u2714\u2705]"
+
+
 def clean(text: str) -> str:
-    """No emojis in anything Chanakya writes: strip pictographs and tidy the spaces they leave."""
-    out = _EMOJI.sub("", text or "")
+    """No emojis in anything Chanakya writes: strip pictographs and tidy the spaces they leave. A tick that
+    separated two phrases ("Sahi ✓ Dhoop mein…") becomes a dash, so the sentences don't run together."""
+    t = re.sub(rf"(?m)^[ \t]*{_CHECK}[ \t]*", "", text or "")
+    t = re.sub(rf"[ \t]*{_CHECK}[ \t]*$", "", t, flags=re.M)
+    t = re.sub(rf"[ \t]*{_CHECK}[ \t]+", " — ", t)
+    out = _EMOJI.sub("", t)
     return "\n".join(" ".join(line.split()) for line in out.split("\n"))
 
 

@@ -28,7 +28,7 @@ ask_category: {hi: "Customer kaunsa product dekh rahe hain?", mr: "ग्रा�
 menu_clang: {hi: "Customer ki bhasha", mr: "ग्राहकाची भाषा", en: "Customer's language"}
 menu_clang_d: {hi: "Abhi: {lang}. Bolo lines isi mein aati hain", mr: "आत्ता: {lang}. बोला ओळी याच भाषेत येतात", en: "Now: {lang}. The lines to say come in this language"}
 clang_pick_body: {hi: "Customer kis bhasha mein baat karte hain? Bolo lines usi mein aayengi.", mr: "ग्राहक कोणत्या भाषेत बोलतात? बोला ओळी त्याच भाषेत येतील.", en: "Which language does the customer speak? The lines to say will come in it."}
-clang_set: {hi: "Customer ki bhasha: {lang}. Bolo lines ab isi mein.", mr: "ग्राहकाची भाषा: {lang}. बोला ओळी आता याच भाषेत.", en: "Customer's language: {lang}. The lines to say are now in it."}
+clang_set: {hi: "Customer ki bhasha: {language}. Bolo lines ab isi mein.", mr: "ग्राहकाची भाषा: {language}. बोला ओळी आता याच भाषेत.", en: "Customer's language: {language}. The lines to say are now in it."}
 lang_name_hi: {hi: "Hindi", mr: "हिंदी", en: "Hindi"}
 lang_name_mr: {hi: "Marathi", mr: "मराठी", en: "Marathi"}
 lang_name_en: {hi: "English", mr: "इंग्रजी", en: "English"}
@@ -186,4 +186,16 @@ catalog_unavailable: {hi: "Abhi product list nahi mil rahi (Jio Commerce se). Th
 footer_photo_saved: {hi: "Photo save hui · options isi jagah dikhenge", mr: "फोटो सेव्ह झाला · पर्याय याच जागी दिसतील", en: "Photo saved · the picks will show in this spot"}
 tryon_drawing: {hi: "Jagah naap rahe hain, product laga rahe hain — kuch second.", mr: "जागा मोजतोय, उत्पादन लावतोय — काही सेकंद.", en: "Measuring the spot and placing it: a few seconds."}
 tryon_footer: {hi: "अनुमानित झलक · सही अनुपात में · TEST DATA", mr: "अंदाजे झलक · योग्य प्रमाणात · TEST DATA", en: "Approx. preview · to scale · TEST DATA"}
-copy_caption: {hi: "Aapki copy (Hindi) · customer ko English wali dikhaiye", mr: "तुमची प्रत (मराठी) · ग्राहकाला English वाली दाखवा", en: "Your copy"}
+copy_caption: {hi: "Aapki copy (Hindi) · customer ko English wali dikhaiye", mr: "तुमची प्रत (मराठी) · ग्राहकाला English प्रत दाखवा", en: "Your copy"}
+install_needs_product: {hi: "Pehle product chuniye — phir installation book karenge.", mr: "आधी उत्पादन निवडा — मग इन्स्टॉलेशन बुक करू.", en: "Choose the product first, then we will book the installation."}
+button_from_closed: {hi: "Ye button pichhle customer ({code}) ka hai — woh baat-cheet khatam ho chuki.", mr: "हे बटण आधीच्या ग्राहकाचं ({code}) आहे — ते संभाषण संपलं.", en: "That button is from an earlier customer ({code}): that conversation is finished."}
+b_task_snooze: {hi: "Kal yaad dilao", mr: "उद्या आठवण करा", en: "Remind tomorrow"}
+task_done_ack: {hi: "Task ho gaya. Shabash!", mr: "टास्क पूर्ण झाला. छान!", en: "Task done. Well done!"}
+task_snoozed: {hi: "Theek hai — kal isi samay yaad dilayenge.", mr: "ठीक आहे — उद्या याच वेळी आठवण करू.", en: "OK: I will remind you tomorrow at this time."}
+cust_change_rebook: {hi: "{name} ne installation ka din badalna chaha. Naya slot chuniye:", mr: "{name} यांना इन्स्टॉलेशनचा दिवस बदलायचा आहे. नवा स्लॉट निवडा:", en: "{name} wants to change the installation day. Choose a new slot:"}
+bolo_no_discount: {hi: "इससे ज़्यादा छूट मेरे पास नहीं है — पर आज के सारे ऑफ़र दिखाता हूँ।", mr: "यापेक्षा जास्त सूट माझ्याकडे नाही — पण आजचे सगळे ऑफर दाखवतो.", en: "I can't take more off than this, but let me show you today's offers."}
+tip_perfect: {hi: "Aise hi — har customer ke saath yahi saat kadam.", mr: "असंच — प्रत्येक ग्राहकासोबत हेच सात टप्पे.", en: "Just like this: the same seven steps with every customer."}
+readback_nudge: {hi: "Kuch naya nahi mila. Customer se poochh kar tap kijiye — sahi samjha?", mr: "नवीन काही मिळालं नाही. ग्राहकाला विचारून टॅप करा — बरोबर समजलं?", en: "Nothing new there. Ask the customer and tap: did I get it right?"}
+expert_expired: {hi: "Expert ka jawab nahi aaya: \"{question}\". Customer ko call karke batayenge — task bana lijiye.", mr: "तज्ज्ञाचं उत्तर आलं नाही: \"{question}\". ग्राहकाला नंतर फोन करून सांगू — टास्क बनवा.", en: "No answer from the expert on \"{question}\". Call the customer back later: make a task."}
+footer_label_hint: {hi: "Label ki photo bhejiye → is ghar ke fayde", mr: "लेबलचा फोटो पाठवा → या घरासाठी फायदे", en: "Send a label photo → benefits for this home"}
+bolo_prefer_personal: {hi: "आपके लिए कौन-सा सही लगा?", mr: "तुमच्यासाठी कोणता योग्य वाटला?", en: "Which one felt right for you?"}

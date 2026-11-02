@@ -196,7 +196,7 @@ async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0) -> Reply:
 
 async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     x = ctx.x
-    sku = x.get("label_sku") or ctx.session.chosen_sku or ctx.session.option_labels.get("B")
+    sku = x.get("label_sku") or ctx.session.chosen_sku or state.best_sku(ctx.session)
     p = ctx.facts.product_sync(sku) if sku else None
     if p is None:
         return ctx.reply(info_reply(ctx, ctx.t("label_send")))

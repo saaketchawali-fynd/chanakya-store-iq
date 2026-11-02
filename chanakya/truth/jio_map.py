@@ -12,6 +12,7 @@ import re
 from datetime import date
 
 NUM = r"(\d+(?:\.\d+)?)"
+PLACEHOLDER = "/l2_category/"  # the backend's shared placeholder picture (a generic icon sheet, not the product)
 EMPTY = {"", "none", "null", "nan", "na", "n/a", "-"}
 
 
@@ -267,7 +268,8 @@ def map_product(p: dict, category: str) -> dict | None:
     mn = model_number(p)
     feats = list(p.get("highlights") or []) or _strip_html(attr(p, "features") or attr(p, "key-features") or "")
     sku = str(p.get("item_code") or p.get("uid"))
-    medias = [m.get("url") for m in p.get("medias") or [] if (m.get("type") or "image") == "image" and m.get("url")]
+    medias = [m.get("url") for m in p.get("medias") or [] if (m.get("type") or "image") == "image" and m.get("url")
+              and PLACEHOLDER not in m.get("url")]  # the generic category picture is not this product
     info = {
         "source": "jio", "slug": p.get("slug"), "uid": p.get("uid"), "name": name, "model_number": mn,
         "warranty_text": attr(p, "warranty"), "colours": [c for c in [attr(p, "primary_color")] if c],

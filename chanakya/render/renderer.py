@@ -651,6 +651,20 @@ async def fetch_images(card: Card) -> None:
                 continue
 
 
+async def image_bytes(ref: str | None) -> bytes | None:
+    """A product picture's bytes (backend URL, cached on disk; or a local file in sample mode); None if missing."""
+    if not ref or not isinstance(ref, str):
+        return None
+    if ref.startswith("https://"):
+        if not _cache_path(ref).is_file():
+            await fetch_images(Card.model_construct(template="product", lang="en", data={"image": ref}))
+        c = _cache_path(ref)
+        return c.read_bytes() if c.is_file() else None
+    p = Path(ref)
+    p = p if p.is_absolute() else STATIC_IMG / ref
+    return p.read_bytes() if p.is_file() else None
+
+
 def to_data_uri(img: Any, max_px: int | None = None) -> str | None:
     """bytes | data: URI | cached backend picture (https URL) | path relative to render/static/img → data URI
     (None if unusable).

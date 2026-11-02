@@ -23,7 +23,7 @@ BANKS = ("HDFC", "SBI", "other")
 
 def _sku(ctx: SkillContext) -> str | None:
     s = ctx.session
-    return s.chosen_sku or s.option_labels.get("B")
+    return s.chosen_sku or state.best_sku(s)
 
 
 async def offers(ctx: SkillContext) -> Reply:
@@ -37,6 +37,14 @@ async def offers(ctx: SkillContext) -> Reply:
         from chanakya.skills.recommend import show_options
 
         return await show_options(ctx)
+    if not s.chosen_sku:  # which one felt right? (the full cost and offers are for one product)
+        from chanakya.skills.recommend import shown
+
+        return await shown(ctx)
+    if (s.cost_snapshot or {}).get("sku") != s.chosen_sku:  # Complete before Close: the full cost first
+        from chanakya.skills import complete
+
+        return await complete.show_cost(ctx)
     pack = ctx.pack
     if ("replace" in P.values(s.home, "trigger") and pack.slot("exchange_old") and not P.known(s.home, "exchange_old")
             and not ctx.x.get("exchange_asked")):
@@ -325,6 +333,8 @@ async def set_delivery(ctx: SkillContext, iso: str) -> Reply:
 
     from chanakya.skills import follow
 
+    if not ctx.x.get("pay"):  # an old delivery button before the offers: the offers first
+        return await offers(ctx)
     d = date.fromisoformat(iso)
     ctx.x["delivery_choice"] = iso
     ctx.x["outcome"] = "sold"
@@ -415,7 +425,10 @@ async def no_invented_discount(ctx: SkillContext) -> Reply:
         if sid
         else [ctx.b("b_status", encode("g", "status"))]
     )
-    return ctx.reply(info_reply(ctx, ctx.t("no_invented_discount"), btns))
+    if not ctx.session:
+        return ctx.reply(info_reply(ctx, ctx.t("no_invented_discount"), btns))
+    # something honest to say to the customer, and the reason for the associate
+    return ctx.reply(coach_reply(ctx, ctx.tc("bolo_no_discount"), ctx.t("no_invented_discount"), C.known_cites(ctx), btns))
 
 
 async def ask_manager(ctx: SkillContext) -> Reply:
@@ -431,7 +444,7 @@ async def ask_manager(ctx: SkillContext) -> Reply:
         {"associate": ctx.actor_wa_id, "code": s.code, "sku": _sku(ctx)},
     )
     ctx.ev("task_created", task_id=task.id, kind="approval", owner=owner, due_at=ctx.now.isoformat())
-    msgs = [info_reply(ctx, ctx.t("approval_sent"))]
+    msgs = [info_reply(ctx, ctx.t("approval_sent"), [ctx.b("b_offers", ctx.sid("offers")), ctx.b("b_status", encode("g", "status"))])]
     if managers:
         mlang = managers[0].lang or "en"
         body = ctx.t(

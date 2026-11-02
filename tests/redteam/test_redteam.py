@@ -148,7 +148,7 @@ async def test_12_customer_before_consent(h):
     await to_options(h)
     h.as_("customer")
     out = await h.say("TV ka daam kya hai?")
-    assert len(out) == 1 and "store team ke liye" in out[0].body and "₹" not in out[0].body
+    assert len(out) == 1 and "store team" in out[0].body and "₹" not in out[0].body  # English: the customer's phone
     assert await h.say("hello?") == []  # replies once only
 
 

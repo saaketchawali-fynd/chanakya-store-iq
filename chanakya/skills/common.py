@@ -186,27 +186,41 @@ def comfort_range(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     return msg
 
 
+READBACK_MAX = 3  # said aloud: the three facts that decide the product (the Home Card shows them all)
+
+
 def readback_facts(ctx: SkillContext, lang: str) -> str:
     pack = ctx.pack
     home = ctx.session.home
+    order = [x for x in pack.required_slots if x != "trigger"] + [x for x in pack.order if x not in pack.required_slots
+                                                                  and x != "trigger"]
     parts = []
-    for sid in [x for x in pack.order if x != "trigger"]:
+    for sid in order:
         sd = pack.slot(sid)
         vals = P.values(home, sid)
         if not sd or not vals:
             continue
         sv = home.slots[sid][-1]
-        if sv.number is not None and sv.source in ("voice", "text") and sd.number:
-            unit = {"seat_distance_ft": "ft", "room_size_sqft": "sq ft", "hours_per_day": "h", "fridge_width_cm": "cm",
-                    "old_tv_in": "inch"}.get(sd.number, "")
+        unit = {"seat_distance_ft": "ft", "room_size_sqft": "sq ft", "hours_per_day": "h", "fridge_width_cm": "cm",
+                "old_tv_in": "inch"}.get(sd.number or "", "")
+        if sv.number is not None and sv.source in ("voice", "text") and unit:  # a measurement, with its unit
             parts.append(ctx.reg.num(sv.number, f"card:{sid}", unit))
         else:
-            parts.append(ctx.reg.static(", ".join(value_title(sd, v, lang) for v in vals)))
+            parts.append(ctx.reg.static(value_title(sd, vals[0], lang)))
+        if len(parts) >= READBACK_MAX:
+            break
     return ", ".join(parts)
+
+
+def readback_nudge(ctx: SkillContext) -> OutMessage:
+    """Something unclear arrived while the read-back is waiting: a one-line nudge, not the two cards again."""
+    btns = [ctx.b("b_readback_ok", ctx.sid("readback_ok")), ctx.b("b_readback_edit", ctx.sid("readback_edit"))]
+    return info_reply(ctx, ctx.t("readback_nudge"), btns)
 
 
 def readback(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     """Say the home back to the customer, with the Home Card: 'So, for your home: … Did I get that right?'"""
+    ctx.x["readback_shown"] = True
     ctx.ev("home_card_sent", known=ctx.pack.known_required(ctx.session.home), total=len(ctx.pack.required_slots))
     key = f"bolo_readback_{ctx.pack.category}"
     say = ctx.tc(key if i18n.has(key) else "bolo_readback", facts=readback_facts(ctx, ctx.clang))
@@ -236,7 +250,10 @@ def resume(ctx: SkillContext) -> OutMessage:
     from chanakya.core.contracts import Step
 
     s = ctx.session
-    if s.step in (Step.CLOSE, Step.FOLLOW):
+    if s.extra.get("delivery_choice") or s.extra.get("outcome") == "sold" or s.consent:  # after the sale
+        btns = [ctx.b("b_send_customer", ctx.sid("parivaar")), ctx.b("b_task", ctx.sid("task")),
+                ctx.b("b_khatam", ctx.sid("khatam"))]
+    elif s.step in (Step.CLOSE, Step.FOLLOW):
         btns = [ctx.b("b_book_delivery", ctx.sid("delivery")), ctx.b("b_not_today", ctx.sid("nottoday")),
                 ctx.b("b_status", encode("g", "status"))]
     elif s.demo_done or s.chosen_sku:

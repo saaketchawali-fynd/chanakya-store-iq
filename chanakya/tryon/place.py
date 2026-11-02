@@ -22,6 +22,9 @@ TV_CENTRE_ABOVE_FLOOR_CM = 105.0
 TV_ABOVE_UNIT_CM = 15.0
 STAND_GAP_CM = 6.0  # pedestal: panel bottom above the TV-unit top
 TV_ABOVE_SOFA_CM = 10.0
+UNIT_MIN_WIDTH_CM = 80.0  # narrower than this is a side table, not a TV unit
+UNIT_MAX_TOP_CM = 100.0
+SOFA_MIN_WIDTH_CM = 120.0  # a sofa, not an armchair
 AC_BELOW_CEILING_CM = 30.0
 AC_ABOVE_FLOOR_CM = 210.0  # minimum height of the AC's bottom edge
 CEILING_MARGIN_CM = 8.0
@@ -47,6 +50,7 @@ class Placed:
     depth: float = 0.0  # front face, cm in front of the wall
     back: float = 0.0  # back face, cm in front of the wall
     door: str | None = None  # fridge door type (drawing only)
+    photo: bytes | None = field(default=None, repr=False)  # the product's catalogue photo (drawn from it if usable)
 
 
 @dataclass
@@ -123,11 +127,23 @@ def _u_range(wall: Wall, z: float) -> tuple[float, float]:
     return max(0.0, vis[0]), min(wall.width_cm, vis[1])
 
 
+def _real_unit(units: list[_Obj], tv_w: float) -> _Obj | None:
+    """A TV unit the TV would really stand on or hang above: wide and low (a side table or stool is not one)."""
+    ok = [u for u in units if (u.u1 - u.u0) >= max(UNIT_MIN_WIDTH_CM, 0.6 * tv_w) and 20 <= u.z1 <= UNIT_MAX_TOP_CM]
+    return max(ok, key=lambda u: u.u1 - u.u0) if ok else None
+
+
+def _facing_sofa(sofas: list[_Obj], lo: float, hi: float) -> _Obj | None:
+    """A sofa along this wall, wide and near the middle (an armchair at the edge of the photo does not decide)."""
+    span = hi - lo
+    ok = [s for s in sofas if (s.u1 - s.u0) >= SOFA_MIN_WIDTH_CM and lo + 0.2 * span <= s.uc <= hi - 0.2 * span]
+    return max(ok, key=lambda s: s.u1 - s.u0) if ok else None
+
+
 def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float, mount: str):
     ceiling = wall.ceiling_z or WALL_HEIGHT_CM
     old = (objs.get("existing_tv") or [None])[0]
-    unit = (objs.get("tv_unit") or [None])[0]
-    sofa = (objs.get("sofa") or [None])[0]
+    unit = _real_unit(objs.get("tv_unit") or [], w)
     anchored = True
     if old is not None:
         ob = room.first("existing_tv")
@@ -144,7 +160,8 @@ def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float,
         anchored = False
         zc = TV_CENTRE_ABOVE_FLOOR_CM
         lo, hi = _u_range(wall, zc)
-        uc = sofa.uc if sofa is not None and lo <= sofa.uc <= hi else (lo + hi) / 2
+        sofa = _facing_sofa(objs.get("sofa") or [], lo, hi)
+        uc = sofa.uc if sofa is not None else (lo + hi) / 2  # else the middle of the visible wall
         if sofa is not None and uc - w / 2 < sofa.u1 and uc + w / 2 > sofa.u0 and zc - h / 2 < sofa.z1 + 10:
             zc = sofa.z1 + TV_ABOVE_SOFA_CM + h / 2
     zc = min(zc, ceiling - CEILING_MARGIN_CM - h / 2) if h < ceiling - 2 * CEILING_MARGIN_CM else zc
@@ -250,6 +267,7 @@ def plan(
                 depth=front,
                 back=back,
                 door=getattr(p, "door", None),
+                photo=getattr(p, "photo", None) if p is primary else None,
             )
         )
     return out

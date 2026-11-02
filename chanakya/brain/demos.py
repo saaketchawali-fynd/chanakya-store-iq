@@ -37,7 +37,8 @@ def rank_demos(opts: OptionSet, home: HomeCard, pack: Pack, guides: dict) -> lis
             if best.product.spec(d.differs_on) == o.product.spec(d.differs_on):
                 continue
             fo = {c.rule_id: c.match for c in fit(o.product, home, pack, guides).contributions}
-            s = (rule.weight * abs(fb.get(rule.id, 0) - fo.get(rule.id, 0))) if rule else 0.0
+            # signed: a demo only where the best pick really is better (its line says "{best} … better")
+            s = (rule.weight * (fb.get(rule.id, 0) - fo.get(rule.id, 0))) if rule else 0.0
             if s > top or top_label is None:
                 top, top_label = s, o.label
         if top_label is not None and top > 0:
@@ -50,8 +51,9 @@ def rank_demos(opts: OptionSet, home: HomeCard, pack: Pack, guides: dict) -> lis
         if d and all(x[0].id != fid for x in out):
             alt = next((o.label for o in others), "A")
             out.append((d, alt, 0.0))
-    if not out and pack.demos:
-        out.append((pack.demos[-1], others[0].label if others else "A", 0.0))
+    neutral = [d for d in pack.demos if not d.differs_on]  # a last resort that claims nothing about either
+    if not out and neutral:
+        out.append((neutral[-1], others[0].label if others else "A", 0.0))
     return out
 
 

@@ -60,6 +60,10 @@ price_rescue:
   line: {hi: "₹{low} से ₹{high} तक है। आपके कमरे के हिसाब से सही वाला दिखाऊँ? बस 2 सवाल।",
          mr: "₹{low} ते ₹{high} पर्यंत आहे. तुमच्या खोलीनुसार योग्य दाखवू का? फक्त 2 प्रश्न.",
          en: "It's between ₹{low} and ₹{high}. Shall I show the right one for your room? Just 2 questions."}
+price_rescue_known:
+  line: {hi: "₹{low} से ₹{high} तक है। आपके कमरे के हिसाब से सही वाले दिखाऊँ?",
+         mr: "₹{low} ते ₹{high} पर्यंत आहे. तुमच्या खोलीनुसार योग्य ते दाखवू का?",
+         en: "It's between ₹{low} and ₹{high}. Shall I show the right ones for your room?"}
 need_validation:
   line: {hi: "बहुत सही सोचा है, एक बार घर से मिला लेते हैं।",
          mr: "छान विचार केलाय, एकदा घराशी जुळवून बघू.",

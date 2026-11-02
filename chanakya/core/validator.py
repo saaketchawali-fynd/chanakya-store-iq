@@ -30,12 +30,22 @@ class Check:
     fatal: bool = False
 
 
+IMAGE_KEYS = ("image", "product_image", "photo")
+
+
+def _is_ref(s: str) -> bool:
+    """A picture reference (URL / data URI / file path), never shown as text: its digits are not claims."""
+    return s.startswith(("data:", "http://", "https://")) or s.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+
+
 def _strings(obj: Any):
     if isinstance(obj, str):
-        yield obj
+        if not _is_ref(obj):
+            yield obj
     elif isinstance(obj, dict):
-        for v in obj.values():
-            yield from _strings(v)
+        for k, v in obj.items():
+            if k not in IMAGE_KEYS:
+                yield from _strings(v)
     elif isinstance(obj, (list, tuple)):
         for v in obj:
             yield from _strings(v)
@@ -54,14 +64,8 @@ def _visible_texts(m: OutMessage) -> list[str]:
 
 def _card_strings(data: dict):
     for k, v in data.items():
-        if k in ("image", "product_image") or (isinstance(v, str) and v.startswith("data:")):
-            continue
-        if isinstance(v, (bytes, bytearray)):
-            continue
-        if isinstance(v, list) and k == "options":
-            for o in v:
-                yield from ((kk, s) for kk, vv in o.items() if kk != "image" for s in _strings(vv))
-            continue
+        if k in IMAGE_KEYS or isinstance(v, (bytes, bytearray)):
+            continue  # pictures (at any depth: options, catalogue items, compare sides) are not text
         for s in _strings(v):
             yield k, s
 

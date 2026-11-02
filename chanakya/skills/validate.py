@@ -7,6 +7,7 @@ import re
 from chanakya.ai.rules import contains_any
 from chanakya.brain.fit import fit
 from chanakya.brain.options import candidate_set
+from chanakya.core import state
 from chanakya.core.buttons import encode
 from chanakya.core.coach import coach_reply, info_reply
 from chanakya.core.contracts import Reply
@@ -36,7 +37,7 @@ def mark_first_price(ctx: SkillContext, who: str) -> None:
 
 def _demo_best_name(ctx: SkillContext) -> str:
     s = ctx.session
-    sku = s.option_labels.get("B") or ctx.x.get("label_sku")
+    sku = state.best_sku(s) or ctx.x.get("label_sku")
     p = ctx.facts.product_sync(sku) if sku else None
     return C.product_name(ctx, p) if p else ctx.t("this_product", ctx.clang)
 
@@ -45,11 +46,12 @@ async def myth(ctx: SkillContext, claim_id: str) -> Reply:
     m = ctx.packs.myth(claim_id, ctx.session.home.category)
     if m is None:
         return await unknown_claim(ctx, claim_id)
+    ctx.x["last_claim_text"] = m.belief or claim_id  # what "Expert se poocho" asks about
     line = ctx.pick(m.line, ctx.clang)
     if "{monthly_bill}" in line:
         from chanakya.truth.hisaab import lifetime_cost
 
-        sku = ctx.session.chosen_sku or ctx.session.option_labels.get("B") or ctx.x.get("label_sku")
+        sku = ctx.session.chosen_sku or state.best_sku(ctx.session) or ctx.x.get("label_sku")
         p = ctx.facts.product_sync(sku) if sku else None
         lt = await lifetime_cost(p, ctx.facts, ctx.reg) if p else None
         line = (
@@ -117,11 +119,11 @@ async def price_rescue(ctx: SkillContext) -> Reply:
     lo_s = ctx.reg.inr(low, "calc:range_low").lstrip("₹")
     hi_s = ctx.reg.inr(high, "calc:range_high").lstrip("₹")
     ctx.reg.sources.append(src)
-    line = ctx.pick(ctx.packs.common_line("price_rescue"), ctx.clang)
+    slot = C.pick_next_slot(ctx)
+    line = ctx.pick(ctx.packs.common_line("price_rescue" if slot else "price_rescue_known"), ctx.clang)
     say = line.format(low=lo_s, high=hi_s)
     ctx.ev("price_range_given", sources=[p.price_source for p in pool], low=low, high=high)
     mark_first_price(ctx, "customer")
-    slot = C.pick_next_slot(ctx)
     if slot:
         return ctx.reply(C.question_reply(ctx, slot, say_override=say, why_override=ctx.t("kyun_price_rescue")))
     cites = C.known_cites(ctx)
@@ -158,7 +160,7 @@ async def honest_version(ctx: SkillContext, phrase: str) -> Reply:
     cat = s.home.category if s else (ctx.staff.dept if ctx.staff else "tv")
     stock_words = ("piece", "पीस", "stock")
     if any(w in phrase for w in stock_words):
-        sku = (s.chosen_sku or s.option_labels.get("B") or ctx.x.get("label_sku")) if s else None
+        sku = (s.chosen_sku or state.best_sku(s) or ctx.x.get("label_sku")) if s else None
         p = ctx.facts.product_sync(sku) if sku else None
         if p and not p.stock_known:  # Jio: availability only, never a count
             honest = ctx.t("honest_available" if p.in_stock else "stock_unavailable", ctx.clang,

@@ -189,9 +189,12 @@ async def approval_action(ctx: SkillContext, task_id: str, action: str) -> Reply
     alang = staff.lang if staff else "hi"
     await repo.task_update(t.id, status="done")
     if action == "no":
+        sd = await ctx.svc.sessions.get(t.session_id) if t.session_id else None
+        btns = [Button(id=encode("s", sd.code, "offers"), title=truncate_title(ctx.t("b_offers", alang)))] if sd else []
         return ctx.reply(
             info_reply(ctx, ctx.t("approval_closed")),
-            OutMessage(to=assoc, kind="text", body=ctx.t("approval_denied", alang)),
+            OutMessage(to=assoc, kind="buttons" if btns else "text", body=ctx.t("approval_denied", alang), buttons=btns,
+                       session_id=sd.id if sd else None),
         )
     # Managers can only point to offers that exist in the data.
     from chanakya.core.clock import today

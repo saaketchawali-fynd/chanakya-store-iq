@@ -36,6 +36,7 @@ class TryonProduct:
     dims_text: str | None = None  # e.g. '123 × 71 cm' (pre-formatted), second line of the label
     mount: str = "wall"  # TV: wall | stand
     door: str | None = None  # fridge: single | double | bottom_freezer | side_by_side
+    photo: bytes | None = field(default=None, repr=False)  # catalogue photo: the real product is drawn from it
 
 
 @dataclass

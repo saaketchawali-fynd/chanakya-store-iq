@@ -45,3 +45,21 @@ def add_override(s: SessionState, gate: str, reason: str, at: datetime) -> None:
     if gate == "price" and "price_first_by" not in s.extra and not s.demo_done:
         s.extra["price_first_by"] = "customer" if reason == "asked" else "associate"
         s.extra["price_first_reason"] = reason
+
+
+# ---------------------------------------------------------------- the options' roles (labels stay A, B, C in order)
+def option_role(s: SessionState, label: str) -> str | None:
+    """value | best | step for an option label (B is the best fit unless there is no cheaper option)."""
+    roles = (s.extra or {}).get("option_roles") or {}
+    return roles.get(label) or {"A": "value", "B": "best", "C": "step"}.get(label)
+
+
+def best_label(s: SessionState) -> str:
+    roles = (s.extra or {}).get("option_roles") or {}
+    return next((lab for lab, r in roles.items() if r == "best"), "B")
+
+
+def best_sku(s: SessionState) -> str | None:
+    """The best-fit option's SKU (never assume it is labelled B)."""
+    return s.option_labels.get(best_label(s))
+

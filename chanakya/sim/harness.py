@@ -117,11 +117,25 @@ class Harness:
         mid = self.ch.put_media(data, mime, p.name)
         return await self._send(type="image", media_id=mid, mime_type=mime, text=caption)
 
+    def _context(self, reply_id: str) -> str | None:
+        """Like WhatsApp: a tap carries the id of the message the button (or list row) was on."""
+        for sent in reversed(self.ch.sent):
+            m = sent.msg
+            if m.to != self.phone:
+                continue
+            if any(b.id == reply_id for b in m.buttons) or any(
+                r.id == reply_id for sec in (m.sections or []) for r in sec.rows
+            ):
+                return sent.wamid
+        return None
+
     async def tap(self, button_id: str, title: str = "") -> list[OutMessage]:
-        return await self._send(type="button_reply", reply_id=button_id, text=title)
+        return await self._send(type="button_reply", reply_id=button_id, text=title,
+                                context_message_id=self._context(button_id))
 
     async def pick(self, row_id: str, title: str = "") -> list[OutMessage]:
-        return await self._send(type="list_reply", reply_id=row_id, text=title)
+        return await self._send(type="list_reply", reply_id=row_id, text=title,
+                                context_message_id=self._context(row_id))
 
     async def clock(self, arg: str) -> list[OutMessage]:
         prev = self.who

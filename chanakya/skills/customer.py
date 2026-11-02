@@ -4,7 +4,7 @@ Chanakya never auto-answers the customer with facts; the associate replies (pref
 from __future__ import annotations
 
 from chanakya.core import repo
-from chanakya.core.buttons import ButtonId
+from chanakya.core.buttons import ButtonId, encode
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, OutMessage, Reply
 from chanakya.core.status import short_name
 from chanakya.skills.base import SkillContext
@@ -25,7 +25,7 @@ async def optin(ctx: SkillContext, token: str) -> Reply:
 
     s = await ctx.svc.sessions.by_token(token.strip())
     if s is None:
-        return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_unknown_token", "hi")))
+        return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_unknown_token", CUSTOMER_PHONE_LANG)))
     ctx.session = s
     return await follow.record_consent(ctx, ctx.actor_wa_id, "qr")
 
@@ -89,19 +89,24 @@ async def install_reply(ctx: SkillContext, action: str) -> Reply:
         tl["ready_at"] = ctx.now.isoformat()
         await repo.install_update(job.id, timeline=tl)
         return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_ready_ack", lang)))
-    if action == "change":
-        t = await repo.task_create(
-            a,
-            "callback",
-            {lg: ctx.t("task_change_day", lg) for lg in ("hi", "mr", "en")},
-            ctx.now,
-            s.id,
-            {"job_id": job.id},
-        )
-        ctx.ev("task_created", task_id=t.id, kind="callback", owner=a, due_at=ctx.now.isoformat())
+    if action == "change":  # pause the job (no 'is it done?' for the old slot) and let the associate re-book
+        await repo.install_update(job.id, status="paused", timeline=tl)
+        s.extra["install_paused"] = True
+        await ctx.svc.sessions.save(s, ctx.now)
+        ctx.ev("install_change_requested", job_id=job.id)
+        from chanakya.skills import follow
+
+        with ctx.as_lang(alang):
+            prev, ctx.session = ctx.session, s
+            slots = follow.slot_choices(ctx)
+            btns = [Button(id=encode("s", s.code, "islot", sid), title=label[:20]) for sid, (label, *_r) in slots.items()]
+            body = ctx.t("cust_change_rebook", alang, name=_name(ctx))
+            ctx.session = prev
+        for b in btns:
+            ctx.reg.static(b.title)
         return ctx.reply(
             OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("cust_change_ack", lang)),
-            OutMessage(to=a, kind="text", body=ctx.t("cust_change_assoc", alang, name=_name(ctx))),
+            OutMessage(to=a, kind="buttons", body=body, buttons=btns, session_id=s.id),
         )
     if action == "working":
         tl["done_at"] = ctx.now.isoformat()
@@ -145,6 +150,7 @@ async def relay(ctx: SkillContext) -> Reply:
     alang = await _assoc_lang(ctx)
     a = s.associate_wa_id
     inb = ctx.inbound
+    await repo.setting_set(f"last_customer_session:{a}", s.id)  # the associate's 'r …' goes back to this customer
     if (inb.text or "").strip().upper() in ("STOP", "BAND", "बंद"):
         s.extra["opted_out"] = True
         s.consent = None
@@ -172,15 +178,26 @@ async def relay(ctx: SkillContext) -> Reply:
         OutMessage(
             to=a,
             kind="text",
-            body=ctx.t("cust_msg_assoc", alang, name=_name(ctx), text=text[:300]),
+            body=ctx.reg.raw(f"[{s.code}]", "session:code") + " " + ctx.t("cust_msg_assoc", alang, name=_name(ctx), text=text[:300]),
             allowed_numbers=ctx.reg.allowed(),
         )
     )
 
 
 async def associate_reply(ctx: SkillContext, text: str) -> Reply:
-    """Associate typed 'r <message>' → relayed to the linked customer (their words, their responsibility)."""
-    s = ctx.session
+    """Associate typed 'r <message>' (or 'r C2 <message>') → relayed to that customer: by default the one who
+    wrote last, even after the sale; never to whoever happens to be the current customer."""
+    import re as _re
+
+    s = None
+    m = _re.match(r"^(C\d{1,3})\s+(.+)$", text.strip(), _re.S)
+    if m:
+        s = await ctx.svc.sessions.by_code(ctx.actor_wa_id, m.group(1))
+        text = m.group(2) if s else text
+    if s is None:
+        sid = await repo.setting_get(f"last_customer_session:{ctx.actor_wa_id}")
+        s = await ctx.svc.sessions.get(sid) if sid else None
+    s = s or ctx.session
     if not s or not s.customer_wa_id:
         return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("no_customer_linked")))
     ctx.reg.raw(text, "associate:relay")

@@ -162,6 +162,8 @@ class SessionRepo:
         await self.save(st, now)
         async with db.session() as s:
             staff = (await s.execute(select(Staff).where(Staff.wa_id == st.associate_wa_id))).scalar_one_or_none()
-            if staff and staff.current_session_id == st.id:
+            from chanakya.core.orchestrator import AFTER_SALE_AWAIT
+
+            if staff and staff.current_session_id == st.id and st.awaiting not in AFTER_SALE_AWAIT:
                 staff.current_session_id = None
             await s.commit()

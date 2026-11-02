@@ -9,7 +9,16 @@ from chanakya.ai.client import AIUnavailable
 from chanakya.core import clock, repo, state
 from chanakya.core.buttons import ButtonId, decode, encode
 from chanakya.core.coach import info_reply
-from chanakya.core.contracts import Button, InboundMessage, ListRow, ListSection, OutMessage, Reply, Step
+from chanakya.core.contracts import (
+    CUSTOMER_PHONE_LANG,
+    Button,
+    InboundMessage,
+    ListRow,
+    ListSection,
+    OutMessage,
+    Reply,
+    Step,
+)
 from chanakya.log import get_log
 from chanakya.skills import (
     assess,
@@ -109,8 +118,10 @@ async def build_context(msg: InboundMessage, svc) -> SkillContext:
     if staff:
         role = staff.role
         if staff.current_session_id:
+            from chanakya.core.orchestrator import AFTER_SALE_AWAIT
+
             session = await svc.sessions.get(staff.current_session_id)
-            if session and session.step == Step.CLOSED:
+            if session and session.step == Step.CLOSED and session.awaiting not in AFTER_SALE_AWAIT:
                 session = None
     else:
         session = await svc.sessions.by_customer(msg.from_wa_id)
@@ -141,7 +152,7 @@ async def dispatch(ctx: SkillContext) -> Reply:
         if ctx.actor_wa_id in _unknown_replied:
             return Reply()
         _unknown_replied.add(ctx.actor_wa_id)
-        return Reply(messages=[OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("unknown_number", "hi"))])
+        return Reply(messages=[OutMessage(to=ctx.actor_wa_id, kind="text", body=ctx.t("unknown_number", CUSTOMER_PHONE_LANG))])
     if ctx.role == "customer":
         return await dispatch_customer(ctx)
     # staff: demo + shared commands first
@@ -198,7 +209,19 @@ async def dispatch(ctx: SkillContext) -> Reply:
             return await visitlog.export(ctx)
         if msg.type in ("text", "audio"):
             return await visitlog.on_note(ctx)
+    if ctx.role in ("manager", "expert", "visitor"):  # never an associate's sales session from another role's phone
+        return _role_help(ctx)
     return await dispatch_associate(ctx, name, arg)
+
+
+def _role_help(ctx: SkillContext) -> Reply:
+    if ctx.role == "manager":
+        btns = [ctx.b("b_digest", encode("m", "digest")), ctx.b("b_team", encode("m", "team")),
+                ctx.b("b_approvals", encode("m", "approvals"))]
+        return ctx.reply(info_reply(ctx, ctx.t("manager_help"), btns))
+    if ctx.role == "visitor":
+        return ctx.reply(info_reply(ctx, ctx.t("visit_start")))
+    return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
 
 
 LANG_BUTTONS = (("en", "English"), ("hi", "हिंदी"), ("mr", "मराठी"))
@@ -334,15 +357,42 @@ async def dispatch_customer(ctx: SkillContext) -> Reply:
     return await customer.relay(ctx)
 
 
-async def _switch_to(ctx: SkillContext, code: str) -> bool:
-    s = await ctx.svc.sessions.by_code(ctx.actor_wa_id, code)
-    if s is None or s.step == Step.CLOSED:
+# Follow-through actions keep working after the conversation closed (task reminders, install booking, the
+# outcome, a voice note or card for the customer, a call logged days later).
+AFTER_SALE = {"parivaar", "qr", "consent_tap", "voice_add", "task", "task_when", "taskdone", "tasksnooze", "khatam",
+              "sold", "outcome", "pricefirst", "islot", "called", "sendoffer"}
+
+
+async def _button_session(ctx: SkillContext, code: str):
+    """The session a tapped button belongs to: the exact one its message was sent for (codes C1, C2… restart
+    every day, so yesterday's C1 must not act on today's C1); without that link, today's session with the code."""
+    sid = await repo.message_session(ctx.inbound.context_message_id)
+    s = await ctx.svc.sessions.get(sid) if sid else None
+    if s is not None and s.associate_wa_id == ctx.actor_wa_id:
+        return s
+    return await ctx.svc.sessions.by_code(ctx.actor_wa_id, code)
+
+
+async def _switch_to(ctx: SkillContext, code: str, action: str | None = None) -> bool | str:
+    s = await _button_session(ctx, code)
+    if s is None:
         return False
+    if s.step == Step.CLOSED and action not in AFTER_SALE:
+        return "closed"
     if ctx.session and ctx.session.id != s.id:
         await ctx.svc.sessions.save(ctx.session, ctx.now)
     ctx.session = s
-    ctx.staff.current_session_id = s.id
+    if s.step != Step.CLOSED:
+        ctx.staff.current_session_id = s.id
     return True
+
+
+def _closed_reply(ctx: SkillContext, code: str) -> Reply:
+    """A button from a finished conversation: say so, and offer the way forward (never a silent fallback)."""
+    from chanakya.core.coach import info_reply
+
+    body = ctx.t("button_from_closed", code=ctx.reg.static(code))
+    return ctx.reply(info_reply(ctx, body, [ctx.b("b_new_customer", "g:new"), ctx.b("b_status", "g:status")]))
 
 
 async def dispatch_associate(ctx: SkillContext, name: str | None, arg: str) -> Reply:
@@ -355,7 +405,10 @@ async def dispatch_associate(ctx: SkillContext, name: str | None, arg: str) -> R
         if bid.scope == "g":
             return await global_action(ctx, bid)
         if bid.scope == "s":
-            if not await _switch_to(ctx, bid.get(0)):
+            ok = await _switch_to(ctx, bid.get(0), bid.get(1))
+            if ok == "closed":
+                return _closed_reply(ctx, bid.get(0))
+            if not ok:
                 return await _fallback(ctx)
             return await session_action(ctx, bid.get(1), list(bid.parts[2:]))
         return await _fallback(ctx)
@@ -577,6 +630,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         return await review.price_first(ctx, a0 or "none")
     if action == "islot":
         return await follow.create_install(ctx, a0 or "t1")
+    if action in ("taskdone", "tasksnooze") and a0 and a0.isdigit():
+        return await follow.task_action(ctx, int(a0), action == "taskdone")
     if action == "oldtv":
         return await tryon_flow.set_old_tv(ctx, a0 or "none")
     if action == "wallw":
@@ -631,6 +686,9 @@ async def on_speech(ctx: SkillContext) -> Reply:
     if s and s.awaiting == "lost_reason":
         s.awaiting = None
         s.home.notes.append("lost_reason: " + (text or "[voice note]"))
+        ctx.ev("lost_reason", text=(text or "[voice note]")[:200])  # for the manager's Digest and the review
+        if ctx.staff and ctx.staff.current_session_id == s.id:
+            ctx.staff.current_session_id = None
         return ctx.reply(info_reply(ctx, ctx.t("noted"), [ctx.b("b_new_customer", encode("g", "new"))]))
     # guards on what the associate typed
     if text and not text.startswith("FIX:"):
@@ -678,13 +736,17 @@ async def on_speech(ctx: SkillContext) -> Reply:
         s.extra["pending_u"] = u.model_dump()
         return assess.category_question(ctx)
     gate_before = state.options_gate_open(s, ctx.pack)
-    assess.apply_understanding(ctx, u, "voice" if msg.type == "audio" or (text or "").startswith("FIX:") else "text")
+    n_new = assess.apply_understanding(ctx, u, "voice" if msg.type == "audio" or (text or "").startswith("FIX:") else "text")
     s.extra["last_claim_text"] = tr[:200]
     intents = set(u.intents)
     m = FEATURES_OF_OPTION.search(tr)
     if m and s.option_labels.get(m.group(1).upper()):  # "B ke features" → Translate for that option
         return await translate.show_sku(ctx, s.option_labels[m.group(1).upper()])
     if "price_asked" in intents:
+        if s.chosen_sku and (s.cost_snapshot or {}).get("sku") == s.chosen_sku:
+            return await complete.show_cost(ctx, resend=True)  # the full cost they already saw
+        if s.shortlist and state.price_gate_open(s, ctx.pack):
+            return await recommend.prefer(ctx)  # which one? then its full cost
         return await validate.price_rescue(ctx)
     if u.claim_id:
         return await validate.myth(ctx, u.claim_id)
@@ -708,7 +770,7 @@ async def on_speech(ctx: SkillContext) -> Reply:
         return await complete.show_cost(ctx)
     if "request_offers" in intents:
         return await close.offers(ctx)
-    return await assess.on_info(ctx, u, applied=True, gate_before=gate_before)
+    return await assess.on_info(ctx, u, applied=True, gate_before=gate_before, n_new=n_new)
 
 
 async def on_image(ctx: SkillContext) -> Reply:

@@ -69,6 +69,8 @@ def score(events: list[Event], extra: dict) -> tuple[dict[str, int], dict]:
 
 
 async def khatam(ctx: SkillContext) -> Reply:
+    if ctx.x.get("outcome") == "sold":  # already known (a delivery day was booked): don't ask again
+        return await outcome(ctx, "sold")
     btns = [
         ctx.b("b_sold", ctx.sid("outcome", "sold")),
         ctx.b("b_followup", ctx.sid("outcome", "followup")),
@@ -129,7 +131,7 @@ async def finish(ctx: SkillContext) -> Reply:
     steps, facts = score(all_events, s.extra)
     total = sum(steps.values())
     lowest = min(STEPS, key=lambda st: (steps[st], STEPS.index(st)))
-    tip = ctx.t(f"tip_{lowest}")
+    tip = ctx.t("tip_perfect") if total >= 14 else ctx.t(f"tip_{lowest}")
     praise = _praise(ctx, steps, facts)
     score_str = ctx.reg.num(total, "calc:score")
     ctx.reg.static("14")
@@ -155,8 +157,10 @@ async def finish(ctx: SkillContext) -> Reply:
     ctx.ev("score_computed", steps=steps, total=total)
     ctx.ev("session_closed", outcome=ctx.x.get("outcome"))
     s.step = Step.CLOSED
-    if ctx.staff and ctx.staff.current_session_id == s.id:
-        ctx.staff.current_session_id = None
+    from chanakya.core.orchestrator import AFTER_SALE_AWAIT
+
+    if ctx.staff and ctx.staff.current_session_id == s.id and s.awaiting not in AFTER_SALE_AWAIT:
+        ctx.staff.current_session_id = None  # (kept while the lost reason / a voice note is awaited)
     ctx.scratch["close_session"] = True
     return ctx.reply(info_reply(ctx, caption, btns, card=card))
 

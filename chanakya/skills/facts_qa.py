@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 
+from chanakya.core import state
 from chanakya.core.buttons import encode
 from chanakya.core.coach import info_reply
 from chanakya.core.contracts import Reply
@@ -73,7 +74,7 @@ def _context_sku(ctx: SkillContext, text: str) -> str | None:
         m = re.search(r"\b(?:option\s*)?([ABC])\b", text)
         if m and s.option_labels.get(m.group(1)):
             return s.option_labels[m.group(1)]
-        return s.extra.get("label_sku") or s.chosen_sku or s.option_labels.get("B")
+        return s.extra.get("label_sku") or s.chosen_sku or state.best_sku(s)
     return None
 
 

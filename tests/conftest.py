@@ -27,6 +27,17 @@ async def make_harness(tmp: Path, **kw) -> Harness:
     return await Harness.create(db_url(tmp), **kw)
 
 
+@pytest.fixture(autouse=True)
+def no_remote_images(monkeypatch):
+    """Tests never download product pictures from the internet (backend media URLs): offline and repeatable."""
+    from chanakya.render import renderer
+
+    async def offline(card):
+        return None
+
+    monkeypatch.setattr(renderer, "fetch_images", offline)
+
+
 @pytest.fixture
 async def h(tmp_path):
     hh = await make_harness(tmp_path)

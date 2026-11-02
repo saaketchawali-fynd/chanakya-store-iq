@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import io
 from dataclasses import replace
 
@@ -12,7 +13,7 @@ from chanakya.brain import packs as P
 from chanakya.brain.fit import fit, tv_size_range
 from chanakya.brain.options import candidate_set
 from chanakya.channel.limits import truncate
-from chanakya.core import repo
+from chanakya.core import repo, state
 from chanakya.core.coach import coach_reply, info_reply
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, ListRow, ListSection, OutMessage, Reply
 from chanakya.log import get_log
@@ -35,7 +36,9 @@ PLACEABLE = ("tv", "ac", "wm", "fridge")
 def interested(ctx: SkillContext) -> list[str]:
     """Products in play, in a sensible order: options B, A, C, then labels scanned / compared / picked."""
     s = ctx.session
-    out = [s.option_labels[k] for k in ("B", "A", "C") if s.option_labels.get(k)]
+    best = state.best_label(s)
+    out = [s.option_labels[k] for k in (best, "A", "B", "C") if s.option_labels.get(k)]
+    out = list(dict.fromkeys(out))
     out += s.extra.get("interested", [])
     if s.chosen_sku:
         out.insert(0, s.chosen_sku)
@@ -148,8 +151,8 @@ def pick_products(ctx: SkillContext) -> list:
     s = ctx.session
     pack = ctx.pack
     f = ctx.facts
-    if s.option_labels.get("B"):
-        out = [f.product_sync(s.option_labels["B"])]
+    if state.best_sku(s):
+        out = [f.product_sync(state.best_sku(s))]
         c = s.option_labels.get("C")
         if c and f.product_sync(c).spec("size_in") != out[0].spec("size_in"):
             out.append(f.product_sync(c))
@@ -200,6 +203,15 @@ def _label(ctx: SkillContext, p) -> str:
         name = " ".join(w for w in p.model.split() if w != str(int(size)))
         return f'{ctx.reg.num(size, f"spec:{p.sku}:size_in")}" · {name}'
     return p.model
+
+
+async def _photo(p) -> bytes | None:
+    try:
+        from chanakya.render.renderer import image_bytes
+
+        return await asyncio.wait_for(image_bytes(p.image), timeout=6)
+    except Exception:
+        return None
 
 
 async def _room(ctx: SkillContext):
@@ -274,6 +286,8 @@ async def job(ctx: SkillContext) -> Reply:
                 extra["mount"] = mount
             if p.category == "fridge":
                 extra["door"] = p.spec("door")
+            if solid:  # the real product is drawn from its catalogue photo when that cuts out cleanly
+                extra["photo"] = await _photo(p)
             tps.append(TryonProduct(sku=p.sku, category=p.category, width_mm=p.spec("width_mm"),
                                     height_mm=p.spec("height_mm"), label=_label(ctx, p), solid=solid, **extra))
         only_tv = all(p.category == "tv" for p, _ in pl)

@@ -30,14 +30,20 @@ def coach_reply(
     st = status_line(ctx) if status else ""
     if st:
         body += "\n" + st
+    if footer is None and ctx.session is not None:  # the voice/menu hint for the first few replies, then no clutter
+        n = int(ctx.session.extra.get("hints", 0))
+        ctx.session.extra["hints"] = n + 1
+        footer = ctx.t("footer_voice") if n < 3 else None
+    elif footer is None:
+        footer = ctx.t("footer_voice")
     return OutMessage(
         to=ctx.actor_wa_id,
         kind="buttons" if buttons else "text",
         body=body,
-        footer=footer or ctx.t("footer_voice"),
+        footer=footer,
         buttons=buttons[:3],
         card=card,
-        coach=True,
+        coach=bool(cites),  # a reason grounded in a Home Card fact; with none known yet it is sent as plain advice
         why_cites=cites,
         allowed_numbers=ctx.reg.allowed(),
     )

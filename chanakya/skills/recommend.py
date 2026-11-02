@@ -28,7 +28,7 @@ def gate_options_reply(ctx: SkillContext) -> Reply:
 
 def gate_price_reply(ctx: SkillContext) -> Reply:
     s = ctx.session
-    best = ctx.facts.product_sync(s.option_labels["B"]) if s.option_labels.get("B") else None
+    best = ctx.facts.product_sync(state.best_sku(s)) if state.best_sku(s) else None
     if not state.options_gate_open(s, ctx.pack):
         n = state.missing_for_options(s, ctx.pack)
         body = ctx.t("gate_price_assess", n=ctx.reg.num(n, "calc:gate_missing"))
@@ -139,6 +139,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
     if opts is None:
         return ctx.reply(info_reply(ctx, ctx.t("no_options"), [ctx.b("b_expert", ctx.sid("expert"))]))
     s.option_labels = {o.label: o.product.sku for o in opts.options}
+    s.extra["option_roles"] = {o.label: o.role for o in opts.options}
     best, value, step = opts.by_role("best"), opts.by_role("value"), opts.by_role("step")
     s.shortlist = [o.product.sku for o in (best, value, step) if o]
     from chanakya.skills.tryon_flow import add_interest
@@ -172,6 +173,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
         btns.append(ctx.b("b_tryon", ctx.sid("tryon")))
     btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
     m1 = C.with_copy(ctx, info_reply(ctx, "\n".join(lines), btns, card=card), copy)
+    m1.footer = ctx.t("footer_label_hint")[:60]  # Translate: a label photo gives the benefits for this home
     if ctx.x.pop("rerank_note", None):
         m1.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
     return ctx.reply(m1)
@@ -191,13 +193,13 @@ async def demo(ctx: SkillContext) -> Reply:
         d, other, _ = nxt
         s.demo_recipe = d.id
         ctx.x["demo_other"] = other
-    best = ctx.facts.product_sync(s.option_labels["B"]) if s.option_labels.get("B") else None
-    from chanakya.brain.fit import fit
+    from chanakya.brain.demos import _rule_for_spec
 
-    reason_key = None
-    if best:
-        top = fit(best, s.home, ctx.pack, ctx.facts.snap.guides).top_rule()
-        reason_key = top if top in ctx.pack.reasons else None
+    rule = _rule_for_spec(ctx.pack, d.differs_on) if d.differs_on else None  # the reason THIS demo shows
+    reason_key = rule.id if rule is not None and rule.id in ctx.pack.reasons else None
+    sent = ctx.x.setdefault("demos_sent", [])
+    if d.id not in sent:  # so "Dusra demo" shows a different one
+        sent.append(d.id)
     ctx.ev("demo_recipe_sent", recipe=d.id)
     return ctx.reply(demo_message(ctx, d, ctx.x.get("demo_other"), reason_key=reason_key))
 
@@ -213,9 +215,9 @@ async def prefer(ctx: SkillContext) -> Reply:
     rows = []
     for lab, sku in sorted(s.option_labels.items()):
         p = ctx.facts.product_sync(sku)
-        role = {"A": "value_fit", "C": "step_up"}.get(lab)
+        role = {"value": "value_fit", "step": "step_up"}.get(state.option_role(s, lab))
         reason = _reason(ctx, role, ctx.lang) if role else ""
-        if lab == "B":
+        if state.option_role(s, lab) == "best":
             from chanakya.brain.fit import fit
 
             top = fit(p, s.home, ctx.pack, ctx.facts.snap.guides).top_rule()
@@ -225,7 +227,8 @@ async def prefer(ctx: SkillContext) -> Reply:
     rows.append(ListRow(id=ctx.sid("nonefit"), title=ctx.t("row_none_fit"), description=ctx.t("row_none_fit_d")))
     ctx.reg.static(" ".join((r.description or "") for r in rows))
     cites = C.known_cites(ctx)
-    msg = coach_reply(ctx, ctx.tc("bolo_prefer"), ctx.t("kyun_prefer"), cites, [])
+    key = "bolo_prefer_personal" if ctx.pack.category == "laptop" else "bolo_prefer"  # a laptop is for a person
+    msg = coach_reply(ctx, ctx.tc(key), ctx.t("kyun_prefer"), cites, [])
     msg.kind = "list"
     msg.list_button = truncate_title(ctx.t("list_prefer"))
     msg.sections = [ListSection(rows=rows)]
@@ -272,7 +275,7 @@ async def rerank(ctx: SkillContext, how: str) -> Reply:
 def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str | None = None) -> OutMessage:
     s = ctx.session
     pack = ctx.pack
-    best_p = ctx.facts.product_sync(s.option_labels["B"]) if s.option_labels.get("B") else None
+    best_p = ctx.facts.product_sync(state.best_sku(s)) if state.best_sku(s) else None
     other_p = (
         ctx.facts.product_sync(s.option_labels[other_label])
         if other_label and s.option_labels.get(other_label)
@@ -315,6 +318,8 @@ async def demo2(ctx: SkillContext) -> Reply:
     if nxt is None:
         ctx.x["demos_sent"] = []
         nxt = pick_demo(opts, s.home, ctx.pack, ctx.facts.snap.guides)
+    if nxt is None:  # no other honest difference to show: ask which one felt right
+        return await prefer(ctx)
     d, other, _ = nxt
     s.demo_recipe = d.id
     ctx.x.setdefault("demos_sent", []).append(d.id)
@@ -329,6 +334,12 @@ async def override(ctx: SkillContext, gate: str, reason: str) -> Reply:
     note = info_reply(ctx, ctx.t("override_logged"))
     if gate == "options":
         r = await show_options(ctx)
+        r.messages.insert(0, note)
+        return r
+    if not s.option_labels and not state.options_gate_open(s, ctx.pack):
+        from chanakya.skills import validate  # nothing known about the home yet: an honest range + one question
+
+        r = await validate.price_rescue(ctx)
         r.messages.insert(0, note)
         return r
     if ctx.x.get("pending_after_override") == "offers":

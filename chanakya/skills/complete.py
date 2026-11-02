@@ -58,7 +58,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         ctx.x["pending_after_override"] = "cost"
         return gate_price_reply(ctx)
     if not s.chosen_sku:
-        s.chosen_sku = s.option_labels.get("B")
+        s.chosen_sku = state.best_sku(s)
     if not s.chosen_sku:
         return await show_options(ctx)
     site = _pending_site_slot(ctx)

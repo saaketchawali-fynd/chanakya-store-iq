@@ -71,6 +71,15 @@ async def message_insert(wa_message_id: str, direction: str, wa_id: str, type_: 
             return False
 
 
+async def message_session(wa_message_id: str | None) -> str | None:
+    """The customer session an outgoing message (with buttons) belonged to."""
+    if not wa_message_id:
+        return None
+    async with db.session() as s:
+        r = (await s.execute(select(MessageRow).where(MessageRow.wa_message_id == wa_message_id))).scalar_one_or_none()
+        return (r.payload or {}).get("session_id") if r and r.direction == "out" else None
+
+
 async def last_inbound_at(wa_id: str) -> datetime | None:
     async with db.session() as s:
         r = (

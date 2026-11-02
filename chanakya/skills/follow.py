@@ -32,11 +32,39 @@ TASK_WHEN = {"today_evening": "b_task_eve", "tomorrow": "b_task_tmr", "weekend":
 
 
 def needs_install(ctx: SkillContext) -> bool:
+    """AC, washing machine and a wall-mounted TV need an installer; a fridge or a TV on a stand is delivered."""
     s = ctx.session
     cat = s.home.category
-    if cat in ("ac", "wm", "fridge"):
+    if cat in ("ac", "wm"):
         return True
     return cat == "tv" and "wall" in P.values(s.home, "mounting")
+
+
+def slot_choices(ctx: SkillContext) -> dict[str, tuple[str, object, int, int]]:
+    """id → (button label, date, start h, end h). From the delivery day when one was picked (never before it);
+    else from today. Labels name the date when it is not simply tomorrow / the day after."""
+    from datetime import date as _date
+
+    s = ctx.session
+    today = ctx.now.date()
+    base = today + timedelta(days=1)
+    iso = ctx.x.get("delivery_choice")
+    paused = bool(s.extra.get("install_paused"))
+    if iso and not paused:
+        try:
+            base = max(base, _date.fromisoformat(iso))
+        except ValueError:
+            pass
+    out = {}
+    for sid, (key, days, h1, h2) in INSTALL_SLOTS.items():
+        d = base + timedelta(days=days - 1)
+        if base == today + timedelta(days=1):
+            label = ctx.t(key)
+        else:
+            label = ctx.reg.raw(f"{fmt.date_short(d, ctx.lang)} {h1 if h1 <= 12 else h1 - 12}–{h2 - 12 if h2 > 12 else h2}",
+                                "choice:install_slot")
+        out[sid] = (label, d, h1, h2)
+    return out
 
 
 async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = False) -> Reply:
@@ -171,7 +199,7 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
     s = ctx.session
     lang = "en"  # the message to the customer's phone is in English, like every customer-facing visual
     alang = assoc_lang or ctx.alang
-    sku = s.chosen_sku or s.option_labels.get("B")
+    sku = s.chosen_sku or state.best_sku(s)
     if not sku:
         return ctx.reply(info_reply(ctx, ctx.t("parivaar_need_product", alang)))
     p = ctx.facts.product_sync(sku)
@@ -353,6 +381,11 @@ async def create_task(ctx: SkillContext, when: str) -> Reply:
 async def sold(ctx: SkillContext) -> Reply:
     ctx.x["outcome"] = "sold"
     if needs_install(ctx) and not ctx.x.get("install_job_id"):
+        pending = [sid for sid in ctx.pack.site_needs if not P.known(ctx.session.home, sid) and ctx.pack.slot(sid)]
+        if pending:  # what the installer must know (one tap each), before the slot
+            ctx.x["pending_install"] = True
+            return ctx.reply(C.question_reply(ctx, pending[0]))
+        ctx.x.pop("pending_install", None)
         return install_menu(ctx)
     from chanakya.skills import review
 
@@ -360,7 +393,9 @@ async def sold(ctx: SkillContext) -> Reply:
 
 
 def install_menu(ctx: SkillContext) -> Reply:
-    btns = [ctx.b(key, ctx.sid("islot", sid)) for sid, (key, *_r) in INSTALL_SLOTS.items()]
+    btns = [Button(id=ctx.sid("islot", sid), title=label[:20]) for sid, (label, *_r) in slot_choices(ctx).items()]
+    for b in btns:
+        ctx.reg.static(b.title)
     return ctx.reply(info_reply(ctx, ctx.t("install_slot_ask"), btns))
 
 
@@ -397,12 +432,21 @@ def site_summary(ctx: SkillContext) -> tuple[dict, str, list[str]]:
 
 async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
     s = ctx.session
-    key, days, h1, h2 = INSTALL_SLOTS.get(slot_id, INSTALL_SLOTS["t1"])
-    slot_date = (ctx.now + timedelta(days=days)).date()
-    label = ctx.t(key)
+    key = INSTALL_SLOTS.get(slot_id, INSTALL_SLOTS["t1"])[0]
+    label, slot_date, h1, h2 = slot_choices(ctx).get(slot_id) or slot_choices(ctx)["t1"]
     needs, summary, risks = site_summary(ctx)
+    sku = s.chosen_sku or state.best_sku(s)
+    if sku and ctx.x.get("outcome") != "sold":  # an installation needs a sale first
+        from chanakya.skills import review
+
+        return await review.khatam(ctx)
+    if not sku:  # nothing chosen yet (e.g. an old installation button): the product first
+        return ctx.reply(info_reply(ctx, ctx.t("install_needs_product"), [ctx.b("b_options", ctx.sid("options"))]))
     tryon = await repo.media_latest(s.id, "tryon")
-    sku = s.chosen_sku or s.option_labels.get("B")
+    old_job = s.extra.get("install_job_id")
+    if old_job:  # a re-booking: the earlier slot is cancelled
+        await repo.install_update(old_job, status="cancelled")
+    s.extra.pop("install_paused", None)
     job = await repo.install_create(
         session_id=s.id,
         sku=sku,
@@ -414,7 +458,7 @@ async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
             "_start_h": h1,
             "_end_h": h2,
             "_slot_time": SLOT_TIMES.get(slot_id, "10–1"),
-            "_slot_labels": {lg: ctx.t(key, lg) for lg in ("hi", "mr", "en")},
+            "_slot_labels": {lg: (ctx.t(key, lg) if label == ctx.t(key) else label) for lg in ("hi", "mr", "en")},
         },
         tryon_media=tryon.data if tryon else None,
         status="created",
@@ -458,7 +502,23 @@ async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
                     ),
                 )
             )
+    if s.step == Step.CLOSED:  # re-booked after the conversation was scored: no second score card
+        return ctx.reply(*msgs)
     from chanakya.skills import review
 
     r = await review.finish(ctx)
     return ctx.reply(*(msgs + r.messages))
+
+
+async def task_action(ctx: SkillContext, task_id: int, done: bool) -> Reply:
+    """A task reminder's [Ho gaya ✓] / [Kal yaad dilao]: acts on that task only."""
+    if done:
+        await repo.task_update(task_id, status="done")
+        ctx.ev("task_done", task_id=task_id)
+        return ctx.reply(info_reply(ctx, ctx.t("task_done_ack"), [ctx.b("b_new_customer", encode("g", "new"))]))
+    tasks = [t for t in await repo.tasks_open(ctx.actor_wa_id) if t.id == task_id]
+    if tasks:
+        p = dict(tasks[0].payload or {})
+        p.pop("reminded", None)
+        await repo.task_update(task_id, due_at=ctx.now + timedelta(days=1), payload=p)
+    return ctx.reply(info_reply(ctx, ctx.t("task_snoozed")))

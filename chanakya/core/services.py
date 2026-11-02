@@ -86,7 +86,13 @@ class Services:
                 m.media_id = await self.channel.upload_media(m.image_bytes, "image/jpeg", "image.jpg")
             if m.kind == "image" and not m.media_id and self.channel.renders_cards:
                 m.kind, m.body, m.caption = "text", m.caption or m.body or " ", None  # card failed → text only
-            return await self.channel.send(m)
+            wamid = await self.channel.send(m)
+            if wamid and m.session_id and (m.buttons or m.sections):
+                from chanakya.core import repo
+
+                # a tap on this message's buttons comes back with its id: the exact customer, even days later
+                await repo.message_insert(wamid, "out", m.to, m.kind, {"session_id": m.session_id})
+            return wamid
         except SendError as e:
             if e.code == 131047:
                 log.warning("window_closed", to=m.to)

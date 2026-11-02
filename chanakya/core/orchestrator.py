@@ -14,6 +14,7 @@ from chanakya.skills.base import SkillContext
 from chanakya.truth.firewall import NumberRegistry
 
 log = get_log("orchestrator")
+AFTER_SALE_AWAIT = ("lost_reason", "voice_for_parivaar")  # answers still expected after the session closed
 
 
 class Orchestrator:
@@ -71,6 +72,8 @@ class Orchestrator:
                 continue
             try:
                 lang = ctx.lang
+                if ctx.session and m.to == ctx.actor_wa_id and m.session_id is None:
+                    m.session_id = ctx.session.id
                 out = self.svc.validate(m, ctx.reg, home, lang, ctx.asking, ctx.session)
                 await self.svc.deliver(out)
                 if first and t0 is not None and m.to == ctx.actor_wa_id:
@@ -102,8 +105,8 @@ class Orchestrator:
             await repo.events_insert(events, ctx.now)
             if ctx.session:
                 await self.svc.sessions.save(ctx.session, ctx.now)
-                if ctx.session.step == Step.CLOSED and ctx.staff:
-                    ctx.staff.current_session_id = None
+                if ctx.session.step == Step.CLOSED and ctx.staff and ctx.session.awaiting not in AFTER_SALE_AWAIT:
+                    ctx.staff.current_session_id = None  # (kept while an after-sale answer is awaited)
             if ctx.staff:
                 await repo.staff_update(
                     ctx.staff.wa_id,

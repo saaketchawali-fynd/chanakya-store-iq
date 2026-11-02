@@ -74,14 +74,18 @@ class Scheduler:
             st = await repo.staff_by_wa(task.owner_wa_id)
             lang = st.lang if st else "hi"
             title = (task.title or {}).get(lang) or (task.title or {}).get("hi", "")
-            btns = [
-                Button(id=encode("s", p.get("code", "C0"), "parivaar"), title=t("b_send_customer", lang)),
-                Button(id=encode("s", p.get("code", "C0"), "khatam"), title=t("b_done_task", lang)),
+            s = await self.svc.sessions.get(task.session_id) if task.session_id else None
+            code = s.code if s else p.get("code", "C0")
+            btns = [  # spec 14.3: [Customer ko bhejo] [Ho gaya ✓] [Kal yaad dilao], each acting on this task's customer
+                Button(id=encode("s", code, "parivaar"), title=t("b_send_customer", lang)),
+                Button(id=encode("s", code, "taskdone", task.id), title=t("b_done_task", lang)),
+                Button(id=encode("s", code, "tasksnooze", task.id), title=t("b_task_snooze", lang)),
             ]
+            if s is None:
+                btns = btns[1:]
             await self.send(
-                OutMessage(
-                    to=task.owner_wa_id, kind="buttons", body=t("task_reminder", lang, title=title), buttons=btns
-                )
+                OutMessage(to=task.owner_wa_id, kind="buttons", body=t("task_reminder", lang, title=title),
+                           buttons=btns, session_id=task.session_id)
             )
             p["reminded"] = now.isoformat()
             await repo.task_update(task.id, payload=p)
