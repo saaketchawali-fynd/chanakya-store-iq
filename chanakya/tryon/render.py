@@ -23,6 +23,9 @@ from chanakya.tryon.read_room import PxBox, Room
 SCREEN_PATH = Path(__file__).resolve().parent.parent / "render" / "static" / "img" / "screen_bright.jpg"
 FALLBACK_SCREEN = Path(__file__).resolve().parent / "assets" / "screen_fallback.jpg"
 SS = 2  # supersampling factor for warps and vector overlays
+# Largest supersampled sprite canvas (px). Building a sprite holds ~a dozen float layers of its size, so a big TV
+# drawn at full 2× was ~120 MB on a 512 MB instance; at this cap it is still ~2× its on-screen size.
+MAX_SPRITE_PX = 900_000
 LUMA = np.array([0.299, 0.587, 0.114], dtype=np.float32)
 
 
@@ -721,6 +724,8 @@ def compose(
         pts = geometry.apply(face_h, cz)
         k = SS * max(float(np.linalg.norm(pts[1] - pts[0])) / w, float(np.linalg.norm(pts[3] - pts[0])) / h)
         k = float(min(max(k, 0.5), 40.0))
+        margin = max(0.16 * w, 8.0)  # the widest sprite margin (TV): canvas ≈ (w + 2m) × (h + 2m) cm at k px/cm
+        k = min(k, (MAX_SPRITE_PX / ((w + 2 * margin) * (h + 2 * margin + STAND_GAP_CM + 2))) ** 0.5)
         if category == "ac":
             sp = ac_sprite(w, h, k, light)
         elif category == "wm":
