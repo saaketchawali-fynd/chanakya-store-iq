@@ -32,6 +32,17 @@ class Settings(BaseSettings):
     gemini_fallback_model: str = "gemini-3.5-flash-lite"
     gemini_image_model: str = "gemini-nano-banana-2.1"
 
+    # Product, price and offer data. "jio" (default): only the Jio Commerce storefront API (getProducts,
+    # getPromotionOffers); nothing else is ever loaded, and with no token the catalogue stays empty.
+    # "seed": data/seed/*.yaml, for the automated tests and the offline simulator only.
+    data_source: str = "jio"
+    jio_domain: str = "https://api.jiox5.de"
+    jio_app_id: str = ""
+    jio_app_token: str = ""
+    jio_store_id: int | None = None  # optional store uid passed to getPromotionOffers
+    jio_sync_minutes: int = 30
+    store_name: str = "Reliance Digital"
+
     database_url: str = "sqlite+aiosqlite:///./chanakya.db"
     public_base_url: str = "http://localhost:8000"
     admin_token: str = "change-me"

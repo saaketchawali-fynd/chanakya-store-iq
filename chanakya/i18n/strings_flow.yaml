@@ -111,6 +111,8 @@ nothing_to_remove: {hi: "Hatane layak kuch nahi — har line zaroori hai.", mr: 
 
 # ---------- close: payment, offers, closing question, objections ----------
 bolo_pay: {hi: "पेमेंट कैसे करना चाहेंगे — कार्ड, UPI या कैश, या EMI?", mr: "पेमेंट कसं करायला आवडेल — कार्ड, UPI किंवा रोख, की EMI?", en: "How would you like to pay: card, UPI or cash, or EMI?"}
+bolo_pay_no_emi: {hi: "पेमेंट कैसे करना चाहेंगे — कार्ड, या UPI / कैश?", mr: "पेमेंट कसं करायला आवडेल — कार्ड, की UPI / रोख?", en: "How would you like to pay: card, or UPI / cash?"}
+bolo_delivery_pref: {hi: "डिलीवरी के लिए कौन-सा दिन ठीक रहेगा — {day1} या {day2}? स्टोर स्लॉट पक्का करेगा।", mr: "डिलिव्हरीसाठी कोणता दिवस सोयीचा — {day1} की {day2}? स्टोअर स्लॉट नक्की करेल.", en: "Which day suits you for delivery: {day1} or {day2}? The store will confirm the slot."}
 kyun_pay: {hi: "Sirf wahi offer dikhenge jo is payment par lagte hain", mr: "फक्त या पेमेंटला लागू ऑफर दिसतील", en: "Only the offers that apply to this payment are shown"}
 b_pay_card: {hi: "Card", mr: "कार्ड", en: "Card"}
 b_pay_upi: {hi: "UPI / Cash", mr: "UPI / रोख", en: "UPI / Cash"}
@@ -178,6 +180,9 @@ bolo_readback_laptop: {hi: "तो आपके लिए: {facts}। सही 
 footer_shown_customer: {hi: "Customer ko dikhaya · unka jawab tap kijiye", mr: "ग्राहकाला दाखवलं · त्यांचं उत्तर टॅप करा", en: "Shown to the customer · tap their answer"}
 stock_in_store_c: {hi: "स्टोर में {qty}", mr: "स्टोअरमध्ये {qty}", en: "{qty} in store"}
 stock_nearby_c: {hi: "{days} दिन में डिलीवरी ({store} से)", mr: "{days} दिवसांत डिलिव्हरी ({store} मधून)", en: "Delivery in {days} days (from {store})"}
+stock_available_c: {hi: "उपलब्ध", mr: "उपलब्ध", en: "Available"}
+stock_unavailable_c: {hi: "अभी उपलब्ध नहीं", mr: "सध्या उपलब्ध नाही", en: "Not available right now"}
+catalog_unavailable: {hi: "Abhi product list nahi mil rahi (Jio Commerce se). Thodi der mein dobara try kijiye.", mr: "सध्या उत्पादनांची यादी मिळत नाही (Jio Commerce कडून). थोड्या वेळाने पुन्हा प्रयत्न करा.", en: "The product list is not available right now (from Jio Commerce). Please try again in a little while."}
 footer_photo_saved: {hi: "Photo save hui · options isi jagah dikhenge", mr: "फोटो सेव्ह झाला · पर्याय याच जागी दिसतील", en: "Photo saved · the picks will show in this spot"}
 tryon_drawing: {hi: "Jagah naap rahe hain, product laga rahe hain — kuch second.", mr: "जागा मोजतोय, उत्पादन लावतोय — काही सेकंद.", en: "Measuring the spot and placing it: a few seconds."}
 tryon_footer: {hi: "अनुमानित झलक · सही अनुपात में · TEST DATA", mr: "अंदाजे झलक · योग्य प्रमाणात · TEST DATA", en: "Approx. preview · to scale · TEST DATA"}

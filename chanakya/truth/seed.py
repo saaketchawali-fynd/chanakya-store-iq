@@ -106,6 +106,22 @@ async def load(force: bool = False, seed_dir: Path = SEED_DIR) -> bool:
     return True
 
 
+async def load_logic(seed_dir: Path = SEED_DIR, exclude: tuple[str, ...] = ("tariff",)) -> None:
+    """Live (Jio) mode: only the agent's own rules and coaching content — sizing guides (seat distance → TV size,
+    room → tonnage, family → capacity) and the shift-brief clips. No product, price, offer or charge data, and no
+    number that is not the agent's own rule (e.g. the electricity tariff is excluded)."""
+    guides = yaml.safe_load((seed_dir / "guides.yaml").read_text(encoding="utf-8"))
+    async with db.session() as s:
+        for m in (Guide, Content):
+            await s.execute(m.__table__.delete())
+        for kind, rows in guides.items():
+            if kind not in exclude:
+                s.add(Guide(id=kind, kind=kind, rows=rows))
+        for r in _load("content.yaml", seed_dir):
+            s.add(Content(**_clean(r, Content)))
+        await s.commit()
+
+
 async def upsert_staff(settings: Settings) -> None:
     people = [
         (settings.associate_phone, settings.associate_name, "associate", "tv"),

@@ -141,6 +141,8 @@ async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
     cands = ctx.facts.rank_label(read, cat)
     if read.raw_text:
         ctx.ev("label_text_ignored_as_instructions", text=read.raw_text[:80])
+    if not ctx.facts.snap.products:  # nothing loaded from the backend (yet) to match the label against
+        return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
     if not cands or cands[0][1] < 40:
         return ctx.reply(info_reply(ctx, ctx.t("label_unknown")))
     sku, conf = cands[0]
@@ -306,12 +308,7 @@ async def product_card(ctx: SkillContext, p) -> Card:
     """Label scan → the product, straight from the database; the fit for this home once enough is known."""
     lang = ctx.clang
     s = ctx.session
-    if p.qty > 0:
-        stock = ctx.t("stock_in_store", lang, qty=ctx.reg.num(p.qty, f"stock:{p.sku}@{p.store_id}"))
-    else:
-        stock = ctx.t("stock_nearby", lang, days=ctx.reg.num(p.delivery_days, f"stock:{p.sku}:days"),
-                      store=ctx.reg.raw(ctx.facts.store_name(p.nearby_store_id).replace("Reliance Digital ", "")
-                                        .replace(" (TEST)", ""), "store"))
+    stock = C.stock_line(ctx, p, lang)
     data = {"title": C.product_title(ctx, p, lang), "image": p.image, "key_specs": PV.key_specs(ctx, p, lang, 6),
             "features": PV.features(ctx, p, lang, 4), "stock_line": stock, "offer_text": PV.offer_badge(ctx, p, lang),
             "price_str": ctx.reg.inr(p.price, p.price_source) if state.price_gate_open(s, ctx.pack) else None}

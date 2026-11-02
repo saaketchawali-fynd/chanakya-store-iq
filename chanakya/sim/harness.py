@@ -28,6 +28,7 @@ def harness_settings(db_url: str, ai_mode: str = "fixture", **kw) -> Settings:
         _env_file=None,
         database_url=db_url,
         ai_mode=ai_mode,
+        data_source=kw.pop("data_source", "seed"),  # sample data: tests and the offline simulator
         demo_mode=True,
         render_cards=False,
         scheduler_enabled=False,

@@ -376,6 +376,20 @@ def budget_list(ctx: SkillContext, body: str | None = None) -> OutMessage:
     )
 
 
+def stock_line(ctx: SkillContext, p, lang: str | None = None, customer: bool = False) -> str:
+    """'3 in store' / 'Delivery in 2 days (from Belapur)'; for Jio products, only 'Available' (the API gives no
+    counts). `customer` → the customer-facing wording used on cards."""
+    sfx = "_c" if customer else ""
+    if not p.stock_known:
+        return ctx.t(("stock_available" if p.in_stock else "stock_unavailable") + sfx, lang)
+    if p.qty > 0:
+        return ctx.t("stock_in_store" + sfx, lang, qty=ctx.reg.num(p.qty, f"stock:{p.sku}@{p.store_id}"))
+    store = ctx.facts.store_name(p.nearby_store_id).replace("Reliance Digital ", "").replace(" (TEST)", "")
+    return ctx.t("stock_nearby" + sfx, lang,
+                 days=ctx.reg.num(p.delivery_days, f"stock:{p.sku}@{p.store_id}:delivery_days"),
+                 store=ctx.reg.raw(store, f"store:{p.nearby_store_id}"))
+
+
 def product_title(ctx: SkillContext, p, lang: str | None = None) -> str:
     return ctx.reg.raw(ctx.pick(p.title, lang or ctx.clang) or p.model, f"product:{p.sku}")
 

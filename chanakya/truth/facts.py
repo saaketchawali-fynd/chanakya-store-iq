@@ -56,6 +56,12 @@ class ProductWithStock:
         return f"price:{self.sku}@{self.store_id}"
 
     @property
+    def stock_known(self) -> bool:
+        """False for Jio products: the documented API says only whether a product is sellable, not how many
+        or where (no counts, nearby stores or delivery days are shown for them)."""
+        return (self.info or {}).get("source") != "jio"
+
+    @property
     def in_stock(self) -> bool:
         return self.qty > 0
 

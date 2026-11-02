@@ -7,6 +7,7 @@ from chanakya.core import state
 from chanakya.core.buttons import encode
 from chanakya.core.coach import info_reply
 from chanakya.core.contracts import Card, Reply
+from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 
@@ -20,6 +21,8 @@ async def show(ctx: SkillContext, category: str | None = None, page: int = 0) ->
         cat = s.home.category
     if cat is None:
         cat = ctx.staff.dept if ctx.staff and ctx.staff.dept in ctx.packs.packs else "tv"
+    if not ctx.facts.snap.products:  # nothing loaded from the backend (yet)
+        return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
     items_all = [p for p in ctx.facts.products_sync(cat) if p.qty > 0 or p.nearby_qty > 0]
     if s and s.option_labels:  # the customer's three picks first
         picks = list(s.option_labels.values())
@@ -29,17 +32,7 @@ async def show(ctx: SkillContext, category: str | None = None, page: int = 0) ->
     show_price = s is None or state.price_gate_open(s, ctx.pack)
     rows = []
     for p in items:
-        if p.qty > 0:
-            stock = ctx.t("stock_in_store", qty=ctx.reg.num(p.qty, f"stock:{p.sku}@{p.store_id}"))
-        else:
-            stock = ctx.t(
-                "stock_nearby",
-                days=ctx.reg.num(p.delivery_days, f"stock:{p.sku}:days"),
-                store=ctx.reg.raw(
-                    ctx.facts.store_name(p.nearby_store_id).replace("Reliance Digital ", "").replace(" (TEST)", ""),
-                    "store",
-                ),
-            )
+        stock = C.stock_line(ctx, p)
         rows.append(
             {
                 "title": ctx.reg.raw(p.model, f"product:{p.sku}"),

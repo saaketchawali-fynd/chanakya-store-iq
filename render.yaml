@@ -45,6 +45,18 @@ services:
         value: "true"
       - key: STORE_ID
         value: RD-JUHU
+      # Product, price and offer data come only from Jio Commerce (getProducts, getPromotionOffers).
+      # Type the sales channel's application ID and token in the dashboard (Environment); never in this repo.
+      - key: DATA_SOURCE
+        value: jio
+      - key: JIO_DOMAIN
+        value: https://api.jiox5.de
+      - key: JIO_APP_ID
+        sync: false
+      - key: JIO_APP_TOKEN
+        sync: false
+      - key: STORE_NAME
+        value: Reliance Digital
       - key: DEMO_MODE
         value: "true"
       - key: TZ_NAME

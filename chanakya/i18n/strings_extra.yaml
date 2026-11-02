@@ -193,6 +193,9 @@ site_reason_pipe: {hi: "Pipe +{ft}: outdoor unit door hai", mr: "पाइप +{
 status_none: {hi: "Abhi koi customer nahi. Naya shuru kariye.", mr: "सध्या कोणताही ग्राहक नाही. नवीन सुरू करा.", en: "No customer right now. Start a new one."}
 stock_in_store: {hi: "Store mein {qty}", mr: "स्टोअरमध्ये {qty}", en: "{qty} in store"}
 stock_nearby: {hi: "{days} din mein delivery ({store} se)", mr: "{days} दिवसांत डिलिव्हरी ({store} मधून)", en: "Delivery in {days} days (from {store})"}
+stock_available: {hi: "Available hai", mr: "उपलब्ध आहे", en: "Available"}
+stock_unavailable: {hi: "Abhi available nahi", mr: "सध्या उपलब्ध नाही", en: "Not available right now"}
+honest_available: {hi: "{product} अभी उपलब्ध है।", mr: "{product} सध्या उपलब्ध आहे.", en: "{product} is available right now."}
 suggestions_off: {hi: "Sujhav hata diye — sirf zaroori.", mr: "सूचना काढल्या — फक्त आवश्यक.", en: "Suggestions removed: essentials only."}
 suggestions_on: {hi: "Sujhav wapas jode.", mr: "सूचना परत जोडल्या.", en: "Suggestions added back."}
 switch_body: {hi: "Kaunsa customer?", mr: "कोणता ग्राहक?", en: "Which customer?"}

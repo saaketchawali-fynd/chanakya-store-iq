@@ -45,11 +45,17 @@ async def offers(ctx: SkillContext) -> Reply:
         return ctx.reply(C.question_reply(ctx, "exchange_old"))
     pay = ctx.x.get("pay")
     if not pay:
-        btns = [ctx.b("b_pay_card", ctx.sid("pay", "card")), ctx.b("b_pay_upi", ctx.sid("pay", "upi")),
-                ctx.b("b_pay_emi", ctx.sid("pay", "emi"))]
-        return ctx.reply(coach_reply(ctx, ctx.tc("bolo_pay"), ctx.t("kyun_pay"), C.known_cites(ctx), btns))
+        btns = [ctx.b("b_pay_card", ctx.sid("pay", "card")), ctx.b("b_pay_upi", ctx.sid("pay", "upi"))]
+        emi = bool(await ctx.facts.finance(pack.category))  # EMI only when the data has EMI plans
+        if emi:
+            btns.append(ctx.b("b_pay_emi", ctx.sid("pay", "emi")))
+        say = ctx.tc("bolo_pay" if emi else "bolo_pay_no_emi")
+        return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_pay"), C.known_cites(ctx), btns))
     if pay in ("card", "emi") and not ctx.x.get("bank"):
-        return ctx.reply(bank_list(ctx, pay))
+        if not _bank_offers(ctx, pay):  # no bank has an offer on this product today: nothing to choose
+            ctx.x["bank"] = "other"
+        else:
+            return ctx.reply(bank_list(ctx, pay))
     return await quote(ctx)
 
 
@@ -60,21 +66,27 @@ async def set_pay(ctx: SkillContext, how: str) -> Reply:
     return await offers(ctx)
 
 
+def _bank_offers(ctx: SkillContext, pay: str) -> list[tuple]:
+    """(offer, discount) for each bank with an offer on this product today, from the data."""
+    p = ctx.facts.product_sync(_sku(ctx))
+    out, seen = [], set()
+    for o in ctx.facts.snap.offers:
+        if not o.bank or o.bank in seen:
+            continue
+        if not offers_engine.eligible(o, p, ctx.session.home, o.bank, pay == "emi", today()):
+            continue
+        seen.add(o.bank)
+        out.append((o, offers_engine.discount(o, p.price)))
+    return out
+
+
 def bank_list(ctx: SkillContext, pay: str) -> OutMessage:
     """Banks that have an offer on this product today (from the data), each with its offer; then 'other card'."""
     from chanakya.channel.limits import truncate, truncate_title
     from chanakya.core.contracts import ListRow, ListSection
 
-    p = ctx.facts.product_sync(_sku(ctx))
-    s = ctx.session
-    rows, seen = [], set()
-    for o in ctx.facts.snap.offers:
-        if not o.bank or o.bank in seen:
-            continue
-        if not offers_engine.eligible(o, p, s.home, o.bank, pay == "emi", today()):
-            continue
-        seen.add(o.bank)
-        d = offers_engine.discount(o, p.price)
+    rows = []
+    for o, d in _bank_offers(ctx, pay):
         title = ctx.pick(o.title)
         desc = f"−{ctx.reg.inr(d, f'offer:{o.id}')} · {title}"
         rows.append(ListRow(id=ctx.sid("bank", o.bank), title=truncate(o.bank, 24), description=truncate(desc, 72)))
@@ -292,11 +304,12 @@ async def delivery(ctx: SkillContext) -> Reply:
     def label(d, lang, roman=False):
         return ctx.reg.raw(f"{fmt.day_name(d, lang, roman=roman)} {fmt.date_short(d, lang)}", src)
 
-    say = fill(
-        ctx.pick(ctx.packs.common_line("close_question"), ctx.clang),
-        day1=label(d1, ctx.clang),
-        day2=label(d2, ctx.clang),
-    )
+    if p.stock_known:
+        say = fill(ctx.pick(ctx.packs.common_line("close_question"), ctx.clang),
+                   day1=label(d1, ctx.clang), day2=label(d2, ctx.clang))
+    else:  # no delivery data from the backend: the customer's preferred day, for the store to confirm
+        src = "calc:delivery_preference"
+        say = ctx.tc("bolo_delivery_pref", day1=label(d1, ctx.clang), day2=label(d2, ctx.clang))
     btns = [
         Button(id=ctx.sid("dday", d1.isoformat()), title=label(d1, ctx.lang, roman=True)[:20]),
         Button(id=ctx.sid("dday", d2.isoformat()), title=label(d2, ctx.lang, roman=True)[:20]),

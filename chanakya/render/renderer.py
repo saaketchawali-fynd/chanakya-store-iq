@@ -607,8 +607,53 @@ def _file_data_uri(path: str, mtime_ns: int, max_px: int | None) -> str:
     return f"data:{mime};base64," + base64.b64encode(b).decode()
 
 
+# Product pictures from the backend (Jio Commerce media URLs) are downloaded once to this disk cache before a card
+# is drawn, then inlined like local files. A picture that cannot be fetched is simply left out.
+IMG_CACHE = Path(__file__).resolve().parents[2] / "data" / "cache" / "img"
+IMAGE_KEYS = ("product_image", "image")
+
+
+def _cache_path(url: str) -> Path:
+    import hashlib
+
+    ext = Path(url.split("?")[0]).suffix.lower()
+    return IMG_CACHE / (hashlib.sha1(url.encode()).hexdigest()[:24] + (ext if ext in (".jpg", ".jpeg", ".png", ".webp") else ".img"))
+
+
+def _card_urls(data: dict) -> list[str]:
+    found = [data.get(k) for k in IMAGE_KEYS]
+    for key in ("options", "items"):
+        found += [(o or {}).get("image") for o in data.get(key) or [] if isinstance(o, dict)]
+    found += [(data.get(side) or {}).get("image") for side in ("a", "b") if isinstance(data.get(side), dict)]
+    return [u for u in found if isinstance(u, str) and u.startswith("https://")]
+
+
+async def fetch_images(card: Card) -> None:
+    """Download the card's backend pictures that are not cached yet (≤ 4 MB each, images only)."""
+    urls = [u for u in dict.fromkeys(_card_urls(card.data or {})) if not _cache_path(u).is_file()]
+    if not urls:
+        return
+    import httpx
+
+    IMG_CACHE.mkdir(parents=True, exist_ok=True)
+    async with httpx.AsyncClient(timeout=httpx.Timeout(6, connect=4), follow_redirects=True) as c:
+        for u in urls:
+            try:
+                r = await c.get(u)
+                if r.status_code != 200 or not r.headers.get("content-type", "").startswith("image/"):
+                    continue
+                if len(r.content) > 4 * 1024 * 1024:
+                    continue
+                tmp = _cache_path(u).with_suffix(".part")
+                tmp.write_bytes(r.content)
+                tmp.replace(_cache_path(u))
+            except Exception:
+                continue
+
+
 def to_data_uri(img: Any, max_px: int | None = None) -> str | None:
-    """bytes | data: URI | path relative to render/static/img → data URI (None if unusable).
+    """bytes | data: URI | cached backend picture (https URL) | path relative to render/static/img → data URI
+    (None if unusable).
 
     Files are cached (keyed by path + mtime) and optionally shrunk to ``max_px`` on the longest side."""
     if not img:
@@ -625,6 +670,9 @@ def to_data_uri(img: Any, max_px: int | None = None) -> str | None:
         if isinstance(img, str):
             if img.startswith("data:"):
                 return img
+            if img.startswith("https://"):
+                c = _cache_path(img)
+                return _file_data_uri(str(c), c.stat().st_mtime_ns, max_px) if c.is_file() else None
             p = Path(img)
             if not p.is_absolute():
                 p = STATIC_IMG / img
@@ -1608,6 +1656,10 @@ class Renderer:
         try:
             if not self.ready:
                 return render_pillow(card)
+            try:
+                await asyncio.wait_for(fetch_images(card), timeout=10)
+            except Exception:
+                pass  # draw without the pictures that could not be fetched
             try:
                 return await asyncio.wait_for(self._render_html(card), timeout=8)
             except Exception:

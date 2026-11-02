@@ -160,7 +160,10 @@ async def honest_version(ctx: SkillContext, phrase: str) -> Reply:
     if any(w in phrase for w in stock_words):
         sku = (s.chosen_sku or s.option_labels.get("B") or ctx.x.get("label_sku")) if s else None
         p = ctx.facts.product_sync(sku) if sku else None
-        if p:
+        if p and not p.stock_known:  # Jio: availability only, never a count
+            honest = ctx.t("honest_available" if p.in_stock else "stock_unavailable", ctx.clang,
+                           product=C.product_name(ctx, p))
+        elif p:
             honest = ctx.t(
                 "honest_stock",
                 ctx.clang,

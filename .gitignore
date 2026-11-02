@@ -8,3 +8,5 @@ latency.csv
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
+.jio_probe/
+data/cache/

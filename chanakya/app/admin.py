@@ -24,6 +24,23 @@ def _fonts() -> dict:
         return {"error": str(e)[:80]}
 
 
+async def _data(s, rt) -> dict:
+    """Where product data comes from; for Jio: token set, last sync, counts, last error (never the token)."""
+    out = {"source": s.data_source, "products_loaded": len(rt.facts.snap.products) if rt else 0}
+    if s.data_source == "jio":
+        from chanakya.truth import jio_sync
+
+        st = dict(jio_sync.STATUS, configured=jio_sync.configured(s))
+        try:
+            meta = await jio_sync.last_meta()
+        except Exception:  # noqa: BLE001
+            meta = None
+        out.update(domain=s.jio_domain, token_set=st["configured"], syncing=st["running"],
+                   last_sync=(meta or {}).get("at"), counts=(meta or {}).get("counts") or st["counts"],
+                   last_error=st["last_error"])
+    return out
+
+
 @router.get("/health")
 async def health(request: Request):
     rt = getattr(request.app.state, "rt", None)
@@ -62,6 +79,7 @@ async def health(request: Request):
         "renderer": bool(rt and rt.renderer and getattr(rt.renderer, "ready", False)),
         "packs": len(rt.packs.packs) if rt else 0,
         "tryon_fonts": _fonts(),
+        "data": await _data(s, rt),
         "memory": memory.snapshot(),
         "chromium": rt.renderer.stats() if rt and rt.renderer and hasattr(rt.renderer, "stats") else None,
         "config": config,

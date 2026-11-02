@@ -97,16 +97,7 @@ def _diffs(ctx: SkillContext, p, best, lang: str, n: int = 2) -> list[dict]:
 
 def _stock_line(ctx: SkillContext, p, lang: str | None = None) -> str:
     """Associate text by default; with `lang`, the customer-facing wording (cards) in that language."""
-    sfx, kw = ("_c", {"lang": lang}) if lang else ("", {})
-    if p.qty > 0:
-        return ctx.t("stock_in_store" + sfx, qty=ctx.reg.num(p.qty, f"stock:{p.sku}@{p.store_id}"), **kw)
-    store = ctx.facts.store_name(p.nearby_store_id).replace("Reliance Digital ", "").replace(" (TEST)", "")
-    return ctx.t(
-        "stock_nearby" + sfx,
-        **kw,
-        days=ctx.reg.num(p.delivery_days, f"stock:{p.sku}@{p.store_id}:delivery_days"),
-        store=ctx.reg.raw(store, f"store:{p.nearby_store_id}"),
-    )
+    return C.stock_line(ctx, p, lang, customer=bool(lang))
 
 
 def options_card(ctx: SkillContext, opts) -> Card:
@@ -142,6 +133,8 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
     pack = ctx.pack
     if not state.options_gate_open(s, pack):
         return gate_options_reply(ctx)
+    if not ctx.facts.snap.products:  # nothing loaded from the backend (yet): say so, not "no model fits"
+        return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
     opts = _option_set(ctx)
     if opts is None:
         return ctx.reply(info_reply(ctx, ctx.t("no_options"), [ctx.b("b_expert", ctx.sid("expert"))]))

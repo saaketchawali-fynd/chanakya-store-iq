@@ -84,6 +84,10 @@ def filter_holds(flt: dict | None, p: ProductWithStock) -> bool:
     for k, v in (flt.get("spec") or {}).items():  # e.g. {spec: {stabiliser_free: false}}
         if p.spec(k) != v:
             return False
+    if "price_min" in flt and p.price < flt["price_min"]:  # e.g. a resQ plan for products of ₹20,000–30,000
+        return False
+    if "price_max" in flt and p.price > flt["price_max"]:
+        return False
     return True
 
 
@@ -146,6 +150,11 @@ async def compute(
             optional_count += 1
             if include_optional:
                 add(c.code, title, c.amount, "optional", f"charge:{c.code}")
+    for pl in await facts.protection(cat):  # plans from the catalogue (no coaching reason): offered, not pushed
+        if not pl.suggest_if and filter_holds(pl.filter, p):
+            optional_count += 1
+            if include_optional:
+                add(pl.code, pick(pl.title, lang, reg), pl.price, "optional", f"protection:{pl.code}")
     if include_suggestions:
         for pl in await facts.protection(cat):
             if filter_holds(pl.filter, p) and pl.suggest_if and cond_holds(pl.suggest_if, home, pack):

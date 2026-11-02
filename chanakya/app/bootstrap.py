@@ -27,12 +27,19 @@ class Runtime:
     orch: Orchestrator
     scheduler: Scheduler
     renderer: object | None = None
+    data_task: object | None = None  # live mode: the Jio catalogue sync loop
 
 
 async def build(settings: Settings, channel, drop: bool = False, render: bool | None = None) -> Runtime:
     db.init_engine(settings.database_url)
     await db.create_all(drop=drop)
-    await seed.load()
+    if settings.data_source == "seed":  # automated tests and the offline simulator only
+        await seed.load()
+    else:  # live: product, price and offer data come only from Jio Commerce (jio_sync)
+        from chanakya.truth import jio_sync
+
+        await jio_sync.purge_seed()
+        await seed.load_logic()
     await seed.upsert_staff(settings)
     reload_strings()
     assert strings(), "i18n strings missing"
@@ -63,7 +70,20 @@ async def start_renderer(rt: Runtime) -> None:
         await rt.renderer.start()
 
 
+def start_data_sync(rt: Runtime) -> None:
+    """Live mode: sync the catalogue from Jio Commerce now and every JIO_SYNC_MINUTES, in the background (the app
+    serves from the last synced data meanwhile)."""
+    if rt.settings.data_source == "jio":
+        import asyncio
+
+        from chanakya.truth import jio_sync
+
+        rt.data_task = asyncio.create_task(jio_sync.loop(rt.settings, rt.facts))
+
+
 async def shutdown(rt: Runtime) -> None:
+    if rt.data_task is not None:
+        rt.data_task.cancel()
     await rt.scheduler.stop()
     if rt.renderer is not None:
         try:

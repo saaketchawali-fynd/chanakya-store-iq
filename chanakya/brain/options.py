@@ -46,7 +46,7 @@ def compute_options(products: list, home: HomeCard, pack: Pack, guides: dict) ->
     if not band:
         return None
     best = sorted(band, key=lambda p: (-fits[p.sku].score, p.price))[0]
-    rest = [p for p in band if p.sku != best.sku]
+    rest = [p for p in band if p.sku != best.sku and p.price < best.price]  # the 'costs less' option really does
     good = [p for p in rest if fits[p.sku].score >= 0.6 * fits[best.sku].score]
     right_size = [p for p in good if (in_band(p, home, pack, guides) or 1.0) >= 1.0]
     good = right_size or good  # the lower-cost choice still has the right size / ton / kg / litres for this home
@@ -56,8 +56,9 @@ def compute_options(products: list, home: HomeCard, pack: Pack, guides: dict) ->
         else (sorted(rest, key=lambda p: (-fits[p.sku].score, p.price))[0] if rest else None)
     )
     used = {best.sku} | ({value.sku} if value else set())
-    step_pool = [
+    step_pool = [  # a step up costs more AND fits this home at least as well (never a smaller or unknown size)
         p for p in in_stock if p.price > best.price and p.sku not in used and (L is None or p.price <= 1.75 * L)
+        and fits[p.sku].score >= 0.95 * fits[best.sku].score
     ]
     step = (
         sorted(step_pool, key=lambda p: (-fits[p.sku].score, -(p.spec("size_in") or 0), p.price))[0]
