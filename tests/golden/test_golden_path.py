@@ -131,7 +131,8 @@ async def test_golden_path(tmp_path):
         # 11 shown → which felt right? (the three + none of these)
         out = await step(h.tap, "s:C1:shown")
         rows = [r.id for sec in out[0].sections for r in sec.rows]
-        assert rows == ["s:C1:opt:A", "s:C1:opt:B", "s:C1:opt:C", "s:C1:upgrade", "s:C1:nonefit"]
+        assert rows == ["s:C1:opt:A", "s:C1:opt:B", "s:C1:opt:C", "s:C1:abwall", "s:C1:view", "s:C1:upgrade",
+                        "s:C1:nonefit"]  # + both on their wall, how big from the sofa, is the extra money worth it
         out2 = await step(h.pick, "s:C1:upgrade")  # is the extra money worth it? (the price is open after the demo)
         assert out2[0].body.count("→") >= 1 and "/din" in out2[0].body
         assert "Daam khula" in out[0].body and "Demo ho gaya" in out[0].body

@@ -61,6 +61,11 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         s.chosen_sku = state.best_sku(s)
     if not s.chosen_sku:
         return await show_options(ctx)
+    from chanakya.skills.returning import out_of_stock_reply
+
+    oos = out_of_stock_reply(ctx, s.chosen_sku)  # not sold today: the same-fit model in stock, one tap away
+    if oos is not None:
+        return ctx.reply(oos)
     site = _pending_site_slot(ctx)
     if site:  # the AC story: pipe run, outdoor spot, wall hole are asked BEFORE the cost
         ctx.x["pending_cost"] = True

@@ -282,8 +282,15 @@ async def prefer(ctx: SkillContext) -> Reply:
             reason = _reason(ctx, top if top in ctx.pack.reasons else "value_fit", ctx.lang)
         rows.append(ListRow(id=ctx.sid("opt", lab), title=truncate(f"{lab}: {p.model}", 24), description=truncate(reason, 72)))
         ctx.reg.raw(rows[-1].title, f"product:{sku}")
+    if ctx.pack.placeable and len(s.option_labels) >= 2:  # A vs B on their wall, in one picture
+        rows.append(ListRow(id=ctx.sid("abwall"), title=truncate(ctx.t("row_abwall"), 24),
+                            description=truncate(ctx.t("row_abwall_d"), 72)))
+    if ctx.pack.category == "tv" and P.number(s.home, "seat_distance", ctx.pack):  # how big it feels from the sofa
+        rows.append(ListRow(id=ctx.sid("view"), title=truncate(ctx.t("row_view"), 24),
+                            description=truncate(ctx.t("row_view_d"), 72)))
     if state.price_gate_open(s, ctx.pack) and len(s.option_labels) >= 2:  # is the extra money worth it?
-        rows.append(ListRow(id=ctx.sid("upgrade"), title=ctx.t("row_upgrade"), description=ctx.t("row_upgrade_d")))
+        rows.append(ListRow(id=ctx.sid("upgrade"), title=truncate(ctx.t("row_upgrade"), 24),
+                            description=truncate(ctx.t("row_upgrade_d"), 72)))
     rows.append(ListRow(id=ctx.sid("nonefit"), title=ctx.t("row_none_fit"), description=ctx.t("row_none_fit_d")))
     ctx.reg.static(" ".join((r.description or "") for r in rows))
     cites = C.known_cites(ctx)

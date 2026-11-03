@@ -162,7 +162,13 @@ async def finish(ctx: SkillContext) -> Reply:
     if ctx.staff and ctx.staff.current_session_id == s.id and s.awaiting not in AFTER_SALE_AWAIT:
         ctx.staff.current_session_id = None  # (kept while the lost reason / a voice note is awaited)
     ctx.scratch["close_session"] = True
-    return ctx.reply(info_reply(ctx, caption, btns, card=card))
+    from chanakya.skills import wins
+
+    m = info_reply(ctx, caption, btns, card=card)
+    won = await wins.line(ctx)
+    if won and len(won) <= 60:
+        m.footer = won  # today's own wins, right after the score
+    return ctx.reply(m)
 
 
 async def last_score(ctx: SkillContext) -> Reply:

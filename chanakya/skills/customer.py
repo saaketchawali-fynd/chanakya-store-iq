@@ -36,6 +36,8 @@ async def button(ctx: SkillContext, bid: ButtonId) -> Reply:
     lang = CUSTOMER_PHONE_LANG
     alang = await _assoc_lang(ctx)
     a = s.associate_wa_id
+    if action in ("talk", "visit", "ask"):
+        ctx.ev("family_replied", associate=a, how=action)  # the family answered the Family Card (associate's wins)
     if action == "talk":
         return ctx.reply(
             OutMessage(
@@ -174,14 +176,21 @@ async def relay(ctx: SkillContext) -> Reply:
     text = (inb.text or "").strip()
     ctx.reg.raw(text, "customer:text")  # the customer's own words are relayed as-is
     s.extra.pop("customer_asking", None)
-    return ctx.reply(
-        OutMessage(
-            to=a,
-            kind="text",
-            body=ctx.reg.raw(f"[{s.code}]", "session:code") + " " + ctx.t("cust_msg_assoc", alang, name=_name(ctx), text=text[:300]),
-            allowed_numbers=ctx.reg.allowed(),
-        )
-    )
+    if s.extra.get("parivaar_sent"):
+        ctx.ev("family_replied", associate=a, how="text")
+    body = ctx.reg.raw(f"[{s.code}]", "session:code") + " " + ctx.t("cust_msg_assoc", alang, name=_name(ctx), text=text[:300])
+    last = s.extra.get("last_touch")
+    if last:
+        from datetime import datetime
+
+        from chanakya.skills import returning
+
+        seen = datetime.fromisoformat(last)
+        if (ctx.now - seen).total_seconds() >= 6 * 3600:  # coming back after a while: what happened last time
+            with ctx.as_lang(alang):
+                line, _ = returning.summary(ctx, seen, s)
+            body = ctx.t("ret_msg_prefix", alang, line=line) + "\n" + body
+    return ctx.reply(OutMessage(to=a, kind="text", body=body, allowed_numbers=ctx.reg.allowed()))
 
 
 async def associate_reply(ctx: SkillContext, text: str) -> Reply:

@@ -36,7 +36,7 @@ async def test_ghar_mein_dekho_asks_photo_then_draws(h):
     assert len(imgs) == 1 and "s:C1:tmenu" in button_ids(imgs)  # then the picture; more choices one tap away
     out = await h.tap("s:C1:tmenu")
     r = rows(out[0])
-    assert r[0] == "s:C1:tmode:best" and "s:C1:tmode:size" in r and "s:C1:tmode:all" in r
+    assert r[0] == "s:C1:tmode:ab" and r[1] == "s:C1:tmode:best" and "s:C1:tmode:size" in r and "s:C1:tmode:all" in r
 
 
 async def test_photo_during_questions_never_interrupts(h):

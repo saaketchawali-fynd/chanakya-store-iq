@@ -358,3 +358,49 @@ want_label_ton: {hi: "Ton", mr: "Ton", en: "Tonnage"}
 want_label_capacity_kg: {hi: "Capacity", mr: "Capacity", en: "Capacity"}
 want_label_capacity_l: {hi: "Capacity", mr: "Capacity", en: "Capacity"}
 want_label_ram_gb: {hi: "RAM", mr: "RAM", en: "RAM"}
+# ---- returning customers, the stock swap, wins, A vs B on the wall, viewing comfort (4 Nov 2026)
+row_returning: {hi: "Purana customer", mr: "जुना ग्राहक", en: "Returning customer"}
+row_returning_d: {hi: "Wapas aaye? Pichhli baat se aage, bina dobara pooche", mr: "परत आले? मागच्या बोलण्यापासून पुढे", en: "Came back? Carry on from last time, no re-asking"}
+ret_list_body: {hi: "Pichhle 30 din ke customer. Ek chuniye: wahi se aage badhenge.", mr: "मागच्या 30 दिवसांचे ग्राहक. एक निवडा: तिथूनच पुढे.", en: "Customers from the last 30 days. Pick one to carry on from where you left."}
+ret_list_button: {hi: "Customer chuniye", mr: "ग्राहक निवडा", en: "Pick customer"}
+ret_none: {hi: "Pichhle 30 din mein koi adhoora customer nahi.", mr: "मागच्या 30 दिवसांत अपूर्ण ग्राहक नाही.", en: "No unfinished customers in the last 30 days."}
+ret_today: {hi: "aaj pehle aaye the", mr: "आज आधी आले होते", en: "here earlier today"}
+ret_days_ago: {hi: "{n} din pehle aaye the", mr: "{n} दिवसांपूर्वी आले होते", en: "came {n} days ago"}
+ret_liked: {hi: "{label} {model} pasand", mr: "{label} {model} आवडला", en: "liked {label} {model}"}
+ret_cheaper: {hi: "ab {amt} sasta", mr: "आता {amt} स्वस्त", en: "now {amt} cheaper"}
+ret_dearer: {hi: "ab {amt} mehenga", mr: "आता {amt} महाग", en: "now {amt} dearer"}
+ret_same_price: {hi: "daam wahi", mr: "किंमत तीच", en: "same price"}
+ret_out: {hi: "abhi stock mein nahi", mr: "आत्ता स्टॉकमध्ये नाही", en: "out of stock now"}
+ret_head: {hi: "Wapas aaye: {line}", mr: "परत आले: {line}", en: "Welcome back: {line}"}
+ret_match: {hi: "Ye customer pehle bhi aaye the: {line}. Wahi se aage badhein?", mr: "हे ग्राहक आधीही आले होते: {line}. तिथूनच पुढे?", en: "This customer came before: {line}. Carry on from there?"}
+ret_msg_prefix: {hi: "Yaad dila doon: {line}", mr: "आठवण: {line}", en: "Last time: {line}"}
+b_ret_continue: {hi: "Wahi se aage", mr: "तिथूनच पुढे", en: "Carry on"}
+b_ret_fresh: {hi: "Naye sire se", mr: "नव्याने", en: "Start fresh"}
+swap_out: {hi: "{model} abhi stock mein nahi hai.", mr: "{model} आत्ता स्टॉकमध्ये नाही.", en: "{model} is out of stock right now."}
+swap_line: {hi: "Usi fit ka, stock mein: {model}", mr: "त्याच फिटचा, स्टॉकमध्ये: {model}", en: "Same fit, in stock: {model}"}
+b_swap: {hi: "Ye lo: {model}", mr: "हा घ्या: {model}", en: "Use {model}"}
+wins_today: {hi: "Aaj: {what}", mr: "आज: {what}", en: "Today: {what}"}
+wins_yesterday: {hi: "Kal: {what}", mr: "काल: {what}", en: "Yesterday: {what}"}
+wins_cards: {hi: "{n} Parivaar Card", mr: "{n} परिवार कार्ड", en: "{n} Family Cards"}
+wins_answered: {hi: "{n} ka jawab aaya", mr: "{n} उत्तरं आली", en: "{n} answered"}
+wins_sales: {hi: "{n} sale", mr: "{n} विक्री", en: "{n} sales"}
+wins_streak: {hi: "{n} din ki streak", mr: "{n} दिवसांची streak", en: "{n}-day streak"}
+wins_none: {hi: "Aaj abhi shuru hai. Pehla Parivaar Card bhejiye!", mr: "आज सुरुवात आहे. पहिलं परिवार कार्ड पाठवा!", en: "The day has just started. Send your first Family Card!"}
+tm_ab: {hi: "{a} vs {b} deewar par", mr: "{a} vs {b} भिंतीवर", en: "{a} vs {b} on the wall"}
+tm_ab_d: {hi: "Dono ek photo mein, sahi size mein", mr: "दोन्ही एका फोटोत, खऱ्या साइजमध्ये", en: "Both in one picture, at true size"}
+row_abwall: {hi: "Dono deewar par", mr: "दोन्ही भिंतीवर", en: "Both on their wall"}
+row_abwall_d: {hi: "A aur B unke ghar mein, ek photo mein, sahi size", mr: "A आणि B त्यांच्या घरात, एका फोटोत", en: "A and B in their room, one picture, true size"}
+ab_like: {hi: "{label} pasand", mr: "{label} आवडला", en: "Like {label}"}
+ab_bolo: {hi: "दोनों आपकी दीवार पर, सही साइज़ में — {a} या {b}, कौन सा अच्छा लग रहा है?", mr: "दोन्ही तुमच्या भिंतीवर, खऱ्या साइजमध्ये — {a} की {b}, कोणता छान वाटतो?", en: "Both on your wall, at true size: {a} or {b}, which looks right?"}
+kyun_ab: {hi: "Dekh kar faisla: spec ki baat se tez aur pakka", mr: "पाहून निर्णय: स्पेक्सपेक्षा जलद आणि पक्का", en: "Seeing decides faster and surer than specs"}
+row_view: {hi: "Sofa se kitna bada", mr: "सोफ्यावरून किती मोठा दिसेल", en: "How big from the sofa"}
+row_view_d: {hi: "Har size: cinema ki kaunsi seat jaisa", mr: "प्रत्येक साइज: सिनेमातील कोणती सीट", en: "Each size as a cinema seat, from their distance"}
+view_need: {hi: "Iske liye sofa se doori chahiye (TV ke options ke saath).", mr: "यासाठी सोफ्यापासूनचं अंतर हवं (टीव्ही पर्यायांसोबत).", en: "This needs the sofa distance (with TV options shown)."}
+view_title: {hi: "How big it feels", mr: "How big it feels", en: "How big it feels"}
+view_note: {hi: "Angle of view from your sofa. Cinemas aim for about 30° to 40°.", mr: "Angle of view from your sofa. Cinemas aim for about 30° to 40°.", en: "Angle of view from your sofa. Cinemas aim for about 30° to 40°."}
+view_seat_back: {hi: "पीछे की सीट जैसा", mr: "मागच्या सीटसारखं", en: "Back rows"}
+view_seat_middle: {hi: "बीच की सीट जैसा", mr: "मधल्या सीटसारखं", en: "Middle rows"}
+view_seat_best: {hi: "सबसे अच्छी सीट जैसा", mr: "सर्वात छान सीटसारखं", en: "The best seats"}
+view_seat_front: {hi: "आगे की सीट जैसा", mr: "पुढच्या सीटसारखं", en: "Front row"}
+view_bolo: {hi: "आपके {ft} ft से {label} ({size}) सिनेमा में {seat} लगेगा।", mr: "तुमच्या {ft} ft अंतरावरून {label} ({size}) सिनेमात {seat} वाटेल.", en: "From your {ft} ft, {label} ({size}) feels like {seat} in a cinema."}
+view_kyun: {hi: "Nazar ka angle: {lines} · cinema ~30°–40°", mr: "नजरेचा कोन: {lines} · सिनेमा ~30°–40°", en: "Angle of view: {lines} · cinemas ~30°–40°"}

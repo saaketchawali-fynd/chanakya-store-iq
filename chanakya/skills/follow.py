@@ -399,6 +399,9 @@ async def create_task(ctx: SkillContext, when: str) -> Reply:
 
 async def sold(ctx: SkillContext) -> Reply:
     ctx.x["outcome"] = "sold"
+    if not ctx.x.get("sale_marked"):
+        ctx.x["sale_marked"] = True
+        ctx.ev("sale_marked")  # the associate's wins
     if needs_install(ctx) and not ctx.x.get("install_job_id"):
         pending = [sid for sid in ctx.pack.site_needs if not P.known(ctx.session.home, sid) and ctx.pack.slot(sid)]
         if pending:  # what the installer must know (one tap each), before the slot

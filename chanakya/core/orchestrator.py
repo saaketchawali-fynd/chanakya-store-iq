@@ -94,6 +94,8 @@ class Orchestrator:
                 lang = ctx.lang
                 if ctx.session and m.to == ctx.actor_wa_id and m.session_id is None:
                     m.session_id = ctx.session.id
+                if ctx.session and ctx.role == "associate":
+                    ctx.session.extra["last_touch"] = ctx.now.isoformat()
                 voice_footer(ctx, m)
                 out = self.svc.validate(m, ctx.reg, home, lang, ctx.asking, ctx.session)
                 await self.svc.deliver(out)

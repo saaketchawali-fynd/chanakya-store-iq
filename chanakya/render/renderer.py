@@ -38,6 +38,7 @@ TEMPLATE_NAMES = (
     "brief",
     "digest",
     "offer",
+    "view",
 )
 WIDTH = 1080
 MAX_HEIGHT = 1350
@@ -1061,6 +1062,13 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
             ),
             "stamp": "1 Nov 18:40",
         }
+    if template == "view":
+        return {"title": "How big it feels", "distance": "10 ft",
+                "rows": [{"label": "A", "size": "55 inch", "model": "Arka 55 4K", "deg": "24", "deg_f": 24.1,
+                          "seat": "middle", "seat_text": "Middle rows", "dx": 128.1},
+                         {"label": "B", "size": "65 inch", "model": "Meru 65 Pro", "deg": "28", "deg_f": 28.4,
+                          "seat": "best", "seat_text": "The best seats", "dx": 151.9}],
+                "note": "Angle of view from your sofa. Cinemas aim for about 30° to 40°."}
     if template == "parivaar":  # the Family Card is English (one card)
         return {
             "kicker": "Picked for the Shah family",

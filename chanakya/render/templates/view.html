@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{# Viewing comfort (English): from the customer's sofa distance, how much of the view each screen fills, shown top-down
+   (the sofa at the bottom, each screen's width as an arc) and as a cinema seat. Plain geometry, no claims. #}
+{% set rs = (rows|aslist)[:3] %}
+{% block style %}
+  .plot { padding: 34px 36px 26px; }
+  .gauge { position: relative; padding: 46px 0 6px 74px; }
+  .scale { position: absolute; left: 74px; right: 96px; top: 0; height: 30px; font-size: 20px; color: var(--faint); }
+  .scale span { position: absolute; transform: translateX(-50%); }
+  .band { position: absolute; left: calc(74px + (100% - 170px) * 0.6); width: calc((100% - 170px) * 0.2); top: 34px; bottom: 0;
+          background: var(--green-pale); border-radius: 12px; }
+  .band i { position: absolute; bottom: -34px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+            font-style: normal; font-size: 19px; font-weight: 600; color: var(--green-deep); }
+  .bar { position: relative; display: flex; align-items: center; gap: 16px; margin: 18px 0; }
+  .bar .bl { position: absolute; left: -74px; width: 50px; height: 50px; border-radius: 14px; background: var(--indigo); color: #fff;
+             font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .bar .bl.best { background: var(--saffron); }
+  .track { flex: 1; height: 26px; border-radius: 13px; background: #EEF0F3; overflow: hidden; position: relative; }
+  .fill { height: 100%; border-radius: 13px; background: #94A3B8; }
+  .fill.best { background: var(--saffron); }
+  .bv { flex: none; width: 80px; font-size: 30px; font-weight: 700; color: var(--ink); text-align: right; }
+  .gauge { margin-bottom: 30px; }
+  .seatrow { display: flex; align-items: center; gap: 18px; padding: 14px 4px; }
+  .seatrow + .seatrow { border-top: 1.5px solid var(--line); }
+  .lt { flex: none; width: 52px; height: 52px; border-radius: 15px; background: var(--indigo); color: #fff; font-size: 26px;
+        font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .lt.best { background: var(--saffron); }
+  .nm { flex: 1; min-width: 0; font-size: 29px; font-weight: 700; color: var(--ink); }
+  .nm .s { display: block; font-size: 22px; font-weight: 500; color: var(--muted); }
+  .dg { flex: none; text-align: right; }
+  .dg b { display: block; font-size: 36px; color: var(--ink); }
+  .dg span { font-size: 21px; font-weight: 600; color: var(--saffron-deep); }
+  .dg span.best { color: var(--green-deep); }
+  .nt { margin-top: 18px; font-size: 21px; color: var(--muted); padding: 0 6px; }
+{% endblock %}
+{% block header %}
+  <div class="kicker">{{ L.kicker|default('From your sofa') }}</div>
+  <h1>{{ title }}</h1>
+  <div class="sub">{{ distance }} · from where you sit</div>
+{% endblock %}
+{% block content %}
+  <section class="card plot">
+    <div class="gauge">
+      <div class="scale"><span style="left:0%">0°</span><span style="left:40%">20°</span><span style="left:60%">30°</span><span style="left:80%">40°</span><span style="left:100%">50°</span></div>
+      <div class="band" title="cinema"><i>Cinema's best seats</i></div>
+      {% for r in rs %}
+      <div class="bar"><span class="bl{% if r.seat == 'best' %} best{% endif %}">{{ r.label }}</span>
+        <div class="track"><div class="fill{% if r.seat == 'best' %} best{% endif %}" style="width: {{ [r.deg_f * 2, 100]|min }}%"></div></div>
+        <span class="bv num">{{ r.deg }}°</span></div>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="card" style="margin-top: 18px">
+    {% for r in rs %}
+    <div class="seatrow"><span class="lt{% if r.seat == 'best' %} best{% endif %}">{{ r.label }}</span>
+      <span class="nm">{{ r.size }}<span class="s">{{ r.model }}</span></span>
+      <span class="dg num"><b>{{ r.deg }}°</b><span class="{{ 'best' if r.seat == 'best' else '' }}">{{ r.seat_text }}</span></span></div>
+    {% endfor %}
+  </section>
+  {% if note %}<div class="nt">{{ note }}</div>{% endif %}
+{% endblock %}

@@ -34,11 +34,13 @@ from chanakya.skills import (
     follow,
     manager,
     recommend,
+    returning,
     review,
     staff_name,
     translate,
     tryon_flow,
     validate,
+    view,
     visitlog,
 )
 from chanakya.skills.base import SkillContext
@@ -90,6 +92,9 @@ CMD = {
     "score": {"score"},
     "language": {"language", "bhasha", "भाषा", "lang"},
     "catalog": {"catalog", "catalogue", "products", "models", "सूची", "यादी"},
+    "wins": {"wins", "meri jeet", "jeet", "streak", "मेरी जीत", "माझी जीत"},
+    "view": {"sofa se", "view", "viewing", "kitna bada lagega", "सोफ्यावरून", "सोफे से"},
+    "abwall": {"a vs b", "dono deewar par", "side by side", "दोन्ही भिंतीवर"},
 }
 
 
@@ -474,6 +479,14 @@ async def global_action(ctx: SkillContext, bid: ButtonId) -> Reply:
 
 async def command(ctx: SkillContext, name: str, arg: str) -> Reply:
     s = ctx.session
+    if name == "wins":
+        from chanakya.skills import wins
+
+        return await wins.show(ctx)
+    if name == "view" and s and s.option_labels:
+        return await view.show(ctx)
+    if name == "abwall" and s and len(s.option_labels) >= 2:
+        return await tryon_flow.choose(ctx, "ab", None)
     if name == "brief":
         return await brief.brief(ctx)
     if name == "new":
@@ -575,6 +588,9 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "offers": lambda: close.offers(ctx),
         "ofs": lambda: recommend.offers_view(ctx),
         "upgrade": lambda: recommend.upgrade_view(ctx),
+        "returning": lambda: returning.list_view(ctx),
+        "view": lambda: view.show(ctx),
+        "abwall": lambda: tryon_flow.choose(ctx, "ab", None),
         "emi": lambda: close.quote(ctx, alt=True),
         "delivery": lambda: close.delivery(ctx),
         "parivaar": lambda: follow.parivaar(ctx),
@@ -593,6 +609,10 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     if action == "lang":
         ctx.session.extra["lang_tapped"] = True
         return await assess.set_customer_lang(ctx, a0 or "hi")
+    if action == "retpick" and a0:
+        return await returning.resume(ctx, ":".join(args))
+    if action == "swap" and a0:
+        return await returning.swap(ctx, a0)
     if action == "voiceq" and a0:
         return await assess.voice_answer(ctx, a0)
     if action == "dq" and a0 and a1:
@@ -687,6 +707,16 @@ async def _understand_ctx(ctx: SkillContext) -> dict:
 
 
 async def on_speech(ctx: SkillContext) -> Reply:
+    r = await _on_speech(ctx)
+    s = ctx.session
+    if s is not None and s.home.customer_name and not s.extra.get("ret_offered") and ctx.role == "associate":
+        m = await returning.name_match(ctx)  # 'Shah ji came 3 days ago: liked B…' — carry on, no re-asking
+        if m is not None:
+            r.messages.insert(0, m)
+    return r
+
+
+async def _on_speech(ctx: SkillContext) -> Reply:
     msg = ctx.inbound
     s = ctx.session
     text = msg.text if msg.type == "text" else None

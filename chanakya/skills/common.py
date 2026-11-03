@@ -198,6 +198,8 @@ def category_message(ctx: SkillContext) -> OutMessage:
         cats.insert(0, dept)
     rows = [ListRow(id=ctx.sid("cat", c), title=truncate(ctx.t(f"cat_{c}"), 24), description=truncate(ctx.t(f"cat_{c}_d"), 72))
             for c in cats]
+    rows.append(ListRow(id=ctx.sid("returning"), title=truncate(ctx.t("row_returning"), 24),
+                        description=truncate(ctx.t("row_returning_d"), 72)))  # came back: carry on, no re-asking
     for r in rows:
         ctx.reg.static(r.title + " " + (r.description or ""))
     code = ctx.reg.raw(ctx.session.code, "session:code")

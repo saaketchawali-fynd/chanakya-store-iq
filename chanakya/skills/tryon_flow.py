@@ -118,6 +118,8 @@ async def menu(ctx: SkillContext) -> Reply:
         b = ctx.reg.num(same[0].spec("size_in"), f"spec:{same[0].sku}:size_in")
         rows.append(_row(ctx, "size", ctx.t("tm_size", a=a, b=b), ctx.t("tm_size_d")))
     if len(s.option_labels) >= 2:
+        pair = ab_pair(s, ctx.facts)
+        rows.insert(0, _row(ctx, "ab", ctx.t("tm_ab", a=pair[0][0], b=pair[1][0]), ctx.t("tm_ab_d")))
         rows.append(_row(ctx, "all", ctx.t("tm_all"), " · ".join(sorted(s.option_labels))))
     cats = list(dict.fromkeys(p.category for p in prods))
     if len(cats) >= 2:
@@ -185,6 +187,8 @@ def _plans(ctx: SkillContext, mode: str, sku: str | None) -> list[list[tuple]]:
         other = next((p for p in prods[1:] if p.category == best.category and p.spec("size_in") != best.spec("size_in")),
                      None)
         return [[(best, True)] + ([(other, False)] if other else [])]
+    if mode == "ab" and len(s.option_labels) >= 2:  # A vs B on their wall: each drawn alone, then one picture
+        return [[(f.product_sync(sku), True)] for _, sku in ab_pair(s, f)]
     if mode == "all" and s.option_labels:
         return [[(f.product_sync(s.option_labels[k]), True)] for k in ("A", "B", "C") if s.option_labels.get(k)]
     if mode == "combo" and prods:
@@ -194,6 +198,66 @@ def _plans(ctx: SkillContext, mode: str, sku: str | None) -> list[list[tuple]]:
         return [[(p, True) for p in firsts.values()]]
     picks = [p for p in pick_products(ctx) if p]
     return [[(p, i == 0) for i, p in enumerate(picks[:2])]] if picks else []
+
+
+def ab_pair(s, facts=None) -> list[tuple[str, str]]:
+    """The two options to put side by side: the best pick and, preferably, one of a different size (the eye judges
+    size best); else the cheaper one, else the step up. In label order."""
+    roles = s.extra.get("option_roles") or {}
+    best = next((lab for lab, r in roles.items() if r == "best"), None) or sorted(s.option_labels)[0]
+    others = [lab for lab in sorted(s.option_labels) if lab != best]
+    other = None
+    if facts is not None:
+        b = facts.product_sync(s.option_labels[best])
+        size = b.spec("size_in") if b else None
+        other = next((lab for lab in others if size and (p := facts.product_sync(s.option_labels[lab]))
+                      and p.spec("size_in") and p.spec("size_in") != size), None)
+    other = other or next((lab for lab, r in roles.items() if r == "value"), None) or (others[0] if others else None)
+    pair = sorted({best, other} - {None})
+    return [(lab, s.option_labels[lab]) for lab in pair]
+
+
+def ab_picture(ctx: SkillContext, items: list[tuple[str, object, bytes]]) -> bytes:
+    """One picture: each option on the customer's own wall (clean, centred crop), stacked, with a clear label."""
+    import io
+
+    from PIL import Image, ImageDraw
+
+    from chanakya.tryon import fonts
+
+    W = 1080
+    panels = []
+    for lab, p, hero in items:
+        im = Image.open(io.BytesIO(hero)).convert("RGB")
+        im = im.resize((W, round(W * im.height / im.width)), Image.Resampling.LANCZOS)
+        d = ImageDraw.Draw(im, "RGBA")
+        size = p.spec("size_in")
+        title = f'{lab}  {p.short_name()}' + (f'  ·  {int(size)}"' if size else "")
+        f1 = fonts.latin(40, bold=True)
+        tw = d.textlength(title, font=f1)
+        d.rounded_rectangle((28, 26, 28 + tw + 44, 26 + 70), radius=35, fill=(11, 16, 32, 225))
+        d.text((50, 38), title, font=f1, fill=(255, 255, 255))
+        dims = PV.dims_text(ctx, p)
+        if dims:
+            f2 = fonts.latin(28)
+            dw = d.textlength(dims, font=f2)
+            d.rounded_rectangle((28, 106, 28 + dw + 36, 106 + 50), radius=25, fill=(255, 255, 255, 230))
+            d.text((46, 116), dims, font=f2, fill=(31, 41, 55))
+        panels.append(im)
+    gap, foot = 10, 64
+    H = sum(p.height for p in panels) + gap * (len(panels) - 1) + foot
+    out = Image.new("RGB", (W, H), (11, 16, 32))
+    y = 0
+    for im in panels:
+        out.paste(im, (0, y))
+        y += im.height + gap
+    d = ImageDraw.Draw(out)
+    f3 = fonts.latin(26)
+    note = "Same wall · true size · approximate preview"
+    d.text(((W - d.textlength(note, font=f3)) / 2, H - foot + 18), note, font=f3, fill=(199, 203, 214))
+    b = io.BytesIO()
+    out.save(b, "JPEG", quality=88)
+    return b.getvalue()
 
 
 def _label(ctx: SkillContext, p) -> str:
@@ -312,6 +376,7 @@ async def job(ctx: SkillContext) -> Reply:
     mount = "stand" if P.value(s.home, "mounting") == "stand" else "wall"
     dist = P.number(s.home, "seat_distance", ctx.pack)
     msgs, drawn = [], []
+    heroes: list[tuple] = []
     fetched: dict[str, str] = {}
     placement: dict[str, dict] = {}
     for pl in plans:
@@ -360,6 +425,8 @@ async def job(ctx: SkillContext) -> Reply:
             await repo.media_put(s.id, "tryon_hero", res.hero, "image/jpeg", ctx.now, days=2)
             s.extra["tryon_hero_sku"] = res.hero_sku
         drawn.append([p.sku for p, _ in pl])
+        if req_spec.get("mode") == "ab" and res.hero:
+            heroes.append((pl[0][0], res.hero))
         msgs.append(_tryon_message(ctx, pl, res.image))
     ms = int((time.perf_counter() - t0) * 1000)
     from chanakya.app import memory
@@ -369,6 +436,20 @@ async def job(ctx: SkillContext) -> Reply:
     if not msgs:
         btns = [ctx.b("b_other_wall", ctx.sid("photo_yes")), ctx.b("b_go", ctx.sid("go"))]
         return ctx.reply(info_reply(ctx, ctx.t("tryon_failed"), btns))
+    if req_spec.get("mode") == "ab" and len(heroes) == 2:  # the two options in ONE picture: decide by seeing
+        labs = {sku: lab for lab, sku in s.option_labels.items()}
+        items = [(labs.get(p.sku, "?"), p, hero) for p, hero in heroes]
+        pic = await asyncio.to_thread(ab_picture, ctx, items)
+        a, b = items[0], items[1]
+        btns = [Button(id=ctx.sid("tpick", p.sku), title=ctx.t("ab_like", label=lab)[:20]) for lab, p, _ in (a, b)]
+        btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
+        say = ctx.t("ab_bolo", ctx.clang, a=a[0], b=b[0])
+        cites = C.known_cites(ctx, ["seat_distance", "room_size", "niche_width_cm"])
+        m = coach_reply(ctx, say, ctx.t("kyun_ab"), cites, btns) if cites else info_reply(ctx, f'"{say}"', btns)
+        m.image_bytes, m.kind = pic, "buttons"
+        s.tryon_done = True
+        ctx.ev("tryon_ab_sent", skus=[p.sku for _, p, _ in items], ms=ms)
+        return ctx.reply(m)
     s.tryon_done = True
     s.extra["tryon_skus"] = drawn[0]
     ctx.ev("tryon_sent", skus=[x for d in drawn for x in d], verified=False, ms=ms, mode=req_spec.get("mode"))
