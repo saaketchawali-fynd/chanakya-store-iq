@@ -122,7 +122,11 @@ async def voice_check(request: Request):
         last = diag.snapshot().get("ai_last_transcribe") or {}
         out.update(transcript=text[:200], transcribe_ms=int((t1 - t0) * 1000), transcribe_model=last.get("model"),
                    models_tried=last.get("tried"))
-        u = await ai._understand_text(text, {"category": "tv"})
+        pack = rt.packs.get("tv")  # the same context a real note gets: the TV questions and their answer ids
+        ctx = {"category": "tv", "known_slots": {}, "slots": [
+            {"id": sd.id, "hint": sd.ask.get("en", ""), "number_name": sd.number,
+             "values": [{"id": v, "means": sd.value_title(v, "en")} for v in sd.values]} for sd in pack.slots]}
+        u = await ai._understand_text(text, ctx)
         t2 = time.perf_counter()
         lu = diag.snapshot().get("ai_last_understand_text") or {}
         out.update(ok=True, understand_ms=int((t2 - t1) * 1000), understand_model=lu.get("model") if lu.get("ok") else "rules",
