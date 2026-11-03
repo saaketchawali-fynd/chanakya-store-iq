@@ -187,9 +187,11 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
     s.extra["option_roles"] = {o.label: o.role for o in opts.options}
     best, value, step = opts.by_role("best"), opts.by_role("value"), opts.by_role("step")
     s.shortlist = [o.product.sku for o in (best, value, step) if o]
-    from chanakya.skills.tryon_flow import add_interest
+    from chanakya.skills.tryon_flow import add_interest, prefetch_photos
 
     add_interest(ctx, *s.shortlist)
+    if pack.placeable and ctx.svc.orchestrator is not None:  # photos ready before 'Ghar mein dekho' is tapped
+        ctx.svc.orchestrator.spawn(prefetch_photos(ctx.facts, list(s.shortlist)))
     state.advance(s, Step.RECOMMEND)
     ctx.ev(
         "options_shown",
@@ -237,29 +239,156 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
     return ctx.reply(m1)
 
 
-async def demo(ctx: SkillContext) -> Reply:
-    """The one demo that shows the difference between the options (picked when the options were shown)."""
+# the demo plan (user, 4 Nov 2026): what they asked for first, then their needs compared with the real options,
+# then one more difference the data shows; each step names its order and the actual values on both models
+FEATURE_KEYS = {
+    "tv": ["resolution", "hdr_formats", "panel", "os", "refresh_hz", "brightness_nits", "speaker_w"],
+    "ac": ["inverter", "star", "noise_db", "wifi"],
+    "wm": ["load", "automatic", "rpm", "heater"],
+    "fridge": ["frost_free", "door", "star_rating", "inverter_compressor", "convertible"],
+    "laptop": ["ram_gb", "storage_gb", "battery_h", "gpu", "weight_kg", "screen_in"],
+}
+MAX_STEPS = 3
+
+
+def _val(p, key: str):
+    v = p.brand if key == "brand" else p.spec(key)
+    return None if v in (None, "", []) else v
+
+
+def demo_plan(ctx: SkillContext) -> list[dict]:
+    """Up to three demo steps for THIS customer, in order. Each compares the best pick with an option that really
+    differs on it (both values from the data)."""
+    from chanakya.brain.demos import rank_demos
+
+    s = ctx.session
+    opts = _option_set(ctx)
+    best = opts.by_role("best") if opts else None
+    if best is None:
+        return []
+    others = [o for o in opts.options if o is not best]
+
+    def differs(key: str | None) -> str | None:
+        if not key:
+            return others[0].label if others else None
+        bv = _val(best.product, key)
+        if bv is None:
+            return None
+        return next((o.label for o in others if _val(o.product, key) is not None and str(_val(o.product, key)) != str(bv)),
+                    None)
+
+    steps, used = [], set()
+    for key in s.extra.get("wants") or {}:  # 1. what they asked for (picture type, brand, size …), shown first
+        if _val(best.product, key) is None:
+            continue
+        steps.append({"kind": "want", "key": key, "other": differs(key)})  # no other differs: show it on the best
+        used.add(key)
+    for d, other, _ in rank_demos(opts, s.home, ctx.pack, ctx.facts.snap.guides):  # 2. their needs, strongest first
+        if len(steps) >= MAX_STEPS - 1 or (d.differs_on and d.differs_on in used):
+            continue
+        steps.append({"kind": "recipe", "id": d.id, "other": other, "key": d.differs_on})
+        if d.differs_on:
+            used.add(d.differs_on)
+    for key in FEATURE_KEYS.get(ctx.pack.category, []):  # 3. one more real difference in the data
+        if len(steps) >= MAX_STEPS:
+            break
+        if key not in used and (lab := differs(key)):
+            steps.append({"kind": "feature", "key": key, "other": lab})
+            break
+    return steps[:MAX_STEPS]
+
+
+def _step_title(ctx: SkillContext, st: dict, lang: str) -> str:
+    from chanakya.i18n.lang import pick
+
+    if st["kind"] == "recipe":
+        d = ctx.pack.demo(st["id"])
+        return pick(d.title, lang) if d else st["id"]
+    key = st["key"]
+    if i18n_has(f"want_label_{key}"):
+        return ctx.t(f"want_label_{key}", lang)
+    return pick(PV.LABELS.get(key, ({"en": key}, ""))[0], lang)
+
+
+def i18n_has(key: str) -> bool:
+    from chanakya.i18n import lang as i18n
+
+    return i18n.has(key)
+
+
+def _values(ctx: SkillContext, key: str | None, best_lab: str, bp, other_lab: str, op) -> str:
+    if not key:
+        return ""
+    from chanakya.brain import data_questions as DQ
+
+    def fmt(p):
+        if key == "brand":
+            return ctx.reg.raw(p.brand, f"product:{p.sku}")
+        v = PV.fmt_value(ctx, p, key, ctx.lang, customer=False)
+        if v is None and isinstance(_val(p, key), bool):
+            v = DQ.label(key, _val(p, key))
+        return v
+
+    vb, vo = fmt(bp), fmt(op)
+    return ctx.t("demo_vals", a=best_lab, va=vb, b=other_lab, vb=vo) if vb and vo else ""
+
+
+async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
+    """The demo plan, one step at a time: 'Demo 1/3 · what they asked for', with both models' values."""
     s = ctx.session
     if not s.shortlist:
         return await show_options(ctx)
-    d = ctx.pack.demo(s.demo_recipe) if s.demo_recipe else None
-    if d is None:
-        opts = _option_set(ctx)
-        nxt = pick_demo(opts, s.home, ctx.pack, ctx.facts.snap.guides) if opts else None
-        if nxt is None:
-            return await prefer(ctx)
-        d, other, _ = nxt
-        s.demo_recipe = d.id
-        ctx.x["demo_other"] = other
-    from chanakya.brain.demos import _rule_for_spec
-
-    rule = _rule_for_spec(ctx.pack, d.differs_on) if d.differs_on else None  # the reason THIS demo shows
-    reason_key = rule.id if rule is not None and rule.id in ctx.pack.reasons else None
+    key = sorted(s.option_labels.values())
+    if ctx.x.get("demo_plan_for") != key or not ctx.x.get("demo_plan"):
+        ctx.x["demo_plan"], ctx.x["demo_plan_for"], ctx.x["demo_i"] = demo_plan(ctx), key, 0
+    plan = ctx.x["demo_plan"]
+    i = ctx.x.get("demo_i", 0) if i is None else i
+    if not plan or i >= len(plan):
+        ctx.x["demo_i"] = 0
+        return await prefer(ctx)
+    ctx.x["demo_i"] = i
+    st = plan[i]
+    best_lab = state.best_label(s) or "B"
+    bp = ctx.facts.product_sync(s.option_labels[best_lab])
+    alone = not st.get("other")  # what they asked for, and every option has it: show it on the best pick
+    op = bp if alone else ctx.facts.product_sync(s.option_labels.get(st["other"]) or s.option_labels[best_lab])
+    head = ctx.t("demo_head", i=ctx.reg.num(i + 1, "demo:step"), n=ctx.reg.num(len(plan), "demo:steps"))
+    vals = "" if alone else _values(ctx, st.get("key"), best_lab, bp, st["other"], op)
+    if alone and st.get("key"):
+        v = PV.fmt_value(ctx, bp, st["key"], ctx.lang, customer=False) if st["key"] != "brand" else ctx.reg.raw(bp.brand, "product")
+        vals = ctx.t("demo_val_one", a=best_lab, va=v) if v else ""
+    has_next = i + 1 < len(plan)
+    s.demo_recipe = st.get("id") or f"{st['kind']}:{st['key']}"
     sent = ctx.x.setdefault("demos_sent", [])
-    if d.id not in sent:  # so "Dusra demo" shows a different one
-        sent.append(d.id)
-    ctx.ev("demo_recipe_sent", recipe=d.id)
-    return ctx.reply(demo_message(ctx, d, ctx.x.get("demo_other"), reason_key=reason_key))
+    if s.demo_recipe not in sent:
+        sent.append(s.demo_recipe)
+    ctx.ev("demo_recipe_sent", recipe=s.demo_recipe, demo_step=i + 1, of=len(plan))
+    if st["kind"] == "recipe":
+        from chanakya.brain.demos import _rule_for_spec
+
+        d = ctx.pack.demo(st["id"])
+        rule = _rule_for_spec(ctx.pack, d.differs_on) if d.differs_on else None
+        reason_key = rule.id if rule is not None and rule.id in ctx.pack.reasons else None
+        ctx.x["demo_other"] = st["other"]
+        msg = demo_message(ctx, d, st["other"], reason_key=reason_key, why_prefix=head, why_suffix=vals,
+                           has_next=has_next)
+    else:
+        what_c, what_a = _step_title(ctx, st, ctx.clang), _step_title(ctx, st, ctx.lang)
+        say_key = "demo_want_one_say" if alone else f"demo_{st['kind']}_say"
+        say = ctx.tc(say_key, what=what_c, best=C.product_name(ctx, bp), other=C.product_name(ctx, op))
+        why = f"{head} · " + ctx.t(f"demo_{st['kind']}_why", what=what_a) + (f" · {vals}" if vals else "")
+        msg = coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next))
+    if i == 0 and len(plan) > 1:  # the plan at a glance: what to show first, then next
+        msg.footer = ctx.t("demo_plan_line", steps=" → ".join(_step_title(ctx, x, ctx.lang) for x in plan))[:60]
+    return ctx.reply(msg)
+
+
+def _demo_buttons(ctx: SkillContext, has_next: bool) -> list:
+    btns = [ctx.b("b_shown", ctx.sid("shown"))]
+    if has_next:
+        btns.append(ctx.b("b_demo_next_step", ctx.sid("demo2")))
+    btns.append(ctx.b("b_tryon", ctx.sid("tryon")) if ctx.pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")))
+    return btns
 
 
 async def prefer(ctx: SkillContext) -> Reply:
@@ -339,7 +468,8 @@ async def rerank(ctx: SkillContext, how: str) -> Reply:
     return r
 
 
-def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str | None = None) -> OutMessage:
+def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str | None = None, why_prefix: str = "",
+                 why_suffix: str = "", has_next: bool = True) -> OutMessage:
     s = ctx.session
     pack = ctx.pack
     best_p = ctx.facts.product_sync(state.best_sku(s)) if state.best_sku(s) else None
@@ -358,10 +488,13 @@ def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str 
     why = fill(ctx.pick(d.steps), best=best, other=other, steps=steps)
     if reason_key:
         why += " — " + ctx.t("because") + " " + _reason(ctx, reason_key, ctx.lang)
+    if why_prefix:
+        why = f"{why_prefix} · {why}"
+    if why_suffix:
+        why = f"{why} · {why_suffix}"
     cites = [k for k in d.when_slots if P.known(s.home, k)] or C.known_cites(ctx)
-    btns = [ctx.b("b_shown", ctx.sid("shown")), ctx.b("b_demo2", ctx.sid("demo2"))]
-    btns.append(ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")))
-    return coach_reply(ctx, say, why, cites, btns)
+    _ = pack
+    return coach_reply(ctx, say, why, cites, _demo_buttons(ctx, has_next))
 
 
 async def shown(ctx: SkillContext) -> Reply:
@@ -376,22 +509,10 @@ async def shown(ctx: SkillContext) -> Reply:
 
 
 async def demo2(ctx: SkillContext) -> Reply:
-    s = ctx.session
-    opts = _option_set(ctx)
-    if opts is None or not s.shortlist:
+    """The next step of the demo plan; after the last one, which one felt right."""
+    if not ctx.session.shortlist:
         return await show_options(ctx)
-    used = set(ctx.x.get("demos_sent", []))
-    nxt = pick_demo(opts, s.home, ctx.pack, ctx.facts.snap.guides, skip=used)
-    if nxt is None:
-        ctx.x["demos_sent"] = []
-        nxt = pick_demo(opts, s.home, ctx.pack, ctx.facts.snap.guides)
-    if nxt is None:  # no other honest difference to show: ask which one felt right
-        return await prefer(ctx)
-    d, other, _ = nxt
-    s.demo_recipe = d.id
-    ctx.x.setdefault("demos_sent", []).append(d.id)
-    ctx.ev("demo_recipe_sent", recipe=d.id)
-    return ctx.reply(demo_message(ctx, d, other))
+    return await demo(ctx, int(ctx.x.get("demo_i", 0)) + 1)
 
 
 async def override(ctx: SkillContext, gate: str, reason: str) -> Reply:

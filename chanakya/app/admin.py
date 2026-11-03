@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import APIRouter, Header, HTTPException, Request
 
 from chanakya.config import get_settings
@@ -85,6 +87,52 @@ async def health(request: Request):
         "config": config,
         "delivery": diag.snapshot(),
     }
+
+
+_VOICE_CHECK: dict = {}
+VOICE_SAMPLE = Path(__file__).resolve().parents[2] / "data" / "fixtures" / "audio" / "voice_check_hi.ogg"
+
+
+@router.get("/health/voice")
+async def voice_check(request: Request):
+    """The voice path, measured on this server with its own key: a short Hindi sample note is transcribed (across the
+    models, as for a real note), then understood. Cached 5 minutes, so it cannot run up costs."""
+    import time
+
+    from chanakya.ai import prompts
+    from chanakya.ai.gemini import AIUnavailable
+    from chanakya.app import diag
+
+    now = time.time()
+    if _VOICE_CHECK and now - _VOICE_CHECK.get("_at", 0) < 300:
+        return {k: v for k, v in _VOICE_CHECK.items() if not k.startswith("_")} | {"cached": True}
+    rt = request.app.state.rt
+    ai = rt.ai
+    if not ai.live or not VOICE_SAMPLE.is_file():
+        return {"ok": False, "error": "voice model not configured" if not ai.live else "sample missing"}
+    from google.genai import types
+
+    audio = VOICE_SAMPLE.read_bytes()
+    out: dict = {"ok": False}
+    t0 = time.perf_counter()
+    try:
+        part = types.Part.from_bytes(data=audio, mime_type="audio/ogg")
+        text = await ai.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=24.0)
+        t1 = time.perf_counter()
+        last = diag.snapshot().get("ai_last_transcribe") or {}
+        out.update(transcript=text[:200], transcribe_ms=int((t1 - t0) * 1000), transcribe_model=last.get("model"),
+                   models_tried=last.get("tried"))
+        u = await ai._understand_text(text, {"category": "tv"})
+        t2 = time.perf_counter()
+        lu = diag.snapshot().get("ai_last_understand_text") or {}
+        out.update(ok=True, understand_ms=int((t2 - t1) * 1000), understand_model=lu.get("model") if lu.get("ok") else "rules",
+                   slots=[f"{s.slot}={s.value}" for s in u.slots], numbers=[f"{n.name}={n.value}" for n in u.numbers],
+                   total_ms=int((t2 - t0) * 1000))
+    except AIUnavailable as e:
+        out.update(error=str(e)[:300], total_ms=int((time.perf_counter() - t0) * 1000))
+    _VOICE_CHECK.clear()
+    _VOICE_CHECK.update(out, _at=now)
+    return out
 
 
 @router.get("/admin/sessions")

@@ -10,6 +10,7 @@ from chanakya.app import admin, legal, webhook
 from chanakya.app.bootstrap import build, shutdown, start_data_sync, start_renderer
 from chanakya.channel.whatsapp import WhatsAppChannel
 from chanakya.config import get_settings
+from chanakya.live import routes as live_routes
 from chanakya.log import get_log, setup_logging
 
 log = get_log("main")
@@ -34,3 +35,4 @@ app = FastAPI(title="Chanakya — Store IQ (TEST)", lifespan=lifespan)
 app.include_router(webhook.router)
 app.include_router(admin.router)
 app.include_router(legal.router)
+app.include_router(live_routes.router)

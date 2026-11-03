@@ -41,7 +41,7 @@ async def test_scan_ac_label_in_ac_conversation_gives_fit(h):
     check_floor(out)
     d = out[0].card.data
     assert d["badge_kind"] in ("good", "partial") and d["fit_str"].endswith("%") and d["pros"]
-    assert d["price_str"] is None  # price locked before the demo
+    assert d["price_str"]  # a scanned label shows its own price (printed on the shelf tag): honest, from the data
 
 
 async def test_compare_two_real_labels(h):

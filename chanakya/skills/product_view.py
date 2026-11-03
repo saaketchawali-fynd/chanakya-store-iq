@@ -80,11 +80,13 @@ LABELS: dict[str, tuple[dict, str]] = {
     "year": ({"hi": "Launch year", "mr": "Launch year", "en": "Launch year"}, ""),
     "series": ({"hi": "Series", "mr": "Series", "en": "Series"}, ""),
 }
-KEY_SPECS = {
-    "tv": ["size_in", "panel", "refresh_hz", "brightness_nits", "speaker_w", "warranty"],
-    "ac": ["ton", "star", "noise_db", "kwh_year", "wifi", "warranty"],
+KEY_SPECS = {  # the ones the live backend carries are in each list too (rows with no data on either side are skipped)
+    "tv": ["size_in", "panel", "resolution", "refresh_hz", "brightness_nits", "hdr_formats", "os", "speaker_w", "wifi",
+           "warranty"],
+    "ac": ["ton", "star", "inverter", "noise_db", "kwh_year", "wifi", "warranty"],
     "wm": ["capacity_kg", "load", "rpm", "heater", "kwh_year", "warranty"],
-    "fridge": ["capacity_l", "door", "star_rating", "freezer_l", "stabiliser_free", "warranty"],
+    "fridge": ["capacity_l", "door", "frost_free", "star_rating", "inverter_compressor", "freezer_l", "convertible",
+               "stabiliser_free", "warranty"],
     "laptop": ["cpu", "ram_gb", "storage_gb", "battery_h", "weight_kg", "warranty"],
     "soundbar": ["speaker_w", "channels", "dialogue_enhance"],
 }

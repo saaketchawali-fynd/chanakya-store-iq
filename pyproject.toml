@@ -20,7 +20,7 @@ build-backend = "setuptools.build_meta"
 include = ["chanakya*"]
 
 [tool.setuptools.package-data]
-chanakya = ["brain/packs/*.yaml", "i18n/*.yaml", "render/templates/*.html", "render/static/**/*"]
+chanakya = ["brain/packs/*.yaml", "i18n/*.yaml", "render/templates/*.html", "render/static/**/*", "live/static/*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

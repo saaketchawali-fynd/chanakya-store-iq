@@ -90,8 +90,8 @@ class AIClient:
         from chanakya.app import diag
 
         try:
-            u = await self.gemini.json([text, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)], Understanding,
-                                       prompts.UNDERSTAND_SYSTEM, timeout=7.0, kind="understand_text")
+            u = await self.gemini.hedged([text, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)], Understanding,
+                                         prompts.UNDERSTAND_SYSTEM, 4.0, "understand_text")  # then the rules: < 5 s
             if not u.transcript:
                 u.transcript = text
             return u
@@ -158,12 +158,12 @@ class AIClient:
             if hint == "room":
                 ask += " It is a photo of a room in the customer's home."
             try:
-                return await self.gemini.json(
+                return await self.gemini.hedged(  # a busy model never holds the room photo up
                     [types.Part.from_bytes(data=img, mime_type="image/jpeg"), ask],
                     ImageRead,
                     prompts.READ_IMAGE_SYSTEM + prompts.READ_IMAGE_GEOMETRY,
-                    timeout=18.0,
-                    kind="read_image",
+                    12.0,
+                    "read_image",
                 )
             except AIUnavailable:
                 pass

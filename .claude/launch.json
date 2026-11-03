@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "chanakya-live",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["DATA_SOURCE=seed", "LIVE_ENABLED=true", "LIVE_PROVIDER=browser", "RENDER_CARDS=false", "SCHEDULER_ENABLED=false",
+                      "DATABASE_URL=sqlite+aiosqlite:////private/tmp/claude-502/chanakya_live_demo.db",
+                      ".venv/bin/uvicorn", "chanakya.app.main:app", "--port", "8077"],
+      "port": 8077
+    }
+  ]
+}

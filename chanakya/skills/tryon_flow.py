@@ -268,6 +268,22 @@ def _label(ctx: SkillContext, p) -> str:
     return p.model
 
 
+GOOD_PHOTO: dict[str, str] = {}  # sku → the backend photo URL that cuts out cleanly (found once, reused)
+
+
+async def prefetch_photos(facts, skus: list[str]) -> None:
+    """When the options are shown: fetch each product's photos and find the one that cuts out, in the background,
+    so 'Ghar mein dekho' does not wait on downloads (target: the picture in < 5 s)."""
+    for sku in skus:
+        p = facts.product_sync(sku)
+        if p is None or sku in GOOD_PHOTO:
+            continue
+        try:
+            await _photo(p)
+        except Exception:
+            continue
+
+
 def _dims_mm(p) -> tuple[float | None, float | None]:
     """The size drawn: the backend's width × height, except for a TV whose numbers are not panel-shaped (they often
     include the stand or the box): then the true 16:9 panel from the screen diagonal."""
@@ -299,6 +315,11 @@ async def _photo(p) -> tuple[bytes | None, str]:
     urls = [u for u in dict.fromkeys([p.image, *((p.info or {}).get("images") or [])]) if u][:4]
     if not urls:
         return None, "no_image"
+    known = GOOD_PHOTO.get(p.sku)
+    if known:  # found before (prefetch or an earlier try-on): straight from the disk cache
+        data = await image_bytes(known)
+        if data:
+            return data, f"used_photo_{urls.index(known) + 1 if known in urls else 1}"
     asp = product_aspect(p)
     got = 0
     for i, u in enumerate(urls, 1):
@@ -310,6 +331,9 @@ async def _photo(p) -> tuple[bytes | None, str]:
             continue
         got += 1
         if asp is None or await asyncio.to_thread(cutout, data, p.category, asp) is not None:
+            GOOD_PHOTO[p.sku] = u
+            while len(GOOD_PHOTO) > 400:
+                GOOD_PHOTO.pop(next(iter(GOOD_PHOTO)))
             return data, f"used_photo_{i}"
     return None, "rejected_all" if got else "fetch_failed"
 

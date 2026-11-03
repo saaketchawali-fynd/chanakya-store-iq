@@ -17,6 +17,9 @@ class DownText:
     async def json(self, *a, **k):
         raise AIUnavailable("503 high demand")
 
+    async def hedged(self, *a, **k):
+        raise AIUnavailable("503 high demand")
+
 
 def live(h, monkeypatch, fail_times: int):
     calls = {"n": 0}

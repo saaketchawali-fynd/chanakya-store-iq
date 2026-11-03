@@ -101,6 +101,8 @@ class Orchestrator:
                 await self.svc.deliver(out)
                 if first and t0 is not None and m.to == ctx.actor_wa_id:
                     ms = int((datetime.now(UTC) - t0.astimezone(UTC)).total_seconds() * 1000)
+                    kind = ctx.inbound.type if ctx.inbound else "?"
+                    diag.mark(f"reply_ms_{kind}", {"ms": ms, "step": ctx.session.step.value if ctx.session else None})
                     ctx.events.append(
                         Event(
                             type="latency",

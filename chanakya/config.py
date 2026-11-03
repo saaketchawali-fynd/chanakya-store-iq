@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     gemini_fallback_model: str = "gemini-3.5-flash-lite"
     gemini_image_model: str = "gemini-nano-banana-2.1"
 
+    # Live (docs/live-mode-plan.md): the in-store whisper copilot web page /live. Off unless LIVE_ENABLED=true.
+    live_enabled: bool = False
+    live_key: str = ""  # if set, the page needs ?k=<key>
+    live_provider: str = "auto"  # auto (gemini → openai → browser) | gemini | openai | browser
+    live_max_sessions: int = 4
+    gemini_live_model: str = "gemini-live-2.5-flash-preview"
+    openai_api_key: str = ""
+    openai_transcribe_model: str = "gpt-4o-transcribe"
+
     # Product, price and offer data. "jio" (default): only the Jio Commerce storefront API (getProducts,
     # getPromotionOffers); nothing else is ever loaded, and with no token the catalogue stays empty.
     # "seed": data/seed/*.yaml, for the automated tests and the offline simulator only.

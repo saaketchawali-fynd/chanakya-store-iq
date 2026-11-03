@@ -21,7 +21,7 @@ class AIUnavailable(Exception):
 
 LATEST = "gemini-flash-latest"  # Google's always-current alias: used only if both pinned models are retired (404)
 LITE_LATEST = "gemini-flash-lite-latest"
-HEDGE_STAGGER = 2.5  # seconds before the next model joins a voice note that has no answer yet
+HEDGE_STAGGER = 1.2  # seconds before the next model joins when one has no answer yet (target: reply < 5 s)
 
 
 class GeminiClient:

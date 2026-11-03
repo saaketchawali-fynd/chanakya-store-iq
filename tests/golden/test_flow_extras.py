@@ -105,7 +105,8 @@ async def test_label_scan_before_and_after_home_is_understood(h):
     out = await h.photo("label_meru55.jpg")  # nothing known yet: facts only, no fit verdict
     card = out[0].card
     assert len(out) == 1 and card.template == "product" and card.data["key_specs"]
-    assert "pros" not in card.data and "badge" not in card.data and card.data["price_str"] is None
+    assert "pros" not in card.data and "badge" not in card.data
+    assert card.data["price_str"] == "₹62,990" and "MRP" in card.data["mrp_str"]  # the scanned label's own price
     assert out[0].buttons[0].id == "s:C1:go"  # first: ask about the home
     await h.voice("assess_1")
     await h.tap("s:C1:slot:mounting:wall")
@@ -117,7 +118,9 @@ async def test_label_scan_before_and_after_home_is_understood(h):
 async def test_compare_two_labels_for_this_home(h):
     await to_options(h)
     await h.photo("label_meru55.jpg")
-    out = await h.tap("s:C1:compare")
+    out = await h.tap("s:C1:compare")  # 'Compare' now compares at once (with the customer's best pick)
+    assert any(m.card and m.card.template == "compare" for m in out)
+    out = await h.tap("s:C1:compare2")  # or with another label photo
     assert not out[0].buttons
     out = await h.photo("label_arka55.jpg")
     check_floor(out)
@@ -127,7 +130,7 @@ async def test_compare_two_labels_for_this_home(h):
     assert "Meru 55 QLED Pro" in d["verdict"] and "Meru 55 QLED Pro" in m.body
     assert button_ids(out)[:2] == ["s:C1:tpick:TV-MER-55-QL120", "s:C1:tpick:TV-ARK-55-4K60"]
     assert any(r["better"] == "a" for r in d["rows"])  # brightness / refresh favour the Meru
-    assert d.get("price_a") is None  # price stays locked until the demo
+    assert d.get("price_a") == "₹62,990"  # a scanned label: its price shows, from the data (the shelf tag shows it too)
 
 
 async def test_voice_note_shows_what_was_understood(h):

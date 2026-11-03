@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1020">
+<title>Chanakya Live</title>
+<style>
+  :root { --bg:#0B1020; --bg2:#10183A; --card:#141C3F; --line:rgba(255,255,255,.09); --text:#E7E9F3; --muted:#9AA3C0;
+          --accent:#818CF8; --accent2:#6366F1; --green:#34D399; --gold:#FBBF24; --red:#F87171; }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body { background:var(--bg); color:var(--text); font-family:Inter,"Avenir Next","Helvetica Neue","Noto Sans","Noto Sans Devanagari",Arial,sans-serif;
+              -webkit-font-smoothing:antialiased; }
+  body { min-height:100vh; padding:env(safe-area-inset-top) 0 calc(96px + env(safe-area-inset-bottom));
+         background:radial-gradient(120% 60% at 100% 0%, rgba(99,102,241,.22) 0%, rgba(99,102,241,0) 60%), var(--bg); }
+  .wrap { max-width:560px; margin:0 auto; padding:14px 16px; }
+  .num { font-variant-numeric:tabular-nums; }
+  button { font:inherit; color:inherit; border:0; background:none; cursor:pointer; }
+
+  header { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:17px; }
+  .brand small { display:block; font-weight:500; font-size:12px; color:var(--muted); }
+  .chips { display:flex; gap:6px; align-items:center; }
+  .chip { font-size:11px; font-weight:700; letter-spacing:.6px; padding:5px 9px; border-radius:999px; border:1px solid var(--line);
+          background:rgba(255,255,255,.05); color:var(--muted); text-transform:uppercase; white-space:nowrap; }
+  .chip.live { color:#fff; border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.12); }
+  .chip.live::before { content:""; display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--green);
+                       margin-right:6px; animation:pulse 1.4s infinite; vertical-align:1px; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  .langs { display:flex; gap:8px; margin-top:12px; }
+  .seg { display:flex; background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:12px; padding:3px; flex:1; }
+  .seg span { font-size:11px; color:var(--muted); padding:6px 6px 6px 8px; align-self:center; }
+  .seg button { flex:1; font-size:13px; font-weight:600; padding:6px 0; border-radius:9px; color:var(--muted); }
+  .seg button.on { background:var(--accent2); color:#fff; }
+
+  /* the whisper: ONE line */
+  .cue { margin-top:14px; border-radius:24px; padding:20px 20px 16px; position:relative; overflow:hidden;
+         background:linear-gradient(160deg,#1B2560 0%,#141C3F 100%); border:1px solid rgba(129,140,248,.35);
+         box-shadow:0 18px 40px rgba(0,0,0,.35); transition:transform .25s ease; }
+  .cue.flash { animation:flash .6s ease; }
+  @keyframes flash { 0%{transform:scale(.98); box-shadow:0 0 0 0 rgba(129,140,248,.6)} 100%{transform:scale(1); box-shadow:0 18px 40px rgba(0,0,0,.35)} }
+  .cue .kind { font-size:11px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; color:var(--accent); }
+  .cue.say .kind { color:var(--gold); } .cue.tip .kind { color:var(--green); }
+  .cue .text { margin-top:8px; font-size:22px; line-height:1.35; font-weight:650; color:#fff; }
+  .cue .why { margin-top:8px; font-size:14px; color:var(--muted); }
+  .cue .acts { display:flex; gap:8px; margin-top:14px; }
+  .btn { padding:10px 14px; border-radius:12px; font-weight:700; font-size:14px; background:rgba(255,255,255,.08); border:1px solid var(--line); }
+  .btn.primary { background:var(--accent2); border-color:var(--accent2); color:#fff; }
+  .btn.ghost { background:none; }
+
+  .sec { margin-top:18px; }
+  .label { font-size:11px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;
+           display:flex; justify-content:space-between; align-items:center; }
+  .tags { display:flex; flex-wrap:wrap; gap:8px; }
+  .tag { display:flex; gap:6px; align-items:center; font-size:14px; padding:7px 11px; border-radius:12px; background:rgba(255,255,255,.06);
+         border:1px solid var(--line); animation:pop .35s ease; }
+  .tag b { font-weight:700; color:#fff; } .tag i { font-style:normal; color:var(--muted); font-size:12px; }
+  .tag.want { border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.08); }
+  @keyframes pop { 0%{transform:scale(.85); opacity:0} 100%{transform:scale(1); opacity:1} }
+  .empty { font-size:14px; color:var(--muted); }
+  .gate { height:6px; border-radius:6px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:10px; }
+  .gate i { display:block; height:100%; background:linear-gradient(90deg,var(--accent2),var(--green)); transition:width .4s; }
+
+  .opts { display:grid; gap:12px; }
+  .opt { border-radius:20px; background:var(--card); border:1px solid var(--line); overflow:hidden; animation:pop .35s ease; }
+  .opt.best { border-color:rgba(129,140,248,.55); }
+  .opt .top { display:flex; gap:12px; padding:14px; }
+  .opt .pic { flex:none; width:88px; height:72px; border-radius:12px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .opt .pic img { max-width:92%; max-height:92%; object-fit:contain; }
+  .opt .lab { font-size:12px; font-weight:800; letter-spacing:1px; color:var(--accent); }
+  .opt .ttl { font-size:16px; font-weight:700; color:#fff; line-height:1.25; margin-top:2px; }
+  .opt .price { margin-top:4px; font-size:19px; font-weight:800; color:#fff; }
+  .opt .price s { font-size:13px; color:var(--muted); font-weight:500; margin-left:6px; }
+  .opt .price s, .opt .price em { white-space:nowrap; }
+  .opt .price em { font-style:normal; font-size:12px; color:var(--green); margin-left:6px; font-weight:700; }
+  .opt ul { list-style:none; padding:0 14px 10px; }
+  .opt li { font-size:14px; padding:4px 0 4px 22px; position:relative; color:var(--text); }
+  .opt li::before { content:""; position:absolute; left:2px; top:9px; width:11px; height:6px; border-left:2px solid var(--green);
+                    border-bottom:2px solid var(--green); transform:rotate(-45deg); }
+  .opt .offer { margin:0 14px 14px; padding:9px 11px; border-radius:12px; font-size:13px; background:rgba(52,211,153,.10);
+                color:#A7F3D0; border:1px solid rgba(52,211,153,.25); }
+  .opt .offer.none { background:rgba(255,255,255,.04); color:var(--muted); border-color:var(--line); }
+
+  .heard { font-size:13px; color:var(--muted); line-height:1.5; }
+  .heard p { padding:3px 0; border-bottom:1px dashed var(--line); }
+  .heard p.interim { color:rgba(154,163,192,.6); font-style:italic; }
+
+  .dock { position:fixed; left:0; right:0; bottom:0; padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+          background:rgba(11,16,32,.92); backdrop-filter:blur(12px); border-top:1px solid var(--line); }
+  .dock .in { max-width:560px; margin:0 auto; display:flex; gap:8px; align-items:center; }
+  .dock input { flex:1; min-width:0; font:inherit; font-size:15px; color:#fff; background:rgba(255,255,255,.06); border:1px solid var(--line);
+                border-radius:14px; padding:12px 14px; outline:none; }
+  .mic { flex:none; width:52px; height:52px; border-radius:50%; background:var(--accent2); display:flex; align-items:center; justify-content:center;
+         box-shadow:0 8px 20px rgba(99,102,241,.45); }
+  .mic.on { background:var(--red); box-shadow:0 0 0 0 rgba(248,113,113,.6); animation:ring 1.6s infinite; }
+  @keyframes ring { 0%{box-shadow:0 0 0 0 rgba(248,113,113,.55)} 100%{box-shadow:0 0 0 16px rgba(248,113,113,0)} }
+
+  .sheet { position:fixed; inset:0; background:rgba(5,8,18,.78); backdrop-filter:blur(6px); display:flex; align-items:flex-end; z-index:20; }
+  .sheet .box { width:100%; max-width:560px; margin:0 auto; background:var(--bg2); border-radius:26px 26px 0 0; padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+                border-top:1px solid rgba(129,140,248,.3); }
+  .sheet h2 { font-size:20px; } .sheet p { color:var(--muted); font-size:14px; margin-top:6px; line-height:1.45; }
+  .sheet .say { margin-top:14px; padding:14px; border-radius:16px; background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.3);
+                font-size:17px; line-height:1.45; color:#fff; }
+  .sheet .row { display:flex; gap:10px; margin-top:16px; } .sheet .row .btn { flex:1; padding:14px; }
+  .hidden { display:none !important; }
+
+  /* customer view: turn the phone around */
+  body.cv .assoc { display:none !important; }
+  body.cv .opt .ttl { font-size:19px; } body.cv .opt li { font-size:16px; }
+  .cvbar { display:none; }
+  body.cv .cvbar { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+  body.cv .cvbar h1 { font-size:22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><svg width="30" height="30" viewBox="0 0 36 36"><rect width="36" height="36" rx="10" fill="#6366F1"/><path d="M24.6 12.3a8 8 0 1 0 0 11.4" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><circle cx="25.2" cy="18" r="2.3" fill="#fff"/></svg>
+      <div>Chanakya Live<small>Reliance Digital · whisper copilot</small></div></div>
+    <div class="chips"><span id="test" class="chip hidden">Test data</span><span id="prov" class="chip">Off</span></div>
+  </header>
+
+  <div class="assoc">
+    <div class="langs">
+      <div class="seg" id="lang"><span>Me</span><button data-v="hi">हिं</button><button data-v="en">EN</button><button data-v="mr">मरा</button></div>
+      <div class="seg" id="clang"><span>Customer</span><button data-v="hi">हिं</button><button data-v="en">EN</button><button data-v="mr">मरा</button></div>
+    </div>
+
+    <section id="cue" class="cue">
+      <div class="kind" id="cueKind">Ready</div>
+      <div class="text" id="cueText">Tap the mic when the customer is with you. Chanakya listens and whispers one line at a time.</div>
+      <div class="why" id="cueWhy"></div>
+      <div class="acts">
+        <button class="btn primary" id="doneBtn">Done</button>
+        <button class="btn" id="sayBtn">Speak it</button>
+        <button class="btn ghost" id="earBtn">Earbud: off</button>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="label"><span>Their home <span id="cat"></span></span><span class="num" id="gateTxt"></span></div>
+      <div class="tags" id="needs"><span class="empty">Needs appear here as the customer speaks.</span></div>
+      <div class="gate"><i id="gateBar" style="width:0"></i></div>
+    </section>
+  </div>
+
+  <div class="cvbar"><h1 id="cvTitle">Picked for your home</h1><button class="btn" id="cvBack">Back</button></div>
+
+  <section class="sec">
+    <div class="label assoc"><span>A / B / C from today's stock</span>
+      <span><button class="btn ghost" id="optsBtn" style="padding:4px 8px;font-size:12px">Show now</button>
+            <button class="btn ghost hidden" id="cvBtn" style="padding:4px 8px;font-size:12px">Customer view</button></span></div>
+    <div class="opts" id="opts"><span class="empty assoc">Options appear once enough is known.</span></div>
+  </section>
+
+  <section class="sec assoc">
+    <div class="label"><span>Heard</span><button class="btn ghost" id="resetBtn" style="padding:4px 8px;font-size:12px">New customer</button></div>
+    <div class="heard" id="heard"></div>
+  </section>
+</div>
+
+<div class="dock assoc"><div class="in">
+  <input id="typed" placeholder="Or type what they said…" autocomplete="off">
+  <button class="mic" id="mic" aria-label="Listen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg></button>
+</div></div>
+
+<div class="sheet hidden" id="consent"><div class="box">
+  <h2>Ask the customer first</h2>
+  <p>Say this, then tap only if they agree. Nothing is recorded; the mic stops when you tap it again.</p>
+  <div class="say" id="consentLine"></div>
+  <div class="row"><button class="btn" id="noBtn">Not now</button><button class="btn primary" id="yesBtn">Customer agreed</button></div>
+</div></div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const q = new URLSearchParams(location.search);
+  const key = q.get("k") || "";
+  const LBL = { gemini: "Gemini Live", openai: "OpenAI live", browser: "On-device" };
+  const SR_LANG = { hi: "hi-IN", en: "en-IN", mr: "mr-IN" };
+  const KIND = { ask: "Ask next", say: "Say this", tip: "Copilot", options: "Options ready" };
+  let ws, view = null, provider = "off", rate = 16000, listening = false, consented = false, ear = false;
+  let lang = localStorage.getItem("cl_lang") || "hi", clang = localStorage.getItem("cl_clang") || lang;
+  let actx, node, stream, rec, lastCue = null;
+
+  function connect() {
+    ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/live/ws${key ? "?k=" + encodeURIComponent(key) : ""}`);
+    ws.binaryType = "arraybuffer";
+    ws.onopen = () => send({ type: "lang", lang, clang });
+    ws.onmessage = (e) => {
+      const m = JSON.parse(e.data);
+      if (m.type === "provider") { provider = m.name; rate = m.rate; setProv(); if (listening) startCapture(); }
+      else if (m.type === "view") render(m);
+    };
+    ws.onclose = () => { setTimeout(connect, 1200); };
+  }
+  const send = (o) => ws && ws.readyState === 1 && ws.send(JSON.stringify(o));
+  function setProv() {
+    const p = $("prov");
+    p.textContent = listening ? (LBL[provider] || provider) : "Off";
+    p.className = "chip" + (listening ? " live" : "");
+  }
+
+  function seg(id, val, cb) {
+    const el = $(id);
+    el.querySelectorAll("button").forEach((b) => {
+      b.classList.toggle("on", b.dataset.v === val);
+      b.onclick = () => { cb(b.dataset.v); seg(id, b.dataset.v, cb); };
+    });
+  }
+  seg("lang", lang, (v) => { lang = v; localStorage.setItem("cl_lang", v); send({ type: "lang", lang, clang }); });
+  seg("clang", clang, (v) => { clang = v; localStorage.setItem("cl_clang", v); send({ type: "lang", lang, clang }); if (rec) restartSR(); });
+
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function render(v) {
+    view = v;
+    $("test").classList.toggle("hidden", !v.test_data);
+    $("consentLine").textContent = v.consent;
+    const c = v.cue, cue = $("cue");
+    if (c) {
+      cue.className = "cue " + c.kind;
+      $("cueKind").textContent = KIND[c.kind] || "Copilot";
+      $("cueText").textContent = c.text;
+      $("cueWhy").textContent = c.why || "";
+      if (c.id !== lastCue) { cue.classList.remove("flash"); void cue.offsetWidth; cue.classList.add("flash");
+        if (ear) speak(c.text); if (navigator.vibrate) navigator.vibrate(30); }
+      lastCue = c.id;
+    } else if (listening) {
+      cue.className = "cue"; $("cueKind").textContent = "Listening"; $("cueText").textContent = "All good. Keep talking; the next useful line appears here."; $("cueWhy").textContent = "";
+    }
+    $("cat").textContent = v.category_word ? "· " + v.category_word : "";
+    const tags = v.needs.map((n) => `<span class="tag"><i>${esc(n.title)}</i><b>${esc(n.value)}</b></span>`)
+      .concat(v.wants.map((w) => `<span class="tag want"><i>Asked</i><b>${esc(w.value)}</b></span>`));
+    $("needs").innerHTML = tags.length ? tags.join("") : '<span class="empty">Needs appear here as the customer speaks.</span>';
+    const g = v.gate; const pct = g.open ? 100 : (g.need ? Math.min(100, Math.round((g.known / g.need) * 100)) : 0);
+    $("gateBar").style.width = pct + "%";
+    $("gateTxt").textContent = v.category ? (g.open ? "Enough to pick" : `${g.known} of ${g.need} known`) : "";
+    $("optsBtn").classList.toggle("hidden", !v.category || g.open);
+    $("cvBtn").classList.toggle("hidden", !v.options.length);
+    $("cvTitle").textContent = v.customer ? `Picked for ${v.customer}` : "Picked for your home";
+    $("opts").innerHTML = v.options.length ? v.options.map(card).join("") : '<span class="empty assoc">Options appear once enough is known.</span>';
+    $("heard").innerHTML = v.heard.slice().reverse().map((h) => `<p>${esc(h.at.slice(0, 5))} · ${esc(h.text)}</p>`).join("");
+  }
+  function card(o) {
+    const off = o.offer ? `<div class="offer">${esc(o.offer.title)} · till ${esc(o.offer.till)}${o.offer.save ? " · save " + esc(o.offer.save) : ""}${o.offer.more ? ` · +${o.offer.more} more` : ""}</div>`
+                        : '<div class="offer none">No live offer on this one today</div>';
+    const role = { value: "Costs less", best: "Best for this home", step: "Step up" }[o.role] || "";
+    return `<article class="opt ${o.role === "best" ? "best" : ""}"><div class="top">
+      <div class="pic">${o.image ? `<img src="${esc(o.image)}" alt="" loading="lazy">` : `<b style="color:#111">${esc(o.brand)}</b>`}</div>
+      <div><div class="lab">${esc(o.label)} · ${esc(role)}</div><div class="ttl">${esc(o.title)}</div>
+      <div class="price num">${esc(o.price)}${o.mrp ? `<s>${esc(o.mrp)}</s><em>save ${esc(o.save)}</em>` : ""}</div></div></div>
+      <ul>${o.reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>${off}</article>`;
+  }
+
+  function speak(text) {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text.replace(/^(Ask|Say|Poochhiye|Boliye|विचारा|सांगा):\s*/, ""));
+    u.lang = SR_LANG[lang]; u.rate = 1.05; u.volume = 0.9;
+    speechSynthesis.speak(u);
+  }
+
+  // ---------- listening ----------
+  async function startCapture() {
+    stopCapture();
+    if (provider === "browser") return startSR();
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 } });
+      actx = new AudioContext();
+      const src = `class P extends AudioWorkletProcessor{constructor(o){super();this.r=o.processorOptions.rate;this.s=sampleRate/this.r;this.b=[];this.n=Math.round(this.r/10)}
+        process(i){const c=i[0][0];if(!c)return true;for(let k=0;k<c.length;k+=this.s){this.b.push(c[Math.floor(k)])}
+        if(this.b.length>=this.n){const f=new Int16Array(this.b.length);for(let k=0;k<this.b.length;k++){const v=Math.max(-1,Math.min(1,this.b[k]));f[k]=v<0?v*32768:v*32767}
+        this.port.postMessage(f.buffer,[f.buffer]);this.b=[]}return true}}registerProcessor("pcm",P)`;
+      await actx.audioWorklet.addModule(URL.createObjectURL(new Blob([src], { type: "application/javascript" })));
+      node = new AudioWorkletNode(actx, "pcm", { processorOptions: { rate } });
+      node.port.onmessage = (e) => ws.readyState === 1 && ws.send(e.data);
+      actx.createMediaStreamSource(stream).connect(node);
+    } catch (e) { console.warn(e); provider = "browser"; setProv(); startSR(); }
+  }
+  function stopCapture() {
+    if (node) { node.disconnect(); node = null; }
+    if (actx) { actx.close(); actx = null; }
+    if (stream) { stream.getTracks().forEach((t) => t.stop()); stream = null; }
+    if (rec) { rec.onend = null; rec.abort(); rec = null; }
+  }
+  function startSR() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { $("cueText").textContent = "This browser has no on-device speech. Type what they said below, or open in Chrome."; return; }
+    rec = new SR(); rec.lang = SR_LANG[clang]; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) send({ type: "text", text: r[0].transcript, who: "customer" }); else interim += r[0].transcript;
+      }
+      const h = $("heard"); let p = h.querySelector(".interim");
+      if (interim) { if (!p) { p = document.createElement("p"); p.className = "interim"; h.prepend(p); } p.textContent = interim; } else if (p) p.remove();
+    };
+    rec.onend = () => { if (listening && rec) try { rec.start(); } catch (_) {} };
+    rec.onerror = (e) => { if (e.error === "not-allowed") { listening = false; setMic(); } };
+    rec.start();
+  }
+  function restartSR() { if (rec) { rec.onend = null; rec.abort(); rec = null; startSR(); } }
+  function setMic() { $("mic").classList.toggle("on", listening); setProv(); }
+
+  $("mic").onclick = () => {
+    if (listening) { listening = false; stopCapture(); send({ type: "stop" }); setMic(); return; }
+    if (!consented) { $("consent").classList.remove("hidden"); return; }
+    listening = true; setMic(); send({ type: "start", lang, clang, provider: q.get("provider") || undefined });
+  };
+  $("yesBtn").onclick = () => { consented = true; $("consent").classList.add("hidden"); $("mic").onclick(); };
+  $("noBtn").onclick = () => $("consent").classList.add("hidden");
+  $("doneBtn").onclick = () => send({ type: "done" });
+  $("sayBtn").onclick = () => view && view.cue && speak(view.cue.text);
+  $("earBtn").onclick = () => { ear = !ear; $("earBtn").textContent = "Earbud: " + (ear ? "on" : "off"); };
+  $("optsBtn").onclick = () => send({ type: "options" });
+  $("cvBtn").onclick = () => { document.body.classList.add("cv"); window.scrollTo(0, 0); };
+  $("cvBack").onclick = () => document.body.classList.remove("cv");
+  $("resetBtn").onclick = () => { consented = false; if (listening) $("mic").onclick(); lastCue = null; send({ type: "reset", lang, clang }); };
+  $("typed").onkeydown = (e) => { if (e.key === "Enter" && e.target.value.trim()) { send({ type: "text", text: e.target.value, who: "associate" }); e.target.value = ""; } };
+  connect();
+})();
+</script>
+</body>
+</html>

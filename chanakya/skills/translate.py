@@ -298,6 +298,11 @@ async def pros_cons(ctx: SkillContext, p, lang: str) -> tuple[list[str], list[st
     return pros[:4], cons[:3], f.score
 
 
+def _price_ok(ctx: SkillContext, *skus: str) -> bool:
+    """The price is said after the demo; a scanned label shows it at once (it is printed on the shelf tag)."""
+    return state.price_gate_open(ctx.session, ctx.pack) or ctx.x.get("label_sku") in skus
+
+
 async def product_card_en(ctx: SkillContext, p) -> Card:
     """The product details card: one card in English for the customer and the associate (no copy)."""
     with ctx.as_lang("en"):
@@ -311,7 +316,11 @@ async def product_card(ctx: SkillContext, p) -> Card:
     stock = C.stock_line(ctx, p, lang)
     data = {"title": C.product_title(ctx, p, lang), "image": p.image, "key_specs": PV.key_specs(ctx, p, lang, 6),
             "features": PV.features(ctx, p, lang, 4), "stock_line": stock, "offer_text": PV.offer_line(ctx, p, lang)["text"],
-            "price_str": ctx.reg.inr(p.price, p.price_source) if state.price_gate_open(s, ctx.pack) else None}
+            "price_str": ctx.reg.inr(p.price, p.price_source) if _price_ok(ctx, p.sku) else None}
+    if data["price_str"] and p.mrp and p.mrp > p.price:  # the backend's MRP: what they save today
+        pct = round((p.mrp - p.price) * 100 / p.mrp)
+        data["mrp_str"] = ctx.t("pc_mrp", lang, mrp=ctx.reg.inr(p.mrp, p.price_source),
+                                pct=ctx.reg.num(pct, f"calc:mrp_saving:{p.sku}"))
     mn = (p.info or {}).get("model_number")
     if mn:
         data["note"] = ctx.t("label_note", lang, model=ctx.reg.raw(mn, f"product:{p.sku}"))
@@ -391,7 +400,7 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
             if sa != sb:
                 winner = a if sa > sb else b
                 data["verdict"] = ctx.t("compare_verdict", lang, name=C.product_name(ctx, winner))
-        if state.price_gate_open(s, ctx.pack):
+        if _price_ok(ctx, a.sku, b.sku):
             data["price_a"], data["price_b"] = ctx.reg.inr(a.price, a.price_source), ctx.reg.inr(b.price, b.price_source)
         found["winner"] = winner
         return Card(template="compare", lang=lang, data=data)  # type: ignore[arg-type]
@@ -408,6 +417,26 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
     btns[0] = btns[0].model_copy(update={"id": ctx.sid("tpick", a.sku)})
     btns[1] = btns[1].model_copy(update={"id": ctx.sid("tpick", b.sku)})
     return ctx.reply(info_reply(ctx, body, btns, card=card))
+
+
+async def compare_smart(ctx: SkillContext) -> Reply:
+    """'Compare' on a product: straight away with the customer's best pick (or, with no shortlist, the closest
+    same-size model in stock); another label photo still works too."""
+    from chanakya.skills.returning import alternative
+
+    s = ctx.session
+    sku = ctx.x.get("label_sku") or s.chosen_sku or state.best_sku(s)
+    if not sku or ctx.facts.product_sync(sku) is None:
+        return await compare_prompt(ctx)
+    best = state.best_sku(s)
+    other = best if best and best != sku else next((v for v in s.option_labels.values() if v != sku), None)
+    if other is None:
+        alt = alternative(ctx, sku)
+        other = alt.sku if alt is not None else None
+    if other is None:
+        return await compare_prompt(ctx)
+    ctx.ev("compare_direct", a=sku, b=other)
+    return await compare(ctx, sku, other)
 
 
 async def compare_prompt(ctx: SkillContext) -> Reply:

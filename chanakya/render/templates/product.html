@@ -6,6 +6,7 @@
 {% set downs = (cons|aslist)[:3] %}
 {% set kind = badge_kind if badge_kind in ('good', 'partial', 'poor') else 'neutral' %}
 {% block style %}
+  .buy .mrp { font-size: 22px; font-weight: 600; color: var(--green-deep); }
   .hd-row { align-items: flex-end; }
   .verdict { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; margin-bottom: 6px; }
   .badge2 { display: inline-flex; align-items: center; gap: 10px; font-size: 25px; font-weight: 800; padding: 10px 18px;
@@ -96,6 +97,7 @@
   {% if price_str or offer_text or stock_line %}
   <section class="card buy">
     {% if price_str %}<span class="price num">{{ price_str }}</span>{% endif %}
+    {% if mrp_str %}<span class="mrp num">{{ mrp_str }}</span>{% endif %}
     {% if offer_text %}<span class="chip saffron">{{ icon('tag', 22) }}{{ offer_text }}</span>{% endif %}
     {% if stock_line %}<span class="stock">{{ icon(stock_line|stock_icon, 24) }}{{ stock_line }}</span>{% endif %}
   </section>

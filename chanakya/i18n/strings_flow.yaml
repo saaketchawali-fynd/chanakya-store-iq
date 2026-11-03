@@ -404,3 +404,15 @@ view_seat_best: {hi: "सबसे अच्छी सीट जैसा", mr: 
 view_seat_front: {hi: "आगे की सीट जैसा", mr: "पुढच्या सीटसारखं", en: "Front row"}
 view_bolo: {hi: "आपके {ft} ft से {label} ({size}) सिनेमा में {seat} लगेगा।", mr: "तुमच्या {ft} ft अंतरावरून {label} ({size}) सिनेमात {seat} वाटेल.", en: "From your {ft} ft, {label} ({size}) feels like {seat} in a cinema."}
 view_kyun: {hi: "Nazar ka angle: {lines} · cinema ~30°–40°", mr: "नजरेचा कोन: {lines} · सिनेमा ~30°–40°", en: "Angle of view: {lines} · cinemas ~30°–40°"}
+# ---- the demo plan: what they asked for first, their needs compared for real, then one more data difference
+demo_head: {hi: "Demo {i}/{n}", mr: "Demo {i}/{n}", en: "Demo {i}/{n}"}
+demo_vals: {hi: "{a}: {va} · {b}: {vb}", mr: "{a}: {va} · {b}: {vb}", en: "{a}: {va} · {b}: {vb}"}
+demo_plan_line: {hi: "Plan: {steps}", mr: "Plan: {steps}", en: "Plan: {steps}"}
+b_demo_next_step: {hi: "Agla demo", mr: "पुढचा डेमो", en: "Next demo"}
+demo_want_say: {hi: "आपने {what} कहा था — {best} और {other} साथ में देखिए, फ़र्क़ आप ख़ुद देखेंगे।", mr: "तुम्ही {what} म्हणाला होतात — {best} आणि {other} शेजारी पाहा, फरक तुम्हीच पाहाल.", en: "You asked about {what}: see {best} and {other} side by side, and judge the difference yourself."}
+demo_want_why: {hi: "Pehle wahi jo unhone maanga: {what}", mr: "आधी त्यांनी जे मागितलं: {what}", en: "First what they asked for: {what}"}
+demo_feature_say: {hi: "एक और फ़र्क़, {what}: {best} और {other} पास-पास देखिए।", mr: "आणखी एक फरक, {what}: {best} आणि {other} शेजारी पाहा.", en: "One more difference, {what}: look at {best} and {other} together."}
+demo_feature_why: {hi: "Data mein ek aur asli farak: {what}", mr: "डेटामधला आणखी एक खरा फरक: {what}", en: "One more real difference in the data: {what}"}
+pc_mrp: {hi: "MRP {mrp} · {pct}% off", mr: "MRP {mrp} · {pct}% off", en: "MRP {mrp} · {pct}% off"}
+demo_val_one: {hi: "{a}: {va}", mr: "{a}: {va}", en: "{a}: {va}"}
+demo_want_one_say: {hi: "आपने {what} कहा था — {best} में वही है, ख़ुद देखिए।", mr: "तुम्ही {what} म्हणाला होतात — {best} मध्ये तेच आहे, स्वतः पाहा.", en: "You asked for {what}: {best} has it, see for yourself."}
