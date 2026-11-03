@@ -296,3 +296,7 @@ staff_name_saved: {hi: "Theek hai, ab se aapka naam {name}.", mr: "ठीक आ
 b_voice_answer: {hi: "Bolkar bataiye", mr: "बोलून सांगा", en: "Answer by voice"}
 voiceq_prompt: {hi: "Boliye, main sun raha hoon: \"{question}\" ka jawab voice note mein bhejiye.\nYa yahan tap kijiye:", mr: "बोला, मी ऐकतोय: \"{question}\" याचं उत्तर व्हॉइस नोटमध्ये पाठवा.\nकिंवा इथे टॅप करा:", en: "Go ahead, I'm listening: send the answer to \"{question}\" as a voice note.\nOr tap one here:"}
 voiceq_footer: {hi: "Hindi, English, मराठी · jaise customer ne kaha", mr: "हिंदी, English, मराठी · ग्राहक जसं बोलले", en: "Hindi, English or Marathi · as the customer said it"}
+# ---- the needs told in one note: the right products straight from it
+note_ack: {hi: "Aapke note se: {facts} → ye {n} {cat} sabse sahi", mr: "तुमच्या नोटवरून: {facts} → हे {n} {cat} सर्वात योग्य", en: "From your note: {facts} → these {n} {cat} fit best"}
+note_as_asked: {hi: "{what} jaisa kaha", mr: "{what} सांगितल्याप्रमाणे", en: "{what} as asked"}
+unit_people: {hi: "log", mr: "जण", en: "people"}

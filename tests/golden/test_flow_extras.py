@@ -133,6 +133,6 @@ async def test_compare_two_labels_for_this_home(h):
 async def test_voice_note_shows_what_was_understood(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:mr")
-    out = await h.voice("assess_1")
+    out = await h.voice("assess_short")  # a short note: the next question, and what was understood below it
     f = out[0].footer
     assert f.startswith("Samjha: ") and "10 ft" in f and len(f) <= 60

@@ -133,6 +133,29 @@ async def on_info(
     return ctx.reply(*msgs)
 
 
+def note_facts(ctx: SkillContext) -> list[str]:
+    """This note's facts in the associate's words, numbers first: ['10 ft', '₹50,000', 'Dhoop aati hai', …]."""
+    pack = ctx.pack
+    nums, facts = [], []
+    for e in ctx.events:
+        if e.type != "slot_filled":
+            continue
+        sd = pack.slot(e.payload.get("slot")) if pack else None
+        if not sd:
+            continue
+        if e.payload.get("number") is not None and sd.number:
+            unit = {"seat_distance_ft": "ft", "room_size_sqft": "sq ft", "pipe_run_ft": "ft", "hours_per_day": "h",
+                    "niche_width_cm": "cm", "family_size": ctx.t("unit_people")}.get(sd.number, "")
+            nums.append(ctx.reg.num(e.payload["number"], f"card:{sd.id}", unit))
+        else:
+            facts.append(ctx.reg.static(sd.value_title(e.payload.get("value"), ctx.lang)))
+    home = ctx.session.home
+    if home.start_level_inr and home.start_level_source == "associate_voice" and not ctx.x.get("budget_noted"):
+        ctx.x["budget_noted"] = True  # the budget once, in the note that gave it
+        nums.append(ctx.reg.inr(home.start_level_inr, "card:start_level"))
+    return list(dict.fromkeys(nums + facts))
+
+
 def noted_footer(ctx: SkillContext, source: str) -> str | None:
     """After a voice/typed note: show what was understood ("Samjha: 10 ft · Dhoop · Cricket"), so a mishearing
     is caught at once. Facts only from this note; fits WhatsApp's 60-character footer without cutting words."""

@@ -76,8 +76,9 @@ async def test_fridge_end_to_end(h):
 async def test_readback_change_something(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:en")
-    await h.voice("assess_1")
-    await h.tap("s:C1:slot:trigger:new_home")
+    await h.voice("assess_short")
+    for b in ("s:C1:slot:trigger:new_home", "s:C1:slot:room_light:sunny", "s:C1:slot:content:sports"):
+        await h.tap(b)
     out = await h.tap("s:C1:photo_no")
     out = await h.tap("s:C1:readback_edit")
     r = rows(out[0])

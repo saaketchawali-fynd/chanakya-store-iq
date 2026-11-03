@@ -66,6 +66,25 @@ async def assess_tv(h, clang: str | None = "mr", trigger: str = "new_home"):
     return await h.tap(f"s:C1:slot:trigger:{trigger}")
 
 
+async def assess_steps(h, clang: str | None = "mr", trigger: str = "new_home"):
+    """The question-by-question path: a short note (room, distance, budget), then why now, light and content by tap,
+    until the photo question. (A note that tells the needs in full skips straight to the products instead.)"""
+    await h.tap("g:new")
+    if clang:
+        await h.tap(f"s:C1:lang:{clang}")
+    out = await h.voice("assess_short")
+    answers = (f"trigger:{trigger}", "old_size:o43", "room_light:sunny", "content:sports")
+    for _ in range(5):
+        ids = button_ids(out)
+        if "s:C1:photo_no" in ids:
+            return out
+        nxt = next((f"s:C1:slot:{a}" for a in answers if f"s:C1:slot:{a}" in ids), None)
+        if nxt is None:
+            return out
+        out = await h.tap(nxt)
+    return out
+
+
 async def to_options(h, photo=None, clang: str | None = "mr"):
     """…→ room photo (or none) → read it back → no doubts → the options."""
     await assess_tv(h, clang)

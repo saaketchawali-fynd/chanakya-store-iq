@@ -46,9 +46,9 @@ MIN_FIT_SCALE = 0.78  # content up to ~1730 px is scaled to fit 1350 (nothing is
 # ---------- fixed labels (hi for customer cards in Devanagari; associate cards in Roman Hinglish) ----------
 LABELS: dict[str, dict[str, dict[str, str]]] = {
     "common": {
-        "hi": {"test_data": "TEST DATA", "brand": "Chanakya", "brand_sub": "Store IQ"},
-        "mr": {"test_data": "TEST DATA", "brand": "Chanakya", "brand_sub": "Store IQ"},
-        "en": {"test_data": "TEST DATA", "brand": "Chanakya", "brand_sub": "Store IQ"},
+        "hi": {"test_data": "TEST DATA", "brand": "Reliance Digital", "brand_sub": "Chanakya"},
+        "mr": {"test_data": "TEST DATA", "brand": "Reliance Digital", "brand_sub": "Chanakya"},
+        "en": {"test_data": "TEST DATA", "brand": "Reliance Digital", "brand_sub": "Chanakya"},
     },
     "home": {
         "hi": {
@@ -1428,28 +1428,28 @@ def render_pillow(card: Card) -> bytes:
     band_h = 110 + 70 * len(title_lines)
     h = band_h + 60 + 54 * len(body_lines) + 90
     h = max(420, min(MAX_HEIGHT, h))
-    img = Image.new("RGB", (w, h), "#F5F2EC")
+    img = Image.new("RGB", (w, h), "#F4F5F7")
     d = ImageDraw.Draw(img)
-    d.rectangle([0, 0, w, band_h], fill="#1B2A4A")
-    d.rounded_rectangle([pad, 34, pad + 30, 64], radius=8, fill="#E8833A")
-    d.text((pad + 44, 32), "Chanakya", font=f_small, fill="#C6CFE2")
+    d.rectangle([0, 0, w, band_h], fill="#0B1020")
+    d.rounded_rectangle([pad, 34, pad + 30, 64], radius=8, fill="#4F46E5")
+    d.text((pad + 44, 32), "Reliance Digital", font=f_small, fill="#C7CBD6")
     bw = int(d.textlength("TEST DATA", font=f_small)) + 30
-    d.rounded_rectangle([w - pad - bw, 30, w - pad, 68], radius=19, fill="#FCE7EC")
-    d.text((w - pad - bw + 15, 34), "TEST DATA", font=f_small, fill="#B4365A")
+    d.rounded_rectangle([w - pad - bw, 30, w - pad, 68], radius=19, fill="#1E293B")
+    d.text((w - pad - bw + 15, 34), "TEST DATA", font=f_small, fill="#9CA3AF")
     y = 92
     for tl in title_lines:
         d.text((pad, y), tl, font=f_title, fill="white")
         y += 70
     box_top = band_h + 30
-    d.rounded_rectangle([pad - 16, box_top, w - pad + 16, h - 50], radius=28, fill="#FFFFFF")
+    d.rounded_rectangle([pad - 16, box_top, w - pad + 16, h - 50], radius=28, fill="#FFFFFF", outline="#E8EAEE", width=2)
     y = box_top + 26
     for ln in body_lines:
         if y > h - 50 - 70:
-            d.text((pad + 10, y), "…", font=f_body, fill="#687083")
+            d.text((pad + 10, y), "…", font=f_body, fill="#6B7280")
             break
-        d.text((pad + 10, y), ln, font=f_body, fill="#2A3142")
+        d.text((pad + 10, y), ln, font=f_body, fill="#1F2937")
         y += 54
-    d.text((pad, h - 40), "Chanakya - Store IQ", font=f_small, fill="#9AA1AF")
+    d.text((pad, h - 40), "Reliance Digital", font=f_small, fill="#9CA3AF")
     out = io.BytesIO()
     img.save(out, format="JPEG", quality=88)
     return out.getvalue()
@@ -1624,8 +1624,12 @@ class Renderer:
             except Exception:
                 pass  # draw without the pictures that could not be fetched
             try:
-                return await asyncio.wait_for(self._render_html(card), timeout=8)
-            except Exception:
+                return await asyncio.wait_for(self._render_html(card), timeout=15)
+            except Exception as e:  # the plain picture, never nothing; recorded so a fallback is visible on /health
+                from chanakya.app import diag
+
+                diag.bump("render_fallbacks")
+                diag.mark("render_fallback_last", {"template": card.template, "error": f"{type(e).__name__}: {e}"[:160]})
                 return render_pillow(card)
         finally:
             self.last_ms[card.template] = int((time.perf_counter() - t0) * 1000)

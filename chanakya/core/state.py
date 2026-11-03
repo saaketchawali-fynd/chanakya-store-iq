@@ -23,6 +23,8 @@ def has_override(s: SessionState, gate: str) -> bool:
 def options_gate_open(s: SessionState, pack) -> bool:
     if has_override(s, "options") or has_override(s, "price"):
         return True
+    if s.extra.get("from_note"):  # the needs were told in one note: the shortlist came from it
+        return True
     if pack is None:
         return False
     return pack.known_required(s.home) >= pack.gate_min_slots

@@ -35,17 +35,28 @@ def candidate_set(products: list, home: HomeCard, stretch: float = 1.75) -> list
     return [p for p in avail if L is None or p.price <= stretch * L]
 
 
-def compute_options(products: list, home: HomeCard, pack: Pack, guides: dict) -> OptionSet | None:
+def compute_options(products: list, home: HomeCard, pack: Pack, guides: dict, wants: dict | None = None) -> OptionSet | None:
+    """wants: what the customer asked for about the product itself (size, brand, panel …). Products that meet every
+    want come first: with two or more such products all three options come from them; with one, it is the best pick."""
+    from chanakya.brain.wants import meets_all
+
     L = home.start_level_inr
     in_stock = [p for p in products if p.qty > 0 or p.nearby_qty > 0]
     fits = {p.sku: fit(p, home, pack, guides) for p in in_stock}
     in_stock = [p for p in in_stock if not fits[p.sku].excluded]
+    forced = None
+    if wants:
+        meet = [p for p in in_stock if meets_all(p, wants)]
+        if len(meet) >= 2:
+            in_stock = meet
+        elif meet:
+            forced = meet[0]
     band = [p for p in in_stock if L is None or p.price <= 1.3 * L]
     if not band:
         band = sorted(in_stock, key=lambda p: p.price)[:3]
     if not band:
         return None
-    best = sorted(band, key=lambda p: (-fits[p.sku].score, p.price))[0]
+    best = forced or sorted(band, key=lambda p: (-fits[p.sku].score, p.price))[0]
     rest = [p for p in band if p.sku != best.sku and p.price < best.price]  # the 'costs less' option really does
     good = [p for p in rest if fits[p.sku].score >= 0.6 * fits[best.sku].score]
     right_size = [p for p in good if (in_band(p, home, pack, guides) or 1.0) >= 1.0]

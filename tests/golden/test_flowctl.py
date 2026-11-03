@@ -14,7 +14,7 @@ def rows(msg):
 async def start_customer(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:mr")
-    return await h.voice("assess_1")
+    return await h.voice("assess_short")
 
 
 async def test_coach_replies_carry_a_menu_hint(h):

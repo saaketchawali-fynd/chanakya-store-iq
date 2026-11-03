@@ -16,7 +16,7 @@ from chanakya.tryon.geometry import Wall
 from chanakya.tryon.read_room import PxBox, Room
 from chanakya.tryon.scale import TV_FACE_DEPTH_CM, WALL_HEIGHT_CM, tv_height_cm, tv_width_cm
 
-SAFFRON = (232, 131, 58)
+SAFFRON = (99, 102, 241)  # the accent (indigo) for comparison outlines; the name is kept for callers
 BEZEL = (17, 17, 17)
 TV_CENTRE_ABOVE_FLOOR_CM = 105.0
 TV_ABOVE_UNIT_CM = 15.0

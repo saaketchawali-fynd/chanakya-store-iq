@@ -9,7 +9,7 @@
   .ring .c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   .ring .n { font-size: 44px; font-weight: 800; line-height: 1; }
   .ring .n small { font-size: 26px; color: #AFC0DD; font-weight: 700; }
-  .ring .l { font-size: 18px; color: #C6CFE2; margin-top: 6px; font-weight: 600; max-width: 120px; text-align: center; line-height: 1.2; }
+  .ring .l { font-size: 18px; color: #C7CBD6; margin-top: 6px; font-weight: 600; max-width: 120px; text-align: center; line-height: 1.2; }
   .facts { padding: 14px 34px; }
   .facts .rows .k { font-size: 27px; }
   .facts .rows .v { font-size: 30px; }
@@ -32,7 +32,7 @@
     <div class="ring">
       <svg width="168" height="168" viewBox="0 0 168 168">
         <circle cx="84" cy="84" r="70" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="14"/>
-        <circle cx="84" cy="84" r="70" fill="none" stroke="#45C486" stroke-width="14" stroke-linecap="round"
+        <circle cx="84" cy="84" r="70" fill="none" stroke="#34D399" stroke-width="14" stroke-linecap="round"
                 stroke-dasharray="439.8" stroke-dashoffset="{{ (439.8 * (1 - frac))|round(1) }}"/>
       </svg>
       <div class="c"><span class="n num">{{ known_str or k }}<small>/{{ total_str or tot }}</small></span><span class="l{{ L.progress|dv }}">{{ L.progress }}</span></div>

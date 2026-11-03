@@ -269,12 +269,13 @@ async def test_languages(h, assoc, cust):
     await h.say(f"lang {assoc}")
     await h.tap("g:new")
     await h.tap(f"s:C1:lang:{cust}")
-    out = await h.voice("assess_1")
+    out = await h.voice("assess_short")
     check_floor(out)
     from chanakya.i18n.lang import raw
 
     assert raw("label_kyun", assoc) in out[0].body
-    await h.tap("s:C1:slot:trigger:new_home")
+    for b in ("s:C1:slot:trigger:new_home", "s:C1:slot:room_light:sunny", "s:C1:slot:content:sports"):
+        await h.tap(b)
     await h.tap("s:C1:photo_no")
     await h.tap("s:C1:readback_ok")
     out = await h.tap("s:C1:options")
@@ -298,7 +299,7 @@ async def test_language_picker_then_single_language(tmp_path):
         out = await hh.tap("g:new")
         assert "नवीन ग्राहक" in out[0].body  # Marathi from now on
         out = await hh.tap("s:C1:lang:hi")  # customer speaks Hindi: only the Bolo line follows the customer
-        out = await hh.voice("assess_1")
+        out = await hh.voice("assess_short")
         body = out[0].body
         assert "*बोला*" in body and "*का*" in body  # associate labels stay Marathi
         assert "पुराना टीवी" in body  # the line to say (why now?) is in the customer's Hindi

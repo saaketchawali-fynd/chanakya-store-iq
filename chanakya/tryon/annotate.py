@@ -13,8 +13,8 @@ from chanakya.tryon.geometry import Wall
 from chanakya.tryon.place import SAFFRON, Placed
 from chanakya.tryon.read_room import Room
 
-INDIGO = (27, 42, 74)
-SAFFRON_TEXT = (196, 96, 22)
+INDIGO = (11, 16, 32)
+SAFFRON_TEXT = (67, 56, 202)
 SS = 2
 Box = tuple[int, int, int, int]
 SCALE_BAR_TEXT = "1 m"

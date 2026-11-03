@@ -12,18 +12,18 @@
              font-size: 43px; font-weight: 800; color: var(--ink); letter-spacing: -1px; }
   .summary .lv { font-size: 40px; font-weight: 800; color: var(--green-deep); line-height: 1.2; }
   .summary .bar { display: flex; gap: 6px; margin-top: 16px; }
-  .summary .bar i { flex: 1; height: 12px; border-radius: 99px; background: #E8E3DA; }
+  .summary .bar i { flex: 1; height: 12px; border-radius: 99px; background: #E5E7EB; }
   .summary .bar i.on { background: var(--green); }
   .summary .bar i.half { background: var(--saffron); }
   .steps { padding: 10px 34px; }
   .step { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 10px 0; font-size: 29px; }
   .step + .step { border-top: 2px solid var(--line); }
   .step .nm { display: flex; align-items: center; gap: 14px; color: var(--ink); font-weight: 600; }
-  .step .no { width: 36px; height: 36px; border-radius: 11px; background: #F0ECE6; color: var(--muted); font-size: 20px;
+  .step .no { width: 36px; height: 36px; border-radius: 11px; background: #EEF0F3; color: var(--muted); font-size: 20px;
               font-weight: 800; display: flex; align-items: center; justify-content: center; }
   .step.p0 .nm { color: var(--muted); }
   .pts { display: flex; gap: 8px; }
-  .pts i { width: 54px; height: 14px; border-radius: 99px; background: #E8E3DA; }
+  .pts i { width: 54px; height: 14px; border-radius: 99px; background: #E5E7EB; }
   .step.p2 .pts i { background: var(--green); }
   .step.p1 .pts i:first-child { background: var(--saffron); }
   .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
@@ -43,8 +43,8 @@
   <section class="card summary">
     <div class="ring">
       <svg width="196" height="196" viewBox="0 0 196 196">
-        <circle cx="98" cy="98" r="82" fill="none" stroke="#EEE9E1" stroke-width="18"/>
-        <circle cx="98" cy="98" r="82" fill="none" stroke="{{ '#2E8B57' if f >= 0.75 else '#E8833A' }}" stroke-width="18"
+        <circle cx="98" cy="98" r="82" fill="none" stroke="#EEF0F3" stroke-width="18"/>
+        <circle cx="98" cy="98" r="82" fill="none" stroke="{{ '#059669' if f >= 0.75 else '#4F46E5' }}" stroke-width="18"
                 stroke-linecap="round" stroke-dasharray="515.2" stroke-dashoffset="{{ (515.2 * (1 - f))|round(1) }}"/>
       </svg>
       <div class="c num">{{ score_str or (got.v ~ '/' ~ (2 * st|length)) }}</div>

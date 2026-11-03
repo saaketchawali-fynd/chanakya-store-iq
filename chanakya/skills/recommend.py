@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from chanakya.brain import packs as P
 from chanakya.brain.demos import pick_demo
+from chanakya.brain.fit import fit
 from chanakya.brain.options import OptionSet, compute_options
 from chanakya.core import state
 from chanakya.core.buttons import encode
@@ -56,7 +57,7 @@ def _option_set(ctx: SkillContext) -> OptionSet | None:
     if ex_sku or ex_brand:  # 'none of these': drop what they turned down (never below three choices if avoidable)
         left = [p for p in products if p.sku not in ex_sku and p.brand not in ex_brand]
         products = left if len([p for p in left if p.qty > 0 or p.nearby_qty > 0]) >= 1 else products
-    return compute_options(products, ctx.session.home, pack, ctx.facts.snap.guides)
+    return compute_options(products, ctx.session.home, pack, ctx.facts.snap.guides, ctx.session.extra.get("wants"))
 
 
 def _reason(ctx: SkillContext, key: str, lang: str) -> str:
@@ -129,10 +130,48 @@ def options_card(ctx: SkillContext, opts) -> Card:
     return Card(template="options", lang=cl, data=data)  # type: ignore[arg-type]
 
 
-async def show_options(ctx: SkillContext, override_checked: bool = False) -> Reply:
+WANT_LABEL = {"size_in": '{v}"', "brand": "{v}", "panel": "{v}", "ton": "{v} ton", "capacity_kg": "{v} kg",
+              "capacity_l": "{v} L", "star": "{v} star", "load": "{v} load", "ram_gb": "{v} GB RAM"}
+
+
+def want_labels(ctx: SkillContext, wants: dict) -> list[str]:
+    from chanakya.truth import fmt
+
+    out = []
+    for k, v in (wants or {}).items():
+        val = fmt.num(v) if isinstance(v, (int, float)) else str(v)
+        out.append(ctx.reg.raw(WANT_LABEL.get(k, "{v}").format(v=val), f"note:want:{k}"))
+    return out
+
+
+def _note_reasons(ctx: SkillContext, p, note_slots: set[str], wants: dict, n: int = 2) -> list[str]:
+    """Why this product, in terms of what the note said: the fit rules its answers switched on that this product
+    meets (strongest first), then the explicit asks it meets ('55" as asked')."""
+    from chanakya.brain.wants import meets
+
+    fr = fit(p, ctx.session.home, ctx.pack, ctx.facts.snap.guides)
+    rules = {r.id: r for r in ctx.pack.fit_rules}
+    out = []
+    for c in sorted(fr.contributions, key=lambda c: -(c.weight * c.match)):
+        r = rules.get(c.rule_id)
+        if r and c.match >= 1 and r.slot in note_slots and c.rule_id in ctx.pack.reasons:
+            txt = _reason(ctx, c.rule_id, ctx.lang)
+            if txt and txt not in out:
+                out.append(txt)
+        if len(out) >= n:
+            break
+    met = meets(p, wants)
+    if met:
+        out.append(ctx.t("note_as_asked", what=", ".join(want_labels(ctx, {k: wants[k] for k in met}))))
+    return out[: n + 1]
+
+
+async def show_options(ctx: SkillContext, override_checked: bool = False, note: dict | None = None) -> Reply:
+    """note: the associate described the needs in one voice note ({'slots': [...], 'wants': {...}}): the fixed
+    questions are skipped and the reply says the picks come from that note, each with the reasons it matched."""
     s = ctx.session
     pack = ctx.pack
-    if not state.options_gate_open(s, pack):
+    if note is None and not state.options_gate_open(s, pack):
         return gate_options_reply(ctx)
     if not ctx.facts.snap.products:  # nothing loaded from the backend (yet): say so, not "no model fits"
         return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
@@ -162,6 +201,22 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
         tag = f" ({ctx.t('best_pick')})" if o.role == "best" else ""
         lines.append(f"*{o.label}* {name}{tag}: {reason_a}{extra}")
         btns.append(C.option_button(ctx, o.label, p))
+    if note is not None:  # from the note: say so, and give the best pick's reasons in the note's own terms
+        from chanakya.skills.assess import note_facts
+
+        s.extra["from_note"] = True
+        facts = (note_facts(ctx) + want_labels(ctx, note.get("wants") or {}))[:6]
+        ack = ctx.t("note_ack", facts=" · ".join(facts), n=ctx.reg.num(len(opts.options), "options:count"),
+                    cat=ctx.t(f"brief_cat_{pack.category}"))
+        b = best
+        why = _note_reasons(ctx, b.product, set(note.get("slots") or []), note.get("wants") or {})
+        line_b = f"*{b.label}* {C.product_name(ctx, b.product)} ({ctx.t('best_pick')}): " + " · ".join(
+            why or [_reason(ctx, b.reason_key, ctx.lang)])
+        rest = [f"*{o.label}* {C.product_name(ctx, o.product)}: {_reason(ctx, o.reason_key, ctx.lang)}"
+                for o in opts.options if o.role != "best"]
+        lines = [ack, line_b, " · ".join(rest)] if rest else [ack, line_b]
+        ctx.ev("note_shortlist", slots=list(note.get("slots") or []), wants=list((note.get("wants") or {}).keys()),
+               best=b.product.sku)
     card = C.english(ctx, lambda: options_card(ctx, opts))
     demo = pick_demo(opts, s.home, pack, ctx.facts.snap.guides)
     if demo:

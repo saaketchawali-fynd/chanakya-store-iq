@@ -772,6 +772,9 @@ async def on_speech(ctx: SkillContext) -> Reply:
         return await expert.ask(
             ctx, u.question_for_expert or tr, via_truth_check=bool(u.question_for_expert), library_id=u.library_id
         )
+    note = _requirements_note(ctx, tr, n_new, intents)
+    if note is not None:  # the needs were told in one note: no more fixed questions, the right products now
+        return await recommend.show_options(ctx, note=note)
     if "demo_done" in intents and s.shortlist:
         return await recommend.shown(ctx)
     if "request_options" in intents:
@@ -789,6 +792,28 @@ async def on_speech(ctx: SkillContext) -> Reply:
         snip = snip if len(snip) <= 38 else snip[:37].rstrip() + "…"
         r.messages[0].footer = ctx.t("footer_heard", text=ctx.reg.raw(snip, "voice:transcript"))
     return r
+
+
+def _requirements_note(ctx: SkillContext, tr: str, n_new: int, intents: set) -> dict | None:
+    """Did this note describe what the customer needs (several facts, or a clear ask such as '55 inch Sony')?
+    Then the shortlist comes straight from it. Explicit product asks are kept for the shortlist ('wants')."""
+    from chanakya.brain import wants as W
+
+    s = ctx.session
+    pack = ctx.pack
+    if pack is None or not ctx.facts.snap.products or s.chosen_sku:
+        return None
+    brands = sorted({p.brand for p in ctx.facts.products_sync(pack.category) if p.brand})
+    new = W.parse(tr, pack.category, brands)
+    if new:
+        s.extra["wants"] = {**(s.extra.get("wants") or {}), **new}
+    n_new = n_new or 0
+    asked = "request_options" in intents
+    rich = n_new >= 3 or (new and (n_new >= 1 or len(new) >= 2)) or (asked and (n_new >= 1 or new))
+    if not rich or (s.shortlist and not (n_new >= 2 or new)):
+        return None
+    slots = list(dict.fromkeys(e.payload.get("slot") for e in ctx.events if e.type == "slot_filled"))
+    return {"slots": [x for x in slots if x], "wants": s.extra.get("wants") or {}}
 
 
 async def voice_step(ctx: SkillContext, u, intents: set) -> Reply | None:

@@ -53,9 +53,9 @@ async def test_two_options_keep_their_roles(tmp_path, monkeypatch):
 
 
 async def test_unclear_text_at_the_read_back_does_not_resend_the_cards(h):
-    from tests.helpers import assess_tv
+    from tests.helpers import assess_steps
 
-    await assess_tv(h)
+    await assess_steps(h)
     out = await h.tap("s:C1:photo_no")
     assert any(m.card for m in out)  # the read-back with the Home Card
     out = await h.say("ok")

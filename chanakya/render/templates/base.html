@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <style>
   :root {
-    --indigo: #1B2A4A; --indigo-2: #26395F; --ink: #1B2A4A; --text: #2A3142; --muted: #687083; --faint: #9AA1AF;
-    --line: #EDE8E0; --bg: #F5F2EC; --surface: #FFFFFF; --stage: #F6F3EE;
-    --saffron: #E8833A; --saffron-deep: #B65E1C; --saffron-pale: #FDF0E4; --saffron-tint: #FFF8F1;
-    --green: #2E8B57; --green-deep: #22704A; --green-pale: #E7F4EC;
-    --red: #C2453D; --pink: #FCE7EC; --pink-ink: #B4365A;
-    --shadow: 0 1px 2px rgba(27,42,74,.05), 0 10px 28px rgba(27,42,74,.08);
-    --shadow-sm: 0 1px 2px rgba(27,42,74,.05), 0 4px 14px rgba(27,42,74,.06);
+    --indigo: #0F172A; --indigo-2: #1E293B; --ink: #0B1220; --text: #1F2937; --muted: #6B7280; --faint: #9CA3AF;
+    --line: #E8EAEE; --bg: #F4F5F7; --surface: #FFFFFF; --stage: #F7F8FA;
+    --saffron: #4F46E5; --saffron-deep: #4338CA; --saffron-pale: #EEF0FF; --saffron-tint: #F6F7FF;
+    --green: #059669; --green-deep: #047857; --green-pale: #ECFDF5;
+    --red: #DC2626; --pink: rgba(255,255,255,.10); --pink-ink: rgba(255,255,255,.72);
+    --shadow: 0 1px 2px rgba(11,18,32,.04), 0 14px 34px rgba(11,18,32,.07);
+    --shadow-sm: 0 1px 2px rgba(11,18,32,.04), 0 6px 16px rgba(11,18,32,.05);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 1080px; background: var(--bg); }
   body {
-    font-family: "Noto Sans", "Noto Sans Devanagari", "Kohinoor Devanagari", "Devanagari Sangam MN",
-                 "Helvetica Neue", Arial, sans-serif, "Noto Color Emoji", "Apple Color Emoji";
+    font-family: "Inter", "Avenir Next", "Helvetica Neue", "Noto Sans", "Noto Sans Devanagari", "Kohinoor Devanagari",
+                 "Devanagari Sangam MN", Arial, sans-serif, "Noto Color Emoji", "Apple Color Emoji";
     color: var(--text); font-size: 32px; line-height: 1.38;
     -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
   }
@@ -26,24 +26,24 @@
   .ic { display: inline-block; flex: none; vertical-align: middle; }
 
   /* ---------- header ---------- */
-  .hd { position: relative; overflow: hidden; color: #fff; padding: 36px 56px 46px;
-        background: linear-gradient(140deg, #18264A 0%, #1F3159 55%, #2A3F6C 100%); }
-  .hd::before { content: ""; position: absolute; right: -170px; top: -230px; width: 560px; height: 560px;
-                border-radius: 50%; background: radial-gradient(circle, rgba(232,131,58,.34) 0%, rgba(232,131,58,0) 68%); }
-  .hd::after { content: ""; position: absolute; left: -120px; bottom: -260px; width: 520px; height: 420px;
-               border-radius: 50%; background: radial-gradient(circle, rgba(120,150,230,.18) 0%, rgba(120,150,230,0) 70%); }
+  .hd { position: relative; overflow: hidden; color: #fff; padding: 38px 56px 46px;
+        background: linear-gradient(160deg, #0B1020 0%, #10183A 58%, #18235A 100%); }
+  .hd::before { content: ""; position: absolute; right: -160px; top: -220px; width: 600px; height: 600px;
+                border-radius: 50%; background: radial-gradient(circle, rgba(129,140,248,.34) 0%, rgba(129,140,248,0) 66%); }
+  .hd::after { content: ""; position: absolute; left: -140px; bottom: -280px; width: 560px; height: 440px;
+               border-radius: 50%; background: radial-gradient(circle, rgba(56,189,248,.12) 0%, rgba(56,189,248,0) 70%); }
   .hd > * { position: relative; z-index: 1; }
   .hd.lift { padding-bottom: 128px; }
   .topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
   .brand { display: flex; align-items: center; gap: 12px; font-size: 23px; font-weight: 700;
            color: rgba(255,255,255,.86); letter-spacing: .4px; }
   .brand .soft { color: rgba(255,255,255,.5); font-weight: 600; }
-  .badge { font-size: 18px; font-weight: 800; letter-spacing: 1.6px; color: var(--pink-ink); background: var(--pink);
-           padding: 5px 13px; border-radius: 999px; line-height: 1.3; }
-  .kicker { font-size: 25px; font-weight: 700; color: #F4A86F; margin-bottom: 6px; letter-spacing: .3px; }
-  h1 { font-size: 56px; line-height: 1.16; font-weight: 800; letter-spacing: -.6px; }
+  .badge { font-size: 17px; font-weight: 600; letter-spacing: 1.4px; color: var(--pink-ink); background: var(--pink);
+           border: 1px solid rgba(255,255,255,.14); padding: 5px 13px; border-radius: 999px; line-height: 1.3; }
+  .kicker { font-size: 24px; font-weight: 600; color: #A5B4FC; margin-bottom: 6px; letter-spacing: .2px; }
+  h1 { font-size: 56px; line-height: 1.14; font-weight: 700; letter-spacing: -1px; }
   h1.dv { line-height: 1.32; }
-  .sub { font-size: 29px; color: #C6CFE2; margin-top: 10px; line-height: 1.35; }
+  .sub { font-size: 29px; color: #C7CBD6; margin-top: 10px; line-height: 1.35; }
   .hd-row { display: flex; align-items: center; gap: 32px; }
   .hd-row .grow { flex: 1; min-width: 0; }
 
@@ -56,9 +56,9 @@
            letter-spacing: 1.6px; text-transform: uppercase; margin: 0 6px 14px; }
   .label.dv { font-size: 26px; letter-spacing: 0; font-weight: 700; }
   .label .ic { color: var(--saffron); }
-  .card { background: var(--surface); border-radius: 30px; box-shadow: var(--shadow); padding: 28px 34px; }
+  .card { background: var(--surface); border-radius: 30px; border: 1.5px solid var(--line); box-shadow: var(--shadow-sm); padding: 28px 34px; }
   .stage { position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
-           border-radius: 24px; background: radial-gradient(120% 95% at 50% 28%, #FFFFFF 0%, #F7F4EF 58%, #EEE9E1 100%); }
+           border-radius: 24px; background: radial-gradient(120% 95% at 50% 28%, #FFFFFF 0%, #F7F8FA 58%, #EEF0F3 100%); }
   .stage img { display: block; max-width: 86%; max-height: 84%; object-fit: contain; }
   .rows .r { display: flex; justify-content: space-between; align-items: baseline; gap: 28px; padding: 15px 0;
              border-bottom: 2px solid var(--line); }
@@ -67,7 +67,7 @@
   .rows .k { color: var(--muted); font-size: 28px; flex: 0 1 auto; max-width: 48%; }
   .rows .v { font-weight: 700; color: var(--ink); text-align: right; }
   .chip { display: inline-flex; align-items: center; gap: 8px; font-size: 25px; font-weight: 600; line-height: 1.25;
-          padding: 9px 16px; border-radius: 999px; background: #F1EEE8; color: var(--text); }
+          padding: 9px 16px; border-radius: 999px; background: #F1F2F4; color: var(--text); }
   .chip.green { background: var(--green-pale); color: var(--green-deep); }
   .chip.saffron { background: var(--saffron-pale); color: var(--saffron-deep); }
   .chip.indigo { background: #E8ECF5; color: var(--indigo); }
@@ -87,7 +87,7 @@
   <header class="hd{% block hd_class %}{% endblock %}">
     <div class="topline">
       <div class="brand">
-        <svg class="ic" width="34" height="34" viewBox="0 0 36 36"><defs><linearGradient id="mk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7A65C"/><stop offset="1" stop-color="#DD6A1E"/></linearGradient></defs><rect width="36" height="36" rx="10" fill="url(#mk)"/><path d="M24.6 12.3a8 8 0 1 0 0 11.4" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><circle cx="25.2" cy="18" r="2.3" fill="#fff"/></svg>
+        <svg class="ic" width="34" height="34" viewBox="0 0 36 36"><defs><linearGradient id="mk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#818CF8"/><stop offset="1" stop-color="#4F46E5"/></linearGradient></defs><rect width="36" height="36" rx="10" fill="url(#mk)"/><path d="M24.6 12.3a8 8 0 1 0 0 11.4" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><circle cx="25.2" cy="18" r="2.3" fill="#fff"/></svg>
         <span>{{ L.brand|default('Chanakya') }}{% block brand_tail %} <span class="soft">· {{ L.brand_sub|default('Store IQ') }}</span>{% endblock %}</span>
       </div>
       <span class="badge">{{ L.test_data|default('TEST DATA') }}</span>

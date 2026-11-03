@@ -54,8 +54,10 @@ async def test_golden_path(tmp_path):
         out = await step(h.tap, "s:C1:lang:mr")
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.customer_lang == "mr"
-        # 4 voice note → ONE message: why now? (Marathi line to say), what was understood in the footer
-        out = await step(h.voice, "assess_1")
+        # 4 a short voice note (room, distance, budget) → ONE message: why now? (Marathi line to say), what was
+        #   understood in the footer. (A note that tells all the needs goes straight to the products: see
+        #   test_note_shortlist.)
+        out = await step(h.voice, "assess_short")
         assert len(out) == 1
         coach = out[0]
         assert coach.coach and "जुना टीव्ही" in coach.body and coach.body.startswith("*Bolo*:") and "*Kyun*:" in coach.body
@@ -69,6 +71,9 @@ async def test_golden_path(tmp_path):
         out = await step(h.tap, "s:C1:slot:trigger:replace")
         assert button_ids(out)[0] == "s:C1:slot:old_size:o32"
         out = await step(h.tap, "s:C1:slot:old_size:o43")
+        assert button_ids(out)[0] == "s:C1:slot:room_light:sunny"  # the home questions the note did not answer
+        out = await step(h.tap, "s:C1:slot:room_light:sunny")
+        out = await step(h.say, "papa cricket dekhte hain, bachche cartoon")  # the answer said, not tapped
         assert len(out) == 1 and button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"]
         # 6 photo → read it back (budget already said, so no range question) with the Home Card + try-on
         out = await step(h.tap, "s:C1:photo_yes")

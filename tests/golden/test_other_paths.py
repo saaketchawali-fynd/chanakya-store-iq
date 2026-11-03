@@ -55,19 +55,9 @@ async def test_wm_smoke_rules(h):
     check_floor(out)
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     assert s.home.category == "wm"
-    assert button_ids(out)[0] == "s:C1:slot:trigger:replace"  # why now, first
-    out = await h.tap("s:C1:slot:trigger:new_home")
-    assert button_ids(out)[0] == "s:C1:slot:water:hard"  # the one home question the note did not answer
-    check_floor(await h.tap("s:C1:slot:water:hard"))
-    out = await h.tap("s:C1:photo_no")
-    rows = [r.id for sec in out[0].sections for r in sec.rows]
-    assert rows[-1] == "s:C1:budget:none" and len(rows) == 4  # three ranges from the real prices + not decided
-    out = await h.pick(rows[1])
-    assert button_ids(out) == ["s:C1:readback_ok", "s:C1:readback_edit"]
-    await h.tap("s:C1:readback_ok")
-    out = await h.tap("s:C1:options")
-    check_floor(out)
+    # the needs were told in one note (people, place, how often): the right machines now, from the note
     assert any(m.card and m.card.template == "options" for m in out)
+    assert out[0].body.startswith("Aapke note se: 5 log")
     await h.tap("s:C1:shown")
     out = await h.tap("s:C1:opt:B")
     check_floor(out)
