@@ -46,11 +46,71 @@ def known_cites(ctx: SkillContext, prefer: list[str] | None = None) -> list[str]
     return []
 
 
+def _avail(ctx: SkillContext) -> list:
+    return [p for p in ctx.facts.products_sync(ctx.pack.category) if p.qty > 0 or p.nearby_qty > 0]
+
+
+def skipped(ctx: SkillContext) -> set[str]:
+    """The home questions today's catalogue cannot act on (brain.data_questions), worked out once per customer and
+    catalogue; kept on the session for the options gate, with how many data questions can stand in for them."""
+    from chanakya.brain import data_questions as DQ
+
+    s = ctx.session
+    key = f"{ctx.pack.category}:{len(ctx.facts.snap.products)}"
+    if s.extra.get("skip_key") != key:
+        avail = _avail(ctx)
+        skip = DQ.skip_slots(ctx.pack, avail, s.home, ctx.facts.snap.guides)
+        if not ctx.pack.placeable and not any(e.category == ctx.pack.category for e in ctx.facts.snap.exchange):
+            skip |= {"trigger", "old_size"}  # 'why now' only feeds the exchange value (no exchange data) and the try-on
+        n_dq = 0
+        if skip:
+            done: set[str] = set()
+            while (q := DQ.next_data_question(ctx.pack, avail, done, {})) is not None:
+                done.add(q[0])
+            n_dq = len(done)
+        s.extra.update(skip_key=key, skip_slots=sorted(skip), dq_avail=n_dq)
+    return set(s.extra.get("skip_slots") or [])
+
+
 def pick_next_slot(ctx: SkillContext, exclude: set[str] | None = None, phase: str | None = None) -> str | None:
-    """The next question in the pack's fixed order (why now, then the home questions); None once it is done."""
+    """The next question in the pack's fixed order (why now, then the home questions); None once it is done.
+    Questions today's catalogue cannot act on are skipped."""
     if not ctx.pack or not ctx.session:
         return None
-    return ordered_next(ctx.session.home, ctx.pack, exclude, phase)
+    return ordered_next(ctx.session.home, ctx.pack, (exclude or set()) | skipped(ctx), phase)
+
+
+def data_question(ctx: SkillContext, footer: str | None = None) -> OutMessage | None:
+    """In place of the questions the data cannot act on: one about what the models on sale really differ on,
+    with the answers from the stock itself (and 'any')."""
+    from chanakya.brain import data_questions as DQ
+
+    s = ctx.session
+    if not skipped(ctx) or s.shortlist:
+        return None
+    done = set(s.extra.get("dq_done") or [])
+    q = DQ.next_data_question(ctx.pack, _avail(ctx), done, s.extra.get("wants") or {})
+    if q is None:
+        return None
+    key, vals = q
+    s.extra.setdefault("dq_vals", {})[key] = [v for v, _ in vals]
+    labels = [ctx.reg.raw(DQ.label(key, v), f"stock:{ctx.pack.category}:{key}") for v, _ in vals]
+    avail = _avail(ctx)
+    parts = []
+    for lab, (v, n) in zip(labels, vals, strict=False):
+        ps = [p for p in avail if DQ._value(p, key) is not None and (DQ._value(p, key) == v or str(DQ._value(p, key)) == str(v))]
+        lo = min((p for p in ps), key=lambda p: p.price, default=None)
+        span = f" {ctx.t('dq_from', price=ctx.reg.inr(lo.price, lo.price_source))}" if lo else ""
+        parts.append(f"{ctx.reg.num(n, f'stock:{ctx.pack.category}:{key}')} {lab}{span}")
+    counts = " · ".join(parts)
+    what_c, what_a = ctx.t(f"dq_whatc_{key}", ctx.clang), ctx.t(f"dq_what_{key}")
+    say = ctx.tc("dq_ask", what=what_c, a=labels[0], b=labels[1])
+    why = ctx.t("dq_why", what=what_a, counts=counts, cat=ctx.t(f"brief_cat_{ctx.pack.category}"))
+    btns = [Button(id=ctx.sid("dq", key, i), title=truncate_title(lab)) for i, lab in enumerate(labels[:2])]
+    btns.append(ctx.b("b_dq_any", ctx.sid("dq", key, "any")))
+    ctx.x["questions_asked"] = questions_asked(ctx) + 1
+    ctx.ev("data_question_asked", key=key, values=[str(v) for v in s.extra["dq_vals"][key]])
+    return coach_reply(ctx, say, why, known_cites(ctx), btns, footer=footer)
 
 
 def info_gain_slot(ctx: SkillContext, exclude: set[str] | None = None) -> str | None:
@@ -325,6 +385,9 @@ def next_question_or_options(ctx: SkillContext, lead: str | None = None, footer:
         return msg
     if not s.shortlist:
         x = ctx.x
+        dq = data_question(ctx, footer=footer)
+        if dq is not None:
+            return dq
         if pack.placeable and not x.get("photo_asked") and not s.tryon_done:
             return photo_question(ctx, footer=footer)
         if s.home.start_level_inr is None and not x.get("budget_asked"):

@@ -56,7 +56,14 @@ def test_mode_selection():
     assert AIClient(Settings(_env_file=None, ai_mode="fixture", gemini_api_key="k"), PACKS).mode == "fixture"
 
 
+def said(text: str):
+    """A plain-text answer (the transcript call has no schema)."""
+    return SimpleNamespace(parsed=None, text=text)
+
+
 async def test_voice_note_understood_with_audio_part():
+    """Voice in two steps (3 Nov 2026 RCA): the audio goes only to the light transcript call; the meaning is read
+    from the words (a text call with the schema)."""
     u = Understanding(
         transcript="sofa se das feet",
         language="hi",
@@ -64,21 +71,22 @@ async def test_voice_note_understood_with_audio_part():
         numbers=[{"name": "seat_distance_ft", "value": 10}],
         intents=["customer_info"],
     )
-    ai, fm = live_client([ok(u)])
+    ai, fm = live_client([said("sofa se das feet"), ok(u)])
     out = await ai.understand(None, b"OggS...", {"category": "tv"}, mime="audio/ogg; codecs=opus")
-    assert out.numbers[0].value == 10
+    assert out.numbers[0].value == 10 and out.transcript == "sofa se das feet"
     part = fm.calls[0]["contents"][0]
     assert part.inline_data.mime_type == "audio/ogg" and part.inline_data.data == b"OggS..."
-    assert fm.calls[0]["config"].response_schema is Understanding
-    assert diag.snapshot()["ai_last_understand_audio"]["ok"] is True
+    assert fm.calls[0]["config"].response_schema is None  # the transcript: plain words, no form to fill
+    assert fm.calls[1]["contents"][0] == "sofa se das feet" and fm.calls[1]["config"].response_schema is Understanding
+    assert diag.snapshot()["ai_last_transcribe"]["ok"] is True
 
 
 async def test_fallback_model_and_thinking_retry():
-    u = Understanding(transcript="x", intents=["other"])
-    ai, fm = live_client([Exception("thinking_level is not supported"), RuntimeError("503 overloaded"), ok(u)])
+    ai, fm = live_client([Exception("thinking_level is not supported"), RuntimeError("503 overloaded"), said("x"),
+                          RuntimeError("down"), RuntimeError("down"), RuntimeError("down"), RuntimeError("down")])
     out = await ai.understand(None, b"a", {})
-    assert out.transcript == "x"
-    models = [c["model"] for c in fm.calls]
+    assert out.transcript == "x"  # heard; the meaning from the offline rules while the text model is down
+    models = [c["model"] for c in fm.calls][:3]
     assert models == ["gemini-flash-latest", "gemini-flash-latest", "gemini-flash-lite-latest"]
     assert fm.calls[0]["config"].thinking_config is not None and fm.calls[1]["config"].thinking_config is None
 
@@ -87,22 +95,21 @@ async def test_retired_models_fall_back_to_the_latest_alias():
     u = Understanding(transcript="y", intents=["other"])
     gone = "404 NOT_FOUND. This model is no longer available to new users."
     ai = AIClient(Settings(_env_file=None, ai_mode="live", gemini_api_key="k"), PACKS)
-    fm = FakeModels([RuntimeError(gone), RuntimeError(gone), ok(u)])
+    fm = FakeModels([RuntimeError(gone), RuntimeError(gone), said("y"), ok(u)])
     ai.gemini.client = SimpleNamespace(aio=SimpleNamespace(models=fm))
     out = await ai.understand(None, b"a", {})
     assert out.transcript == "y"
-    assert [c["model"] for c in fm.calls] == ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"]  # each failure: the next at once
+    assert [c["model"] for c in fm.calls][:3] == ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"]
 
 
 async def test_busy_model_never_loses_a_voice_note():
-    """3 Nov 2026 on production: the main model said 503 (high demand) and the backup hung. Now the next model
-    joins at once on a failure, and after a few seconds when one is just slow; the first good answer wins."""
+    """3 Nov 2026 on production: the main model said 503 (high demand) and others hung. The next model joins at
+    once on a failure, and after a few seconds when one is just slow; the first good transcript wins."""
     import asyncio
     import time
 
     from chanakya.ai import gemini
 
-    u = Understanding(transcript="sofa se das feet", intents=["customer_info"])
     busy = "503 UNAVAILABLE. This model is currently experiencing high demand."
 
     class Slow:
@@ -111,11 +118,13 @@ async def test_busy_model_never_loses_a_voice_note():
 
         async def generate_content(self, model, contents, config):
             self.calls.append(model)
+            if config.response_schema is not None:  # the text step: down too → the offline rules
+                raise RuntimeError(busy)
             if model == "gemini-3.8-flash":
                 raise RuntimeError(busy)
             if model == "gemini-flash-latest":
                 await asyncio.sleep(30)  # hangs
-            return ok(u)
+            return said("sofa se das feet, dhoop aati hai")
 
     ai = AIClient(Settings(_env_file=None, ai_mode="live", gemini_api_key="k"), PACKS)
     fm = Slow()
@@ -125,7 +134,8 @@ async def test_busy_model_never_loses_a_voice_note():
     try:
         t0 = time.perf_counter()
         out = await ai.understand(None, b"OggS", {"category": "tv"}, mime="audio/ogg")
-        assert out.transcript == "sofa se das feet" and time.perf_counter() - t0 < 3
+        assert out.transcript.startswith("sofa se das feet") and time.perf_counter() - t0 < 9
+        assert ("room_light", "sunny") in {(s.slot, s.value) for s in out.slots}  # understood even with no model
         assert fm.calls[:3] == ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"]
     finally:
         gemini.HEDGE_STAGGER = old

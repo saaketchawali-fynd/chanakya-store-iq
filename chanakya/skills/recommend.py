@@ -179,6 +179,11 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
     if opts is None:
         return ctx.reply(info_reply(ctx, ctx.t("no_options"), [ctx.b("b_expert", ctx.sid("expert"))]))
     s.option_labels = {o.label: o.product.sku for o in opts.options}
+    from chanakya.core.clock import today
+    from chanakya.jobs.price_watch import remember
+
+    for o in opts.options:  # for the price watch: what they saw today
+        remember(s, o.product, ctx.facts, today())
     s.extra["option_roles"] = {o.label: o.role for o in opts.options}
     best, value, step = opts.by_role("best"), opts.by_role("value"), opts.by_role("step")
     s.shortlist = [o.product.sku for o in (best, value, step) if o]
@@ -277,6 +282,8 @@ async def prefer(ctx: SkillContext) -> Reply:
             reason = _reason(ctx, top if top in ctx.pack.reasons else "value_fit", ctx.lang)
         rows.append(ListRow(id=ctx.sid("opt", lab), title=truncate(f"{lab}: {p.model}", 24), description=truncate(reason, 72)))
         ctx.reg.raw(rows[-1].title, f"product:{sku}")
+    if state.price_gate_open(s, ctx.pack) and len(s.option_labels) >= 2:  # is the extra money worth it?
+        rows.append(ListRow(id=ctx.sid("upgrade"), title=ctx.t("row_upgrade"), description=ctx.t("row_upgrade_d")))
     rows.append(ListRow(id=ctx.sid("nonefit"), title=ctx.t("row_none_fit"), description=ctx.t("row_none_fit_d")))
     ctx.reg.static(" ".join((r.description or "") for r in rows))
     cites = C.known_cites(ctx)
@@ -491,3 +498,49 @@ async def offer_detail(ctx: SkillContext, offer_id: str, label: str) -> Reply:
         btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
     ctx.ev("offer_explained", offer=o.id, sku=sku)
     return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns[:3]))
+
+
+def _gains(ctx: SkillContext, lower, higher) -> list[str]:
+    """What the dearer one really adds FOR THIS HOME, from the data: the fit rules it meets and the cheaper one
+    does not (only rules today's catalogue can judge), and a bigger key size."""
+    from chanakya.brain.data_questions import rule_informative
+
+    pack, home, g = ctx.pack, ctx.session.home, ctx.facts.snap.guides
+    avail = [p for p in ctx.facts.products_sync(pack.category) if p.qty > 0 or p.nearby_qty > 0]
+    lo = {c.rule_id: c.match for c in fit(lower, home, pack, g).contributions}
+    rules = {r.id: r for r in pack.fit_rules}
+    out = []
+    for c in sorted(fit(higher, home, pack, g).contributions, key=lambda c: -(c.weight * (c.match - lo.get(c.rule_id, 0)))):
+        r = rules.get(c.rule_id)
+        if r and c.match > lo.get(c.rule_id, 0) + 0.25 and c.rule_id in pack.reasons and rule_informative(r, avail, home, pack, g):
+            txt = _reason(ctx, c.rule_id, ctx.lang)
+            if txt and txt not in out:
+                out.append(txt)
+    for key, unit in (("size_in", "inch"), ("ton", "ton"), ("capacity_kg", "kg"), ("capacity_l", "L"), ("ram_gb", "GB RAM")):
+        a, b = lower.spec(key), higher.spec(key)
+        if a and b and float(b) > float(a):
+            out.append(ctx.t("upg_more", what=ctx.reg.num(b, f"spec:{higher.sku}:{key}", unit)))
+            break
+    return out[:2]
+
+
+async def upgrade_view(ctx: SkillContext) -> Reply:
+    """'Is the extra money worth it?': each step up, what it costs (and per day over 5 years), and what it really
+    adds for this home. When it adds nothing for them, it says so: the honest answer that wins trust."""
+    s = ctx.session
+    if not state.price_gate_open(s, ctx.pack) or len(s.option_labels) < 2:
+        return await prefer(ctx)
+    picks = sorted(((lab, ctx.facts.product_sync(sku)) for lab, sku in s.option_labels.items()), key=lambda x: x[1].price)
+    lines = [ctx.t("upg_head")]
+    for (la, a), (lb, b) in zip(picks, picks[1:], strict=False):
+        diff = b.price - a.price
+        if diff <= 0:
+            continue
+        src = f"calc:upgrade:{a.sku}:{b.sku}"
+        per_day = ctx.reg.inr(max(1, round(diff / (5 * 365))), src)
+        gains = _gains(ctx, a, b)
+        what = " · ".join(gains) if gains else ctx.t("upg_nothing", lower=la)
+        lines.append(ctx.t("upg_line", a=la, b=lb, diff=ctx.reg.inr(diff, src), day=per_day, what=what))
+    ctx.ev("upgrade_check", options=[lab for lab, _ in picks])
+    btns = [ctx.b("b_they_chose", ctx.sid("prefer")), ctx.b("b_offers_on", ctx.sid("ofs"))]
+    return ctx.reply(info_reply(ctx, "\n".join(lines[:3]), btns))

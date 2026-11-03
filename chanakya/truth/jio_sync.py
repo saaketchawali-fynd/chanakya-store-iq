@@ -115,15 +115,20 @@ def catalog_report(products: list[dict]) -> dict:
     products carry the spec the fit logic needs most (and from where)."""
     cats: dict[str, dict[str, int]] = {}
     cover: dict[str, dict[str, int]] = {}
+    specs: dict[str, dict[str, int]] = {}
     for r in products:
         c = r["category"]
+        for k, v in {**(r.get("specs") or {}), **(r.get("energy") or {})}.items():  # which questions the data supports
+            if v not in (None, "", []):
+                specs.setdefault(c, {})[k] = specs.setdefault(c, {}).get(k, 0) + 1
         for name in r["info"].get("categories") or ["?"]:
             cats.setdefault(c, {})[name] = cats.setdefault(c, {}).get(name, 0) + 1
         src = r["info"]["spec_source"].get(KEY_SPEC[c])
         k = "missing" if not src else ("name" if src == "name" else "attributes")
         cover.setdefault(c, {"attributes": 0, "name": 0, "missing": 0})[k] += 1
     return {"backend_categories": {c: dict(sorted(v.items(), key=lambda x: -x[1])[:15]) for c, v in cats.items()},
-            "key_spec": {c: {"spec": KEY_SPEC[c], **v} for c, v in cover.items()}}
+            "key_spec": {c: {"spec": KEY_SPEC[c], **v} for c, v in cover.items()},
+            "spec_cover": {c: dict(sorted(v.items(), key=lambda x: -x[1])[:16]) for c, v in specs.items()}}
 
 
 async def _yesterday(ses, store_id: str) -> dict[str, int]:
@@ -205,10 +210,16 @@ async def sync(s: Settings, facts) -> dict:
     return STATUS
 
 
-async def loop(s: Settings, facts) -> None:
-    """Sync now, then every jio_sync_minutes (background task for the live app)."""
+async def loop(s: Settings, facts, after=None) -> None:
+    """Sync now, then every jio_sync_minutes (background task for the live app). `after()` runs after each good sync
+    (the price watch)."""
     while True:
         await sync(s, facts)
+        if after is not None and STATUS.get("last_error") is None:
+            try:
+                await after()
+            except Exception:  # never stop the sync loop
+                log.exception("after_sync_failed")
         await asyncio.sleep(max(5, s.jio_sync_minutes) * 60)
 
 

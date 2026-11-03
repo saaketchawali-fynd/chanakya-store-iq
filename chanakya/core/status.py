@@ -30,8 +30,7 @@ def status_line(ctx: SkillContext) -> str:
     pack = ctx.pack
     L = ctx.lang
     cat = ctx.pick(pack.label) if pack else "–"
-    known = pack.known_required(s.home) if pack else 0
-    total = len(pack.required_slots) if pack else 0
+    known, total = state.required_progress(s, pack) if pack else (0, 0)
     code = ctx.reg.raw(s.code, "session:code")
     k = ctx.reg.num(known, "card:known")
     tt = ctx.reg.num(total, "pack:required")

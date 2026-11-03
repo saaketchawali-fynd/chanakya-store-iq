@@ -284,7 +284,7 @@ tip_budget_gap: {hi: "{budget} mein is ghar ke size ka TV stock mein nahi; sabse
 tip_offer_soon: {hi: "{label} par '{title}' {date} ko khatam: demo ke baad zaroor bataiye", mr: "{label} वर '{title}' {date} ला संपते: डेमोनंतर नक्की सांगा", en: "'{title}' on {label} ends {date}: mention it after the demo"}
 tip_only_best: {hi: "Sirf {label} '{need}' poora karta hai: demo usi par", mr: "फक्त {label} '{need}' पूर्ण करतो: डेमो त्यावरच", en: "Only {label} meets '{need}': demo that one"}
 tip_exchange: {hi: "Purana dene ki baat abhi poochiye: kharcha kam ho sakta hai", mr: "जुनं देण्याबद्दल आत्ताच विचारा: खर्च कमी होऊ शकतो", en: "Ask about exchanging the old one now: it can lower the cost"}
-tip_protection: {hi: "{n} protection plan hain, {low} se: ek baar bataiye, zor nahi", mr: "{n} protection plans आहेत, {low} पासून: एकदा सांगा, आग्रह नको", en: "{n} protection plans from {low}: mention once, no pressure"}
+tip_protection: {hi: "{n} protection plan hain, {low} se (sirf {day} roz): ek baar bataiye, zor nahi", mr: "{n} protection plans आहेत, {low} पासून (फक्त {day} रोज): एकदा सांगा, आग्रह नको", en: "{n} protection plans from {low} (just {day} a day): mention once, no pressure"}
 tip_family_card: {hi: "Faisla ghar par hoga: Parivaar Card abhi bhejiye", mr: "निर्णय घरी होईल: परिवार कार्ड आत्ताच पाठवा", en: "The family decides: send the Family Card now"}
 tip_wall_type: {hi: "Installer ke liye deewar ka type abhi pooch lijiye", mr: "इन्स्टॉलरसाठी भिंतीचा प्रकार आत्ताच विचारा", en: "Ask the wall type now, for the installer"}
 # ---- the associate's own name (no dummy name)
@@ -300,3 +300,44 @@ voiceq_footer: {hi: "Hindi, English, मराठी · jaise customer ne kaha",
 note_ack: {hi: "Aapke note se: {facts} → ye {n} {cat} sabse sahi", mr: "तुमच्या नोटवरून: {facts} → हे {n} {cat} सर्वात योग्य", en: "From your note: {facts} → these {n} {cat} fit best"}
 note_as_asked: {hi: "{what} jaisa kaha", mr: "{what} सांगितल्याप्रमाणे", en: "{what} as asked"}
 unit_people: {hi: "log", mr: "जण", en: "people"}
+# ---- voice: honest when Google's voice service is busy (3 Nov 2026 RCA), and the note is never lost
+voice_busy: {hi: "Note mil gaya. Google ki voice service abhi busy hai, 1 minute mein jawab bhejta hoon. Jaldi ho to text likh dijiye.", mr: "नोट मिळाली. Google ची व्हॉइस सेवा आत्ता व्यस्त आहे, 1 मिनिटात उत्तर पाठवतो. घाई असेल तर टेक्स्ट लिहा.", en: "Got your note. Google's voice service is busy right now; I'll reply within a minute. If it's urgent, type it."}
+voice_failed_final: {hi: "Google ki voice service abhi bhi busy hai, is note ka jawab nahi de paaya. Text mein likh dijiye ya button chuniye.", mr: "Google ची व्हॉइस सेवा अजूनही व्यस्त आहे, या नोटचं उत्तर देता आलं नाही. टेक्स्ट लिहा किंवा बटण निवडा.", en: "Google's voice service is still busy and I couldn't answer this note. Please type it or tap a button."}
+# ---- questions backwards from the products: what the stock really differs on (3 Nov 2026)
+dq_ask: {hi: "{what} में कोई पसंद? हमारे पास {a} और {b} दोनों हैं।", mr: "{what} बद्दल काही पसंती? आमच्याकडे {a} आणि {b} दोन्ही आहेत.", en: "Any preference on {what}? We have both {a} and {b}."}
+dq_why: {hi: "Stock ke {cat} isi par alag hain: {counts}. Jawab se sahi wale chunenge", mr: "स्टॉकमधील {cat} यावरच वेगळे आहेत: {counts}. उत्तरावरून योग्य निवडू", en: "The {cat} in stock differ on {what}: {counts}. The answer picks the right ones"}
+b_dq_any: {hi: "Koi bhi chalega", mr: "कोणताही चालेल", en: "Any is fine"}
+dq_what_panel: {hi: "picture type (LED/QLED/OLED)", mr: "पिक्चर प्रकार (LED/QLED/OLED)", en: "picture type (LED/QLED/OLED)"}
+dq_whatc_panel: {hi: "पिक्चर टाइप", mr: "पिक्चरचा प्रकार", en: "picture type (LED/QLED/OLED)"}
+dq_what_os: {hi: "smart system", mr: "स्मार्ट सिस्टम", en: "smart system"}
+dq_whatc_os: {hi: "स्मार्ट सिस्टम", mr: "स्मार्ट सिस्टम", en: "smart system"}
+dq_what_resolution: {hi: "picture sharpness", mr: "पिक्चरची स्पष्टता", en: "picture sharpness"}
+dq_whatc_resolution: {hi: "पिक्चर की क्वालिटी", mr: "पिक्चरची स्पष्टता", en: "picture sharpness"}
+dq_what_brand: {hi: "brand", mr: "ब्रँड", en: "brand"}
+dq_whatc_brand: {hi: "ब्रांड", mr: "ब्रँड", en: "brand"}
+dq_what_inverter: {hi: "inverter (bijli bachat)", mr: "इन्व्हर्टर (वीज बचत)", en: "inverter (saves power)"}
+dq_whatc_inverter: {hi: "इन्वर्टर (बिजली बचत)", mr: "इन्व्हर्टर (वीज बचत)", en: "inverter (saves power)"}
+dq_what_star: {hi: "star rating", mr: "star rating", en: "star rating"}
+dq_whatc_star: {hi: "star rating", mr: "star rating", en: "star rating"}
+dq_what_load: {hi: "top ya front load", mr: "टॉप की फ्रंट लोड", en: "top or front load"}
+dq_whatc_load: {hi: "टॉप या फ्रंट लोड", mr: "टॉप की फ्रंट लोड", en: "top or front load"}
+dq_what_automatic: {hi: "fully ya semi automatic", mr: "fully की semi automatic", en: "fully or semi automatic"}
+dq_whatc_automatic: {hi: "fully या semi automatic", mr: "fully की semi automatic", en: "fully or semi automatic"}
+dq_what_door: {hi: "door type", mr: "दरवाज्याचा प्रकार", en: "door type"}
+dq_whatc_door: {hi: "दरवाज़े का प्रकार", mr: "दरवाज्याचा प्रकार", en: "door type"}
+dq_what_frost_free: {hi: "frost free ya direct cool", mr: "फ्रॉस्ट फ्री की डायरेक्ट कूल", en: "frost free or direct cool"}
+dq_whatc_frost_free: {hi: "फ्रॉस्ट फ्री या डायरेक्ट कूल", mr: "फ्रॉस्ट फ्री की डायरेक्ट कूल", en: "frost free or direct cool"}
+dq_what_laptop_type: {hi: "laptop type", mr: "लॅपटॉपचा प्रकार", en: "laptop type"}
+dq_whatc_laptop_type: {hi: "लैपटॉप का प्रकार", mr: "लॅपटॉपचा प्रकार", en: "laptop type"}
+# ---- the upgrade check and the MRP saving (data only)
+row_upgrade: {hi: "Extra paisa worth hai?", mr: "जास्त पैसे योग्य आहेत?", en: "Worth the extra money?"}
+row_upgrade_d: {hi: "Har step up: kitna zyada, aur is ghar ke liye kya milta hai", mr: "प्रत्येक step up: किती जास्त, आणि या घरासाठी काय मिळतं", en: "Each step up: how much more, and what it adds for this home"}
+upg_head: {hi: "Paisa vs fayda, is ghar ke liye:", mr: "पैसे vs फायदा, या घरासाठी:", en: "Money vs what it adds, for this home:"}
+upg_line: {hi: "*{a} → {b}*: +{diff} (5 saal mein ~{day}/din) · {what}", mr: "*{a} → {b}*: +{diff} (5 वर्षांत ~{day}/दिवस) · {what}", en: "*{a} → {b}*: +{diff} (~{day}/day over 5 years) · {what}"}
+upg_nothing: {hi: "is ghar ke liye koi naya fayda nahi, {lower} kaafi hai", mr: "या घरासाठी नवीन फायदा नाही, {lower} पुरेसा", en: "nothing new for this home: {lower} is enough"}
+upg_more: {hi: "bada: {what}", mr: "मोठा: {what}", en: "bigger: {what}"}
+fc_mrp_saving: {hi: "MRP {mrp} · aaj {pct}% kam", mr: "MRP {mrp} · आज {pct}% कमी", en: "MRP {mrp} · {pct}% off today"}
+# ---- price watch: the backend price fell, or a live offer now applies, after the customer left
+pw_drop: {hi: "Price watch · {code} {name}: {model} ab {now} (pehle {was}, {diff} kam). Call karke bataiye?", mr: "Price watch · {code} {name}: {model} आता {now} (आधी {was}, {diff} कमी). कॉल करून सांगा?", en: "Price watch · {code} {name}: {model} is now {now} (was {was}, {diff} less). Call them?"}
+pw_offer: {hi: "Price watch · {code} {name}: {model} par naya offer: {offer} ({till} tak). Call karke bataiye?", mr: "Price watch · {code} {name}: {model} वर नवी ऑफर: {offer} ({till} पर्यंत). कॉल करून सांगा?", en: "Price watch · {code} {name}: a new offer on {model}: {offer} (till {till}). Call them?"}
+dq_from: {hi: "{price} se", mr: "{price} पासून", en: "from {price}"}

@@ -1,0 +1,100 @@
+"""User, 3 Nov 2026: every question must translate to the products we really have (the backend data); new
+features must use only that data: the upgrade check, the MRP saving, protection per day, the price watch."""
+
+from __future__ import annotations
+
+from types import SimpleNamespace
+
+from chanakya.brain import data_questions as DQ
+from chanakya.brain.packs import load_packs
+from chanakya.core import repo
+from chanakya.core.contracts import HomeCard
+from chanakya.jobs import price_watch
+from chanakya.sim.harness import PHONES
+from chanakya.truth import jio_sync
+from chanakya.truth.jio import JioClient
+from tests.helpers import check_floor, pay, pick, to_options
+from tests.unit.test_jio import backend, live
+
+PACKS = load_packs()
+
+
+def tv(sku, panel=None, os=None, nits=None, hz=None, size=55, brand="X"):
+    specs = {k: v for k, v in {"panel": panel, "os": os, "brightness_nits": nits, "refresh_hz": hz, "size_in": size}.items() if v is not None}
+    return SimpleNamespace(sku=sku, brand=brand, qty=1, nearby_qty=0, price=40000,
+                           spec=lambda k, d=None, s=specs: s.get(k, d))
+
+
+def test_questions_the_data_cannot_answer_are_skipped():
+    pack = PACKS.get("tv")
+    no_specs = [tv(f"T{i}", panel="LED" if i % 2 else "QLED", os="Google TV" if i < 5 else "webOS", size=43 + i) for i in range(10)]
+    skip = DQ.skip_slots(pack, no_specs, HomeCard(), {})
+    assert {"room_light", "content"} <= skip  # no brightness / refresh in the data: sun and cricket cannot pick a TV
+    assert "seat_distance" not in skip  # sizes vary: distance picks the size
+    full = [tv(f"T{i}", nits=300 + 100 * i, hz=60 if i < 5 else 120, size=43 + i) for i in range(10)]
+    assert not ({"room_light", "content"} & DQ.skip_slots(pack, full, HomeCard(), {}))
+    q = DQ.next_data_question(pack, no_specs, set(), {})
+    assert q and q[0] == "panel" and {v for v, _ in q[1]} == {"LED", "QLED"}  # asked from what the stock differs on
+
+
+async def test_live_flow_asks_only_what_the_stock_can_answer(tmp_path, monkeypatch):
+    monkeypatch.setattr(JioClient, "transport", backend())
+    h = await live(tmp_path)
+    try:
+        await jio_sync.sync(h.rt.settings, h.rt.facts)
+        await h.tap("g:new")
+        await h.tap("s:C1:lang:en")
+        out = await h.pick("s:C1:cat:tv")
+        asked = []
+        for _ in range(8):
+            ids = [b.id for m in out for b in m.buttons]
+            slot = next((i for i in ids if ":slot:" in i or ":dq:" in i), None)
+            if slot is None:
+                break
+            asked.append(slot.split(":")[3] if ":slot:" in slot else "dq")
+            out = await h.tap(slot)
+        assert "room_light" not in asked and "content" not in asked  # the recorded TVs have no brightness/refresh
+        check_floor(out)
+    finally:
+        await h.close()
+
+
+async def test_upgrade_check_and_mrp_saving(h):
+    await to_options(h)
+    await h.tap("s:C1:shown")
+    out = await h.pick("s:C1:upgrade")
+    check_floor(out)
+    body = out[0].body
+    assert "A → B" in body and "/din" in body  # what each step up costs, per day over 5 years
+
+
+async def test_price_watch_nudges_once_when_the_price_falls(h):
+    await to_options(h)
+    s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+    sku = s.option_labels["B"]
+    assert s.extra["seen_prices"][sku]
+    st = h.rt.facts.snap.stock[(sku, h.rt.settings.store_id)]
+    st.price = int(s.extra["seen_prices"][sku] * 0.9)  # the backend lowers the price
+    from chanakya.core import clock
+
+    n0 = len(h.ch.sent)
+    assert await price_watch.run(h.rt.svc, clock.now()) == 1
+    msg = h.ch.sent[n0].msg
+    assert msg.to == PHONES["associate"] and "Price watch" in msg.body and "s:C1:called" in [b.id for b in msg.buttons]
+    assert await price_watch.run(h.rt.svc, clock.now()) == 0  # told once
+
+
+async def test_no_price_watch_after_a_sale(h):
+    await to_options(h)
+    await h.tap("s:C1:shown")
+    await pick(h)
+    await pay(h)
+    s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+    s.extra["outcome"] = "sold"
+    await h.rt.svc.sessions.save(s)
+    from chanakya.core import clock
+
+    sku = s.chosen_sku
+    h.rt.facts.snap.stock[(sku, h.rt.settings.store_id)].price -= 5000
+    assert await price_watch.run(h.rt.svc, clock.now()) == 0
+    assert await repo.events_for(s.id)

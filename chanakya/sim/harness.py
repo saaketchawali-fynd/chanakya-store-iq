@@ -68,7 +68,7 @@ class Harness:
             from chanakya.core import repo
 
             for st in await repo.staff_all():
-                await repo.staff_update(st.wa_id, lang_set=True, name_set=True)
+                await repo.staff_update(st.wa_id, lang_set=True, name_set=True, name_asked=True)
         if render:
             await start_renderer(rt)
         return cls(rt, ch)

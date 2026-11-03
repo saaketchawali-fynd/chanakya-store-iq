@@ -47,6 +47,7 @@ class AIClient:
         self.packs = packs
         self.fix = fixtures
         self.gemini = None
+        self.heard: dict[str, str] = {}  # voice note (sha1) → its words, so a retry never asks the model twice
         if mode == "live":
             from chanakya.ai.gemini import GeminiClient
 
@@ -66,44 +67,68 @@ class AIClient:
             key = hashlib.sha1(audio).hexdigest()
             if (self.fix / "understand" / f"{key}.json").exists():
                 return self._fixture("understand", key, Understanding)
+        if self.live and audio is not None:
+            # voice (3 Nov 2026 RCA: Gemini overloaded): the light plain transcript first, across models with retries;
+            # then the meaning from the text (Gemini text, else the offline rules). Only the transcript can fail.
+            from chanakya.app import diag
+
+            heard = await self.hear(audio, mime)
+            u = await self._understand_text(heard, ctx)
+            u.transcript = heard
+            diag.mark("ai_last_understanding", {
+                "source": "audio", "language": u.language, "category": u.category, "slots": len(u.slots),
+                "numbers": len(u.numbers), "intents": u.intents, "transcript_chars": len(heard)})
+            return u
         if self.live:
-            from google.genai import types
-
-            part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime)) if audio is not None else (text or "")
-            try:
-                parts = [part, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)]
-                if audio is not None:  # hedged across models: a busy one never loses the note
-                    u = await self.gemini.hedged(parts, Understanding, prompts.UNDERSTAND_SYSTEM, 16.0, "understand_audio")
-                else:
-                    u = await self.gemini.json(parts, Understanding, prompts.UNDERSTAND_SYSTEM, timeout=8.0,
-                                               kind="understand_text")
-                if not u.transcript and text:
-                    u.transcript = text
-                from chanakya.app import diag
-
-                diag.mark("ai_last_understanding", {
-                    "source": "audio" if audio is not None else "text", "language": u.language,
-                    "category": u.category, "slots": len(u.slots), "numbers": len(u.numbers),
-                    "intents": u.intents, "transcript_chars": len(u.transcript or "")})
-                return u
-            except AIUnavailable:
-                if audio is not None:  # safety net: plain transcript, then the offline rules on it
-                    heard = await self.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=10.0)
-                    u = self._rules(heard, ctx)
-                    u.transcript = heard
-                    return u
+            return await self._understand_text(text or "", ctx)
         if audio is not None:
             raise AIUnavailable("voice")
         return self._rules(text or "", ctx)
 
-    async def transcribe(self, audio: bytes, mime: str | None = None) -> str:
-        """Plain words of a voice note (manager commands): Gemini when live, else unavailable."""
-        if self.live:
-            from google.genai import types
+    async def _understand_text(self, text: str, ctx: dict) -> Understanding:
+        """The meaning of a note's words: Gemini (text only: fast and light), else the offline rules. Never fails."""
+        from chanakya.app import diag
 
-            part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime))
-            return await self.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=9.0)
-        raise AIUnavailable("voice")
+        try:
+            u = await self.gemini.json([text, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)], Understanding,
+                                       prompts.UNDERSTAND_SYSTEM, timeout=7.0, kind="understand_text")
+            if not u.transcript:
+                u.transcript = text
+            return u
+        except AIUnavailable:
+            diag.bump("understand_by_rules")
+            u = self._rules(text, ctx)
+            u.transcript = text
+            return u
+
+    async def hear(self, audio: bytes, mime: str | None = None, timeout: float = 24.0) -> str:
+        """The words of a voice note. Cached by content, so a retry (or the second step) never pays twice.
+        Raises AIUnavailable only when every model failed for the whole time."""
+        from chanakya.app import diag
+
+        key = hashlib.sha1(audio).hexdigest()
+        if key in self.heard:
+            return self.heard[key]
+        if not self.live:
+            raise AIUnavailable("voice")
+        from google.genai import types
+
+        diag.bump("voice_notes")
+        part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime))
+        try:
+            text = await self.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=timeout)
+        except AIUnavailable:
+            diag.bump("voice_failed")
+            raise
+        diag.bump("voice_ok")
+        self.heard[key] = text
+        while len(self.heard) > 64:
+            self.heard.pop(next(iter(self.heard)))
+        return text
+
+    async def transcribe(self, audio: bytes, mime: str | None = None) -> str:
+        """Plain words of a voice note (manager commands, the associate's name)."""
+        return await self.hear(audio, mime)
 
     def _rules(self, text: str, ctx: dict) -> Understanding:
         myths = [m["id"] for m in ctx.get("myths", [])] or None

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import re
 from datetime import timedelta
 
@@ -171,7 +172,7 @@ async def dispatch(ctx: SkillContext) -> Reply:
         return language_picker(ctx)
     if ctx.role == "associate" and ctx.staff and name in ("myname",):
         return await staff_name.change(ctx, arg)
-    if ctx.role == "associate" and ctx.staff and not ctx.staff.name_set and name not in ("role", "clock", "reset"):
+    if ctx.role == "associate" and ctx.staff and staff_name.needs_name(ctx.staff) and name not in ("role", "clock", "reset"):
         return await staff_name.capture(ctx)  # who is this? asked once, after the language
     if name in ("exit", "restart") and ctx.role != "associate":
         return await (flowctl.exit_ask(ctx) if name == "exit" else flowctl.restart_ask(ctx))
@@ -573,6 +574,7 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "cost_drop_optional": lambda: complete.toggle_suggestions(ctx),
         "offers": lambda: close.offers(ctx),
         "ofs": lambda: recommend.offers_view(ctx),
+        "upgrade": lambda: recommend.upgrade_view(ctx),
         "emi": lambda: close.quote(ctx, alt=True),
         "delivery": lambda: close.delivery(ctx),
         "parivaar": lambda: follow.parivaar(ctx),
@@ -593,6 +595,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         return await assess.set_customer_lang(ctx, a0 or "hi")
     if action == "voiceq" and a0:
         return await assess.voice_answer(ctx, a0)
+    if action == "dq" and a0 and a1:
+        return await assess.data_answer(ctx, a0, a1)
     if action == "ofd" and a0:
         if a0 == "none":
             return await recommend.offers_view(ctx)
@@ -718,7 +722,14 @@ async def on_speech(ctx: SkillContext) -> Reply:
             ctx.b("b_status", encode("g", "status")),
             ctx.b("b_help", encode("g", "help")),
         ]
-        return ctx.reply(info_reply(ctx, ctx.t("voice_retry" if ctx.ai.live else "voice_unavailable"), btns))
+        if not ctx.ai.live:
+            return ctx.reply(info_reply(ctx, ctx.t("voice_unavailable"), btns))
+        if audio is not None and not msg.wa_message_id.endswith(RETRY_TAG):
+            # the note was fine; Google's voice service was not: keep the note and answer it as soon as it can
+            ctx.ev("voice_deferred")
+            ctx.svc.orchestrator.spawn(retry_voice(ctx.svc, msg, audio, amime or msg.mime_type, ctx.lang))
+            return ctx.reply(info_reply(ctx, ctx.t("voice_busy"), btns[:2]))
+        return ctx.reply(info_reply(ctx, ctx.t("voice_failed_final"), btns))
     tr = u.transcript or text or ""
     if msg.type == "audio" or (text or "").startswith("FIX:"):  # the manager's voice log
         ctx.ev("voice_note", code=s.code if s else None, lang=u.language, transcript=" ".join(tr.split())[:300],
@@ -814,6 +825,29 @@ def _requirements_note(ctx: SkillContext, tr: str, n_new: int, intents: set) -> 
         return None
     slots = list(dict.fromkeys(e.payload.get("slot") for e in ctx.events if e.type == "slot_filled"))
     return {"slots": [x for x in slots if x], "wants": s.extra.get("wants") or {}}
+
+
+RETRY_TAG = ":retry"
+VOICE_RETRY_WAITS = (12.0, 25.0, 40.0)  # seconds between tries while Google's voice service is busy
+
+
+async def retry_voice(svc, msg: InboundMessage, audio: bytes, mime: str | None, lang: str) -> None:
+    """A voice note that could not be heard because the model was busy: try again in the background; when the
+    words come through, handle the note as if it had just arrived. If it never does, say so plainly."""
+    from chanakya.app import diag
+    from chanakya.i18n.lang import t as tr
+
+    for wait in VOICE_RETRY_WAITS:
+        await asyncio.sleep(wait)
+        try:
+            await svc.ai.hear(audio, mime)  # cached: the replay below does not ask the model again
+        except AIUnavailable:
+            continue
+        diag.bump("voice_retried_ok")
+        await svc.orchestrator.handle_inbound(msg.model_copy(update={"wa_message_id": msg.wa_message_id + RETRY_TAG}))
+        return
+    diag.bump("voice_retry_gave_up")
+    await svc.deliver(OutMessage(to=msg.from_wa_id, kind="text", body=tr("voice_failed_final", lang)))
 
 
 async def voice_step(ctx: SkillContext, u, intents: set) -> Reply | None:

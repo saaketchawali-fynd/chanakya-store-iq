@@ -76,9 +76,14 @@ def start_data_sync(rt: Runtime) -> None:
     if rt.settings.data_source == "jio":
         import asyncio
 
+        from chanakya.core import clock
+        from chanakya.jobs import price_watch
         from chanakya.truth import jio_sync
 
-        rt.data_task = asyncio.create_task(jio_sync.loop(rt.settings, rt.facts))
+        async def watch() -> None:
+            await price_watch.run(rt.svc, clock.now())
+
+        rt.data_task = asyncio.create_task(jio_sync.loop(rt.settings, rt.facts, after=watch))
 
 
 async def shutdown(rt: Runtime) -> None:

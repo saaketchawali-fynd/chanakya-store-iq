@@ -219,6 +219,11 @@ async def family_card(ctx: SkillContext, p, presale: bool, image, is_photo: bool
         os_ = s.offer_snapshot if (s.offer_snapshot or {}).get("sku") == p.sku else None
         if cs:
             ladder.append({"label": ctx.t("fc_price"), "value": ctx.reg.inr(p.price, p.price_source)})
+            if p.mrp and p.mrp > p.price:  # the backend's own MRP: the saving the family gets today
+                pct = round((p.mrp - p.price) * 100 / p.mrp)
+                ladder.append({"label": ctx.t("fc_mrp_saving", mrp=ctx.reg.inr(p.mrp, p.price_source),
+                                              pct=ctx.reg.num(pct, f"calc:mrp_saving:{p.sku}")),
+                               "value": "−" + ctx.reg.inr(p.mrp - p.price, f"calc:mrp_saving:{p.sku}"), "note": True})
             extras = int(cs["zaroori_total"]) - int(p.price)
             if extras > 0:
                 ladder.append({"label": ctx.t("fc_essentials"), "value": "+" + ctx.reg.inr(extras, f"snapshot:hisaab:{p.sku}")})

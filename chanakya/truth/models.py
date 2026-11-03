@@ -52,6 +52,7 @@ class Staff(_Ts, Base):
     lang: Mapped[str] = mapped_column(String, default="en")
     lang_set: Mapped[bool] = mapped_column(Boolean, default=False)  # associate picked a language at first contact
     name_set: Mapped[bool] = mapped_column(Boolean, default=False)  # the associate told us their own name
+    name_asked: Mapped[bool] = mapped_column(Boolean, default=False)  # the name question was sent (wait for the answer)
     current_session_id: Mapped[str | None] = mapped_column(String, nullable=True)
     streak: Mapped[int] = mapped_column(Integer, default=0)
     last_brief_date: Mapped[date | None] = mapped_column(Date, nullable=True)

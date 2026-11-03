@@ -86,6 +86,9 @@ def meets(p, wants: dict) -> list[str]:
             ok.append(k)
         elif k in ("panel", "load") and str(have).lower() == str(v).lower():
             ok.append(k)
+        elif k not in ("size_in", "ton", "capacity_kg", "capacity_l", "star", "ram_gb", "panel", "load"):
+            if (have is v) if isinstance(v, bool) else str(have).lower() == str(v).lower():
+                ok.append(k)  # a data-question answer: the same value as the stock carries
     return ok
 
 

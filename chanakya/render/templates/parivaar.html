@@ -61,6 +61,7 @@
   .lr { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 7px 0; font-size: 24px; color: var(--muted); }
   .lr .v { color: var(--text); font-weight: 600; white-space: nowrap; }
   .lr.offer .v, .lr.offer .k { color: var(--green); font-weight: 600; }
+  .lr.note .k, .lr.note .v { color: var(--green); font-size: 21px; font-weight: 600; }
   .tot { margin-top: 12px; border-radius: 20px; background: var(--ink); color: #fff; padding: 16px 22px; }
   .tot .k { font-size: 21px; font-weight: 600; color: #C7CBD6; }
   .tot .v { font-size: 46px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
@@ -111,7 +112,7 @@
     <div class="box">
       <div class="label">Your price</div>
       {% if total %}
-        {% for r in lad %}<div class="lr num{% if r.offer %} offer{% endif %}"><span class="k">{{ r.label }}</span><span class="v">{{ r.value }}</span></div>{% endfor %}
+        {% for r in lad %}<div class="lr num{% if r.offer %} offer{% endif %}{% if r.note %} note{% endif %}"><span class="k">{{ r.label }}</span><span class="v">{{ r.value }}</span></div>{% endfor %}
         <div class="tot num"><div class="k">{{ total_label }}</div><div class="v">{{ total }}</div></div>
         {% if emi %}<div class="emi">{{ emi }}</div>{% endif %}
         {% if optional %}<div class="opt num">{{ optional }}</div>{% endif %}

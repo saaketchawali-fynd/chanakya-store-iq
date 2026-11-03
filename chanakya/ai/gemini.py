@@ -110,7 +110,8 @@ class GeminiClient:
         """Voice notes: one busy or slow model must never lose the note. The main model starts at once; if it has
         no answer after a few seconds (or fails, e.g. 503 high demand), the next model joins, and so on. The first
         good answer wins; the rest are cancelled."""
-        models = list(dict.fromkeys([self.fast, LATEST, self.fallback, LITE_LATEST]))
+        first = list(dict.fromkeys([self.fast, LATEST, self.fallback, LITE_LATEST]))
+        models = first + first[:2]  # 503 'high demand' passes in seconds: the first two get a second try
         t0 = time.perf_counter()
         deadline = t0 + timeout
         running: dict[asyncio.Task, str] = {}

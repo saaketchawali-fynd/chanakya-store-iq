@@ -359,6 +359,20 @@ async def status(ctx: SkillContext) -> Reply:
     return ctx.reply(msg)
 
 
+async def data_answer(ctx: SkillContext, key: str, choice: str) -> Reply:
+    """A data question answered: the chosen value becomes a want (it filters the shortlist); 'any' is fine too."""
+    s = ctx.session
+    vals = (s.extra.get("dq_vals") or {}).get(key) or []
+    done = list(s.extra.get("dq_done") or [])
+    if key not in done:
+        done.append(key)
+    s.extra["dq_done"] = done
+    if choice.isdigit() and int(choice) < len(vals):
+        s.extra["wants"] = {**(s.extra.get("wants") or {}), key: vals[int(choice)]}
+    ctx.ev("data_question_answered", key=key, value=str(vals[int(choice)]) if choice.isdigit() and int(choice) < len(vals) else "any")
+    return ctx.reply(C.next_question_or_options(ctx))
+
+
 async def voice_answer(ctx: SkillContext, slot: str) -> Reply:
     """The voice button on a question: just speak (Hindi, English or Marathi); every tap answer is still here."""
     from chanakya.core.coach import info_reply

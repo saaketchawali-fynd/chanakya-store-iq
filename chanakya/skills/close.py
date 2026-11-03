@@ -51,7 +51,7 @@ async def offers(ctx: SkillContext) -> Reply:
         return await complete.show_cost(ctx)
     pack = ctx.pack
     if ("replace" in P.values(s.home, "trigger") and pack.slot("exchange_old") and not P.known(s.home, "exchange_old")
-            and not ctx.x.get("exchange_asked")):
+            and not ctx.x.get("exchange_asked") and any(e.category == pack.category for e in ctx.facts.snap.exchange)):
         ctx.x["exchange_asked"] = True
         ctx.x["pending_close"] = True
         return ctx.reply(C.question_reply(ctx, "exchange_old"))

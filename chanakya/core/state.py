@@ -27,13 +27,36 @@ def options_gate_open(s: SessionState, pack) -> bool:
         return True
     if pack is None:
         return False
-    return pack.known_required(s.home) >= pack.gate_min_slots
+    skip = set(s.extra.get("skip_slots") or [])
+    if not skip:
+        return pack.known_required(s.home) >= pack.gate_min_slots
+    # some home questions cannot act on today's catalogue: the data questions stand in for them
+    eff = [r for r in pack.required_slots if r not in skip]
+    known = sum(1 for r in eff if r in s.home.slots and s.home.slots[r]) + len(s.extra.get("dq_done") or [])
+    need = min(pack.gate_min_slots, len(eff) + int(s.extra.get("dq_avail") or 0))
+    return known >= need
+
+
+def required_progress(s: SessionState, pack) -> tuple[int, int]:
+    """(known, total) of the home questions that count today (those the catalogue cannot act on left out, the
+    data questions standing in for them)."""
+    skip = set(s.extra.get("skip_slots") or [])
+    if not skip:
+        return pack.known_required(s.home), len(pack.required_slots)
+    eff = [r for r in pack.required_slots if r not in skip]
+    known = sum(1 for r in eff if r in s.home.slots and s.home.slots[r]) + len(s.extra.get("dq_done") or [])
+    return known, len(eff) + int(s.extra.get("dq_avail") or 0)
 
 
 def missing_for_options(s: SessionState, pack) -> int:
     if pack is None:
         return 0
-    return max(0, pack.gate_min_slots - pack.known_required(s.home))
+    skip = set(s.extra.get("skip_slots") or [])
+    if not skip:
+        return max(0, pack.gate_min_slots - pack.known_required(s.home))
+    eff = [r for r in pack.required_slots if r not in skip]
+    known = sum(1 for r in eff if r in s.home.slots and s.home.slots[r]) + len(s.extra.get("dq_done") or [])
+    return max(0, min(pack.gate_min_slots, len(eff) + int(s.extra.get("dq_avail") or 0)) - known)
 
 
 def price_gate_open(s: SessionState, pack) -> bool:

@@ -15,6 +15,8 @@ def test_names_are_cleaned():
     assert clean_name("माझं नाव सुनीता") == "सुनीता"
     assert clean_name("55 inch TV chahiye") is None and clean_name("") is None
     assert clean_name("ok ok ok ok ok") is None  # not a name
+    for word in ("restart", "Restart", "shuru se", "new", "help", "menu", "hi", "namaste", "ok", "haan", "नमस्ते"):
+        assert clean_name(word) is None, word  # a command or a greeting is never a name
 
 
 async def test_first_contact_asks_the_name_then_uses_it(tmp_path):
@@ -53,5 +55,40 @@ async def test_name_by_voice(tmp_path, monkeypatch):
         out = await h.voice_bytes(b"OggS-name")
         assert any(m.card and m.card.template == "brief" for m in out)
         assert (await repo.staff_by_wa(PHONES["associate"])).name == "Rahul"
+    finally:
+        await h.close()
+
+
+async def test_restart_is_never_taken_as_a_name(tmp_path):
+    """3 Nov 2026 on the phone: the language was set before names existed; the first message ('restart') was
+    saved as the name, and the question was never asked. Now the question comes first, and commands are not names."""
+    from chanakya.core import repo as R
+
+    h = await make_harness(tmp_path, associate_name="")
+    try:
+        await R.staff_update(PHONES["associate"], name_set=False, name_asked=False)  # as on production
+        out = await h.say("restart")
+        assert "name" in out[0].body.lower() or "naam" in out[0].body.lower()  # asked, not saved
+        st = await R.staff_by_wa(PHONES["associate"])
+        assert not st.name_set and st.name_asked
+        out = await h.say("restart")  # still not a name
+        assert "naam" in out[0].body.lower() and not (await R.staff_by_wa(PHONES["associate"])).name_set
+        out = await h.say("Amit")
+        assert any(m.card and m.card.template == "brief" for m in out)
+        assert (await R.staff_by_wa(PHONES["associate"])).name == "Amit"
+    finally:
+        await h.close()
+
+
+async def test_a_command_saved_as_a_name_is_repaired(tmp_path):
+    from chanakya.core import repo as R
+
+    h = await make_harness(tmp_path)
+    try:
+        await R.staff_update(PHONES["associate"], name="Restart", name_set=True, name_asked=True)  # the bug's result
+        out = await h.say("namaste")
+        assert "naam" in out[0].body.lower()  # asked again
+        out = await h.say("mera naam Rahul hai")
+        assert (await R.staff_by_wa(PHONES["associate"])).name == "Rahul"
     finally:
         await h.close()

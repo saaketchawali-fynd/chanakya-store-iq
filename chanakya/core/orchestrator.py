@@ -67,7 +67,7 @@ class Orchestrator:
                     "last_inbound",
                     {"role": ctx.role, "type": msg.type, "from": f"{w[:2]}{'*' * max(0, len(w) - 4)}{w[-2:]}"},
                 )
-                if msg.type == "audio" and ctx.role != "customer":  # heard: a receipt at once, before the model
+                if msg.type == "audio" and ctx.role != "customer" and not msg.wa_message_id.endswith(":retry"):
                     try:
                         await self.svc.channel.send(OutMessage(to=msg.from_wa_id, kind="reaction",
                                                                reaction_to=msg.wa_message_id, emoji="👂"))
@@ -139,6 +139,7 @@ class Orchestrator:
                     lang_set=ctx.staff.lang_set,
                     name=ctx.staff.name,
                     name_set=ctx.staff.name_set,
+                    name_asked=ctx.staff.name_asked,
                     last_brief_date=ctx.staff.last_brief_date,
                 )
         except Exception:

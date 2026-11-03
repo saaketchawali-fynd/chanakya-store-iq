@@ -82,9 +82,11 @@ def _cost(ctx: SkillContext) -> str | None:
     plans = [pl for pl in ctx.facts.snap.protection if pl.category == ctx.pack.category]
     on_bill = {str(ln.get("code", "")) for ln in (s.cost_snapshot or {}).get("lines") or []}
     if plans and not on_bill & {pl.code for pl in plans}:  # not already on the bill as a suggestion
-        lo = min(pl.price for pl in plans)
-        return _once(ctx, "protection", ctx.t("tip_protection", n=ctx.reg.num(len(plans), f"protection:{ctx.pack.category}"),
-                                              low=ctx.reg.inr(lo, f"protection:{ctx.pack.category}")))
+        cheap = min(plans, key=lambda pl: pl.price)
+        src = f"protection:{ctx.pack.category}"
+        day = max(1, round(cheap.price / (max(1, cheap.years or 1) * 365)))
+        return _once(ctx, "protection", ctx.t("tip_protection", n=ctx.reg.num(len(plans), src),
+                                              low=ctx.reg.inr(cheap.price, src), day=ctx.reg.inr(day, f"calc:{src}:per_day")))
     return None
 
 
