@@ -219,7 +219,7 @@ clip_why_first: {hi: "Aaj ka focus: {step}", mr: "आजचा फोकस: {st
 clip_then_ready: {hi: "Clip dekh liya? Taiyaar hon to bataiye.", mr: "क्लिप पाहिली? तयार असाल तर सांगा.", en: "Watched it? Tap when you're ready."}
 b_ready: {hi: "Taiyaar hoon ✓", mr: "मी तयार ✓", en: "I'm ready ✓"}
 ready_body: {hi: "Shabash, aap taiyaar hain ✓\nAaj yaad rakhiye: {tip}\nCustomer aaye to 'Naya customer' dabaiye, ya seedha voice note bhejiye.", mr: "छान, तुम्ही तयार आहात ✓\nआज लक्षात ठेवा: {tip}\nग्राहक आला की 'नवीन ग्राहक' दाबा, किंवा थेट व्हॉइस नोट पाठवा.", en: "You're ready ✓\nToday, remember: {tip}\nWhen a customer comes, tap New customer, or just send a voice note."}
-footer_voice_q: {hi: "🎤 Bolkar bhi bata sakte hain: Hindi, English, मराठी", mr: "🎤 बोलूनही सांगू शकता: हिंदी, English, मराठी", en: "🎤 Or just say it: Hindi, English or Marathi"}
+footer_voice_q: {hi: "Bolkar bhi: voice note — Hindi, English, मराठी · menu", mr: "बोलूनही: व्हॉइस नोट पाठवा — हिंदी, English, मराठी · menu", en: "Or send a voice note: Hindi, English or Marathi · menu"}
 brief_keep_cover: {hi: "Offer {n} of {total} {cat} par lagta hai", mr: "ऑफर {total} पैकी {n} {cat} वर लागू", en: "Offers apply to {n} of the {total} {cat} on sale"}
 brief_keep_days_left: {hi: "{title}: sirf {n} din baaki", mr: "{title}: फक्त {n} दिवस उरले", en: "{title}: only {n} days left"}
 brief_keep_last_day: {hi: "{title}: aaj aakhri din", mr: "{title}: आज शेवटचा दिवस", en: "{title}: today is the last day"}
@@ -237,3 +237,53 @@ kyun_offer_line: {hi: "System ka live offer, {product} par lagta hai", mr: "स�
 kyun_tail_band: {hi: "stock mein {lo}–{hi}, jawab sahi wala chunega", mr: "स्टॉकमध्ये {lo}–{hi}, उत्तर योग्य ते निवडेल", en: "in stock {lo}–{hi}; the answer picks the right one"}
 kyun_tail_rule: {hi: "{need}: stock ke {total} mein se {n} {cat} sahi", mr: "{need}: स्टॉकमधील {total} पैकी {n} {cat} योग्य", en: "{need}: {n} of {total} {cat} in stock qualify"}
 footer_heard: {hi: "Suna: “{text}”", mr: "ऐकलं: “{text}”", en: "Heard: “{text}”"}
+# ---- the Family Card (English, one card): desirable, clear, one final number
+fc_kicker: {hi: "Picked for the {name} family", mr: "Picked for the {name} family", en: "Picked for the {name} family"}
+fc_kicker_presale: {hi: "For the {name} family to decide together", mr: "For the {name} family to decide together", en: "For the {name} family to decide together"}
+fc_kicker_you: {hi: "Picked for your home", mr: "Picked for your home", en: "Picked for your home"}
+fc_title: {hi: "Your new {product}", mr: "Your new {product}", en: "Your new {product}"}
+fc_price: {hi: "Price", mr: "Price", en: "Price"}
+fc_essentials: {hi: "Installation and essentials", mr: "Installation and essentials", en: "Installation and essentials"}
+fc_full_cost: {hi: "Full cost", mr: "Full cost", en: "Full cost"}
+fc_pay_today: {hi: "You pay today", mr: "You pay today", en: "You pay today"}
+fc_offer: {hi: "{title} · till {till}", mr: "{title} · till {till}", en: "{title} · till {till}"}
+fc_optional: {hi: "Recommended add-ons, optional: +{amount}", mr: "Recommended add-ons, optional: +{amount}", en: "Recommended add-ons, optional: +{amount}"}
+fc_price_at_store: {hi: "Your full price is ready at the store", mr: "Your full price is ready at the store", en: "Your full price is ready at the store"}
+fc_delivery: {hi: "Delivery", mr: "Delivery", en: "Delivery"}
+fc_install: {hi: "Installation", mr: "Installation", en: "Installation"}
+fc_warranty: {hi: "Warranty", mr: "Warranty", en: "Warranty"}
+fc_warranty_years: {hi: "{n} year brand warranty", mr: "{n} year brand warranty", en: "{n} year brand warranty"}
+fc_reply: {hi: "Reply here to talk to {associate}", mr: "Reply here to talk to {associate}", en: "Reply here to talk to {associate}"}
+footer_voice_mgr: {hi: "Bolkar bhi: 'digest', 'team', 'voice log' — voice note", mr: "बोलूनही: 'digest', 'team', 'voice log' — व्हॉइस नोट", en: "Or say it: 'digest', 'team', 'voice log' by voice note"}
+# ---- manager: voice first, and the voice log
+list_mgr: {hi: "Menu", mr: "मेनू", en: "Menu"}
+mgr_row_digest: {hi: "Aaj ka Digest", mr: "आजचा डायजेस्ट", en: "Today's Digest"}
+mgr_row_digest_d: {hi: "Score, price-first, Parivaar, install", mr: "स्कोअर, price-first, परिवार, इन्स्टॉल", en: "Scores, price-first, Family Cards, installs"}
+mgr_row_floor: {hi: "Floor abhi", mr: "आत्ता फ्लोर", en: "Floor now"}
+mgr_row_floor_d: {hi: "Kaun kis customer ke saath, kis step par", mr: "कोण कोणत्या ग्राहकासोबत, कोणत्या टप्प्यावर", en: "Who is with which customer, at which step"}
+mgr_row_team: {hi: "Team", mr: "टीम", en: "Team"}
+mgr_row_team_d: {hi: "Har associate: customer aur score", mr: "प्रत्येक associate: ग्राहक आणि स्कोअर", en: "Each associate: customers and score"}
+mgr_row_approvals: {hi: "Approvals", mr: "मंजुरी", en: "Approvals"}
+mgr_row_approvals_d: {hi: "Discount ya chhoot ki maang", mr: "सवलतीची मागणी", en: "Discount requests waiting"}
+mgr_row_vlog: {hi: "Voice log", mr: "व्हॉइस लॉग", en: "Voice log"}
+mgr_row_vlog_d: {hi: "Associates ke voice notes, kya samjha gaya", mr: "associates च्या व्हॉइस नोट्स, काय समजलं", en: "Associates' voice notes and what was understood"}
+list_vlog: {hi: "Voice notes", mr: "व्हॉइस नोट्स", en: "Voice notes"}
+vlog_body: {hi: "Pichhle 14 din mein {n} voice notes. Ek par tap karein: poora transcript aur kya samjha.", mr: "मागच्या 14 दिवसांत {n} व्हॉइस नोट्स. एकावर टॅप करा: पूर्ण मजकूर आणि काय समजलं.", en: "{n} voice notes in the last 14 days. Tap one for the full transcript and what was understood."}
+vlog_body_who: {hi: "{name}: {n} voice notes (14 din). Ek par tap karein.", mr: "{name}: {n} व्हॉइस नोट्स (14 दिवस). एकावर टॅप करा.", en: "{name}: {n} voice notes (14 days). Tap one to read it."}
+vlog_none: {hi: "Abhi koi voice note nahi.", mr: "अजून व्हॉइस नोट नाही.", en: "No voice notes yet."}
+vlog_empty: {hi: "(kuch sunai nahi diya)", mr: "(काही ऐकू आलं नाही)", en: "(nothing was heard)"}
+vlog_understood: {hi: "Samjha: {what}", mr: "समजलं: {what}", en: "Understood: {what}"}
+vlog_nothing: {hi: "Isse koi baat nahi mili", mr: "यातून काही मिळालं नाही", en: "Nothing usable was understood"}
+b_vlog: {hi: "Voice log", mr: "व्हॉइस लॉग", en: "Voice log"}
+b_vlog_who: {hi: "{name} ke notes", mr: "{name} च्या नोट्स", en: "{name}'s notes"}
+kpi_voice: {hi: "Voice notes", mr: "व्हॉइस नोट्स", en: "Voice notes"}
+kpi_voice_val: {hi: "{n} · {ok} samjhe", mr: "{n} · {ok} समजल्या", en: "{n} · {ok} understood"}
+# ---- the copilot's one line (associate only, each tip once per customer)
+tip_line: {hi: "Sujhav: {tip}", mr: "सूचना: {tip}", en: "Tip: {tip}"}
+tip_budget_gap: {hi: "{budget} mein is ghar ke size ka TV stock mein nahi; sabse sasta {low}. Budget ya size par pehle baat kijiye", mr: "{budget} मध्ये या घराच्या साइजचा स्टॉक नाही; सर्वात स्वस्त {low}. आधी बजेट किंवा साइजवर बोला", en: "Nothing in stock that suits this home fits {budget}; the lowest is {low}. Talk budget or size first"}
+tip_offer_soon: {hi: "{label} par '{title}' {date} ko khatam: demo ke baad zaroor bataiye", mr: "{label} वर '{title}' {date} ला संपते: डेमोनंतर नक्की सांगा", en: "'{title}' on {label} ends {date}: mention it after the demo"}
+tip_only_best: {hi: "Sirf {label} '{need}' poora karta hai: demo usi par", mr: "फक्त {label} '{need}' पूर्ण करतो: डेमो त्यावरच", en: "Only {label} meets '{need}': demo that one"}
+tip_exchange: {hi: "Purana dene ki baat abhi poochiye: kharcha kam ho sakta hai", mr: "जुनं देण्याबद्दल आत्ताच विचारा: खर्च कमी होऊ शकतो", en: "Ask about exchanging the old one now: it can lower the cost"}
+tip_protection: {hi: "{n} protection plan hain, {low} se: ek baar bataiye, zor nahi", mr: "{n} protection plans आहेत, {low} पासून: एकदा सांगा, आग्रह नको", en: "{n} protection plans from {low}: mention once, no pressure"}
+tip_family_card: {hi: "Faisla ghar par hoga: Parivaar Card abhi bhejiye", mr: "निर्णय घरी होईल: परिवार कार्ड आत्ताच पाठवा", en: "The family decides: send the Family Card now"}
+tip_wall_type: {hi: "Installer ke liye deewar ka type abhi pooch lijiye", mr: "इन्स्टॉलरसाठी भिंतीचा प्रकार आत्ताच विचारा", en: "Ask the wall type now, for the installer"}

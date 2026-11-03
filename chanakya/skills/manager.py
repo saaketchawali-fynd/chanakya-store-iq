@@ -97,6 +97,11 @@ async def digest(ctx: SkillContext, to: str | None = None) -> Reply:
         {"label": ctx.t("kpi_install"), "value_str": f"{n(inst_ok, 'calc:digest')} ok · {n(inst_bad, 'calc:digest')} issue"},
         {"label": ctx.t("kpi_expert_open"), "value_str": n(expert_open, "calc:digest")},
     ]
+    vn = [e for e in ev if e.type == "voice_note"]
+    if vn:
+        ok = sum(1 for e in vn if (e.payload or {}).get("understood") or (e.payload or {}).get("intents"))
+        kpis.append({"label": ctx.t("kpi_voice"), "value_str": ctx.t("kpi_voice_val", n=n(len(vn), "calc:digest"),
+                                                                       ok=n(ok, "calc:digest"))})
     ctx.reg.static("14")
     by_assoc: dict[str, list] = {}
     for sc in d["scores"]:
@@ -222,3 +227,111 @@ async def nudge(ctx: SkillContext, wa_id: str, step: str) -> Reply:
         Button(id=encode("g", "quiz", step), title=ctx.t("b_quiz", lang)),
     ]
     return ctx.reply(info_reply(ctx, ctx.t("nudge_sent", name=staff.name)), info_reply(ctx, body, btns, to=wa_id))
+
+
+# ---------------------------------------------------------------- voice first for the manager, and the voice log
+MGR_WORDS = {
+    "digest": ["digest", "sabha", "report", "aaj kaisa", "summary", "डायजेस्ट", "रिपोर्ट", "अहवाल", "सारांश"],
+    "floor": ["floor", "abhi kaun", "live", "kaun kya kar", "फ्लोर", "आत्ता कोण"],
+    "team": ["team", "sab log", "टीम"],
+    "approvals": ["approval", "manzoori", "manjoori", "मंजूरी", "मंजुरी"],
+    "voice": ["voice", "awaaz", "recording", "voice log", "voice note", "आवाज", "व्हॉइस"],
+}
+
+
+def menu(ctx: SkillContext, heard: str | None = None) -> Reply:
+    """The manager's menu, one list (more than three things): Digest, Floor, Team, Approvals, Voice log."""
+    rows = [ListRow(id=encode("m", k), title=truncate(ctx.t(f"mgr_row_{k}"), 24), description=truncate(ctx.t(f"mgr_row_{k}_d"), 72))
+            for k in ("digest", "floor", "team", "approvals", "vlog")]
+    ctx.reg.static(" ".join(r.title + " " + (r.description or "") for r in rows))
+    m = OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("manager_help"), list_button=truncate_title(ctx.t("list_mgr")),
+                   sections=[ListSection(rows=rows)], allowed_numbers=ctx.reg.allowed())
+    if heard:
+        m.footer = ctx.t("footer_heard", text=ctx.reg.raw(heard, "voice:transcript"))
+    return ctx.reply(m)
+
+
+def _match(text: str, staff: dict) -> tuple[str | None, str | None]:
+    t = " " + " ".join((text or "").lower().split()) + " "
+    who = next((wa for wa, st in staff.items() if st.role == "associate" and st.name and f" {st.name.lower()} " in t), None)
+    for k, words in MGR_WORDS.items():
+        if any((" " + w + " ") in t if w.isascii() else w in t for w in words):
+            return k, who
+    return ("voice" if who else None), who
+
+
+async def by_voice(ctx: SkillContext) -> Reply:
+    """What the manager said or typed: 'aaj ka digest', 'Ravi ke voice notes', 'team kaisi hai', 'approvals'."""
+    from chanakya.ai.gemini import AIUnavailable
+
+    msg = ctx.inbound
+    text = msg.text or ""
+    if msg.type == "audio" and msg.media_id:
+        try:
+            audio, mime = await ctx.svc.channel.download_media(msg.media_id)
+            text = await ctx.ai.transcribe(audio, mime or msg.mime_type)
+        except AIUnavailable:
+            return ctx.reply(info_reply(ctx, ctx.t("voice_retry" if ctx.ai.live else "voice_unavailable")))
+    staff = {s.wa_id: s for s in await repo.staff_all()}
+    what, who = _match(text, staff)
+    ctx.ev("manager_voice" if msg.type == "audio" else "manager_text", what=what, transcript=" ".join(text.split())[:200])
+    if what == "digest":
+        return await digest(ctx)
+    if what == "floor":
+        return await floor(ctx)
+    if what == "team":
+        return await team(ctx)
+    if what == "approvals":
+        return await approvals(ctx)
+    if what == "voice":
+        return await voice_log(ctx, who)
+    snip = " ".join(text.split())
+    return menu(ctx, heard=(snip if len(snip) <= 38 else snip[:37] + "…") if snip else None)
+
+
+def _when(e) -> str:
+    from chanakya.core.clock import IST
+
+    at = repo.aware(e.at) or repo.aware(e.created_at)
+    return at.astimezone(IST).strftime("%d %b %H:%M") if at else ""
+
+
+async def voice_log(ctx: SkillContext, who: str | None = None) -> Reply:
+    """The associates' voice notes, newest first (14 days): who, which customer, when, and what was said."""
+    since = ctx.now - timedelta(days=14)
+    rows_ev = [e for e in await repo.events_for(types=["voice_note"], since=since) if not who or e.actor_wa_id == who]
+    staff = {s.wa_id: s for s in await repo.staff_all()}
+    if not rows_ev:
+        return ctx.reply(info_reply(ctx, ctx.t("vlog_none"), [Button(id=encode("m", "digest"), title=ctx.t("b_digest"))]))
+    rows = []
+    for e in reversed(rows_ev[-10:]):
+        pl = e.payload or {}
+        st = staff.get(e.actor_wa_id or "")
+        title = " · ".join(x for x in ((st.name if st else "?"), pl.get("code") or "", _when(e)) if x)
+        rows.append(ListRow(id=encode("m", "vnote", e.id), title=truncate(title, 24),
+                            description=truncate(pl.get("transcript") or ctx.t("vlog_empty"), 72)))
+    for r in rows:
+        ctx.reg.raw(r.title + " " + (r.description or ""), "voice:log")
+    n = ctx.reg.num(len(rows_ev), "voice:log:count")
+    name = staff[who].name if who and who in staff else None
+    body = ctx.t("vlog_body_who", n=n, name=name) if name else ctx.t("vlog_body", n=n)
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=body, list_button=truncate_title(ctx.t("list_vlog")),
+                                sections=[ListSection(rows=rows)], allowed_numbers=ctx.reg.allowed()))
+
+
+async def voice_detail(ctx: SkillContext, event_id: int) -> Reply:
+    """One voice note: the full transcript, what Chanakya understood from it, and the step it led to."""
+    e = await repo.event_get(event_id)
+    if e is None or e.type != "voice_note":
+        return await voice_log(ctx)
+    pl = e.payload or {}
+    st = await repo.staff_by_wa(e.actor_wa_id or "")
+    head = " · ".join(x for x in ((st.name if st else "?"), pl.get("code") or "", _when(e), (pl.get("lang") or "").upper()) if x)
+    got = [x.replace("=", ": ") for x in (pl.get("understood") or [])] + list(pl.get("intents") or [])
+    lines = [head, f'"{pl.get("transcript") or ctx.t("vlog_empty")}"',
+             ctx.t("vlog_understood", what=", ".join(got[:6])) if got else ctx.t("vlog_nothing")]
+    ctx.reg.raw("\n".join(lines), "voice:log")
+    btns = [Button(id=encode("m", "vlog"), title=ctx.t("b_vlog")), Button(id=encode("m", "digest"), title=ctx.t("b_digest"))]
+    if st:
+        btns.insert(1, Button(id=encode("m", "who", st.wa_id), title=truncate_title(ctx.t("b_vlog_who", name=st.name))))
+    return ctx.reply(info_reply(ctx, "\n".join(lines), btns[:3]))

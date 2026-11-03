@@ -32,7 +32,14 @@ Return JSON that matches the schema. Rules:
    पंचवीस 25, तीस 30, चाळीस 40, पन्नास 50, साठ 60, सत्तर 70, ऐंशी 80, नव्वद 90; दीड 1.5, अडीच 2.5, साडे N = N.5,
    सव्वा N = N.25, पावणे N = N-0.25; हजार 1000, लाख 100000.
    English and Hinglish: "fifty-five inch" 55, "one and a half ton" 1.5, "50k" 50000.
-   Sizes: inch/इंच; distance: feet/foot/फुट/फूट, metre x 3.3, kadam/पावलं (steps) x 2.5 for feet."""
+   Sizes: inch/इंच; distance: feet/foot/फुट/फूट, metre x 3.3, kadam/पावलं (steps) x 2.5 for feet.
+12. Later steps, by voice (any language). Add the intent when the associate says it:
+   demo_next ("demo dikhao", "डेमो दाखवा"), request_tryon ("ghar mein dikhao", "घरात दाखवा", "try at home"),
+   sold ("bik gaya", "le liya", "विकलं", "they bought it"), not_today ("kal aayenge", "baad mein", "उद्या येऊ",
+   "will come back"), lost ("nahi liya", "chala gaya", "घेतलं नाही"), request_delivery ("delivery kab",
+   "डिलिव्हरी कधी"), request_emi ("EMI pe", "kist", "हप्ते"), send_family_card ("family ko bhejo",
+   "घरच्यांना पाठवा"), set_reminder ("kal yaad dilana", "आठवण करून द्या", "remind me"), next_step ("ab kya karun",
+   "पुढे काय", "what next"). remind_when: today_evening / tomorrow / weekend, only if said."""
 
 TRANSCRIBE_SYSTEM = """Write down exactly what is said in this voice note from a shop-floor associate in Mumbai.
 Hindi, Marathi, English or a mix. Hindi in Roman script as spoken, Marathi in Devanagari, English product words

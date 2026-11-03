@@ -256,6 +256,16 @@ def understand_text(
         "request_offers",
         "demo_done",
         "consent_yes",
+        "demo_next",
+        "request_tryon",
+        "sold",
+        "not_today",
+        "lost",
+        "request_delivery",
+        "request_emi",
+        "send_family_card",
+        "set_reminder",
+        "next_step",
     ):
         if _has(t0, ik.get(intent, [])):
             intents.append(intent)

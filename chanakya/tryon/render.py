@@ -766,6 +766,7 @@ def compose(
     wall: Wall,
     room: Room | None = None,
     niche_width_cm: float | None = None,
+    with_outlines: bool = True,
 ) -> Image.Image:
     """Solid products rendered to scale as 3D boxes against the wall (front face at its true depth, visible
     sides, shadows on the wall and the floor); comparison sizes as dashed outlines of their front face."""
@@ -834,8 +835,13 @@ def compose(
             sub = mask[at[1] : at[1] + a.shape[0], at[0] : at[0] + a.shape[1]]
             np.maximum(sub, a[: sub.shape[0], : sub.shape[1]], out=sub)
     out = match_photo(out, mask, light)
-    lw = max(3, round(out.width / 300))
+    return outlines(out, placed) if with_outlines else out
+
+
+def outlines(img: Image.Image, placed: list[Placed]) -> Image.Image:
+    """The comparison sizes as dashed outlines of their front face."""
+    lw = max(3, round(img.width / 300))
     for p in placed:
         if not p.solid:
-            out = dashed_quad(out, p.quad, SAFFRON, lw)
-    return out
+            img = dashed_quad(img, p.quad, SAFFRON, lw)
+    return img

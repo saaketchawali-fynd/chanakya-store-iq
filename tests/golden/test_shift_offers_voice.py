@@ -115,7 +115,7 @@ async def test_every_question_has_a_voice_option_and_a_stock_reason(h):
     out = await h.pick("s:C1:cat:tv")
     seen = []
     for b in ("s:C1:slot:trigger:new_home", "s:C1:slot:room:living", "s:C1:slot:seat_distance:d8_10"):
-        assert out[0].footer and "say it" in out[0].footer.lower()  # voice first, at every question
+        assert out[0].footer and "voice note" in out[0].footer.lower()  # voice first, at every question
         seen.append(out[0].body)
         out = await h.tap(b)
     seen.append(out[0].body)

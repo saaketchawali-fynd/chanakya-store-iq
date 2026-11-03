@@ -72,8 +72,9 @@ class WhatsAppChannel:
     # ---------- payloads ----------
     def payload(self, m: OutMessage) -> dict:
         base = {"messaging_product": "whatsapp", "recipient_type": "individual", "to": m.to}
-        if m.kind == "text":
-            return base | {"type": "text", "text": {"preview_url": False, "body": m.body or ""}}
+        if m.kind == "text":  # a text message has no footer field: the footer goes last, in italics
+            body = (m.body or "") + (f"\n\n_{m.footer}_" if m.footer else "")
+            return base | {"type": "text", "text": {"preview_url": False, "body": body}}
         if m.kind == "buttons":
             inter: dict = {
                 "type": "button",
@@ -93,6 +94,7 @@ class WhatsAppChannel:
                 "interactive": {
                     "type": "list",
                     "body": {"text": m.body or " "},
+                    **({"footer": {"text": m.footer}} if m.footer else {}),
                     "action": {
                         "button": m.list_button or "Chuniye",
                         "sections": [
@@ -108,7 +110,7 @@ class WhatsAppChannel:
         if m.kind == "image":
             img = {"id": m.media_id}
             if m.caption or m.body:
-                img["caption"] = m.caption or m.body
+                img["caption"] = (m.caption or m.body) + (f"\n\n_{m.footer}_" if m.footer else "")
             return base | {"type": "image", "image": img}
         if m.kind == "audio":
             return base | {"type": "audio", "audio": {"id": m.media_id, **({"voice": True} if m.voice else {})}}

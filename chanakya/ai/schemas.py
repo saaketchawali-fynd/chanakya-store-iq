@@ -44,6 +44,17 @@ Intent = Literal[
     "demo_done",
     "consent_yes",
     "ask_question",
+    # later steps, by voice (user, 3 Nov 2026: voice first at every step)
+    "demo_next",
+    "request_tryon",
+    "sold",
+    "not_today",
+    "lost",
+    "request_delivery",
+    "request_emi",
+    "send_family_card",
+    "set_reminder",
+    "next_step",
     "other",
 ]
 Objection = Literal[
@@ -67,6 +78,7 @@ class Understanding(BaseModel):
     library_id: str | None = None  # id from the provided expert library
     question_for_expert: str | None = None
     customer_request: str | None = None  # e.g. "55 inch QLED chahiye" (for need validation)
+    remind_when: Literal["today_evening", "tomorrow", "weekend"] | None = None  # with set_reminder / not_today
 
 
 # ---------- 8.3 Read image ----------

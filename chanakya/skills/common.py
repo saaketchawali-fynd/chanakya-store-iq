@@ -142,7 +142,7 @@ def category_message(ctx: SkillContext) -> OutMessage:
     body = (f'{ctx.t("label_bolo")}: "{ctx.tc("bolo_opener")}"\n{ctx.t("label_kyun")}: {ctx.t("kyun_opener")}\n'
             + ctx.t("st_new", code=code))
     return OutMessage(to=ctx.actor_wa_id, kind="list", body=body, list_button=truncate_title(ctx.t("list_product")),
-                      sections=[ListSection(rows=rows)], footer=ctx.t("footer_voice"), allowed_numbers=ctx.reg.allowed())
+                      sections=[ListSection(rows=rows)], footer=ctx.t("footer_voice_q"), allowed_numbers=ctx.reg.allowed())
 
 
 def photo_question(ctx: SkillContext, footer: str | None = None) -> OutMessage:

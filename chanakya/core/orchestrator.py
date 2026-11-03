@@ -17,6 +17,20 @@ log = get_log("orchestrator")
 AFTER_SALE_AWAIT = ("lost_reason", "voice_for_parivaar")  # answers still expected after the session closed
 
 
+VOICE_KINDS = ("text", "buttons", "list", "image")
+
+
+def voice_footer(ctx: SkillContext, m) -> None:
+    """Voice first, at every step: every message to the associate (and the manager) says it can simply be
+    answered by voice, in Hindi, English or Marathi, unless it already carries its own footer (such as what a
+    voice note was understood as). Not on the customer's, expert's or visitor's phone."""
+    if m.footer or m.kind not in VOICE_KINDS or m.to != ctx.actor_wa_id or ctx.role not in ("associate", "manager"):
+        return
+    if ctx.staff is None or not ctx.staff.lang_set:
+        return  # the language picker comes first
+    m.footer = ctx.t("footer_voice_mgr" if ctx.role == "manager" else "footer_voice_q")
+
+
 class Orchestrator:
     def __init__(self, svc, scheduler=None):
         self.svc = svc
@@ -74,6 +88,7 @@ class Orchestrator:
                 lang = ctx.lang
                 if ctx.session and m.to == ctx.actor_wa_id and m.session_id is None:
                     m.session_id = ctx.session.id
+                voice_footer(ctx, m)
                 out = self.svc.validate(m, ctx.reg, home, lang, ctx.asking, ctx.session)
                 await self.svc.deliver(out)
                 if first and t0 is not None and m.to == ctx.actor_wa_id:

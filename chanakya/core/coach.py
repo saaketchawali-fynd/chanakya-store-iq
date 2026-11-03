@@ -28,14 +28,13 @@ def coach_reply(
     L = ctx.lang
     body = f'{ctx.t("label_bolo", L)}: "{_one_line(say)}"\n{ctx.t("label_kyun", L)}: {_one_line(why)}'
     st = status_line(ctx) if status else ""
+    if status:  # the copilot: one quiet line, only when a fact calls for it (the status is one tap away)
+        from chanakya.skills.copilot import tip
+
+        st = tip(ctx) or st
     if st:
         body += "\n" + st
-    if footer is None and ctx.session is not None:  # the voice/menu hint for the first few replies, then no clutter
-        n = int(ctx.session.extra.get("hints", 0))
-        ctx.session.extra["hints"] = n + 1
-        footer = ctx.t("footer_voice") if n < 3 else None
-    elif footer is None:
-        footer = ctx.t("footer_voice")
+    # no footer given: the voice line is added for every associate message when it is sent (orchestrator)
     return OutMessage(
         to=ctx.actor_wa_id,
         kind="buttons" if buttons else "text",

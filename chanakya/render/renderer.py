@@ -700,27 +700,6 @@ def to_data_uri(img: Any, max_px: int | None = None) -> str | None:
 _FIELD_LABELS = ("ऑफ़र", "ऑफर", "offer", "डिलीवरी", "डिलिव्हरी", "delivery", "emi", "ईएमआई")
 
 
-def _strip_label(text: Any) -> Any:
-    """'ऑफ़र: HDFC −₹5,000' → 'HDFC −₹5,000' (the card prints its own label). Only known field words are stripped."""
-    if not isinstance(text, str):
-        return text
-    m = re.match(r"^\s*([^:：]{1,16})[:：]\s+", text)
-    if m and m.group(1).strip().lower() in _FIELD_LABELS:
-        return text[m.end() :] or text
-    return text
-
-
-def _cost_rows_from_text(text: str) -> list[dict[str, Any]]:
-    """Legacy cost_text 'पूरा खर्च ₹65,288 · सुझाव सहित ₹68,787' → label/value rows (first one strong)."""
-    rows = []
-    parts = [p.strip() for p in re.split(r"\s+·\s+|\s*\(|\)\s*", text) if p and p.strip()]
-    for i, part in enumerate(parts):
-        m = re.search(r"[₹\d]", part)
-        label, value = (part[: m.start()].strip(" :"), part[m.start() :].strip()) if m else (part, "")
-        rows.append({"label": label, "value": value, "strong": i == 0})
-    return rows
-
-
 def _raw_is_photo(raw: Any) -> bool:
     if isinstance(raw, (bytes, bytearray)):
         return _sniff_mime(bytes(raw[:16])) == "image/jpeg"
@@ -741,11 +720,6 @@ def _prepare(card: Card) -> dict[str, Any]:
         photo = bool(data.get("image_is_photo")) or _raw_is_photo(raw)
         data["image"] = to_data_uri(raw, None if photo else (700 if tpl == "product" else 900))
         data["image_is_photo"] = photo
-    if tpl == "parivaar":
-        if not data.get("cost_rows") and isinstance(data.get("cost_text"), str) and data["cost_text"].strip():
-            data["cost_rows"] = _cost_rows_from_text(data["cost_text"])
-        for k in ("offer_text", "finance_text", "delivery_text"):
-            data[k] = _strip_label(data.get(k))
     if isinstance(data.get("options"), list):
         opts = []
         for o in data["options"]:
@@ -1087,46 +1061,28 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
             ),
             "stamp": "1 Nov 18:40",
         }
-    if template == "parivaar":
+    if template == "parivaar":  # the Family Card is English (one card)
         return {
-            "title": p("शाह परिवार के लिए", "शहा कुटुंबासाठी", "For the Shah family"),
+            "kicker": "Picked for the Shah family",
+            "title": 'Your new Meru 55" QLED Pro',
             "image": "products/TV-MER-55-QL120.png",
-            "product_title": 'Meru 55" QLED Pro',
-            "reasons": p(
-                ["क्रिकेट में तेज़ बॉल भी साफ़", "धूप वाले कमरे में भी चमकदार तस्वीर", "आपकी 9 ft की दूरी के लिए सही साइज़"],
-                ["क्रिकेटमध्ये वेगवान बॉलही स्पष्ट", "उन्हाच्या खोलीतही उजळ चित्र", "तुमच्या 9 ft च्या अंतरासाठी योग्य साइज"],
-                ["Fast cricket balls stay sharp", "Bright even in a sunny room", "Right size for your 9 ft distance"],
-            ),
-            "key_specs": [
-                {"label": p("स्क्रीन", "स्क्रीन", "Screen"), "value": '55" QLED 4K'},
-                {"label": p("चमक", "उजळपणा", "Brightness"), "value": "600 nits"},
-                {"label": p("मोशन", "मोशन", "Motion"), "value": "120 Hz"},
-                {"label": p("आवाज़", "आवाज", "Sound"), "value": "40 W Atmos"},
-            ],
-            "cost_rows": [
-                {
-                    "label": p("प्रोडक्ट + ज़रूरी", "उत्पादन + आवश्यक", "Product + required"),
-                    "value": "₹65,288",
-                    "strong": True,
-                },
-                {
-                    "label": p("2 साल की वारंटी (सुझाव)", "2 वर्षांची वॉरंटी (सूचना)", "2-year warranty (suggested)"),
-                    "value": "+₹3,499",
-                    "strong": False,
-                },
-                {"label": p("ऑफ़र के बाद देय", "ऑफरनंतर देय", "Payable after offer"), "value": "₹60,288", "strong": True},
-            ],
-            "offer_text": p(
-                "HDFC कार्ड −₹5,000 (15 Nov तक)", "HDFC कार्ड −₹5,000 (15 Nov पर्यंत)", "HDFC card −₹5,000 (until 15 Nov)"
-            ),
-            "finance_text": p(
-                "₹5,024 महीना, 12 महीने; फ़ीस ₹299",
-                "दरमहा ₹5,024, 12 महिने; फी ₹299",
-                "₹5,024 a month for 12 months, ₹299 fee",
-            ),
-            "delivery_text": p("मंगलवार, 4 Nov", "मंगळवार, 4 Nov", "Tuesday, 4 Nov"),
-            "associate_name": p("रवि", "रवी", "Ravi"),
-            "store_name": "Reliance Digital Juhu (TEST)",
+            "key_specs": [{"label": "Size", "value": "55 inch"}, {"label": "Panel", "value": "QLED"},
+                          {"label": "Refresh rate", "value": "120 Hz"}, {"label": "Brightness", "value": "600 nits"}],
+            "points": [{"text": "Sharp ball in cricket", "proof": "120 Hz"},
+                       {"text": "Clear picture in sunlight", "proof": "600 nits"},
+                       {"text": "Right size for your distance", "proof": "55 inch"}],
+            "ladder": [{"label": "Price", "value": "₹62,990"}, {"label": "Installation and essentials", "value": "+₹2,298"},
+                       {"label": "10% off on HDFC cards · till 15 Nov", "value": "−₹5,000", "offer": True}],
+            "total": "₹60,288",
+            "total_label": "You pay today",
+            "optional": "Recommended add-ons, optional: +₹3,499",
+            "steps": [{"icon": "truck", "k": "Delivery", "v": "Tuesday 3 Nov"},
+                      {"icon": "calendar", "k": "Installation", "v": "4 Nov · 10–12"},
+                      {"icon": "shield", "k": "Warranty", "v": "1 year brand warranty"}],
+            "associate_name": "Ravi",
+            "store_name": "Reliance Digital Juhu",
+            "reply_line": "Reply here to talk to Ravi",
+            "test_data": True,
         }
     if template == "score":
         names = p(
@@ -1362,24 +1318,23 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
                 rows.append(str(d[k]))
     elif tpl == "parivaar":
         title = d.get("title") or title
-        rows.append(str(d.get("product_title") or ""))
-        rows += [f"✓ {r}" for r in (d.get("reasons") or [])[:3]]
+        if d.get("kicker"):
+            rows.append(str(d["kicker"]))
+        rows += [f"- {x.get('text')}" + (f" ({x['proof']})" if x.get("proof") else "") for x in (d.get("points") or [])[:3]]
         specs = " · ".join(
             f"{s.get('label')}: {s.get('value')}" for s in (d.get("key_specs") or [])[:4] if isinstance(s, dict)
         )
         if specs:
             rows.append(specs)
-        cost_rows = d.get("cost_rows") or []
-        if cost_rows:
-            rows += [f"{c.get('label')}: {c.get('value')}" for c in cost_rows if isinstance(c, dict)]
-        elif d.get("cost_text"):
-            rows.append(str(d["cost_text"]))
-        for k, lab in (("offer_text", "offer"), ("finance_text", "finance"), ("delivery_text", "delivery")):
-            if d.get(k):
-                rows.append(f"{lb[lab]}: {_strip_label(d[k])}")
+        rows += [f"{c.get('label')}: {c.get('value')}" for c in (d.get("ladder") or []) if isinstance(c, dict)]
+        if d.get("total"):
+            rows.append(f"{d.get('total_label') or ''}: {d['total']}")
+        elif d.get("no_price"):
+            rows.append(str(d["no_price"]))
+        rows += [f"{x.get('k')}: {x.get('v')}" for x in (d.get("steps") or []) if isinstance(x, dict)]
         who = " · ".join(str(x) for x in (d.get("associate_name"), d.get("store_name")) if x)
         if who:
-            rows.append(f"{lb['from']}: {who}")
+            rows.append(who)
     elif tpl == "score":
         title = f"{lb['title']} · {d.get('score_str') or ''}"
         for s in d.get("steps") or []:

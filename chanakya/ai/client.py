@@ -97,6 +97,15 @@ class AIClient:
             raise AIUnavailable("voice")
         return self._rules(text or "", ctx)
 
+    async def transcribe(self, audio: bytes, mime: str | None = None) -> str:
+        """Plain words of a voice note (manager commands): Gemini when live, else unavailable."""
+        if self.live:
+            from google.genai import types
+
+            part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime))
+            return await self.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=9.0)
+        raise AIUnavailable("voice")
+
     def _rules(self, text: str, ctx: dict) -> Understanding:
         myths = [m["id"] for m in ctx.get("myths", [])] or None
         return rules.understand_text(

@@ -314,6 +314,9 @@ async def job(ctx: SkillContext) -> Reply:
             diag.mark("tryon_last", {"mode": req_spec.get("mode"), "error": (res.error or "no image")[:160]})
             continue
         await repo.media_put(s.id, "tryon", res.image, "image/jpeg", ctx.now)
+        if res.hero and res.hero_sku:  # the clean picture for the Family Card
+            await repo.media_put(s.id, "tryon_hero", res.hero, "image/jpeg", ctx.now, days=2)
+            s.extra["tryon_hero_sku"] = res.hero_sku
         drawn.append([p.sku for p, _ in pl])
         msgs.append(_tryon_message(ctx, pl, res.image))
     ms = int((time.perf_counter() - t0) * 1000)

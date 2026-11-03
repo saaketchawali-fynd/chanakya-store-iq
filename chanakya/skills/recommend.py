@@ -172,7 +172,6 @@ async def show_options(ctx: SkillContext, override_checked: bool = False) -> Rep
     btns = [ctx.b("b_demo_next", ctx.sid("demo")), ctx.b("b_offers_on", ctx.sid("ofs"))]  # offers with the products
     btns.append(ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")))
     m1 = info_reply(ctx, "\n".join(lines), btns, card=card)
-    m1.footer = ctx.t("footer_label_hint")[:60]  # Translate: a label photo gives the benefits for this home
     if ctx.x.pop("rerank_note", None):
         m1.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
     return ctx.reply(m1)

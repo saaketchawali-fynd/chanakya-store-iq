@@ -1,119 +1,124 @@
-{% extends "base.html" %}
-{# Sent to the customer's family: try-on photo (or product), why it suits, key specs, full cost, offer/EMI/delivery. #}
-{% set specs = (key_specs|aslist)[:4] %}
-{% set rows = (cost_rows|aslist)[:5] %}
-{% set why = (reasons|aslist)[:3] %}
-{% set last_strong = namespace(i=-1) %}
-{% for r in rows %}{% if r.strong %}{% set last_strong.i = loop.index0 %}{% endif %}{% endfor %}
-{% block style %}
-  .hero { padding: 0; overflow: hidden; }
-  .media { position: relative; }
-  .media .photo { display: block; width: 100%; height: 360px; object-fit: cover; object-position: 50% 42%; }
-  .media .stage { height: 340px; border-radius: 0; align-items: flex-start; padding-top: 22px; }
-  .media .stage img { max-width: 64%; max-height: 66%; }
-  .specbar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: rgba(255,255,255,.94); }
-  .media .specbar { position: absolute; left: 0; right: 0; bottom: 0; border-top: 1px solid rgba(27,42,74,.06); }
-  .spec { padding: 13px 18px 13px 26px; border-left: 2px solid var(--line); min-width: 0; }
+<!doctype html>
+{# The Family Card (English): sent to the customer's family. Their room with the product in it (or the product on a
+   soft stage), why it is right for THEIR home with the spec that proves each point, one clear price ladder with a
+   single final number, and what happens next. Every number comes from the data or the session's snapshots. #}
+{% set specs = (key_specs|aslist)[:4] %}{% set pts = (points|aslist)[:3] %}{% set lad = (ladder|aslist)[:5] %}
+{% set st = (steps|aslist)[:3] %}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --ink: #0B1220; --text: #1F2937; --muted: #6B7280; --faint: #9CA3AF; --line: #E8EAEE; --bg: #F4F5F7;
+          --accent: #4338CA; --accent-pale: #EEF0FF; --green: #047857; --green-pale: #ECFDF5; --gold: #B45309; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; background: var(--bg); }
+  body { font-family: "Inter", "Avenir Next", "Helvetica Neue", "Noto Sans", "Noto Sans Devanagari", Arial, sans-serif;
+         color: var(--text); font-size: 30px; line-height: 1.4; -webkit-font-smoothing: antialiased; }
+  #card { width: 1080px; max-height: 1350px; overflow: hidden; background: var(--bg); position: relative; }
+  #fit { width: 1080px; transform-origin: 0 0; padding: 42px 48px 30px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .ic { display: inline-block; flex: none; vertical-align: middle; }
+
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .brand { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 600; color: var(--muted); }
+  .brand b { color: var(--ink); font-weight: 700; }
+  .test { font-size: 18px; font-weight: 600; letter-spacing: 1px; padding: 6px 14px; border-radius: 999px; background: #EAECEF; color: var(--faint); }
+  .kicker { margin: 26px 8px 0; font-size: 26px; font-weight: 600; color: var(--accent); }
+  h1 { margin: 4px 8px 0; font-size: 54px; line-height: 1.12; font-weight: 700; letter-spacing: -1px; color: var(--ink); }
+
+  .hero { margin-top: 24px; border-radius: 32px; overflow: hidden; background: #fff; border: 1.5px solid var(--line); }
+  .hero .photo { display: block; width: 100%; height: 520px; object-fit: cover; }
+  .hero .stage { height: 420px; display: flex; align-items: center; justify-content: center;
+                 background: radial-gradient(110% 90% at 50% 30%, #FFFFFF 0%, #F3F4F7 70%, #E9EBF0 100%); }
+  .hero .stage img { max-width: 78%; max-height: 84%; object-fit: contain; filter: drop-shadow(0 26px 30px rgba(11,18,32,.18)); }
+  .specs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border-top: 1.5px solid var(--line); }
+  .spec { padding: 16px 22px; border-left: 1.5px solid var(--line); min-width: 0; }
   .spec:first-child { border-left: none; }
-  .spec .k { display: block; font-size: 20px; font-weight: 700; color: var(--muted); line-height: 1.3; }
-  .spec .v { display: block; font-size: 27px; font-weight: 800; color: var(--ink); line-height: 1.25;
-              }
-  .sub.prod { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 33px; font-weight: 700; margin-top: 12px; }
-  .sub.prod .ic { color: #F4A86F; }
-  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; align-items: stretch; }
-  .duo.one { grid-template-columns: 1fr; }
-  .duo .card { padding: 24px 28px; }
-  .reasons .rs { display: flex; align-items: flex-start; gap: 14px; padding: 9px 0; font-size: 28px; line-height: 1.36; }
-  .reasons .rs + .rs { border-top: 2px solid var(--line); }
-  .chk { width: 36px; height: 36px; background: var(--green); color: #fff; margin-top: 2px; }
-  .cost .crow { display: flex; justify-content: space-between; align-items: baseline; gap: 18px; padding: 9px 0;
-                font-size: 26px; line-height: 1.3; color: var(--muted); }
-  .cost .crow + .crow { border-top: 2px solid var(--line); }
-  .cost .crow .v { color: var(--text); font-weight: 700; white-space: nowrap; font-size: 28px; }
-  .cost .crow.strong { color: var(--ink); font-weight: 700; }
-  .cost .crow.strong .v { font-weight: 800; font-size: 32px; color: var(--ink); }
-  .cost .crow.total { background: var(--green-pale); color: var(--green-deep); border-radius: 18px; padding: 14px 16px;
-                      margin: 10px -14px 0; border-top: none; flex-direction: column; align-items: flex-start; gap: 2px; }
-  .cost .crow.total .v { color: var(--green-deep); font-size: 40px; }
-  .cost .crow.solo { justify-content: flex-start; }
-  .extras { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; margin-top: 18px; padding: 22px 10px; }
-  .ex { padding: 0 20px; border-left: 2px solid var(--line); min-width: 0; }
-  .ex:first-child { border-left: none; }
-  .ex .top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-  .ex .bubble { width: 42px; height: 42px; background: var(--saffron-pale); color: var(--saffron-deep); }
-  .ex .k { font-size: 23px; font-weight: 800; color: var(--muted); }
-  .ex .k.dv { font-size: 24px; font-weight: 700; }
-  .ex .v { font-size: 25px; line-height: 1.34; color: var(--text); font-weight: 600; }
-  .from { display: flex; align-items: center; gap: 18px; padding: 20px 56px 28px; }
-  .avatar { width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #F29A56, #DD6A1E);
-            color: #fff; font-size: 28px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
-  .from .who { font-size: 24px; color: var(--muted); line-height: 1.3; }
-  .from .who b { color: var(--ink); font-size: 28px; }
-  .from .store { font-size: 22px; color: var(--faint); }
-{% endblock %}
-{% block brand_tail %} <span class="soft">· {{ L.brand_sub_customer|default('Reliance Digital') }}</span>{% endblock %}
-{% block hd_class %}{% if image or specs %} lift{% endif %}{% endblock %}
-{% block header %}
-  {% set ttl = title or product_title or '' %}
-  {% if title and L.kicker %}<div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>{% endif %}
-  <h1 class="{{ ttl|dv }}">{{ ttl }}</h1>
-  {% if title and product_title %}<div class="sub prod">{{ icon('sparkle', 30) }}<span >{{ product_title }}</span></div>{% endif %}
-{% endblock %}
-{% macro specbar() %}
-  <div class="specbar">{% for s in specs %}<div class="spec"><span class="k{{ s.label|dv }}">{{ s.label }}</span><span class="v num">{{ s.value }}</span></div>{% endfor %}</div>
-{% endmacro %}
-{% block content %}
-  {% if image or specs %}
-  <section class="hero card">
-    {% if image %}
-    <div class="media">
-      {% if image_is_photo %}<img class="photo" src="{{ image }}" alt="">{% else %}<div class="stage"><img src="{{ image }}" alt=""></div>{% endif %}
-      {% if specs %}{{ specbar() }}{% endif %}
-    </div>
-    {% else %}{{ specbar() }}{% endif %}
+  .spec .k { display: block; font-size: 19px; font-weight: 600; color: var(--muted); }
+  .spec .v { display: block; font-size: 27px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; }
+
+  .sec { margin-top: 20px; }
+  .box { background: #fff; border: 1.5px solid var(--line); border-radius: 28px; padding: 26px 32px; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .pt { display: flex; align-items: center; gap: 16px; padding: 9px 0; }
+  .pt + .pt { border-top: 1.5px solid var(--line); }
+  .pt .ck { flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--green-pale); color: var(--green);
+            display: flex; align-items: center; justify-content: center; }
+  .pt .t { flex: 1; min-width: 0; font-size: 29px; font-weight: 600; color: var(--ink); line-height: 1.3; }
+  .pt .pf { flex: none; font-size: 22px; font-weight: 700; color: var(--accent); background: var(--accent-pale);
+            padding: 6px 13px; border-radius: 12px; white-space: nowrap; }
+
+  .row2 { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; margin-top: 20px; }
+  .row2.one { grid-template-columns: 1fr; }
+  .lr { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 7px 0; font-size: 24px; color: var(--muted); }
+  .lr .v { color: var(--text); font-weight: 600; white-space: nowrap; }
+  .lr.offer .v, .lr.offer .k { color: var(--green); font-weight: 600; }
+  .tot { margin-top: 12px; border-radius: 20px; background: var(--ink); color: #fff; padding: 16px 22px; }
+  .tot .k { font-size: 21px; font-weight: 600; color: #C7CBD6; }
+  .tot .v { font-size: 46px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+  .opt { margin-top: 10px; font-size: 20px; color: var(--faint); }
+  .emi { margin-top: 8px; font-size: 21px; color: var(--muted); }
+  .noprice { font-size: 27px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+  .stp { display: flex; align-items: center; gap: 16px; padding: 10px 0; }
+  .stp + .stp { border-top: 1.5px solid var(--line); }
+  .stp .bub { flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--accent-pale); color: var(--accent);
+              display: flex; align-items: center; justify-content: center; }
+  .stp .k { font-size: 19px; font-weight: 600; color: var(--muted); }
+  .stp .v { font-size: 25px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+
+  .from { display: flex; align-items: center; gap: 18px; margin-top: 22px; padding: 0 8px; }
+  .av { flex: none; width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 28px;
+        font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .from .who { font-size: 25px; color: var(--ink); font-weight: 600; }
+  .from .sub { font-size: 21px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="card"><div id="fit">
+  <div class="top">
+    <div class="brand"><svg class="ic" width="30" height="30" viewBox="0 0 36 36"><rect width="36" height="36" rx="10" fill="#4338CA"/><path d="M24.6 12.3a8 8 0 1 0 0 11.4" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><circle cx="25.2" cy="18" r="2.3" fill="#fff"/></svg>
+      <span><b>Reliance Digital</b>{% if store_name %} · {{ store_name|replace('Reliance Digital ', '') }}{% endif %}</span></div>
+    {% if test_data %}<span class="test">TEST DATA</span>{% endif %}
+  </div>
+  {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+  <h1>{{ title or product_title }}</h1>
+
+  <section class="hero">
+    {% if image and image_is_photo %}<img class="photo" src="{{ image }}" alt="">
+    {% elif image %}<div class="stage"><img src="{{ image }}" alt=""></div>
+    {% else %}<div class="stage">{{ icon('tv', 140, '', 1.2) }}</div>{% endif %}
+    {% if specs %}<div class="specs">{% for s in specs %}<div class="spec"><span class="k">{{ s.label }}</span><span class="v num">{{ s.value }}</span></div>{% endfor %}</div>{% endif %}
+  </section>
+
+  {% if pts %}
+  <section class="sec box">
+    <div class="label">Made for your home</div>
+    {% for p in pts %}<div class="pt"><span class="ck">{{ icon('check', 22, '', 3) }}</span><span class="t">{{ p.text }}</span>{% if p.proof %}<span class="pf num">{{ p.proof }}</span>{% endif %}</div>{% endfor %}
   </section>
   {% endif %}
 
-  {% set extras = [] %}
-  {% if offer_text %}{% set _ = extras.append(('tag', L.offer, offer_text)) %}{% endif %}
-  {% if finance_text %}{% set _ = extras.append(('card', L.finance, finance_text)) %}{% endif %}
-  {% if delivery_text %}{% set _ = extras.append(('truck', L.delivery, delivery_text)) %}{% endif %}
-  {% if why or rows %}
-  <section class="duo{% if not (why and rows) %} one{% endif %}">
-    {% if why %}
-    <div class="card reasons">
-      <div class="label{{ L.reasons|dv }}">{{ icon('home', 26) }}{{ L.reasons }}</div>
-      {% for r in why %}<div class="rs"><span class="bubble chk">{{ icon('check', 22, '', 3) }}</span><span>{{ r }}</span></div>{% endfor %}
+  <section class="row2{% if not st %} one{% endif %}">
+    <div class="box">
+      <div class="label">Your price</div>
+      {% if total %}
+        {% for r in lad %}<div class="lr num{% if r.offer %} offer{% endif %}"><span class="k">{{ r.label }}</span><span class="v">{{ r.value }}</span></div>{% endfor %}
+        <div class="tot num"><div class="k">{{ total_label }}</div><div class="v">{{ total }}</div></div>
+        {% if emi %}<div class="emi">{{ emi }}</div>{% endif %}
+        {% if optional %}<div class="opt num">{{ optional }}</div>{% endif %}
+      {% else %}<div class="noprice">{{ no_price }}</div>{% endif %}
     </div>
-    {% endif %}
-    {% if rows %}
-    <div class="card cost">
-      <div class="label{{ L.cost|dv }}">{{ icon('rupee', 26) }}{{ L.cost }}</div>
-      {% for r in rows %}
-      <div class="crow num{% if r.strong %} strong{% endif %}{% if loop.index0 == last_strong.i and loop.last and rows|length > 1 %} total{% endif %}{% if not r.label or not r.value %} solo{% endif %}">
-        {% if r.label %}<span class="k">{{ r.label }}</span>{% endif %}{% if r.value %}<span class="v">{{ r.value }}</span>{% endif %}
-      </div>
-      {% endfor %}
+    {% if st %}
+    <div class="box">
+      <div class="label">What happens next</div>
+      {% for x in st %}<div class="stp"><span class="bub">{{ icon(x.icon, 26) }}</span><div><div class="k">{{ x.k }}</div><div class="v num">{{ x.v }}</div></div></div>{% endfor %}
     </div>
     {% endif %}
   </section>
+
+  {% if associate_name %}
+  <div class="from"><span class="av">{{ associate_name|initial }}</span>
+    <div><div class="who">{{ associate_name }}, your Reliance Digital expert</div>{% if reply_line %}<div class="sub">{{ reply_line }}</div>{% endif %}</div></div>
   {% endif %}
-  {% if extras %}
-  <section class="card extras">
-    {% for ic, k, v in extras %}
-    <div class="ex"><div class="top"><span class="bubble">{{ icon(ic, 23) }}</span><span class="k{{ k|dv }}">{{ k }}</span></div><div class="v">{{ v }}</div></div>
-    {% endfor %}
-  </section>
-  {% endif %}
-{% endblock %}
-{% block footer %}
-  {% if associate_name or store_name %}
-  <footer class="from">
-    <span class="avatar">{{ (associate_name or store_name)|initial }}</span>
-    <div>
-      <div class="who{{ L.from|dv }}">{{ L.from }}{% if associate_name %} · <b>{{ associate_name }}</b>{% endif %}</div>
-      {% if store_name %}<div class="store">{{ store_name }}</div>{% endif %}
-    </div>
-  </footer>
-  {% else %}{{ super() }}{% endif %}
-{% endblock %}
+</div></div>
+</body>
+</html>

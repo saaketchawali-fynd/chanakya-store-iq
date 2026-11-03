@@ -21,7 +21,7 @@ async def test_coach_replies_carry_a_menu_hint(h):
     await start_customer(h)
     out = await h.tap("s:C1:slot:trigger:new_home")
     coach = next(m for m in out if m.coach)
-    assert coach.footer == "Tap karein ya voice note bhejein · menu" and len(coach.footer) <= 60
+    assert coach.footer.startswith("Bolkar bhi: voice note") and coach.footer.endswith("menu") and len(coach.footer) <= 60
 
 
 async def test_menu_lists_new_end_restart(h):

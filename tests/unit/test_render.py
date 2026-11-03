@@ -18,8 +18,6 @@ from chanakya.core.contracts import Card
 from chanakya.render.renderer import (
     TEMPLATE_NAMES,
     Renderer,
-    _cost_rows_from_text,
-    _strip_label,
     dv_class,
     frac,
     pct,
@@ -142,14 +140,14 @@ def test_catalog_hides_price_row_when_missing():
     assert html.count('class="price num"') == sum(1 for it in items[:3] if it.get("price_str"))
 
 
-def test_parivaar_accepts_legacy_cost_text():
+def test_family_card_has_one_final_number_and_no_price_before_it_is_known():
     r = Renderer()
-    data = {k: v for k, v in sample_data("parivaar", "hi").items() if k != "cost_rows"}
-    data["cost_text"] = "पूरा खर्च ₹65,288 · सुझाव सहित ₹68,787"
-    data["offer_text"] = "ऑफ़र: HDFC −₹5,000 (15 Nov तक)"
-    html = r.html(_card(template="parivaar", lang="hi", data=data))
-    assert "₹65,288" in html and "₹68,787" in html
-    assert "ऑफ़र: HDFC" not in html and "HDFC −₹5,000" in html
+    html = r.html(_card(template="parivaar", lang="en", data=sample_data("parivaar", "en")))
+    assert html.count("₹60,288") == 1 and "You pay today" in html and "(TEST)" not in html
+    data = {k: v for k, v in sample_data("parivaar", "en").items() if k not in ("ladder", "total")}
+    data["no_price"] = "Your full price is ready at the store"
+    html = r.html(_card(template="parivaar", lang="en", data=data))
+    assert "₹6" not in html and "ready at the store" in html
 
 
 EMOJI_RE = re.compile("[\U0001f000-\U0001faff\u2600-\u27bf\ufe0f]")
@@ -203,9 +201,6 @@ def test_helpers():
     assert dv_class("घर") == " dv" and dv_class("Ghar") == ""
     assert stock_icon("4 in store") == "store" and stock_icon("Delivery in 3 days") == "truck"
     assert stock_icon("Novex 55 OLED stock khatam") == "alert"
-    assert _strip_label("Delivery: Tue 4 Nov") == "Tue 4 Nov" and _strip_label("HDFC: −₹5,000") == "HDFC: −₹5,000"
-    rows = _cost_rows_from_text("पूरा खर्च ₹65,288 · सुझाव सहित ₹68,787")
-    assert rows[0] == {"label": "पूरा खर्च", "value": "₹65,288", "strong": True} and rows[1]["value"] == "₹68,787"
 
 
 def test_to_data_uri_variants():

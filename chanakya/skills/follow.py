@@ -195,6 +195,100 @@ def _reasons(ctx: SkillContext, sku: str, lang: str) -> list[str]:
     return out[:3]
 
 
+def _store(ctx: SkillContext, staff) -> str:
+    return ctx.facts.store_name(staff.store_id if staff else None).replace(" (TEST)", "")
+
+
+async def family_card(ctx: SkillContext, p, presale: bool, image, is_photo: bool, staff, name: str) -> Card:
+    """The Family Card, one English card for the family at home: their room with the product, why it is right
+    for THEIR home (each benefit with the spec that proves it), one clear price (one final number, the same as
+    on the bill and the offer card), and what happens next. Every number from the data or the snapshots."""
+    from chanakya.skills import fitview as FV
+
+    s = ctx.session
+    lang = "en"
+    with ctx.as_lang(lang):
+        fam = short_name(name) if name else ""
+        points = FV.points(ctx, p, lang, 3)
+        if len(points) < 3:
+            for r in _reasons(ctx, p.sku, lang):
+                if all(r != x["text"] for x in points) and len(points) < 3:
+                    points.append({"text": r, "proof": None})
+        ladder, total, total_label, optional, emi = [], None, None, None, None
+        cs = s.cost_snapshot if (s.cost_snapshot or {}).get("sku") == p.sku else None
+        os_ = s.offer_snapshot if (s.offer_snapshot or {}).get("sku") == p.sku else None
+        if cs:
+            ladder.append({"label": ctx.t("fc_price"), "value": ctx.reg.inr(p.price, p.price_source)})
+            extras = int(cs["zaroori_total"]) - int(p.price)
+            if extras > 0:
+                ladder.append({"label": ctx.t("fc_essentials"), "value": "+" + ctx.reg.inr(extras, f"snapshot:hisaab:{p.sku}")})
+            total, total_label = ctx.reg.raw(cs["zaroori_total_str"], f"snapshot:hisaab:{p.sku}"), ctx.t("fc_full_cost")
+            if os_ and os_.get("applied"):
+                from datetime import date
+
+                for a in os_["applied"][:2]:
+                    till = fmt.date_short(date.fromisoformat(a["valid_to"]), lang)
+                    ladder.append({"label": ctx.t("fc_offer", title=ctx.reg.static(_offer_title(ctx, a["id"], lang)),
+                                                  till=ctx.reg.raw(till, f"offer:{a['id']}:valid_to")),
+                                   "value": "−" + ctx.reg.raw(a["amount_str"], f"offer:{a['id']}"), "offer": True})
+                total = ctx.reg.raw(os_.get("total_today_str") or os_["payable_str"], "snapshot:total_today")
+                total_label = ctx.t("fc_pay_today")
+            sug = int(cs["with_suggestions_total"]) - int(cs["zaroori_total"])
+            if sug > 0 and not s.extra.get("suggestions_off"):
+                optional = ctx.t("fc_optional", amount=ctx.reg.inr(sug, f"snapshot:hisaab:{p.sku}"))
+            if os_ and os_.get("finance"):
+                from chanakya.skills.close import finance_sentence
+                from chanakya.truth.finance import FinanceQuote
+
+                q = FinanceQuote.model_validate(os_["finance"])
+                for v in (q.monthly_str, q.fee_str, q.total_str, q.extra_str, q.months_str):
+                    ctx.reg.raw(v, f"snapshot:finance:{q.plan_id}")
+                emi = finance_sentence(ctx, q, lang)
+        steps = []
+        if s.extra.get("delivery_choice"):
+            from datetime import date
+
+            d = date.fromisoformat(s.extra["delivery_choice"])
+            steps.append({"icon": "truck", "k": ctx.t("fc_delivery"),
+                          "v": ctx.reg.raw(f"{fmt.day_name(d, lang)} {fmt.date_short(d, lang)}", "choice:delivery")})
+        if s.extra.get("install_job_id"):
+            job = await repo.install_get(s.extra["install_job_id"])
+            if job and job.status != "cancelled":
+                steps.append({"icon": "calendar", "k": ctx.t("fc_install"),
+                              "v": ctx.reg.raw(f"{fmt.date_short(job.slot_date, lang)} · {job.slot_label}", f"install:{job.id}")})
+        w = (p.info or {}).get("warranty") or {}
+        wt = (p.info or {}).get("warranty_text")
+        if isinstance(w, dict) and w.get("years"):
+            steps.append({"icon": "shield", "k": ctx.t("fc_warranty"),
+                          "v": ctx.t("fc_warranty_years", n=ctx.reg.num(w["years"], f"product:{p.sku}:warranty"))})
+        elif wt:
+            steps.append({"icon": "shield", "k": ctx.t("fc_warranty"), "v": ctx.reg.raw(str(wt)[:40], f"product:{p.sku}:warranty")})
+        aname = staff.name if staff else ""
+        return Card(
+            template="parivaar",
+            lang=lang,
+            data={  # type: ignore[arg-type]
+                "kicker": ctx.t("fc_kicker_presale" if presale else "fc_kicker", name=fam) if fam else ctx.t("fc_kicker_you"),
+                "title": ctx.t("fc_title", product=C.product_title(ctx, p, lang)),
+                "image": image,
+                "image_is_photo": is_photo,
+                "key_specs": PV.key_specs(ctx, p, lang, 4),
+                "points": points,
+                "ladder": ladder,
+                "total": total,
+                "total_label": total_label,
+                "optional": optional,
+                "emi": emi,
+                "no_price": None if total else ctx.t("fc_price_at_store"),
+                "steps": steps,
+                "associate_name": aname,
+                "store_name": _store(ctx, staff),
+                "reply_line": ctx.t("fc_reply", associate=aname) if aname else None,
+                "test_data": bool(getattr(p, "test_data", False)),
+            },
+        )
+
+
 async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Reply:
     s = ctx.session
     lang = "en"  # the message to the customer's phone is in English, like every customer-facing visual
@@ -205,89 +299,12 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
     p = ctx.facts.product_sync(sku)
     name = s.home.customer_name or ""
     presale = bool(s.extra.get("presale_parivaar")) and s.extra.get("outcome") != "sold"
-    image: str | bytes | None = p.image
-    tryon = await repo.media_latest(s.id, "tryon")
-    if tryon:
-        image = "data:image/jpeg;base64," + base64.b64encode(tryon.data).decode()
+    image: str | None = p.image
+    hero = await repo.media_latest(s.id, "tryon_hero")
+    if hero and s.extra.get("tryon_hero_sku") == sku:  # their own room, with this product in it
+        image = "data:image/jpeg;base64," + base64.b64encode(hero.data).decode()
     staff = await repo.staff_by_wa(s.associate_wa_id)
-
-    def card_in(lang: str) -> Card:
-        title = ctx.t("parivaar_title_presale" if presale else "parivaar_title", lang, name=short_name(name) if name else "")
-        cost_text = offer_text = finance_text = delivery_text = None
-        if s.cost_snapshot:
-            cs = s.cost_snapshot
-            ctx.reg.raw(cs["zaroori_total_str"] + " " + cs["with_suggestions_total_str"], f"snapshot:hisaab:{sku}")
-            cost_text = ctx.t("parivaar_cost", lang, total=cs["zaroori_total_str"])
-            if cs["with_suggestions_total"] != cs["zaroori_total"] and not s.extra.get("suggestions_off"):
-                cost_text += " · " + ctx.t("parivaar_cost_sug", lang, total=cs["with_suggestions_total_str"])
-        if s.offer_snapshot:
-            os_ = s.offer_snapshot
-            if os_.get("applied"):
-                a = os_["applied"][0]
-                from datetime import date
-
-                vt = date.fromisoformat(a["valid_to"])
-                offer_text = ctx.t(
-                    "parivaar_offer",
-                    lang,
-                    offer=ctx.reg.static(_offer_title(ctx, a["id"], lang)),
-                    amount=ctx.reg.raw(a["amount_str"], f"offer:{a['id']}"),
-                    date=ctx.reg.raw(fmt.date_short(vt, lang), f"offer:{a['id']}"),
-                    payable=ctx.reg.raw(os_["payable_str"], "snapshot:payable"),
-                )
-            if os_.get("finance"):
-                from chanakya.skills.close import finance_sentence
-                from chanakya.truth.finance import FinanceQuote
-
-                q = FinanceQuote.model_validate(os_["finance"])
-                for v in (q.monthly_str, q.fee_str, q.total_str, q.extra_str, q.months_str):
-                    ctx.reg.raw(v, f"snapshot:finance:{q.plan_id}")
-                finance_text = finance_sentence(ctx, q, lang)
-        cost_rows = []
-        if s.cost_snapshot:
-            cs = s.cost_snapshot
-            cost_rows.append({"label": ctx.t("row_full_cost", lang), "value": cs["zaroori_total_str"], "strong": True})
-            if cs["with_suggestions_total"] != cs["zaroori_total"] and not s.extra.get("suggestions_off"):
-                cost_rows.append(
-                    {"label": ctx.t("row_with_sug", lang), "value": cs["with_suggestions_total_str"], "strong": False}
-                )
-        if s.offer_snapshot and s.offer_snapshot.get("applied"):
-            os_ = s.offer_snapshot
-            for a in os_["applied"][:2]:
-                ctx.reg.raw(a["amount_str"], f"offer:{a['id']}")
-                cost_rows.append({"label": ctx.t("row_offer", lang), "value": "−" + a["amount_str"], "strong": False})
-            final = os_.get("total_today_str") or os_["payable_str"]
-            ctx.reg.raw(final, "snapshot:total_today")
-            cost_rows.append({"label": ctx.t("row_payable", lang), "value": final, "strong": True})
-        if s.extra.get("delivery_choice"):
-            from datetime import date
-
-            d = date.fromisoformat(s.extra["delivery_choice"])
-            delivery_text = ctx.t(
-                "parivaar_delivery",
-                lang,
-                day=ctx.reg.raw(f"{fmt.day_name(d, lang)} {fmt.date_short(d, lang)}", "choice:delivery"),
-            )
-        return Card(
-            template="parivaar",
-            lang=lang,
-            data={  # type: ignore[arg-type]
-                "title": title,
-                "image": image,
-                "product_title": C.product_title(ctx, p, lang),
-                "reasons": _reasons(ctx, sku, lang),
-                "cost_text": cost_text,
-                "cost_rows": cost_rows,
-                "key_specs": PV.key_specs(ctx, p, lang, 4),
-                "offer_text": offer_text,
-                "finance_text": finance_text,
-                "delivery_text": delivery_text,
-                "associate_name": staff.name if staff else "",
-                "store_name": ctx.facts.store_name(staff.store_id if staff else None),
-            },
-        )
-
-    card = card_in("en")  # what the family sees: English (the user's rule for every customer-facing visual)
+    card = await family_card(ctx, p, presale, image, bool(hero and s.extra.get("tryon_hero_sku") == sku), staff, name)
     s8 = s.id[:8]
     aname = staff.name if staff else "Chanakya"
     from chanakya.channel.limits import truncate_title

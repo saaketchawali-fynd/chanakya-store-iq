@@ -130,6 +130,11 @@ async def events_for(
     return rows
 
 
+async def event_get(event_id: int) -> EventRow | None:
+    async with db.session() as s:
+        return await s.get(EventRow, event_id)
+
+
 # ---------- tasks ----------
 async def task_create(
     owner: str, kind: str, title: dict, due_at: datetime, session_id: str | None = None, payload: dict | None = None

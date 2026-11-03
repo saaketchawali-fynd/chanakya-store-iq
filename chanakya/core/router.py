@@ -188,18 +188,8 @@ async def dispatch(ctx: SkillContext) -> Reply:
             return await manager.digest(ctx)
         if name in ("visit", "export"):
             return await (visitlog.start(ctx) if name == "visit" else visitlog.export(ctx))
-        if name == "help" or (msg.type == "text" and not name):
-            return ctx.reply(
-                info_reply(
-                    ctx,
-                    ctx.t("manager_help"),
-                    [
-                        ctx.b("b_digest", encode("m", "digest")),
-                        ctx.b("b_team", encode("m", "team")),
-                        ctx.b("b_approvals", encode("m", "approvals")),
-                    ],
-                )
-            )
+        if msg.type == "audio" or (msg.type == "text" and name in (None, "help")):
+            return await manager.by_voice(ctx)
     if ctx.role == "expert" and msg.type in ("text", "audio") and name is None:
         return await expert.expert_message(ctx)
     if ctx.role == "visitor":
@@ -216,9 +206,7 @@ async def dispatch(ctx: SkillContext) -> Reply:
 
 def _role_help(ctx: SkillContext) -> Reply:
     if ctx.role == "manager":
-        btns = [ctx.b("b_digest", encode("m", "digest")), ctx.b("b_team", encode("m", "team")),
-                ctx.b("b_approvals", encode("m", "approvals"))]
-        return ctx.reply(info_reply(ctx, ctx.t("manager_help"), btns))
+        return manager.menu(ctx)
     if ctx.role == "visitor":
         return ctx.reply(info_reply(ctx, ctx.t("visit_start")))
     return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
@@ -240,17 +228,7 @@ async def set_staff_language(ctx: SkillContext, lang: str) -> Reply:
     st.lang_set = True
     role = ctx.role
     if role == "manager":
-        return ctx.reply(
-            info_reply(
-                ctx,
-                ctx.t("manager_help"),
-                [
-                    ctx.b("b_digest", encode("m", "digest")),
-                    ctx.b("b_team", encode("m", "team")),
-                    ctx.b("b_approvals", encode("m", "approvals")),
-                ],
-            )
-        )
+        return manager.menu(ctx)
     if role == "expert":
         return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
     if role == "visitor":
@@ -342,7 +320,13 @@ async def manager_button(ctx: SkillContext, bid: ButtonId) -> Reply:
     if a == "nudge":
         return await manager.nudge(ctx, bid.get(1), bid.get(2))
     if a == "who":
-        return await manager.team(ctx)
+        return await manager.voice_log(ctx, bid.get(1))
+    if a == "vlog":
+        return await manager.voice_log(ctx)
+    if a == "vnote" and (bid.get(1) or "").isdigit():
+        return await manager.voice_detail(ctx, int(bid.get(1)))
+    if a == "floor":
+        return await manager.floor(ctx)
     return await manager.floor(ctx)
 
 
@@ -722,6 +706,10 @@ async def on_speech(ctx: SkillContext) -> Reply:
         ]
         return ctx.reply(info_reply(ctx, ctx.t("voice_retry" if ctx.ai.live else "voice_unavailable"), btns))
     tr = u.transcript or text or ""
+    if msg.type == "audio" or (text or "").startswith("FIX:"):  # the manager's voice log
+        ctx.ev("voice_note", code=s.code if s else None, lang=u.language, transcript=" ".join(tr.split())[:300],
+               understood=[f"{x.slot}={x.value}" for x in u.slots][:8] + [f"{x.name}={x.value}" for x in u.numbers][:4],
+               intents=[i for i in u.intents if i != "other"][:4])
     # guards on the transcript (fixtures / future voice model)
     if validate.looks_bait(ctx, tr):
         return await validate.no_looks(ctx)
@@ -778,12 +766,49 @@ async def on_speech(ctx: SkillContext) -> Reply:
         return await complete.show_cost(ctx)
     if "request_offers" in intents:
         return await close.offers(ctx)
+    r = await voice_step(ctx, u, intents)  # the later steps by voice, with the same guards as their buttons
+    if r is not None:
+        return r
     r = await assess.on_info(ctx, u, applied=True, gate_before=gate_before, n_new=n_new)
     if msg.type == "audio" and not n_new and tr.strip() and r.messages:  # nothing new: show what was heard
         snip = " ".join(tr.split())
         snip = snip if len(snip) <= 38 else snip[:37].rstrip() + "…"
         r.messages[0].footer = ctx.t("footer_heard", text=ctx.reg.raw(snip, "voice:transcript"))
     return r
+
+
+async def voice_step(ctx: SkillContext, u, intents: set) -> Reply | None:
+    """Voice first at every step: what the associate says maps to the button that step would offer."""
+    s = ctx.session
+    when = u.remind_when
+    if "sold" in intents:
+        return await follow.sold(ctx)
+    if "lost" in intents:
+        return await review.outcome(ctx, "lost")
+    if "set_reminder" in intents:
+        return await (follow.create_task(ctx, when) if when else follow.task_menu(ctx))
+    if "not_today" in intents:
+        if when:
+            return await follow.create_task(ctx, when)
+        return await close.not_today(ctx) if s.shortlist else await review.outcome(ctx, "followup")
+    if "send_family_card" in intents:
+        return await follow.parivaar(ctx, presale=s.extra.get("outcome") != "sold")
+    if "request_tryon" in intents and ctx.pack and ctx.pack.placeable:
+        return await tryon_flow.tryon_request(ctx)
+    if "demo_next" in intents:
+        return await (recommend.demo(ctx) if s.shortlist else recommend.show_options(ctx))
+    if "request_emi" in intents:
+        ctx.x["pay"] = "emi"
+        return await close.offers(ctx)
+    if "request_delivery" in intents:
+        if s.chosen_sku and ctx.x.get("pay"):
+            return await close.delivery(ctx)
+        return await close.offers(ctx) if s.chosen_sku else await recommend.shown(ctx) if s.shortlist else None
+    if "next_step" in intents:
+        from chanakya.skills import common as C
+
+        return ctx.reply(C.next_question_or_options(ctx)) if not s.shortlist else await assess.status(ctx)
+    return None
 
 
 async def on_image(ctx: SkillContext) -> Reply:
