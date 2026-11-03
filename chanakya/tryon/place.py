@@ -51,6 +51,8 @@ class Placed:
     back: float = 0.0  # back face, cm in front of the wall
     door: str | None = None  # fridge door type (drawing only)
     photo: bytes | None = field(default=None, repr=False)  # the product's catalogue photo (drawn from it if usable)
+    anchor: str = ""  # why it is placed there: wall_centre | sofa | unit | old_tv (shown on /health)
+    photo_status: str = ""  # used | none | rejected (the drawn product): shown on /health
 
 
 @dataclass
@@ -140,11 +142,33 @@ def _facing_sofa(sofas: list[_Obj], lo: float, hi: float) -> _Obj | None:
     return max(ok, key=lambda s: s.u1 - s.u0) if ok else None
 
 
+CENTRAL = 0.35  # an object anchors the TV only if its centre is within this share of the wall's middle (each side)
+
+
+def _central(o: _Obj | None, lo: float, hi: float) -> bool:
+    if o is None:
+        return False
+    mid, span = (lo + hi) / 2, max(1.0, hi - lo)
+    return abs(o.uc - mid) <= CENTRAL * span
+
+
+def _plausible_tv(o: _Obj | None) -> bool:
+    """A detected 'TV already there' is used only if it is TV-sized (a frame or a window is often mistaken)."""
+    return o is not None and 50 <= (o.u1 - o.u0) <= 220 and 30 <= (o.z1 - o.z0) <= 130
+
+
 def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float, mount: str):
+    """Where the TV goes (user, 2–4 Nov 2026: centred and believable): on/above the TV already there or a real TV
+    unit, but only when that is TV-sized and near the middle of the wall; over a wide, central sofa; else the middle
+    of the visible wall. Returns (u, z, anchor)."""
     ceiling = wall.ceiling_z or WALL_HEIGHT_CM
+    lo0, hi0 = _u_range(wall, TV_CENTRE_ABOVE_FLOOR_CM)
     old = (objs.get("existing_tv") or [None])[0]
+    old = old if _plausible_tv(old) and _central(old, lo0, hi0) else None
     unit = _real_unit(objs.get("tv_unit") or [], w)
+    unit = unit if (_central(unit, lo0, hi0) or mount == "stand") else None  # a stand must stand on its unit
     anchored = True
+    anchor = "old_tv" if old is not None else "unit" if unit is not None else "wall_centre"
     if old is not None:
         ob = room.first("existing_tv")
         uc, zc = (float(v) for v in wall.to_wall([((ob[0] + ob[2]) / 2, (ob[1] + ob[3]) / 2)])[0])
@@ -162,6 +186,7 @@ def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float,
         lo, hi = _u_range(wall, zc)
         sofa = _facing_sofa(objs.get("sofa") or [], lo, hi)
         uc = sofa.uc if sofa is not None else (lo + hi) / 2  # else the middle of the visible wall
+        anchor = "sofa" if sofa is not None else "wall_centre"
         if sofa is not None and uc - w / 2 < sofa.u1 and uc + w / 2 > sofa.u0 and zc - h / 2 < sofa.z1 + 10:
             zc = sofa.z1 + TV_ABOVE_SOFA_CM + h / 2
     zc = min(zc, ceiling - CEILING_MARGIN_CM - h / 2) if h < ceiling - 2 * CEILING_MARGIN_CM else zc
@@ -172,7 +197,7 @@ def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float,
     uc = _clamp(uc, w, 0.0, wall.width_cm)
     if not anchored:
         uc = _clamp(uc, w, lo, hi)
-    return uc, _fit_frame_z(wall, uc, zc, h, ceiling)
+    return uc, _fit_frame_z(wall, uc, zc, h, ceiling), anchor
 
 
 def _fit_frame_z(wall: Wall, uc: float, zc: float, h: float, ceiling: float) -> float:
@@ -224,12 +249,13 @@ def plan(
     primary, (w, h) = next(((p, d) for p, d in sized if p.solid), sized[0])
     mount = getattr(primary, "mount", "wall") or "wall"
     objs = _objects(wall, room)
+    anchor = "wall_centre"
     if category == "ac":
         uc, zc = _ac(wall, objs, w, h)
     elif category in ("wm", "fridge"):
         uc, zc = _wm(wall, objs, w, h)  # floor-standing: same rules as the machine
     else:
-        uc, zc = _tv(wall, room, objs, w, h, mount)
+        uc, zc, anchor = _tv(wall, room, objs, w, h, mount)
     back, front = DEPTH_CM.get("tv_stand" if category == "tv" and mount == "stand" else category, DEPTH_CM["tv"])
     pose = wall.pose()
     if pose is None or front > 0.6 * pose.centre[2]:
@@ -268,6 +294,7 @@ def plan(
                 back=back,
                 door=getattr(p, "door", None),
                 photo=getattr(p, "photo", None) if p is primary else None,
+                anchor=anchor,
             )
         )
     return out

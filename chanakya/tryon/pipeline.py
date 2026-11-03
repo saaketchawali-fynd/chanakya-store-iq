@@ -67,6 +67,7 @@ class TryonResult:
     perspective: bool = False  # True when the wall corners gave a homography
     quads: list[tuple[str, tuple[tuple[float, float], ...]]] = field(default_factory=list)  # (sku, TL TR BR BL)
     label_boxes: list[tuple[str, tuple[int, int, int, int]]] = field(default_factory=list)
+    placement: dict = field(default_factory=dict)  # sku → {anchor, x (share of the photo width), photo}
     hero: bytes | None = field(default=None, repr=False)  # clean (no labels) crop around the main product
     hero_sku: str | None = None
 
@@ -122,6 +123,8 @@ def _prepare(req: TryonRequest, res: TryonResult) -> _Prepared | None:
     primary = next((p for p in placed if p.solid), placed[0])
     res.px_per_cm = round(sc.wall.scale_at(primary.rect[0], primary.rect[1])[0], 4)
     res.planned = [(p.sku, p.box) for p in placed]
+    res.placement = {p.sku: {"anchor": p.anchor, "x": round((p.box[0] + p.box[2]) / 2 / max(1, clean.width), 2),
+                             "photo": p.photo_status} for p in placed if p.solid}
     res.quads = [(p.sku, p.quad) for p in placed]
     return _Prepared(category, placed, composite, sc, room, clean)
 

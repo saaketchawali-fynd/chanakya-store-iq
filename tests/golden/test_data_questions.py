@@ -98,3 +98,28 @@ async def test_no_price_watch_after_a_sale(h):
     h.rt.facts.snap.stock[(sku, h.rt.settings.store_id)].price -= 5000
     assert await price_watch.run(h.rt.svc, clock.now()) == 0
     assert await repo.events_for(s.id)
+
+
+async def test_the_card_shows_everything_the_customer_told(tmp_path, monkeypatch):
+    """3 Nov 2026 on the phone: the Home Card showed the old questions' answers only, not the new ones (picture
+    type, smart system, a brand asked in a note). Now it shows all of it, 'any is fine' included."""
+    from chanakya.skills.base import SkillContext  # noqa: F401  (the card is built through the flow below)
+
+    h = await live(tmp_path)
+    try:
+        monkeypatch.setattr(JioClient, "transport", backend())
+        await jio_sync.sync(h.rt.settings, h.rt.facts)
+        await h.tap("g:new")
+        await h.tap("s:C1:lang:en")
+        await h.pick("s:C1:cat:tv")
+        s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+        s.extra.update(wants={"panel": "QLED", "brand": "Sony", "size_in": 55}, dq_done=["panel", "os"])
+        await h.rt.svc.sessions.save(s)
+        out = await h.say("status")
+        card = next(m.card for m in out if m.card and m.card.template == "home")
+        rows = {r["label"]: r["value"] for r in card.data["rows"]}
+        assert rows.get("Picture type") == "QLED" and rows.get("Brand") == "Sony" and rows.get("Screen size") == '55"'
+        assert rows.get("Smart system") == "Any is fine"  # 'any' is an answer too
+        assert "Sunlight" not in " ".join(card.data["missing"])  # never 'still to ask' for a question we skip
+    finally:
+        await h.close()

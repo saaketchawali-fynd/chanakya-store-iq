@@ -341,3 +341,20 @@ fc_mrp_saving: {hi: "MRP {mrp} · aaj {pct}% kam", mr: "MRP {mrp} · आज {pct
 pw_drop: {hi: "Price watch · {code} {name}: {model} ab {now} (pehle {was}, {diff} kam). Call karke bataiye?", mr: "Price watch · {code} {name}: {model} आता {now} (आधी {was}, {diff} कमी). कॉल करून सांगा?", en: "Price watch · {code} {name}: {model} is now {now} (was {was}, {diff} less). Call them?"}
 pw_offer: {hi: "Price watch · {code} {name}: {model} par naya offer: {offer} ({till} tak). Call karke bataiye?", mr: "Price watch · {code} {name}: {model} वर नवी ऑफर: {offer} ({till} पर्यंत). कॉल करून सांगा?", en: "Price watch · {code} {name}: a new offer on {model}: {offer} (till {till}). Call them?"}
 dq_from: {hi: "{price} se", mr: "{price} पासून", en: "from {price}"}
+# ---- what the customer asked for (data questions, note asks): on the Home Card and in the read-back
+want_label_panel: {hi: "Picture type", mr: "पिक्चर प्रकार", en: "Picture type"}
+want_label_os: {hi: "Smart system", mr: "स्मार्ट सिस्टम", en: "Smart system"}
+want_label_resolution: {hi: "Picture quality", mr: "पिक्चर क्वालिटी", en: "Picture sharpness"}
+want_label_brand: {hi: "Brand", mr: "ब्रँड", en: "Brand"}
+want_label_inverter: {hi: "Inverter", mr: "Inverter", en: "Inverter"}
+want_label_star: {hi: "Star rating", mr: "Star rating", en: "Star rating"}
+want_label_load: {hi: "Load", mr: "Load", en: "Load"}
+want_label_automatic: {hi: "Wash type", mr: "Wash type", en: "Wash type"}
+want_label_door: {hi: "Door type", mr: "दरवाजा", en: "Door type"}
+want_label_frost_free: {hi: "Cooling", mr: "Cooling", en: "Cooling"}
+want_label_laptop_type: {hi: "Laptop type", mr: "लॅपटॉप प्रकार", en: "Laptop type"}
+want_label_size_in: {hi: "Screen size", mr: "Screen size", en: "Screen size"}
+want_label_ton: {hi: "Ton", mr: "Ton", en: "Tonnage"}
+want_label_capacity_kg: {hi: "Capacity", mr: "Capacity", en: "Capacity"}
+want_label_capacity_l: {hi: "Capacity", mr: "Capacity", en: "Capacity"}
+want_label_ram_gb: {hi: "RAM", mr: "RAM", en: "RAM"}

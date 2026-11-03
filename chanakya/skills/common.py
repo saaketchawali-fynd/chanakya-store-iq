@@ -293,6 +293,32 @@ def comfort_range(ctx: SkillContext, footer: str | None = None) -> OutMessage:
 READBACK_MAX = 3  # said aloud: the three facts that decide the product (the Home Card shows them all)
 
 
+def asked_for(ctx: SkillContext, lang: str | None = None) -> list[tuple[str, str]]:
+    """What the customer asked for beyond the fixed questions: the data questions' answers (including 'any is
+    fine') and explicit asks from a note ('55 inch Sony'), as (label, value) in the order they were said."""
+    from chanakya.brain import data_questions as DQ
+    from chanakya.truth import fmt
+
+    s = ctx.session
+    lang = lang or ctx.lang
+    wants = s.extra.get("wants") or {}
+    out = []
+    for key, v in wants.items():
+        if key == "size_in":
+            val = f'{fmt.num(v)}"'
+        elif isinstance(v, (int, float)) and not isinstance(v, bool) and key in ("ton", "capacity_kg", "capacity_l", "ram_gb"):
+            val = fmt.num(v) + {"ton": " ton", "capacity_kg": " kg", "capacity_l": " L", "ram_gb": " GB RAM"}[key]
+        else:
+            val = DQ.label(key, v)
+        out.append((ctx.t(f"want_label_{key}", lang), ctx.reg.raw(val, f"note:want:{key}")))
+    for key in s.extra.get("dq_done") or []:
+        if key not in wants:  # answered 'any is fine': that is an answer too
+            out.append((ctx.t(f"want_label_{key}", lang), ctx.t("b_dq_any", lang)))
+    for label, _ in out:
+        ctx.reg.static(label)
+    return out
+
+
 def readback_facts(ctx: SkillContext, lang: str) -> str:
     pack = ctx.pack
     home = ctx.session.home
@@ -313,6 +339,10 @@ def readback_facts(ctx: SkillContext, lang: str) -> str:
             parts.append(ctx.reg.static(value_title(sd, vals[0], lang)))
         if len(parts) >= READBACK_MAX:
             break
+    for _, val in asked_for(ctx, lang):  # and what they asked for about the product itself
+        if len(parts) >= READBACK_MAX + 1:
+            break
+        parts.append(val)
     return ", ".join(parts)
 
 
@@ -432,6 +462,8 @@ def home_card(ctx: SkillContext) -> Card:
         who = (ctx.packs.common.get("who_titles") or {}).get(home.sports_viewer)
         if who:
             rows.append({"_id": "who", "label": ctx.t("home_row_sports"), "value": ctx.pick(who)})
+    for label, val in asked_for(ctx):  # the data questions and the note's asks: everything they told us
+        rows.append({"_id": label, "label": label, "value": val})
     for r in rows:
         r.pop("_id", None)
     band = next((b for b in ctx.x.get("range_bands") or [] if b["id"] == ctx.x.get("range_id")), None)
@@ -442,8 +474,10 @@ def home_card(ctx: SkillContext) -> Card:
         start = f"{ctx.reg.inr(home.start_level_inr, 'card:start_level')} ({src})"
     else:
         start = ctx.t("start_level_not_told")
-    missing = [ctx.pick(pack.slot(s).title) for s in pack.missing_required(home) if pack.slot(s)]
+    skip = skipped(ctx)  # questions today's catalogue cannot act on are not 'still to ask'
+    missing = [ctx.pick(pack.slot(s).title) for s in pack.missing_required(home) if pack.slot(s) and s not in skip]
     name = home.customer_name or ctx.reg.raw(ctx.session.code, "session:code")
+    known, total = state.required_progress(ctx.session, pack)
     return Card(
         template="home",
         lang=ctx.lang,
@@ -452,11 +486,11 @@ def home_card(ctx: SkillContext) -> Card:
             "category_label": ctx.pick(pack.label),
             "rows": rows,
             "start_level_text": start,
-            "known": pack.known_required(home),
-            "total": len(pack.required_slots),
+            "known": known,
+            "total": total,
             "missing": missing,
-            "known_str": ctx.reg.num(pack.known_required(home), "card:known"),
-            "total_str": ctx.reg.num(len(pack.required_slots), "pack:required"),
+            "known_str": ctx.reg.num(known, "card:known"),
+            "total_str": ctx.reg.num(total, "pack:required"),
         },
     )
 
@@ -465,15 +499,15 @@ def home_card_message(ctx: SkillContext, force: bool = False) -> OutMessage | No
     """Home Card image when ≥ 3 required slots are known and the card changed since the last image."""
     pack = ctx.pack
     s = ctx.session
-    known = pack.known_required(s.home)
-    if not force and (known < 3 or ctx.x.get("last_card_known") == known):
+    known, total = state.required_progress(s, pack)  # data-question answers count, skipped questions do not
+    if not force and (known < min(3, total) or ctx.x.get("last_card_known") == known):
         return None
     first = not ctx.x.get("home_card_sent")
     ctx.x["last_card_known"] = known
     ctx.x["home_card_sent"] = True
-    ctx.ev("home_card_sent", known=known, total=len(pack.required_slots))
+    ctx.ev("home_card_sent", known=known, total=total)
     k = ctx.reg.num(known, "card:known")
-    tt = ctx.reg.num(len(pack.required_slots), "pack:required")
+    tt = ctx.reg.num(total, "pack:required")
     if first and not s.tryon_done:
         body = ctx.t("room_photo_ask")
         btns = [ctx.b("b_photo", ctx.sid("photo"))]

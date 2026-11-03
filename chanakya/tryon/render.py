@@ -796,13 +796,16 @@ def compose(
         margin = max(0.16 * w, 8.0)  # the widest sprite margin (TV): canvas ≈ (w + 2m) × (h + 2m) cm at k px/cm
         k = min(k, (MAX_SPRITE_PX / ((w + 2 * margin) * (h + 2 * margin + STAND_GAP_CM + 2))) ** 0.5)
         sp = None
+        p.photo_status = "none"
         if getattr(p, "photo", None):  # the real product, from its catalogue photo, when it cuts out cleanly
             from chanakya.tryon.photo import cutout
 
             stand = category == "tv" and p.mount == "stand"
             cut = cutout(p.photo, category, w / h, keep_stand=stand)
+            p.photo_status = "rejected"
             if cut is not None:
                 sp = photo_sprite(cut, category, w, h, k, light, stand)
+                p.photo_status = "used"
         if sp is None and category == "ac":
             sp = ac_sprite(w, h, k, light)
         elif sp is None and category == "wm":

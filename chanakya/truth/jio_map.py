@@ -276,6 +276,7 @@ def map_product(p: dict, category: str) -> dict | None:
         "features": [{"hi": f, "mr": f, "en": f} for f in feats[:8]], "spec_source": src,
         "categories": [c.get("name") for c in p.get("categories") or []], "sellable": bool(p.get("sellable")),
         "teaser_tag": p.get("teaser_tag") if isinstance(p.get("teaser_tag"), str) else None,
+        "images": medias[:6],  # every photo of this product: the try-on uses the first that cuts out cleanly
     }
     return {
         "sku": sku, "category": category, "brand": brand, "model": short_name(brand, specs, mn, name),

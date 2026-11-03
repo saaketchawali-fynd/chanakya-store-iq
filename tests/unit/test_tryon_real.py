@@ -110,3 +110,20 @@ def test_placeholder_picture_is_not_the_product():
     it = dict(item("Panasonic 584 litres"))
     assert "/l2_category/" in it["medias"][0]["url"]
     assert map_product(it, "fridge")["image"] is None  # the generic icon sheet is never shown as the product
+
+
+async def test_a_unit_at_the_far_edge_does_not_pull_the_tv():
+    """4 Nov 2026 on the phone: the TV again sat off centre. A TV unit (or an 'existing TV') anchors the TV only
+    when it is near the middle of the wall; at the edge of the photo, the TV goes at the wall's centre."""
+    x = await centre_x(unit=(W - 110, 160, 50))  # a wide unit pushed to the right edge
+    assert abs(x - W / 2) < 0.05 * W
+
+
+async def test_a_picture_frame_mistaken_for_a_tv_is_ignored():
+    photo, boxes, floor_y, ceil_y = _room(PPC)
+    boxes["existing_tv"] = (90, 200, 150, 240)  # tiny and at the edge: a frame, not a TV
+    res = await run(TryonRequest(photo=photo, read=_read(boxes, floor_y=floor_y, ceiling_y=ceil_y),
+                                 products=[tv(55)], wall_width_ft=W / PPC / 30.48))
+    box = res.planned[0][1]
+    assert abs((box[0] + box[2]) / 2 - W / 2) < 0.05 * W
+    assert res.placement[next(iter(res.placement))]["anchor"] == "wall_centre"

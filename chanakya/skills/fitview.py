@@ -64,6 +64,12 @@ def points(ctx: SkillContext, p, lang: str, n: int = 3) -> list[dict]:
         out.append({"text": ctx.reg.static(text), "proof": _proof(ctx, p, b, lang)})
         if len(out) >= n:
             break
+    from chanakya.skills.common import asked_for
+
+    for _, val in asked_for(ctx, lang):  # what they asked for about the product itself (picture type, brand …)
+        if len(out) >= n + 2:
+            break
+        out.append(val)
     return out
 
 

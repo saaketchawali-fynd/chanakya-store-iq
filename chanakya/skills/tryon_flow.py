@@ -204,13 +204,50 @@ def _label(ctx: SkillContext, p) -> str:
     return p.model
 
 
-async def _photo(p) -> bytes | None:
-    try:
-        from chanakya.render.renderer import image_bytes
+def _dims_mm(p) -> tuple[float | None, float | None]:
+    """The size drawn: the backend's width × height, except for a TV whose numbers are not panel-shaped (they often
+    include the stand or the box): then the true 16:9 panel from the screen diagonal."""
+    w, h = p.spec("width_mm"), p.spec("height_mm")
+    if p.category == "tv" and p.spec("size_in"):
+        from chanakya.tryon.scale import tv_height_cm, tv_width_cm
 
-        return await asyncio.wait_for(image_bytes(p.image), timeout=6)
-    except Exception:
+        if not (w and h and 1.6 <= float(w) / float(h) <= 1.95):
+            d = float(p.spec("size_in"))
+            return tv_width_cm(d) * 10, tv_height_cm(d) * 10
+    return w, h
+
+
+def product_aspect(p) -> float | None:
+    w, h = _dims_mm(p)
+    try:
+        return float(w) / float(h) if w and h else None
+    except (TypeError, ValueError, ZeroDivisionError):
         return None
+
+
+async def _photo(p) -> tuple[bytes | None, str]:
+    """The product's own photo for the try-on: the first of its backend photos that cuts out cleanly (front view
+    on a plain background). The first photo is often a lifestyle or angled shot, so up to four are tried.
+    Returns (photo, status): used_photo_N | rejected_all | fetch_failed | no_image."""
+    from chanakya.render.renderer import image_bytes
+    from chanakya.tryon.photo import cutout
+
+    urls = [u for u in dict.fromkeys([p.image, *((p.info or {}).get("images") or [])]) if u][:4]
+    if not urls:
+        return None, "no_image"
+    asp = product_aspect(p)
+    got = 0
+    for i, u in enumerate(urls, 1):
+        try:
+            data = await asyncio.wait_for(image_bytes(u), timeout=6)
+        except Exception:
+            data = None
+        if not data:
+            continue
+        got += 1
+        if asp is None or await asyncio.to_thread(cutout, data, p.category, asp) is not None:
+            return data, f"used_photo_{i}"
+    return None, "rejected_all" if got else "fetch_failed"
 
 
 async def _room(ctx: SkillContext):
@@ -275,6 +312,8 @@ async def job(ctx: SkillContext) -> Reply:
     mount = "stand" if P.value(s.home, "mounting") == "stand" else "wall"
     dist = P.number(s.home, "seat_distance", ctx.pack)
     msgs, drawn = [], []
+    fetched: dict[str, str] = {}
+    placement: dict[str, dict] = {}
     for pl in plans:
         tps = []
         for p, solid in pl:
@@ -286,9 +325,10 @@ async def job(ctx: SkillContext) -> Reply:
             if p.category == "fridge":
                 extra["door"] = p.spec("door")
             if solid:  # the real product is drawn from its catalogue photo when that cuts out cleanly
-                extra["photo"] = await _photo(p)
-            tps.append(TryonProduct(sku=p.sku, category=p.category, width_mm=p.spec("width_mm"),
-                                    height_mm=p.spec("height_mm"), label=_label(ctx, p), solid=solid, **extra))
+                extra["photo"], fetched[p.sku] = await _photo(p)
+            wmm, hmm = _dims_mm(p)
+            tps.append(TryonProduct(sku=p.sku, category=p.category, width_mm=wmm, height_mm=hmm,
+                                    label=_label(ctx, p), solid=solid, **extra))
         only_tv = all(p.category == "tv" for p, _ in pl)
         def dist_text(lang: str, only_tv: bool = only_tv) -> str | None:
             return (ctx.t("tryon_distance", lang, ft=ctx.reg.num(dist, "card:seat_distance"))
@@ -313,6 +353,8 @@ async def job(ctx: SkillContext) -> Reply:
         if not res.image:
             diag.mark("tryon_last", {"mode": req_spec.get("mode"), "error": (res.error or "no image")[:160]})
             continue
+        for sku, info in res.placement.items():  # why it went there, and was the real photo used (on /health)
+            placement[sku] = {**info, "fetch": fetched.get(sku)}
         await repo.media_put(s.id, "tryon", res.image, "image/jpeg", ctx.now)
         if res.hero and res.hero_sku:  # the clean picture for the Family Card
             await repo.media_put(s.id, "tryon_hero", res.hero, "image/jpeg", ctx.now, days=2)
@@ -323,7 +365,7 @@ async def job(ctx: SkillContext) -> Reply:
     from chanakya.app import memory
 
     diag.mark("tryon_last", {"mode": req_spec.get("mode"), "images": len(msgs), "read_ms": t_read, "total_ms": ms,
-                             "mem_mb": memory.used_mb()})
+                             "mem_mb": memory.used_mb(), "placement": placement})
     if not msgs:
         btns = [ctx.b("b_other_wall", ctx.sid("photo_yes")), ctx.b("b_go", ctx.sid("go"))]
         return ctx.reply(info_reply(ctx, ctx.t("tryon_failed"), btns))
