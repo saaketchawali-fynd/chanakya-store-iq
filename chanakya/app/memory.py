@@ -33,13 +33,34 @@ def cgroup() -> tuple[int | None, int | None, int | None]:
     return used, limit, _int("sys/fs/cgroup/memory/memory.max_usage_in_bytes")
 
 
+def file_cache() -> int:
+    """Reclaimable page cache (inactive file pages) inside the cgroup: fonts, the Chromium binary, images read.
+    Linux frees it before ever killing the service, so it is not memory pressure."""
+    for rel, key in (("sys/fs/cgroup/memory.stat", "inactive_file"), ("sys/fs/cgroup/memory/memory.stat", "total_inactive_file")):
+        try:
+            for line in (ROOT / rel).read_text().splitlines():
+                k, _, v = line.partition(" ")
+                if k == key:
+                    return int(v)
+        except (OSError, ValueError):
+            continue
+    return 0
+
+
+def working_set() -> int | None:
+    """What the service really holds: usage minus reclaimable cache (as docker stats and Kubernetes measure)."""
+    used = cgroup()[0]
+    return None if used is None else max(0, used - file_cache())
+
+
 def limit_bytes() -> int:
     limit = cgroup()[1]
     return limit or int(os.environ.get("MEMORY_LIMIT_MB") or DEFAULT_LIMIT_MB) * 1024 * 1024
 
 
 def used_fraction() -> float | None:
-    used = cgroup()[0]
+    """Memory pressure for decisions (start Chromium fresh): the working set, not the cache-inflated total."""
+    used = working_set()
     return used / limit_bytes() if used is not None else None
 
 
@@ -94,12 +115,13 @@ def _mb(b: int | None) -> int | None:
 
 
 def used_mb() -> int | None:
-    return _mb(cgroup()[0])
+    return _mb(working_set())
 
 
 def snapshot() -> dict:
     used, limit, peak = cgroup()
-    return {"used_mb": _mb(used), "limit_mb": _mb(limit or limit_bytes()), "peak_mb": _mb(peak), "by_process": by_process()}
+    return {"used_mb": _mb(working_set()), "with_cache_mb": _mb(used), "cache_mb": _mb(file_cache()) if used else None,
+            "limit_mb": _mb(limit or limit_bytes()), "peak_mb": _mb(peak), "by_process": by_process()}
 
 
 def trim() -> None:

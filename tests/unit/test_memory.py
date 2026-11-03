@@ -36,6 +36,12 @@ def test_cgroup_readings_v2_and_v1(tmp_path, monkeypatch):
     assert memory.used_fraction() == 0.5
     snap = memory.snapshot()
     assert (snap["used_mb"], snap["limit_mb"], snap["peak_mb"]) == (268, 537, 403)
+    # 3 Nov 2026 on Render: 497 MB 'used' at idle was mostly file cache (fonts, the Chromium binary). Decisions use
+    # the working set (usage minus inactive file cache), as docker stats and Kubernetes do.
+    _write(tmp_path, "sys/fs/cgroup/memory.stat", "anon 100000000\nfile 150000000\ninactive_file 134217728\n")
+    assert memory.working_set() == 268435456 - 134217728 and memory.used_fraction() == 0.25
+    snap = memory.snapshot()
+    assert snap["used_mb"] == 134 and snap["with_cache_mb"] == 268 and snap["cache_mb"] == 134
     _write(tmp_path, "sys/fs/cgroup/memory.max", "max\n")  # no limit set: fall back to the plan's 512 MB
     assert memory.limit_bytes() == 512 * 1024 * 1024
     v1 = tmp_path / "v1"
