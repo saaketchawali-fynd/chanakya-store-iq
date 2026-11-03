@@ -96,7 +96,7 @@ class Harness:
         )
         await self.rt.orch.handle_inbound(msg)
         await self.rt.orch.drain()
-        return [s.msg for s in self.ch.sent[n0:]]
+        return [s.msg for s in self.ch.sent[n0:] if s.msg.kind != "reaction"]  # the 👂 receipt is checked apart
 
     async def say(self, text: str) -> list[OutMessage]:
         return await self._send(type="text", text=text)

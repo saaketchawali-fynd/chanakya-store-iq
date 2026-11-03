@@ -71,13 +71,12 @@ class AIClient:
 
             part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime)) if audio is not None else (text or "")
             try:
-                u = await self.gemini.json(
-                    [part, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)],
-                    Understanding,
-                    prompts.UNDERSTAND_SYSTEM,
-                    timeout=14.0 if audio is not None else 8.0,
-                    kind="understand_audio" if audio is not None else "understand_text",
-                )
+                parts = [part, "CONTEXT:\n" + json.dumps(ctx, ensure_ascii=False)]
+                if audio is not None:  # hedged across models: a busy one never loses the note
+                    u = await self.gemini.hedged(parts, Understanding, prompts.UNDERSTAND_SYSTEM, 16.0, "understand_audio")
+                else:
+                    u = await self.gemini.json(parts, Understanding, prompts.UNDERSTAND_SYSTEM, timeout=8.0,
+                                               kind="understand_text")
                 if not u.transcript and text:
                     u.transcript = text
                 from chanakya.app import diag
@@ -89,7 +88,7 @@ class AIClient:
                 return u
             except AIUnavailable:
                 if audio is not None:  # safety net: plain transcript, then the offline rules on it
-                    heard = await self.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=9.0)
+                    heard = await self.gemini.transcribe([part], prompts.TRANSCRIBE_SYSTEM, timeout=10.0)
                     u = self._rules(heard, ctx)
                     u.transcript = heard
                     return u

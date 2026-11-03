@@ -23,7 +23,7 @@ async def test_fridge_end_to_end(h):
     out = await h.tap("g:new")
     out = await h.pick("s:C1:cat:fridge")
     check_floor(out)
-    assert button_ids(out) == ["s:C1:slot:trigger:replace", "s:C1:slot:trigger:new_home", "s:C1:slot:trigger:first"]
+    assert button_ids(out) == ["s:C1:slot:trigger:replace", "s:C1:slot:trigger:new_home", "s:C1:voiceq:trigger"]
     for bid, nxt in (
         ("s:C1:slot:trigger:replace", "s:C1:slot:family_size:f1_2"),
         ("s:C1:slot:family_size:f3_4", "s:C1:slot:shopping:daily"),

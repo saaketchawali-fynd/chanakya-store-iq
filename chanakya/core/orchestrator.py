@@ -67,6 +67,12 @@ class Orchestrator:
                     "last_inbound",
                     {"role": ctx.role, "type": msg.type, "from": f"{w[:2]}{'*' * max(0, len(w) - 4)}{w[-2:]}"},
                 )
+                if msg.type == "audio" and ctx.role != "customer":  # heard: a receipt at once, before the model
+                    try:
+                        await self.svc.channel.send(OutMessage(to=msg.from_wa_id, kind="reaction",
+                                                               reaction_to=msg.wa_message_id, emoji="👂"))
+                    except Exception:
+                        log.warning("reaction_failed")
                 reply = await router.dispatch(ctx)
             except Exception:
                 log.exception("skill_failed", wa_id=msg.from_wa_id, type=msg.type)

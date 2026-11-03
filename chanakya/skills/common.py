@@ -80,7 +80,9 @@ def question_reply(
         tail = question_tail(ctx, slot_id)
         if tail:
             why = f"{why.rstrip('.')} · {tail}"
-    btns = buttons if buttons is not None else quick_buttons(ctx, slot_id)
+    btns = list(buttons) if buttons is not None else quick_buttons(ctx, slot_id)
+    if buttons is None or len(btns) < 3:  # voice first: a voice button on every question (all answers one tap away)
+        btns = btns[:2] + [ctx.b("b_voice_answer", ctx.sid("voiceq", slot_id))]
     ctx.x["questions_asked"] = questions_asked(ctx) + 1
     ctx.x["last_question"] = slot_id
     ctx.ev("question_asked", slot=slot_id)

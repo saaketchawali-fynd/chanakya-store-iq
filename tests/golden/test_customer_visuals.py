@@ -140,7 +140,9 @@ async def test_live_sports_question_and_exclusive_answers(h):
     for bid in ("s:C1:slot:trigger:second", "s:C1:slot:room:living", "s:C1:slot:seat_distance:d8_10",
                 "s:C1:slot:room_light:sunny"):
         out = await h.tap(bid)
-    assert button_ids(out) == ["s:C1:slot:content:sports", "s:C1:slot:content:sports_some", "s:C1:slot:content:few_sports"]
+    assert button_ids(out) == ["s:C1:slot:content:sports", "s:C1:slot:content:sports_some", "s:C1:voiceq:content"]
+    out2 = await h.tap("s:C1:voiceq:content")  # the voice button: speak now, and every answer is still there
+    assert "s:C1:slot:content:few_sports" in button_ids(out2)
     assert "cricket" in out[0].body.lower()
     from chanakya.brain import packs as P
 

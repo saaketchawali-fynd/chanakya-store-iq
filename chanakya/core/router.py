@@ -591,6 +591,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     if action == "lang":
         ctx.session.extra["lang_tapped"] = True
         return await assess.set_customer_lang(ctx, a0 or "hi")
+    if action == "voiceq" and a0:
+        return await assess.voice_answer(ctx, a0)
     if action == "ofd" and a0:
         if a0 == "none":
             return await recommend.offers_view(ctx)

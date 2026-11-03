@@ -60,7 +60,7 @@ async def test_golden_path(tmp_path):
         coach = out[0]
         assert coach.coach and "जुना टीव्ही" in coach.body and coach.body.startswith("*Bolo*:") and "*Kyun*:" in coach.body
         assert coach.footer.startswith("Samjha: 10 ft")
-        assert button_ids(out) == ["s:C1:slot:trigger:replace", "s:C1:slot:trigger:new_home", "s:C1:slot:trigger:second"]
+        assert button_ids(out) == ["s:C1:slot:trigger:replace", "s:C1:slot:trigger:new_home", "s:C1:voiceq:trigger"]
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.slots["seat_distance"][-1].value == "d8_10" and s.home.slots["room"][-1].value == "living"
         assert s.home.start_level_inr == 50000 and s.home.start_level_source == "associate_voice"

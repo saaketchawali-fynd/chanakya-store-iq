@@ -91,7 +91,44 @@ async def test_retired_models_fall_back_to_the_latest_alias():
     ai.gemini.client = SimpleNamespace(aio=SimpleNamespace(models=fm))
     out = await ai.understand(None, b"a", {})
     assert out.transcript == "y"
-    assert [c["model"] for c in fm.calls] == ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-flash-latest"]
+    assert [c["model"] for c in fm.calls] == ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"]  # each failure: the next at once
+
+
+async def test_busy_model_never_loses_a_voice_note():
+    """3 Nov 2026 on production: the main model said 503 (high demand) and the backup hung. Now the next model
+    joins at once on a failure, and after a few seconds when one is just slow; the first good answer wins."""
+    import asyncio
+    import time
+
+    from chanakya.ai import gemini
+
+    u = Understanding(transcript="sofa se das feet", intents=["customer_info"])
+    busy = "503 UNAVAILABLE. This model is currently experiencing high demand."
+
+    class Slow:
+        def __init__(self):
+            self.calls = []
+
+        async def generate_content(self, model, contents, config):
+            self.calls.append(model)
+            if model == "gemini-3.8-flash":
+                raise RuntimeError(busy)
+            if model == "gemini-flash-latest":
+                await asyncio.sleep(30)  # hangs
+            return ok(u)
+
+    ai = AIClient(Settings(_env_file=None, ai_mode="live", gemini_api_key="k"), PACKS)
+    fm = Slow()
+    ai.gemini.client = SimpleNamespace(aio=SimpleNamespace(models=fm))
+    old = gemini.HEDGE_STAGGER
+    gemini.HEDGE_STAGGER = 0.2
+    try:
+        t0 = time.perf_counter()
+        out = await ai.understand(None, b"OggS", {"category": "tv"}, mime="audio/ogg")
+        assert out.transcript == "sofa se das feet" and time.perf_counter() - t0 < 3
+        assert fm.calls[:3] == ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-flash-lite"]
+    finally:
+        gemini.HEDGE_STAGGER = old
 
 
 async def test_text_falls_back_to_rules_but_voice_fails_cleanly():

@@ -334,3 +334,19 @@ async def status(ctx: SkillContext) -> Reply:
     msg.allowed_numbers = ctx.reg.allowed()
     _ = pack
     return ctx.reply(msg)
+
+
+async def voice_answer(ctx: SkillContext, slot: str) -> Reply:
+    """The voice button on a question: just speak (Hindi, English or Marathi); every tap answer is still here."""
+    from chanakya.core.coach import info_reply
+
+    pack = ctx.pack
+    sd = pack.slot(slot) if pack else None
+    if sd is None:
+        return ctx.reply(C.next_question_or_options(ctx))
+    ctx.asking.add(slot)
+    ctx.x["last_question"] = slot
+    q = ctx.pick(sd.ask, ctx.clang)
+    m = info_reply(ctx, ctx.t("voiceq_prompt", question=q), C.quick_buttons(ctx, slot))
+    m.footer = ctx.t("voiceq_footer")
+    return ctx.reply(m)
