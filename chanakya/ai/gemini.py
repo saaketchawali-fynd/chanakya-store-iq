@@ -22,6 +22,7 @@ class AIUnavailable(Exception):
 LATEST = "gemini-flash-latest"  # Google's always-current alias: used only if both pinned models are retired (404)
 LITE_LATEST = "gemini-flash-lite-latest"
 HEDGE_STAGGER = 1.2  # seconds before the next model joins when one has no answer yet (target: reply < 5 s)
+HEDGE_START = 2  # models started at once
 
 
 class GeminiClient:
@@ -110,7 +111,9 @@ class GeminiClient:
         """Voice notes: one busy or slow model must never lose the note. The main model starts at once; if it has
         no answer after a few seconds (or fails, e.g. 503 high demand), the next model joins, and so on. The first
         good answer wins; the rest are cancelled."""
-        first = list(dict.fromkeys([self.fast, LATEST, self.fallback, LITE_LATEST]))
+        # measured on the server (4 Nov 2026): the lite model answers a voice note in ~2 s while the bigger one can
+        # take > 4 s; so the lite model and the main one start together, the others join if neither has answered
+        first = list(dict.fromkeys([self.fallback, self.fast, LITE_LATEST, LATEST]))
         models = first + first[:2]  # 503 'high demand' passes in seconds: the first two get a second try
         t0 = time.perf_counter()
         deadline = t0 + timeout
@@ -125,7 +128,8 @@ class GeminiClient:
                 nxt += 1
                 running[asyncio.create_task(self._call(m, parts, schema, system))] = m
 
-        launch()
+        for _ in range(min(HEDGE_START, len(models))):  # the quickest two at once: the reply waits only for the fastest
+            launch()
         next_at = t0 + HEDGE_STAGGER
         try:
             while running:
