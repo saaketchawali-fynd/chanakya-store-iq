@@ -34,6 +34,7 @@ from chanakya.skills import (
     manager,
     recommend,
     review,
+    staff_name,
     translate,
     tryon_flow,
     validate,
@@ -98,6 +99,11 @@ def command_of(text: str | None) -> tuple[str | None, str]:
             return name, ""
     for pre, name in (
         ("expert ", "expert"),
+        ("naam ", "myname"),
+        ("name ", "myname"),
+        ("my name is ", "myname"),
+        ("mera naam ", "myname"),
+        ("नाव ", "myname"),
         ("lang ", "lang"),
         ("customer lang ", "customer_lang"),
         ("/role ", "role"),
@@ -163,6 +169,10 @@ async def dispatch(ctx: SkillContext) -> Reply:
         return await set_staff_language(ctx, b0.get(1, "en"))
     if ctx.staff and (name == "language" or (not ctx.staff.lang_set and name not in ("role", "clock", "reset"))):
         return language_picker(ctx)
+    if ctx.role == "associate" and ctx.staff and name in ("myname",):
+        return await staff_name.change(ctx, arg)
+    if ctx.role == "associate" and ctx.staff and not ctx.staff.name_set and name not in ("role", "clock", "reset"):
+        return await staff_name.capture(ctx)  # who is this? asked once, after the language
     if name in ("exit", "restart") and ctx.role != "associate":
         return await (flowctl.exit_ask(ctx) if name == "exit" else flowctl.restart_ask(ctx))
     if name in ("role", "clock", "lang") or (name == "reset" and ctx.svc.settings.demo_mode):
@@ -227,6 +237,8 @@ async def set_staff_language(ctx: SkillContext, lang: str) -> Reply:
     st.lang = lang if lang in ("hi", "mr", "en") else "hi"
     st.lang_set = True
     role = ctx.role
+    if role == "associate" and not st.name_set:
+        return staff_name.ask(ctx)
     if role == "manager":
         return manager.menu(ctx)
     if role == "expert":

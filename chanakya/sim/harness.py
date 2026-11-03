@@ -39,6 +39,7 @@ def harness_settings(db_url: str, ai_mode: str = "fixture", **kw) -> Settings:
         visitor_phone=PHONES["visitor"],
         wa_app_secret="",
         store_id="RD-JUHU",
+        associate_name=kw.pop("associate_name", "Ravi"),  # the simulated associate already told us their name
         **kw,
     )
 
@@ -63,11 +64,11 @@ class Harness:
         locks.reset()
         ch = FakeChannel(renders_cards=render)
         rt = await build(harness_settings(db_url, ai_mode, **kw), ch, drop=drop, render=render)
-        if lang_set:  # skip the first-contact language picker (tests that check it pass lang_set=False)
+        if lang_set:  # skip first contact: language and name (tests that check it pass lang_set=False)
             from chanakya.core import repo
 
             for st in await repo.staff_all():
-                await repo.staff_update(st.wa_id, lang_set=True)
+                await repo.staff_update(st.wa_id, lang_set=True, name_set=True)
         if render:
             await start_renderer(rt)
         return cls(rt, ch)

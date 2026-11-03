@@ -131,6 +131,8 @@ class Orchestrator:
                     current_session_id=ctx.staff.current_session_id,
                     streak=ctx.staff.streak,
                     lang_set=ctx.staff.lang_set,
+                    name=ctx.staff.name,
+                    name_set=ctx.staff.name_set,
                     last_brief_date=ctx.staff.last_brief_date,
                 )
         except Exception:

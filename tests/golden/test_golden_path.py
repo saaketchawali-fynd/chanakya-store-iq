@@ -30,7 +30,10 @@ async def test_golden_path(tmp_path):
         # 1 shift start, one step at a time (Hindi chosen): the pre-read (stock, offers, keep in mind) → the clip →
         #   ready → only then the customer button
         out = await step(h.tap, "g:alang:hi")
+        assert "naam" in out[0].body.lower() and not any(m.card for m in out)  # then: who is this? (no dummy name)
+        out = await step(h.say, "mera naam Amit hai")
         brief = next(m for m in out if m.card and m.card.template == "brief")
+        assert "Amit" in brief.card.data["greeting"]
         assert brief.card.lang == "en"  # one card, in English
         assert any("Meru 55 QLED Pro" in c["text"] for c in brief.card.data["changes"])
         assert brief.card.data["stock"]["n"] and brief.card.data["stock"]["tiles"]

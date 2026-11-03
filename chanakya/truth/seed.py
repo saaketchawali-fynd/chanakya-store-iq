@@ -147,7 +147,8 @@ async def upsert_staff(settings: Settings) -> None:
                         streak=0,
                     )
                 )
-            else:
-                row.name = name
+            else:  # a name the associate gave is theirs: never overwritten by configuration
+                if name and not getattr(row, "name_set", False):
+                    row.name = name
                 row.store_id = settings.store_id
         await s.commit()

@@ -287,3 +287,8 @@ tip_exchange: {hi: "Purana dene ki baat abhi poochiye: kharcha kam ho sakta hai"
 tip_protection: {hi: "{n} protection plan hain, {low} se: ek baar bataiye, zor nahi", mr: "{n} protection plans आहेत, {low} पासून: एकदा सांगा, आग्रह नको", en: "{n} protection plans from {low}: mention once, no pressure"}
 tip_family_card: {hi: "Faisla ghar par hoga: Parivaar Card abhi bhejiye", mr: "निर्णय घरी होईल: परिवार कार्ड आत्ताच पाठवा", en: "The family decides: send the Family Card now"}
 tip_wall_type: {hi: "Installer ke liye deewar ka type abhi pooch lijiye", mr: "इन्स्टॉलरसाठी भिंतीचा प्रकार आत्ताच विचारा", en: "Ask the wall type now, for the installer"}
+# ---- the associate's own name (no dummy name)
+ask_staff_name: {hi: "Aapka naam kya hai? Yahi naam customer ke Family Card par jayega.", mr: "तुमचं नाव काय? हेच नाव ग्राहकाच्या फॅमिली कार्डवर जाईल.", en: "What's your name? It goes on the Family Card your customers get."}
+ask_staff_name_again: {hi: "Sirf apna naam likhiye, jaise: Amit", mr: "फक्त तुमचं नाव लिहा, जसं: अमित", en: "Just type your name, for example: Amit"}
+ask_staff_name_type: {hi: "Voice abhi nahi chala. Apna naam likh dijiye.", mr: "व्हॉइस आत्ता चालला नाही. तुमचं नाव लिहा.", en: "Voice didn't work just now. Please type your name."}
+staff_name_saved: {hi: "Theek hai, ab se aapka naam {name}.", mr: "ठीक आहे, आतापासून तुमचं नाव {name}.", en: "Done: your name is now {name}."}

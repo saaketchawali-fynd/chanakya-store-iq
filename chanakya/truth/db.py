@@ -32,6 +32,7 @@ def session() -> AsyncSession:
 _ADDED_COLUMNS = [
     ("products", "info", "JSONB", "JSON", "'{}'"),
     ("staff", "lang_set", "BOOLEAN", "BOOLEAN", "false"),
+    ("staff", "name_set", "BOOLEAN", "BOOLEAN", "false"),
 ]
 
 

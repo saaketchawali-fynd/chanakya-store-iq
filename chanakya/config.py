@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     store_id: str = "RD-JUHU"
 
     associate_phone: str = ""
-    associate_name: str = "Ravi"
+    associate_name: str = ""  # no dummy name: the associate is asked their name at first contact
     customer_phone: str = ""
     manager_phone: str = ""
     manager_name: str = "Meena"
