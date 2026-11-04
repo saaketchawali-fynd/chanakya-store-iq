@@ -31,7 +31,7 @@ async def test_a_full_note_gives_the_products_at_once(h):
     m = out[0]
     assert m.card and m.card.template == "options" and m.body.startswith("Aapke note se:")
     assert "10 ft" in m.body and "Dhoop mein bhi saaf" in m.body  # the reasons are the note's own needs
-    assert button_ids(out) == ["s:C1:demo", "s:C1:ofs", "s:C1:tryon"]  # no fixed questions first
+    assert button_ids(out) == ["s:C1:demo", "s:C1:tryon", "s:C1:more"]  # no fixed questions first
     assert "₹" not in m.body.split("\n", 1)[1]  # the budget is acknowledged, but no price before the demo
     s = await session(h)
     assert (await repo.events_for(s.id, ["note_shortlist"]))

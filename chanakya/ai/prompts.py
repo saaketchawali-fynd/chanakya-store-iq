@@ -39,7 +39,20 @@ Return JSON that matches the schema. Rules:
    "will come back"), lost ("nahi liya", "chala gaya", "घेतलं नाही"), request_delivery ("delivery kab",
    "डिलिव्हरी कधी"), request_emi ("EMI pe", "kist", "हप्ते"), send_family_card ("family ko bhejo",
    "घरच्यांना पाठवा"), set_reminder ("kal yaad dilana", "आठवण करून द्या", "remind me"), next_step ("ab kya karun",
-   "पुढे काय", "what next"). remind_when: today_evening / tomorrow / weekend, only if said."""
+   "पुढे काय", "what next"). remind_when: today_evening / tomorrow / weekend, only if said.
+13. The product, by MEANING (any language, whether or not specs are named):
+   - wants: what the customer wants in the NEW product, only if asked for (size_in, brand, model, panel,
+     resolution, os, ton, star, capacity_kg, capacity_l, load, ram_gb). "55 inch Sony chahiye" → size_in 55,
+     brand Sony. Brands spelled as in CONTEXT brands.
+   - existing: the product they HAVE NOW. A size, brand or model said about their current / old one goes here and
+     NEVER in wants: "unke paas abhi Sony 43 hai" → existing brand Sony, size_in 43; "जुना 32 इंच आहे" → existing
+     size_in 32; "they have a 5-year-old Samsung" → existing brand Samsung.
+   - avoid: what they do not want ("Samsung nahi chahiye", "OLED नको", "not LG").
+   - asks: the needs the new one must meet, as theme ids from CONTEXT themes, by meaning: "papa ko dialogue sunai
+     nahi deta" → sound; "Netflix bahut dekhte" → smart; "picture achhi chahiye" → picture; "light bahut jaati hai"
+     (fridge) → power; "college ke liye Office" → office. Only ids that are listed.
+   - upgrade: true when they want something newer or better than what they have ("naye features", "upgrade",
+     "abhi wale se behtar", "नवीन फीचर्स", "something better")."""
 
 TRANSCRIBE_SYSTEM = """Write down exactly what is said in this voice note from a shop-floor associate in Mumbai.
 Hindi, Marathi, English or a mix. Hindi in Roman script as spoken, Marathi in Devanagari, English product words

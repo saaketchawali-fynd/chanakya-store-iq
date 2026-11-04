@@ -62,7 +62,7 @@ CUSTOMER_PHONE_LANG = "en"  # every message and visual on the customer's own pho
 
 class Card(BaseModel):
     template: Literal["home", "benefit", "options", "kharcha", "parivaar", "score", "brief", "digest", "catalog", "product", "compare", "offer",
-                      "view"]
+                      "view", "demo", "homecompare"]
     lang: Lang  # language of the card text
     data: dict[str, Any]  # template variables (numbers already formatted via firewall)
 
@@ -141,6 +141,9 @@ class HomeCard(BaseModel):
     start_level_source: Literal["associate_voice", "associate_tap", "none"] = "none"
     sports_viewer: str | None = None  # e.g. "papa" (for personal lines)
     notes: list[str] = []
+    asks: list[str] = []  # need themes the associate told by meaning (brain/highlights.py theme ids)
+    existing: dict = {}  # the product they have now: {brand, size_in, sku} — never a want
+    upgrade: bool = False  # they want something newer / better than what they have
 
 
 class SessionState(BaseModel):

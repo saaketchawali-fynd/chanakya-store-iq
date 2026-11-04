@@ -194,7 +194,8 @@ def extract_slots(t: str, pack: Pack) -> list[SlotPair]:
 
 
 def understand_text(
-    text: str, packs: PackRegistry, category: str | None, myth_ids: list[str] | None = None, options_shown: bool = False
+    text: str, packs: PackRegistry, category: str | None, myth_ids: list[str] | None = None, options_shown: bool = False,
+    brands: list[str] | None = None,
 ) -> Understanding:
     raw = text or ""
     if category not in packs.packs:  # e.g. a department of "all": treat as not yet known
@@ -297,7 +298,18 @@ def understand_text(
     m = re.search(r"(\d{2})\s*(?:inch|inches|इंच|\")", t)
     if m and re.search(r"chahiye|chaiye|want|हवा|हवी|चाहिए|lena|लेना|घ्यायचा", t):
         u.customer_request = raw.strip()[:80]
-    if u.slots or u.numbers or u.customer_name:
+    # the product, by clause: what they want, what they have now, what they rule out, the needs it must meet
+    from chanakya.ai.schemas import WantPair
+    from chanakya.brain import highlights as HL
+    from chanakya.brain import wants as W
+
+    note = W.parse_note(raw, cat or category, brands or [])
+    keys = set(WantPair.model_fields["key"].annotation.__args__)
+    for name in ("wants", "existing", "avoid"):
+        setattr(u, name, [WantPair(key=k, value=str(v)) for k, v in note[name].items() if k in keys])
+    u.upgrade = note["upgrade"]
+    u.asks = HL.asks_in(raw, cat or category)
+    if u.slots or u.numbers or u.customer_name or u.asks or u.existing:
         intents.append("customer_info")
     # unmapped product question → expert
     if not (u.slots or u.claim_id or u.objection or intents) and any(h in t for h in QUESTION_HINTS):

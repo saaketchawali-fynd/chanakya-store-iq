@@ -589,6 +589,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "offers": lambda: close.offers(ctx),
         "ofs": lambda: recommend.offers_view(ctx),
         "upgrade": lambda: recommend.upgrade_view(ctx),
+        "more": lambda: recommend.more_menu(ctx),
+        "askdq": lambda: recommend.ask_more(ctx, None),
         "returning": lambda: returning.list_view(ctx),
         "view": lambda: view.show(ctx),
         "abwall": lambda: tryon_flow.choose(ctx, "ab", None),
@@ -614,6 +616,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         return await returning.resume(ctx, ":".join(args))
     if action == "swap" and a0:
         return await returning.swap(ctx, a0)
+    if action == "askq" and a0:
+        return await recommend.ask_more(ctx, a0)
     if action == "voiceq" and a0:
         return await assess.voice_answer(ctx, a0)
     if action == "dq" and a0 and a1:
@@ -706,6 +710,7 @@ async def _understand_ctx(ctx: SkillContext) -> dict:
         "brands": sorted({p.brand for p in ctx.facts.products_sync(pack.category) if p.brand})[:40],  # spelling help
         "library": [{"id": f"L{e.id}", "q": e.question} for e in lib][:30],
         "options_shown": opts,
+        "themes": __import__("chanakya.brain.highlights", fromlist=["catalogue"]).catalogue(pack.category),
     }
 
 
@@ -816,7 +821,7 @@ async def _on_speech(ctx: SkillContext) -> Reply:
         return await expert.ask(
             ctx, u.question_for_expert or tr, via_truth_check=bool(u.question_for_expert), library_id=u.library_id
         )
-    note = _requirements_note(ctx, tr, n_new, intents)
+    note = _requirements_note(ctx, tr, n_new, intents, u)
     if note is not None:  # the needs were told in one note: no more fixed questions, the right products now
         return await recommend.show_options(ctx, note=note)
     if "demo_done" in intents and s.shortlist:
@@ -838,20 +843,33 @@ async def _on_speech(ctx: SkillContext) -> Reply:
     return r
 
 
-def _requirements_note(ctx: SkillContext, tr: str, n_new: int, intents: set) -> dict | None:
+def _requirements_note(ctx: SkillContext, tr: str, n_new: int, intents: set, u=None) -> dict | None:
     """Did this note describe what the customer needs (several facts, or a clear ask such as '55 inch Sony')?
-    Then the shortlist comes straight from it. Explicit product asks are kept for the shortlist ('wants')."""
+    Then the shortlist comes straight from it. Explicit product asks are kept for the shortlist ('wants'); what
+    they have now never is (assess.apply_product_meaning)."""
+    from chanakya.ai.schemas import WantPair
     from chanakya.brain import wants as W
 
     s = ctx.session
     pack = ctx.pack
     if pack is None or not ctx.facts.snap.products or s.chosen_sku:
         return None
-    brands = sorted({p.brand for p in ctx.facts.products_sync(pack.category) if p.brand})
-    new = W.parse(tr, pack.category, brands)
-    if new:
-        s.extra["wants"] = {**(s.extra.get("wants") or {}), **new}
+    new = {wp.key: wp.value for wp in (u.wants if u is not None else [])}
+    if u is not None and not (u.wants or u.existing or u.avoid or u.asks or u.upgrade):
+        # an understanding without the product fields (a recorded note): read the words clause by clause
+        brands = sorted({p.brand for p in ctx.facts.products_sync(pack.category) if p.brand})
+        parsed = W.parse_note(tr, pack.category, brands)
+        keys = set(WantPair.model_fields["key"].annotation.__args__)
+        for name in ("wants", "existing", "avoid"):
+            setattr(u, name, [WantPair(key=k, value=str(v)) for k, v in parsed[name].items() if k in keys])
+        u.upgrade = parsed["upgrade"]
+        from chanakya.brain import highlights as HL
+
+        u.asks = HL.asks_in(tr, pack.category)
+        n_new = (n_new or 0) + assess.apply_product_meaning(ctx, u)
+        new = parsed["wants"]
     n_new = n_new or 0
+    new = new or {}
     asked = "request_options" in intents
     rich = n_new >= 3 or (new and (n_new >= 1 or len(new) >= 2)) or (asked and (n_new >= 1 or new))
     if not rich or (s.shortlist and not (n_new >= 2 or new)):

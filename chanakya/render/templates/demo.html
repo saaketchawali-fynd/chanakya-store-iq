@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{# The demo guide (English): for each product on the shortlist, the demo in order. The wow first (their own need,
+   shown the way that proves it), then their next need, then what else is worth showing. Each step: what to show,
+   its proof from the product's data, what to do, and the line to say. #}
+{% set ps = (products|aslist)[:3] %}
+{% block style %}
+  .homechips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .hc { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; font-size: 22px;
+        font-weight: 600; color: #E0E7FF; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.16); }
+  .prod { padding: 20px 26px 12px; margin-top: 18px; }
+  .prod:first-child { margin-top: 0; }
+  .prod.best { border: 2px solid #C7D2FE; }
+  .ph { display: flex; align-items: center; gap: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--line); }
+  .ph .letter { flex: none; width: 50px; height: 50px; border-radius: 14px; background: var(--indigo); color: #fff;
+                font-size: 26px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .prod.best .letter { background: var(--saffron); }
+  .ph h3 { flex: 1; min-width: 0; margin: 0; font-size: 27px; line-height: 1.25; color: var(--ink); }
+  .ph .thumb { flex: none; width: 110px; height: 74px; border-radius: 14px; background: #fff; display: flex;
+               align-items: center; justify-content: center; }
+  .ph .thumb img { max-width: 92%; max-height: 88%; }
+  .st { display: flex; gap: 16px; padding: 14px 0 12px; }
+  .st + .st { border-top: 1.5px dashed var(--line); }
+  .num { flex: none; width: 42px; height: 42px; border-radius: 50%; background: var(--green-pale); color: var(--green-deep);
+         font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
+  .st.wow .num { background: var(--green); color: #fff; }
+  .sb { flex: 1; min-width: 0; }
+  .tag { display: inline-block; font-size: 17px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+         color: var(--muted); margin-bottom: 4px; }
+  .st.wow .tag { color: var(--green-deep); }
+  .tt { font-size: 26px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+  .pf { display: inline-block; margin-left: 10px; padding: 2px 12px; border-radius: 999px; font-size: 19px; font-weight: 700;
+        color: #3730A3; background: #EEF2FF; vertical-align: 2px; }
+  .do { margin-top: 6px; font-size: 23px; color: var(--text); line-height: 1.36; display: flex; gap: 8px; }
+  .do .ic { flex: none; color: var(--saffron); margin-top: 3px; }
+  .say { margin-top: 6px; font-size: 22px; color: var(--muted); font-style: italic; line-height: 1.36; }
+{% endblock %}
+{% block header %}
+  <div class="kicker">Demo guide</div>
+  <h1>Show their need first</h1>
+  {% if chips %}<div class="homechips">{% for c in (chips|aslist)[:5] %}<span class="hc">{% if loop.first %}{{ icon('home', 22) }}{% endif %}{{ c }}</span>{% endfor %}</div>{% endif %}
+{% endblock %}
+{% block content %}
+  {% for p in ps %}
+  <section class="card prod{% if p.best %} best{% endif %}">
+    <div class="ph">
+      <span class="letter">{{ p.label }}</span>
+      <h3>{{ p.title }}</h3>
+      {% if p.image %}<span class="thumb"><img src="{{ p.image }}" alt=""></span>{% endif %}
+    </div>
+    {% for st in (p.steps|aslist) %}
+    <div class="st {{ st.tag }}">
+      <span class="num">{{ loop.index }}</span>
+      <div class="sb">
+        <span class="tag">{{ {'wow': 'Wow first', 'then': 'Then', 'more': 'Also show'}.get(st.tag, '') }}</span>
+        <div class="tt">{{ st.title }}{% if st.proof %}<span class="pf">{{ st.proof }}</span>{% endif %}</div>
+        {% if st.do %}<div class="do">{{ icon('play', 22) }}<span>{{ st.do }}</span></div>{% endif %}
+        {% if st.say and st.tag == 'wow' %}<div class="say">“{{ st.say }}”</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% endfor %}
+{% endblock %}

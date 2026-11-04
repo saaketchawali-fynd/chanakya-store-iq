@@ -50,7 +50,7 @@ async def test_fridge_end_to_end(h):
         p = h.rt.svc.facts.product_sync(sku)
         assert p.category == "fridge" and p.spec("width_mm") <= 620  # never wider than the kitchen spot
     out = await h.tap("s:C1:demo")
-    assert out[0].coach
+    assert out[-1].coach
     out = await h.tap("s:C1:shown")
     assert rows(out[0])[-1] == "s:C1:nonefit"
     out = await pick(h)

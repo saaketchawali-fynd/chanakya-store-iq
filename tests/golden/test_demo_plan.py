@@ -16,7 +16,8 @@ async def test_the_demo_is_a_plan_built_from_this_customer(h):
     await to_options(h)
     out = await h.tap("s:C1:demo")
     check_floor(out)
-    m = out[0]
+    guide, m = out[0], out[-1]  # first the demo guide card (per product, wow first), then step 1 to run live
+    assert guide.card.template == "demo" and guide.card.data["products"][0]["steps"][0]["tag"] == "wow"
     assert "Demo 1/" in m.body and m.footer and m.footer.startswith("Plan:")  # the order at a glance
     assert "s:C1:demo2" in button_ids(out)
     s = await session(h)

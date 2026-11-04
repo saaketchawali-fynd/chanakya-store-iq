@@ -437,3 +437,18 @@ kh_mrp: {hi: "MRP {mrp} · aaj bachat {save}", mr: "MRP {mrp} · आज बच�
 kh_protect_note: {hi: "{years} saal ka cover · roz ka {day} · chahein to jodein", mr: "{years} वर्षांचं कव्हर · रोजचे {day} · हवं तर जोडा", en: "{years}-year cover · about {day} a day · add it if you like"}
 kh_warranty: {hi: "Warranty: {w}", mr: "Warranty: {w}", en: "Warranty: {w}"}
 kh_note_mount_confirm: {hi: "Wall mount: sahi wala store pakka karega", mr: "Wall mount: योग्य तो स्टोअर निश्चित करेल", en: "Wall mount: the store confirms the right one"}
+# ---- the note by meaning, and the next steps with the products (user, 4 Nov 2026)
+note_existing: {hi: "Abhi: {what}", mr: "सध्या: {what}", en: "Has now: {what}"}
+note_upgrade: {hi: "Naye features chahiye", mr: "नवीन फीचर्स हवेत", en: "Wants new features"}
+b_demo_guide: {hi: "Demo guide", mr: "डेमो गाइड", en: "Demo guide"}
+b_more_needs: {hi: "Aur bataiye", mr: "अजून सांगा", en: "Tell me more"}
+list_more: {hi: "Kya poochhein", mr: "काय विचारायचं", en: "What to ask"}
+more_body: {hi: "Note mein ye baatein nahi aayin — inse sahi product aur pakka hoga:", mr: "नोटमध्ये या गोष्टी आल्या नाहीत — यांनी योग्य प्रॉडक्ट अधिक पक्का होईल:", en: "The note didn't cover these; each makes the pick surer:"}
+more_body_none: {hi: "Note se sab zaroori baatein mil gayin. Aur kuch?", mr: "नोटमधून सगळ्या महत्त्वाच्या गोष्टी मिळाल्या. आणखी काही?", en: "The note covered what matters. Anything else?"}
+more_footer: {hi: "Ya ek aur voice note bhejiye", mr: "किंवा आणखी एक व्हॉइस नोट पाठवा", en: "Or send another voice note"}
+more_dq_d: {hi: "Stock mein jis par models alag hain", mr: "स्टॉकमध्ये ज्यावर मॉडेल वेगळे आहेत", en: "What the models in stock differ on"}
+row_more_offers: {hi: "In par offers", mr: "यांवरच्या ऑफर्स", en: "Offers on these"}
+row_more_offers_d: {hi: "Har product ka live offer, data se", mr: "प्रत्येक प्रॉडक्टची live ऑफर, डेटामधून", en: "Each product's live offer, from the data"}
+row_more_other: {hi: "Alag budget ya brand", mr: "वेगळं बजेट किंवा ब्रँड", en: "Other budget or brand"}
+row_more_other_d: {hi: "Kam, zyada ya doosra brand", mr: "कमी, जास्त किंवा दुसरा ब्रँड", en: "Lower, higher or another brand"}
+demo_guide_caption: {hi: "Demo guide: har product par pehle unki zaroorat (wow), phir baaki. Step-by-step neeche.", mr: "डेमो गाइड: प्रत्येक प्रॉडक्टवर आधी त्यांची गरज (wow), मग बाकी. स्टेप-बाय-स्टेप खाली.", en: "Demo guide: their need first on each product (the wow), then the rest. Step by step below."}

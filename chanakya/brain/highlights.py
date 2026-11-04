@@ -57,6 +57,8 @@ class Theme:
     demo: dict
     label: str = ""
     specs: tuple = ()  # ({key, line, proof?}, …): spec fields that show it when no highlight does
+    keywords: tuple = ()  # words that name this need in a note (offline rules)
+    demo_one: dict | None = None  # the demo when there is only one product (no "on both")
 
 
 @dataclass(frozen=True)
@@ -95,7 +97,8 @@ def _data() -> dict:
                 needs = tuple(Need(n["id"], n.get("slot"), tuple(str(v) for v in n.get("in") or ()), n.get("gte"),
                                    n.get("want"), float(n.get("w", 1))) for n in t.get("needs") or [])
                 out.append(Theme(t["id"], lines, needs, tuple(t.get("covers") or ()), float(t.get("general", 0.3)),
-                                 t.get("demo") or {}, t.get("label") or t["id"], tuple(t.get("specs") or ())))
+                                 t.get("demo") or {}, t.get("label") or t["id"], tuple(t.get("specs") or ()),
+                                 tuple(str(k).lower() for k in t.get("keywords") or ()), t.get("demo_one")))
             themes[cat] = out
         _DATA = {"prefix": raw.get("prefix") or {}, "say": raw.get("say") or {}, "themes": themes}
     return _DATA
@@ -219,9 +222,14 @@ def need_holds(n: Need, home, wants: dict | None, pack) -> bool:
     return any(v in n.values for v in P.values(home, n.slot))
 
 
+ASKED_W = 2.0  # a need the associate told by meaning ("papa ko dialogue sunai nahi deta" → sound)
+
+
 def triggered(th: Theme, home, wants: dict | None, pack) -> tuple[float, str | None]:
     """(weight, need id) of the strongest need of this theme the customer's answers switch on; (0, None) if none."""
     best: tuple[float, str | None] = (0.0, None)
+    if th.id in (getattr(home, "asks", None) or []):
+        best = (ASKED_W, "as_asked")
     for n in th.needs:
         if n.w > best[0] and need_holds(n, home, wants, pack):
             best = (n.w, n.id)
@@ -340,3 +348,27 @@ def need_label(need: str | None, lang: str) -> str | None:
         return None
     pre = _data()["prefix"].get(need)
     return (pre.get(lang) or pre.get("en")) if pre else None
+
+
+def catalogue(category: str | None) -> list[dict]:
+    """The need themes of a category, for the AI to map a note's meaning to (ids only come back)."""
+    return [{"id": th.id, "means": f"{th.label}: {(th.lines[0].say.get('en') if th.lines else '')}"}
+            for th in themes(category)]
+
+
+def asks_in(text: str, category: str | None) -> list[str]:
+    """Offline: the need themes a note names, from each theme's keywords (the AI does this by meaning)."""
+    t = " " + " ".join((text or "").lower().split()) + " "
+    out = []
+    for th in themes(category):
+        if any((f" {k} " in t) if len(k) <= 4 else (k in t) for k in th.keywords):
+            out.append(th.id)
+    return out
+
+
+def demo_text(th: Theme | None, lang: str, alone: bool = False) -> str:
+    """How to show this theme, in the associate's language; with one product, without comparing."""
+    if th is None:
+        return ""
+    d = (th.demo_one if alone and th.demo_one else th.demo) or {}
+    return d.get(lang) or d.get("en") or ""

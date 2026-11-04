@@ -65,8 +65,9 @@ async def test_offers_are_always_with_the_products(h):
     out = await to_options(h)
     card = out[0].card
     assert all(o["offer"]["text"] for o in card.data["options"])
-    assert "s:C1:ofs" in button_ids(out)
-    out = await h.tap("s:C1:ofs")
+    out = await h.tap("s:C1:more")  # 'Tell me more' with the products: the offers on these are one row away
+    assert "s:C1:ofs" in [r.id for m in out for sec in (m.sections or []) for r in sec.rows]
+    out = await h.pick("s:C1:ofs")
     check_floor(out)
     rows = [r for m in out for sec in (m.sections or []) for r in sec.rows]
     assert rows and all(r.title[:1] in "ABC" for r in rows)  # per option

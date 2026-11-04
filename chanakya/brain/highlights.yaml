@@ -7,6 +7,7 @@
 #
 # needs: {id, slot, in: [values]} | {id, slot, gte: n (numeric slot)} | {id, want: key}; w = how much it matters.
 # covers: fit rules that already judge this from a spec; when the product carries that spec, the rule decides.
+# keywords: words that name this need in a note (offline rules; the AI maps by meaning)
 # specs: backend spec fields that show the theme too (when no highlight does): {key, line (which line's words),
 #        proof (for a yes/no flag; otherwise the value itself is quoted)}.
 # Technical terms stay English inside hi / mr (stabiliser, inverter, apps, HDR …).
@@ -55,6 +56,8 @@ themes:
   tv:
     - id: sound
       label: "sound features"
+      demo_one: {hi: "Kam volume par ek dialogue scene chalaiye", en: "Play a dialogue scene at a low volume", mr: "कमी आवाजात एक संवादाचा सीन लावा"}
+      keywords: ["dialogue", "sunai nahi", "sunayi nahi", "awaaz", "aawaz", "sound", "speaker", "volume", "suna nahi", "आवाज़", "आवाज", "सुनाई नहीं", "ऐकू येत नाही", "ऐकू", "bass"]
       specs: [{key: dialogue_enhance, line: 0, proof: "Dialogue enhance"}, {key: dolby_atmos, line: 1, proof: "Dolby Atmos"}]
       needs:
         - {id: elders, slot: elders, in: ["yes"], w: 2}
@@ -81,6 +84,8 @@ themes:
         mr: "दोन्हीवर सारख्या कमी आवाजात एक संवादाचा सीन लावा"
     - id: picture
       label: "HDR / picture tech"
+      demo_one: {hi: "Ek andhera movie scene (HDR demo) chalaiye", en: "Play a dark movie scene (HDR demo)", mr: "एक गडद चित्रपट दृश्य (HDR demo) लावा"}
+      keywords: ["picture", "picture quality", "clarity", "hdr", "colour", "color", "sharp", "movie", "movies", "film", "cinema", "पिक्चर", "रंग", "सिनेमा", "फ़िल्म", "चित्रपट"]
       specs: [{key: hdr_formats, line: 0}]
       needs:
         - {id: movies, slot: content, in: [movies], w: 2}
@@ -113,6 +118,7 @@ themes:
         mr: "दोन्हीवर एक गडद चित्रपट दृश्य (HDR demo) शेजारी-शेजारी लावा"
     - id: smart
       label: "casting / smart apps"
+      keywords: ["netflix", "youtube", "ott", "prime", "hotstar", "apps", "app", "smart", "cast", "mobile se", "phone se", "चैनल ऐप", "ॲप", "ऐप"]
       specs: [{key: os, line: 1}, {key: apps, line: 1}]
       needs:
         - {id: kids, slot: content, in: [kids], w: 1.5}
@@ -130,11 +136,12 @@ themes:
           hi: "आपकी streaming apps सीधे टीवी पर, कोई अलग बॉक्स नहीं"
           mr: "तुमची streaming apps थेट टीव्हीवर, वेगळा बॉक्स नको"
       demo:
-        hi: "Customer ke apne phone se ek video cast kariye"
-        en: "Cast a video from the customer's own phone"
-        mr: "ग्राहकाच्या स्वतःच्या फोनवरून एक व्हिडिओ कास्ट करा"
+        hi: "Unka pasandida app kholiye, ya unke phone se ek video cast kariye"
+        en: "Open their favourite app on it, or cast a video from their phone"
+        mr: "त्यांचं आवडतं app उघडा, किंवा त्यांच्या फोनवरून व्हिडिओ कास्ट करा"
     - id: remote
       label: "smart remote"
+      keywords: ["remote", "voice search", "bolkar", "रिमोट"]
       needs:
         - {id: elders, slot: elders, in: ["yes"], w: 1.5}
       general: 0.3
@@ -153,6 +160,7 @@ themes:
         mr: "रिमोट ग्राहकाच्या हातात द्या, स्वतः चालवून पाहू द्या"
     - id: gaming
       label: "game mode"
+      keywords: ["gaming", "game", "playstation", "ps5", "xbox", "गेम"]
       needs:
         - {id: gaming, slot: content, in: [gaming], w: 2}
       covers: [motion_ok]
@@ -168,6 +176,8 @@ themes:
         mr: "Game mode सुरू करून एक वेगवान गेम क्लिप लावा"
     - id: motion
       label: "motion tech"
+      demo_one: {hi: "Ek fast cricket clip chalaiye", en: "Play a fast cricket clip", mr: "एक वेगवान क्रिकेट क्लिप लावा"}
+      keywords: ["cricket", "match", "sports", "ipl", "football", "क्रिकेट", "मैच", "मॅच"]
       needs:
         - {id: sports, slot: content, in: [sports], w: 2}
         - {id: sports, slot: content, in: [sports_some], w: 1}
@@ -184,6 +194,8 @@ themes:
         mr: "दोन्हीवर एक वेगवान क्रिकेट क्लिप लावा"
     - id: angle
       label: "IPS / wide angle"
+      demo_one: {hi: "Customer ke saath side wali seat se dekhiye", en: "Walk to the side seat with the customer and look", mr: "ग्राहकासोबत बाजूच्या जागेवरून पाहा"}
+      keywords: ["side se", "wide sofa", "l shape", "bagal se", "बाजूने", "साइड से"]
       specs: [{key: wide_angle, line: 0, proof: "Wide viewing angle"}]
       needs:
         - {id: wide_seating, slot: seating, in: [wide], w: 2}
@@ -200,6 +212,7 @@ themes:
         mr: "ग्राहकासोबत बाजूच्या जागेवरून दोन्ही पाहा"
     - id: eyes
       label: "eye comfort"
+      keywords: ["eyes", "aankh", "आँख", "डोळे"]
       needs:
         - {id: kids, slot: content, in: [kids], w: 1}
         - {id: elders, slot: elders, in: ["yes"], w: 1}
@@ -215,6 +228,7 @@ themes:
         mr: "ग्राहकाला eye comfort सेटिंग दाखवा"
     - id: slim
       label: "slim design"
+      keywords: ["slim", "patla", "sleek", "पतला"]
       needs:
         - {id: wall, slot: mounting, in: [wall], w: 1}
       general: 0.2
@@ -231,6 +245,7 @@ themes:
   fridge:
     - id: power
       label: "power-cut features"
+      keywords: ["light jaati", "bijli jaati", "power cut", "light nahi", "voltage", "बिजली जाती", "वीज जाते", "लाइट जाते"]
       specs: [{key: stabiliser_free, line: 0, proof: "Stabiliser-free"}]
       needs:
         - {id: power_cuts, slot: power_cuts, in: ["yes"], w: 2}
@@ -251,6 +266,7 @@ themes:
         mr: "हे फीचर ग्राहकाला युनिटवर दाखवा"
     - id: fresh
       label: "freshness features"
+      keywords: ["sabzi", "sabji", "vegetables", "fresh", "fruits", "सब्ज़ी", "भाजी", "ताज़ा"]
       needs:
         - {id: daily_shop, slot: shopping, in: [daily], w: 1.5}
         - {id: weekly_shop, slot: shopping, in: [weekly], w: 1.5}
@@ -267,6 +283,7 @@ themes:
         mr: "Vegetable box आणि कूलिंग व्हेंट्स उघडून दाखवा"
     - id: convertible
       label: "convertible modes"
+      keywords: ["convertible", "extra space", "party", "कन्वर्टिबल"]
       specs: [{key: convertible, line: 0, proof: "Convertible"}]
       needs:
         - {id: weekly_shop, slot: shopping, in: [weekly], w: 1.5}
@@ -298,6 +315,7 @@ themes:
         mr: "आतले शेल्फ आणि जागा दाखवा"
     - id: freeze
       label: "fast freeze / ice"
+      keywords: ["ice", "baraf", "frozen", "ice cream", "बर्फ़", "बर्फ"]
       needs:
         - {id: frozen, slot: shopping, in: [frozen], w: 1.5}
       general: 0.3
@@ -339,6 +357,7 @@ themes:
   wm:
     - id: hygiene
       label: "steam / hygiene wash"
+      keywords: ["baby", "bachcha", "allergy", "hygiene", "germs", "बच्चा", "बाळ"]
       needs:
         - {id: family_wash, slot: family_size, in: [f5plus], w: 1}
       general: 0.5
@@ -353,6 +372,7 @@ themes:
         mr: "पॅनलवर steam / hygiene programme दाखवा"
     - id: speed
       label: "quick wash"
+      keywords: ["jaldi", "quick", "office jaate", "time nahi", "जल्दी", "लवकर"]
       needs:
         - {id: daily_wash, slot: wash_load, in: [daily], w: 1.5}
       general: 0.4
@@ -367,6 +387,7 @@ themes:
         mr: "पॅनलवर quick wash ची वेळ दाखवा"
     - id: dry
       label: "drying"
+      keywords: ["dry", "sukhana", "sukhte nahi", "monsoon", "सुखाना", "सुकवायला", "वाळत"]
       needs:
         - {id: drying, slot: drying, in: ["yes"], w: 2}
       covers: [dry_ok]
@@ -382,6 +403,7 @@ themes:
         mr: "पॅनलवर dry / spin programme दाखवा"
     - id: clean
       label: "stain / filter tech"
+      keywords: ["daag", "stain", "mitti", "dirty", "दाग", "डाग"]
       needs:
         - {id: family_wash, slot: family_size, in: [f3_4, f5plus], w: 1}
       general: 0.4
@@ -453,6 +475,7 @@ themes:
   ac:
     - id: inverter
       label: "inverter"
+      keywords: ["bill", "bijli bill", "electricity", "saving", "raat bhar", "बिल", "वीज बिल"]
       specs: [{key: inverter, line: 0, proof: "Inverter"}]
       needs:
         - {id: long_hours, slot: hours_per_day, in: [h4_8, h_gt8], w: 2}
@@ -469,6 +492,7 @@ themes:
         mr: "Energy label वर star rating आणि inverter दाखवा"
     - id: fast
       label: "turbo cooling"
+      keywords: ["jaldi thanda", "fast cooling", "garmi bahut", "top floor", "जल्दी ठंडा", "लवकर थंड"]
       needs:
         - {id: sunny, slot: sun_exposure, in: ["yes"], w: 1.5}
       general: 0.3
@@ -483,6 +507,7 @@ themes:
         mr: "रिमोटवर turbo बटण दाबून दाखवा"
     - id: voltage
       label: "voltage protection"
+      keywords: ["voltage", "light jaati", "fluctuation", "वोल्टेज", "व्होल्टेज"]
       needs:
         - {id: power_issues, slot: power_issues, in: ["yes"], w: 2}
       general: 0.3
@@ -497,6 +522,7 @@ themes:
         mr: "Spec sheet वर voltage range दाखवा"
     - id: smart
       label: "Wi-Fi / app"
+      keywords: ["wifi", "phone se", "app", "alexa", "फ़ोन से", "फोनवरून"]
       specs: [{key: wifi, line: 0, proof: "Wi-Fi"}]
       needs:
         - {id: app, slot: app_control, in: ["yes"], w: 2}
@@ -551,6 +577,7 @@ themes:
   laptop:
     - id: battery
       label: "long battery"
+      keywords: ["battery", "bina charger", "charging", "बैटरी", "बॅटरी"]
       needs:
         - {id: battery, slot: battery_need, in: ["yes"], w: 2}
         - {id: carry_daily, slot: carry, in: [daily], w: 1.5}
@@ -566,6 +593,7 @@ themes:
         mr: "Battery settings मध्ये उरलेला वेळ दाखवा"
     - id: office
       label: "MS Office"
+      keywords: ["office", "word", "excel", "powerpoint", "assignment", "ऑफ़िस"]
       needs:
         - {id: office_sw, slot: software, in: [office], w: 2}
         - {id: student, slot: user, in: [student], w: 1.5}
@@ -582,6 +610,7 @@ themes:
         mr: "Start menu मधून Office apps उघडून दाखवा"
     - id: graphics
       label: "graphics card"
+      keywords: ["gaming", "game", "graphics", "design", "autocad", "cad", "editing", "video editing", "गेम"]
       needs:
         - {id: gaming, slot: gaming, in: ["yes"], w: 2}
         - {id: design, slot: software, in: [cad], w: 2}
@@ -598,6 +627,7 @@ themes:
         mr: "एक गेम किंवा डिझाइन ॲप उघडून चालवून दाखवा"
     - id: calls
       label: "camera / mic"
+      keywords: ["online class", "zoom", "meet", "video call", "teams", "ऑनलाइन क्लास"]
       needs:
         - {id: student, slot: user, in: [student], w: 1}
         - {id: professional, slot: user, in: [professional], w: 1}
@@ -613,6 +643,7 @@ themes:
         mr: "Camera app उघडून ग्राहकाला स्वतःला पाहू द्या"
     - id: light
       label: "light build"
+      keywords: ["halka", "light weight", "lightweight", "carry", "travel", "हल्का", "हलका"]
       needs:
         - {id: carry_daily, slot: carry, in: [daily], w: 2}
       general: 0.2

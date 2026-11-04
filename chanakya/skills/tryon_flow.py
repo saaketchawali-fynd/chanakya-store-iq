@@ -14,7 +14,7 @@ from chanakya.brain.options import candidate_set
 from chanakya.channel.limits import truncate
 from chanakya.core import repo, state
 from chanakya.core.coach import coach_reply, info_reply
-from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, ListRow, ListSection, OutMessage, Reply
+from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, Card, ListRow, ListSection, OutMessage, Reply
 from chanakya.log import get_log
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
@@ -215,6 +215,38 @@ def ab_pair(s, facts=None) -> list[tuple[str, str]]:
     other = other or next((lab for lab, r in roles.items() if r == "value"), None) or (others[0] if others else None)
     pair = sorted({best, other} - {None})
     return [(lab, s.option_labels[lab]) for lab in pair]
+
+
+def home_compare_card(ctx: SkillContext, items: list[tuple[str, object, bytes]]) -> Card:
+    """See at home with two options (user, 4 Nov 2026): each drawn alone on their own wall, side by side, and under
+    the pictures how each meets THEIR needs (the product's own value or highlight per cell), then what really
+    differs in the data. One English card."""
+    from chanakya.skills import fitview as FV
+    from chanakya.skills import recommend as R
+
+    s = ctx.session
+    best = next((lab for lab, r in (s.extra.get("option_roles") or {}).items() if r == "best"), None)
+    with ctx.as_lang("en"):
+        cols = []
+        for lab, p, hero in items:
+            size = p.spec("size_in")
+            w = p.spec("width_mm")
+            cols.append({"label": lab, "title": C.product_title(ctx, p, "en"), "photo": hero, "is_room": True,
+                         "size": ctx.reg.num(size, f"spec:{p.sku}:size_in", "inch") if size else "",
+                         "width": ctx.reg.num(round(float(w) / 10), f"spec:{p.sku}:width_mm", "cm") if w else "",
+                         "best": lab == best, "offer": PV.offer_line(ctx, p, "en")["text"]})
+        labelled = [(lab, p) for lab, p, _ in items]
+        rows = FV.needs_grid(ctx, labelled, "en", rows=4)
+        for key in R.FEATURE_KEYS.get(ctx.pack.category, []):  # then what really differs, as plain facts
+            if len(rows) >= 6:
+                break
+            vals = [PV.fmt_value(ctx, p, key, "en") for _, p in labelled]
+            if all(vals) and len(set(vals)) > 1:
+                rows.append({"need": ctx.reg.static(PV.label(key, "en")),
+                             "cells": [{"label": lab, "value": v, "state": "info"} for (lab, _), v in zip(labelled, vals, strict=True)]})
+        chips = FV.home_chips(ctx, "en") + R.meaning_labels(ctx, "en")
+    ctx.ev("home_compare_sent", skus=[p.sku for _, p, _ in items], rows=len(rows))
+    return Card(template="homecompare", lang="en", data={"cols": cols, "rows": rows, "chips": chips[:5]})  # type: ignore[arg-type]
 
 
 def ab_picture(ctx: SkillContext, items: list[tuple[str, object, bytes]]) -> bytes:
@@ -460,17 +492,16 @@ async def job(ctx: SkillContext) -> Reply:
     if not msgs:
         btns = [ctx.b("b_other_wall", ctx.sid("photo_yes")), ctx.b("b_go", ctx.sid("go"))]
         return ctx.reply(info_reply(ctx, ctx.t("tryon_failed"), btns))
-    if req_spec.get("mode") == "ab" and len(heroes) == 2:  # the two options in ONE picture: decide by seeing
+    if req_spec.get("mode") == "ab" and len(heroes) == 2:  # both on their wall AND how each meets their needs
         labs = {sku: lab for lab, sku in s.option_labels.items()}
-        items = [(labs.get(p.sku, "?"), p, hero) for p, hero in heroes]
-        pic = await asyncio.to_thread(ab_picture, ctx, items)
+        items = sorted([(labs.get(p.sku, "?"), p, hero) for p, hero in heroes], key=lambda x: x[0])
         a, b = items[0], items[1]
         btns = [Button(id=ctx.sid("tpick", p.sku), title=ctx.t("ab_like", label=lab)[:20]) for lab, p, _ in (a, b)]
         btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
         say = ctx.t("ab_bolo", ctx.clang, a=a[0], b=b[0])
         cites = C.known_cites(ctx, ["seat_distance", "room_size", "niche_width_cm"])
         m = coach_reply(ctx, say, ctx.t("kyun_ab"), cites, btns) if cites else info_reply(ctx, f'"{say}"', btns)
-        m.image_bytes, m.kind = pic, "buttons"
+        m.card, m.kind = home_compare_card(ctx, items), "buttons"
         s.tryon_done = True
         ctx.ev("tryon_ab_sent", skus=[p.sku for _, p, _ in items], ms=ms)
         return ctx.reply(m)

@@ -81,9 +81,12 @@ async def test_a_vs_b_on_their_wall_in_one_picture(h):
     await to_options(h, photo="room_living.jpg")
     await h.tap("s:C1:shown")
     out = await h.pick("s:C1:abwall")
-    imgs = [m for m in out if m.image_bytes]
-    assert len(imgs) == 1  # one picture, both options
-    ids = button_ids(imgs)
+    cards = [m for m in out if m.card and m.card.template == "homecompare"]
+    assert len(cards) == 1  # one card: both on their own wall, and how each meets their needs
+    d = cards[0].card.data
+    assert len(d["cols"]) == 2 and all(c["photo"] and c["is_room"] for c in d["cols"])  # their room, each drawn
+    assert d["rows"] and all(len(r["cells"]) == 2 for r in d["rows"])  # their needs, a cell per product
+    ids = button_ids(cards)
     assert sum(1 for i in ids if ":tpick:" in i) == 2 and "s:C1:prefer" in ids
 
 

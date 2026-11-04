@@ -62,6 +62,15 @@ Objection = Literal[
 ]
 
 
+WantKey = Literal["size_in", "brand", "model", "panel", "resolution", "os", "ton", "star", "capacity_kg", "capacity_l",
+                  "load", "ram_gb"]
+
+
+class WantPair(BaseModel):
+    key: WantKey
+    value: str
+
+
 class Understanding(BaseModel):
     transcript: str = ""
     language: Literal["hi", "mr", "en", "mixed"] = "hi"
@@ -79,6 +88,13 @@ class Understanding(BaseModel):
     question_for_expert: str | None = None
     customer_request: str | None = None  # e.g. "55 inch QLED chahiye" (for need validation)
     remind_when: Literal["today_evening", "tomorrow", "weekend"] | None = None  # with set_reminder / not_today
+    # the note's meaning about the product (user, 4 Nov 2026): what they want in the NEW one, what they have NOW,
+    # what they do not want, the needs it must meet (theme ids from CONTEXT) and whether they want an upgrade
+    wants: list[WantPair] = []
+    existing: list[WantPair] = []
+    avoid: list[WantPair] = []
+    asks: list[str] = []
+    upgrade: bool = False
 
 
 # ---------- 8.3 Read image ----------

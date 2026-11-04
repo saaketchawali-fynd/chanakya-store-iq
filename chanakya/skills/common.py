@@ -80,13 +80,13 @@ def pick_next_slot(ctx: SkillContext, exclude: set[str] | None = None, phase: st
     return ordered_next(ctx.session.home, ctx.pack, (exclude or set()) | skipped(ctx), phase)
 
 
-def data_question(ctx: SkillContext, footer: str | None = None) -> OutMessage | None:
+def data_question(ctx: SkillContext, footer: str | None = None, force: bool = False) -> OutMessage | None:
     """In place of the questions the data cannot act on: one about what the models on sale really differ on,
-    with the answers from the stock itself (and 'any')."""
+    with the answers from the stock itself (and 'any'). `force`: asked from 'Tell me more' after the options."""
     from chanakya.brain import data_questions as DQ
 
     s = ctx.session
-    if not skipped(ctx) or s.shortlist:
+    if not force and (not skipped(ctx) or s.shortlist):
         return None
     done = set(s.extra.get("dq_done") or [])
     q = DQ.next_data_question(ctx.pack, _avail(ctx), done, s.extra.get("wants") or {})

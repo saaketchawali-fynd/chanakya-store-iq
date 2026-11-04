@@ -56,6 +56,11 @@
           background: #E8ECF5; color: var(--indigo); }
   .role.value { background: var(--saffron-pale); color: var(--saffron-deep); }
   .stk { margin-left: 12px; font-size: 22px; color: var(--faint); }
+  .opt-pt { display: flex; align-items: flex-start; gap: 10px; margin-top: 8px; font-size: 23px; font-weight: 600;
+            line-height: 1.32; color: var(--ink); }
+  .opt-pt .bubble { width: 28px; height: 28px; margin-top: 2px; flex: none; background: var(--green-pale); color: var(--green-deep); }
+  .opt-pt .pf { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 999px; font-size: 19px;
+                font-weight: 700; color: var(--green-deep); background: var(--green-pale); }
   .df { margin-top: 6px; font-size: 24px; line-height: 1.38; color: var(--muted); }
   .df b { color: var(--ink); font-weight: 700; }
   .cmp { margin-top: 20px; padding: 18px 28px 8px; }
@@ -84,7 +89,7 @@
 {% block hd_class %}{% if best %} lift{% endif %}{% endblock %}
 {% block header %}
   <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
-  {% set title = L.title|replace('{n}', (opts|length or 3)|string) %}
+  {% set title = (L.title_one if opts|length == 1 and L.title_one else L.title|replace('{n}', (opts|length or 3)|string)) %}
   <div class="hd-row">
     <h1 class="grow{{ title|dv }}">{{ title }}</h1>
     {% if L.no_price %}<span class="lockchip{{ L.no_price|dv }}">{{ icon('lock', 24) }}{{ L.no_price }}</span>{% endif %}
@@ -103,7 +108,7 @@
       {% set pts = best.points|aslist %}
       {% if pts %}
       <div class="why"><div class="k{{ L.why|dv }}">{{ L.why }}</div>
-        {% for p in pts[:3] %}<div class="pt"><span class="bubble">{{ icon('check', 22, '', 2.8) }}</span><span class="t{{ p.text|dv }}">{{ p.text }}</span>{% if p.proof %}<span class="pf num">{{ p.proof }}</span>{% endif %}</div>{% endfor %}
+        {% for p in pts[:3] %}{% set pt = p if p is mapping else {'text': p} %}<div class="pt"><span class="bubble">{{ icon('check', 22, '', 2.8) }}</span><span class="t{{ pt.text|dv }}">{{ pt.text }}</span>{% if pt.proof %}<span class="pf num">{{ pt.proof }}</span>{% endif %}</div>{% endfor %}
       </div>
       {% elif best.reason %}<div class="why"><div class="pt"><span class="bubble">{{ icon('check', 22, '', 2.8) }}</span><span class="t">{{ best.reason }}</span></div></div>
       {% endif %}
@@ -127,7 +132,10 @@
         <div class="trow">{% if o.label %}<span class="letter">{{ o.label }}</span>{% endif %}<h3>{{ o.title }}</h3></div>
         {% set rl = L['role_' ~ o.role] if o.role in ('value', 'step') else '' %}
         {% if rl %}<span class="role {{ o.role }}{{ rl|dv }}">{{ rl }}</span>{% endif %}{% if o.stock_line %}<span class="stk">{{ o.stock_line }}</span>{% endif %}
-        {% if o.reason and not (o.diffs|aslist) %}<div class="df num"><b>{{ o.reason }}</b></div>{% endif %}
+        {% set opts_pts = (o.points|aslist)[:2] %}
+        {% if opts_pts %}{% for p in opts_pts %}<div class="opt-pt num"><span class="bubble">{{ icon('check', 18, '', 3) }}</span><span>{{ p.text if p is mapping else p }}{% if p is mapping and p.proof %}<span class="pf">{{ p.proof }}</span>{% endif %}</span></div>{% endfor %}
+        {% elif o.reason and not (o.diffs|aslist) %}<div class="df num"><b>{{ o.reason }}</b></div>{% endif %}
+        {% if opts_pts and o.reason and o.role == 'step' %}<div class="df num"><b>{{ o.reason }}</b></div>{% endif %}
         {% for d in (o.diffs|aslist)[:2] %}<div class="df num">{{ d.label }} · <b>{{ d.value }}</b></div>{% endfor %}
         {% set of = o.offer or {} %}
         {% if of.text %}<div class="ofr{% if of.none %} none{% endif %}{{ of.text|dv }}">{{ icon('tag', 20) }}<span>{{ of.text }}</span></div>{% endif %}

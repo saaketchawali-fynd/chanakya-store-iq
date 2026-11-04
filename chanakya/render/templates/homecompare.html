@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{# See at home, compared (English): each option drawn alone on the customer's own wall, side by side, and under the
+   pictures how each meets THEIR needs (each cell the product's own value or highlight), then what really differs.
+   Every value comes from the product data or their Home Card. #}
+{% set cs = (cols|aslist)[:2] %}
+{% set rs = (rows|aslist)[:6] %}
+{% block style %}
+  .homechips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .hc { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; font-size: 22px;
+        font-weight: 600; color: #E0E7FF; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.16); }
+  .pics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pic { padding: 0; overflow: hidden; }
+  .pic .im { height: 300px; background: #0B1020; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .pic .im img { width: 100%; height: 100%; object-fit: cover; }
+  .pic .im img.prod { object-fit: contain; width: 80%; height: 80%; }
+  .pic .cap { padding: 14px 18px 16px; }
+  .pic .trow { display: flex; align-items: center; gap: 12px; }
+  .pic .letter { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--indigo); color: #fff;
+                 font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .pic.best .letter { background: var(--saffron); }
+  .pic h3 { margin: 0; font-size: 24px; line-height: 1.25; color: var(--ink); }
+  .pic .meta { margin-top: 6px; font-size: 20px; color: var(--muted); }
+  .pic .of { margin-top: 6px; font-size: 19px; font-weight: 700; color: var(--saffron-deep); }
+  .pic.best { box-shadow: 0 0 0 3px #A5B4FC; }
+  .cmp { margin-top: 18px; padding: 16px 26px 8px; }
+  .cmp .k { font-size: 21px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted);
+            margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .cmp .k .ic { color: var(--saffron); }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 2px 4px 8px; }
+  th .letter { width: 40px; height: 40px; border-radius: 12px; font-size: 21px; margin: 0 auto; background: var(--indigo);
+               color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+  td { padding: 10px 4px; border-top: 2px solid var(--line); text-align: center; font-size: 23px; vertical-align: middle; }
+  td.need { text-align: left; font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.28; width: 40%; padding-right: 12px; }
+  .cell { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 6px 12px; border-radius: 11px; }
+  .cell.good { background: var(--green-pale); color: var(--green-deep); }
+  .cell.near { background: var(--saffron-pale); color: var(--saffron-deep); }
+  .cell.no { color: var(--faint); font-weight: 600; }
+  .cell.info { color: var(--ink); }
+  .nt { margin-top: 12px; font-size: 20px; color: var(--faint); text-align: center; }
+{% endblock %}
+{% block header %}
+  <div class="kicker">In your home</div>
+  <h1>Both on your wall, compared</h1>
+  {% if chips %}<div class="homechips">{% for c in (chips|aslist)[:5] %}<span class="hc">{% if loop.first %}{{ icon('home', 22) }}{% endif %}{{ c }}</span>{% endfor %}</div>{% endif %}
+{% endblock %}
+{% block content %}
+  <section class="pics">
+    {% for c in cs %}
+    <div class="card pic{% if c.best %} best{% endif %}">
+      <div class="im">{% if c.photo %}<img src="{{ c.photo }}" alt=""{% if not c.is_room %} class="prod"{% endif %}>{% endif %}</div>
+      <div class="cap">
+        <div class="trow"><span class="letter">{{ c.label }}</span><h3>{{ c.title }}</h3></div>
+        <div class="meta num">{{ c.size }}{% if c.width %} · {{ c.width }} wide{% endif %}</div>
+        {% if c.offer %}<div class="of">{{ c.offer }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+  {% if rs %}
+  <section class="card cmp">
+    <div class="k">{{ icon('target', 22) }}For your home</div>
+    <table>
+      <tr><th></th>{% for c in cs %}<th><span class="letter">{{ c.label }}</span></th>{% endfor %}</tr>
+      {% for r in rs %}
+      <tr><td class="need">{{ r.need }}</td>{% for cell in (r.cells|aslist)[:2] %}<td><span class="cell {{ cell.state }} num">{% if cell.state == 'good' %}{{ icon('check', 18, '', 3) }}{% endif %}{{ cell.value }}</span></td>{% endfor %}</tr>
+      {% endfor %}
+    </table>
+  </section>
+  {% endif %}
+  <div class="nt">Same wall · true size · approximate preview</div>
+{% endblock %}

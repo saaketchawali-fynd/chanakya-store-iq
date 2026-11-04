@@ -39,6 +39,8 @@ TEMPLATE_NAMES = (
     "digest",
     "offer",
     "view",
+    "demo",
+    "homecompare",
 )
 WIDTH = 1080
 MAX_HEIGHT = 1350
@@ -83,6 +85,7 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
         "hi": {
             "kicker": "आपके घर के लिए",
             "title": "{n} सही विकल्प",
+            "title_one": "आपके घर के लिए सही",
             "best": "सबसे सही",
             "no_price": "कीमत डेमो के बाद",
             "why": "आपके घर में क्यों सही",
@@ -93,6 +96,7 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
         "mr": {
             "kicker": "तुमच्या घरासाठी",
             "title": "{n} योग्य पर्याय",
+            "title_one": "तुमच्या घरासाठी योग्य",
             "best": "सर्वोत्तम",
             "no_price": "किंमत डेमोनंतर",
             "why": "तुमच्या घरासाठी का योग्य",
@@ -103,6 +107,7 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
         "en": {
             "kicker": "For your home",
             "title": "{n} picks that fit",
+            "title_one": "The pick that fits",
             "best": "Best fit",
             "no_price": "Price after the demo",
             "why": "Why it fits your home",
@@ -359,6 +364,7 @@ ICONS: dict[str, str] = {
     "users": '<circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/>'
     '<path d="M15.5 5.2a3.5 3.5 0 0 1 0 6.6M17.5 14.3c2.4.6 4 2.6 4 5.7"/>',
     "home": '<path d="M3.5 11L12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
+    "play": '<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/>',
     "target": '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/>',
     "calendar": '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
     "clock": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 2"/>',
@@ -740,6 +746,16 @@ def _prepare(card: Card) -> dict[str, Any]:
             o["image"] = to_data_uri(o.get("image"), 900 if o.get("is_best") else 560)
             opts.append(o)
         data["options"] = opts
+    for key, px in (("products", 320), ("cols", 760)):  # the demo guide's products; the home compare's columns
+        if isinstance(data.get(key), list):
+            rows = []
+            for o in data[key]:
+                o = dict(o or {})
+                for k in ("image", "photo"):
+                    if o.get(k):
+                        o[k] = to_data_uri(o[k], px if k == "image" else 900)
+                rows.append(o)
+            data[key] = rows
     for side in ("a", "b"):
         if isinstance(data.get(side), dict):
             data[side] = dict(data[side])
@@ -1074,6 +1090,34 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
             ),
             "stamp": "1 Nov 18:40",
         }
+    if template == "demo":
+        return {"chips": ["Living room", "10 ft", "Movies/OTT", "sound features"],
+                "products": [
+                    {"label": "B", "title": 'Meru 55" QLED Pro', "image": "products/TV-MER-55-QL120.png", "best": True,
+                     "steps": [{"tag": "wow", "title": "Voices and dialogue come through clearer", "proof": "Dialogue enhance",
+                                "do": "Play a dialogue scene at the same low volume on both",
+                                "say": "For the elders at home: voices and dialogue come through clearer."},
+                               {"tag": "then", "title": "Sharp ball in cricket", "proof": "120 Hz",
+                                "do": "Play a cricket highlight on both; point at the ball on a fast shot", "say": ""},
+                               {"tag": "more", "title": "Right size from their sofa", "proof": "55 inch",
+                                "do": "Stand the customer 4 steps back, about their sofa distance", "say": ""}]},
+                    {"label": "A", "title": 'Arka 55" 4K', "image": "products/TV-ARK-55-4K60.png", "best": False,
+                     "steps": [{"tag": "wow", "title": "Right size from their sofa", "proof": "55 inch",
+                                "do": "Stand the customer 4 steps back, about their sofa distance", "say": ""},
+                               {"tag": "then", "title": "Panel: 4K LED", "proof": None,
+                                "do": "Point it out next to Meru 55 QLED Pro", "say": ""}]}]}
+    if template == "homecompare":
+        return {"chips": ["Living room", "10 ft", "Movies/OTT"],
+                "cols": [{"label": "A", "title": 'Arka 55" 4K', "size": "55 inch", "width": "123 cm",
+                          "photo": "products/TV-ARK-55-4K60.png", "best": False, "offer": "No live offer today"},
+                         {"label": "B", "title": 'Meru 55" QLED Pro', "size": "55 inch", "width": "123 cm",
+                          "photo": "products/TV-MER-55-QL120.png", "best": True, "offer": "10% off on HDFC · till 15 Nov"}],
+                "rows": [{"need": "Size for 10 ft away", "cells": [{"label": "A", "value": "55 inch", "state": "good"},
+                                                                  {"label": "B", "value": "55 inch", "state": "good"}]},
+                         {"need": "For your movie nights", "cells": [{"label": "A", "value": "—", "state": "no"},
+                                                                    {"label": "B", "value": "HDR10+", "state": "good"}]},
+                         {"need": "Panel", "cells": [{"label": "A", "value": "LED", "state": "info"},
+                                                    {"label": "B", "value": "QLED", "state": "info"}]}]}
     if template == "view":
         return {"title": "How big it feels", "distance": "10 ft",
                 "rows": [{"label": "A", "size": "55 inch", "model": "Arka 55 4K", "deg": "24", "deg_f": 24.1,
@@ -1313,6 +1357,18 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
         rows += [f"A + {x}" for x in aslist(d.get("a_pros"))[:3]] + [f"B + {x}" for x in aslist(d.get("b_pros"))[:3]]
         if d.get("verdict"):
             rows.append(f"{lb['verdict']}: {d['verdict']}")
+    elif tpl == "demo":
+        title = "Demo guide"
+        for pr in d.get("products") or []:
+            rows.append(f"{pr.get('label')}: {pr.get('title')}")
+            for i, st in enumerate(pr.get("steps") or [], 1):
+                proof = f" ({st['proof']})" if st.get("proof") else ""
+                rows.append(f"  {i}. {st.get('title')}{proof}" + (f" — {st['do']}" if st.get("do") else ""))
+    elif tpl == "homecompare":
+        title = "In your home"
+        rows += [f"{c.get('label')}: {c.get('title')} {c.get('size') or ''}".strip() for c in d.get("cols") or []]
+        for r in d.get("rows") or []:
+            rows.append(f"{r.get('need')}: " + " | ".join(f"{c.get('label')} {c.get('value')}" for c in r.get("cells") or []))
     elif tpl == "kharcha":
         title = f"{lb['title']} · {d.get('product_title') or ''}"
         for ln in d.get("lines") or []:

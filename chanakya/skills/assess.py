@@ -98,9 +98,89 @@ def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voic
         if P.set_slot(home, pack, sid, "num", float(npair.value), source, ctx.now):
             new += 1
             ctx.ev("slot_filled", slot=sid, value=P.value(home, sid), number=npair.value, source=source)
+    new += apply_product_meaning(ctx, u, source)
     if "first_note_slots" not in s.extra and (u.slots or u.numbers):
         s.extra["first_note_slots"] = new
     return new
+
+
+def apply_product_meaning(ctx: SkillContext, u: Understanding, source: str = "voice") -> int:
+    """The note's meaning about the product (user, 4 Nov 2026): what they want in the new one (wants), the one they
+    have now (existing: never a want; its size is the old TV), what they rule out (avoid), the needs it must meet
+    (asks: highlight themes) and whether they want an upgrade. Returns how many new facts this added."""
+    from chanakya.brain import highlights as HL
+    from chanakya.brain import wants as W
+
+    s, home, pack = ctx.session, ctx.session.home, ctx.pack
+    brands = {b.lower(): b for b in {p.brand for p in ctx.facts.products_sync(pack.category) if p.brand}}
+
+    def norm(pairs) -> dict:
+        out = {}
+        for wp in pairs or []:
+            k, v = wp.key, str(wp.value).strip()
+            if not v:
+                continue
+            if k == "brand":
+                v = brands.get(v.lower(), v)
+            elif k in ("size_in", "capacity_l", "star", "ram_gb"):
+                try:
+                    v = int(float(v))
+                except ValueError:
+                    continue
+            elif k in ("ton", "capacity_kg"):
+                try:
+                    v = float(v)
+                except ValueError:
+                    continue
+            out[k] = v
+        return out
+
+    note = W.clean({"wants": norm(u.wants), "existing": norm(u.existing), "avoid": norm(u.avoid)})
+    n = 0
+    if note["existing"]:
+        ex = {**home.existing, **{k: v for k, v in note["existing"].items() if k in ("brand", "size_in", "model")}}
+        found = ctx.facts.find_in_text(" ".join(str(x) for x in (ex.get("brand"), ex.get("model")) if x), pack.category) \
+            if ex.get("model") else None
+        if found:
+            ex["sku"] = found
+        if ex != home.existing:
+            home.existing = ex
+            n += 1
+            ctx.ev("existing_noted", **{k: str(v) for k, v in ex.items()})
+        size = ex.get("size_in")
+        if size and pack.slot("old_size") and not P.known(home, "old_size"):
+            sd = pack.slot("old_size")
+            q = min(sd.quick, key=lambda q: abs((q.number or 0) - float(size)), default=None)
+            if q is not None and P.set_slot(home, pack, "old_size", q.id, None, source, ctx.now):
+                ctx.ev("slot_filled", slot="old_size", value=q.id, source=source)
+        if pack.slot("trigger") and not P.known(home, "trigger") and "replace" in (pack.slot("trigger").values or []):
+            if P.set_slot(home, pack, "trigger", "replace", None, source, ctx.now):
+                ctx.ev("slot_filled", slot="trigger", value="replace", source=source)
+    if note["avoid"].get("brand"):
+        ex_b = set(s.extra.get("excluded_brands") or [])
+        if note["avoid"]["brand"] not in ex_b:
+            s.extra["excluded_brands"] = sorted(ex_b | {note["avoid"]["brand"]})
+            ctx.ev("brand_avoided", brand=note["avoid"]["brand"])
+            n += 1
+    if note["wants"]:
+        before = dict(s.extra.get("wants") or {})
+        s.extra["wants"] = {**before, **note["wants"]}
+        n += len(set(note["wants"].items()) - set(before.items()))
+    by_id = {th.id: th for th in HL.themes(pack.category)}
+    for a in u.asks or []:
+        th = by_id.get(a)
+        if th is None or a in home.asks:
+            continue
+        if HL.triggered(th, home, s.extra.get("wants") or {}, pack)[0] >= HL.STRONG:
+            continue  # their answers already say it strongly ("cricket" → the sports question): not a second fact
+        if a not in home.asks:
+            home.asks.append(a)
+            n += 1
+            ctx.ev("need_asked", theme=a, source=source)
+    if u.upgrade and not home.upgrade:
+        home.upgrade = True
+        n += 1
+    return n
 
 
 async def on_info(
@@ -200,6 +280,12 @@ async def tap_slot(ctx: SkillContext, slot: str, val: str) -> Reply:
     from chanakya.ai.schemas import SlotPair
 
     u.slots = [SlotPair(slot=slot, value=val)]
+    if ctx.x.get("more_q") == slot:  # asked from 'Tell me more': the answer re-picks the products at once
+        ctx.x.pop("more_q", None)
+        apply_understanding(ctx, u, "tap")
+        from chanakya.skills import recommend
+
+        return await recommend.show_options(ctx, override_checked=True)
     if ctx.x.get("pending_cost") and (slot in pack.complete_slots or sd.phase == "site"):
         apply_understanding(ctx, u, "tap")
         from chanakya.skills import complete
@@ -402,6 +488,10 @@ async def data_answer(ctx: SkillContext, key: str, choice: str) -> Reply:
     if choice.isdigit() and int(choice) < len(vals):
         s.extra["wants"] = {**(s.extra.get("wants") or {}), key: vals[int(choice)]}
     ctx.ev("data_question_answered", key=key, value=str(vals[int(choice)]) if choice.isdigit() and int(choice) < len(vals) else "any")
+    if ctx.x.pop("more_q", None) == "dq" and s.shortlist:  # from 'Tell me more': re-pick the products
+        from chanakya.skills import recommend
+
+        return await recommend.show_options(ctx, override_checked=True)
     return ctx.reply(C.next_question_or_options(ctx))
 
 

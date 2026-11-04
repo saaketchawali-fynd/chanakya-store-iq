@@ -53,10 +53,11 @@ def _proof(ctx: SkillContext, p, benefit, lang: str) -> str | None:
 
 
 def points(ctx: SkillContext, p, lang: str, n: int = 3) -> list[dict]:
-    """[{text, proof}] — benefits that hold for this product and this home, strongest first."""
+    """[{text, proof}] — benefits that hold for this product and this home, strongest first. With the product they
+    have now known: first, what this one adds over it (a bigger size; a highlight their model lacks)."""
     from chanakya.skills.translate import matching
 
-    out = []
+    out = over_current(ctx, p)[:1]
     for b in matching(ctx, p):
         text = pick(b.card, lang) if b.card else None
         if not text or P.placeholders(text):
@@ -161,7 +162,7 @@ def needs_grid(ctx: SkillContext, options: list[tuple[str, object]], lang: str, 
             any_has = any_has or f is not None
             cells.append({"label": label, "value": ctx.reg.raw(f.proof, f"highlight:{p.sku}") if f else "—",
                           "state": "good" if f else "no"})
-        title = HL.need_label(need, lang)
+        title = (th.label[:1].upper() + th.label[1:] + " (asked)") if need == "as_asked" else HL.need_label(need, lang)
         if any_has and title and not any(r["need"] == title for r in out):
             out.append({"need": ctx.reg.static(title), "cells": cells})
     return out
@@ -187,4 +188,25 @@ def home_chips(ctx: SkillContext, lang: str, n: int = 4) -> list[str]:
             out.append(ctx.reg.static(value_title(sd, vals[0], lang)))
         if len(out) >= n:
             break
+    return out
+
+
+def over_current(ctx: SkillContext, p) -> list[dict]:
+    """What this product adds over the one they have now, from the data: a bigger size than theirs; and, when their
+    model is in the catalogue, a highlight it lacks. Nothing when it adds nothing."""
+    from chanakya.brain import highlights as HL
+
+    home = ctx.session.home
+    ex = home.existing or {}
+    out = []
+    size, old = p.spec("size_in"), ex.get("size_in")
+    if size and old and float(size) > float(old):
+        out.append({"text": ctx.reg.static("Bigger than your current TV"),
+                    "proof": ctx.reg.num(size, f"spec:{p.sku}:size_in", '"') + " vs " + ctx.reg.num(old, "note:existing", '"')})
+    oldp = ctx.facts.product_sync(ex["sku"]) if ex.get("sku") else None
+    if oldp is not None:
+        diff = HL.differences(p, oldp, home, ctx.session.extra.get("wants") or {}, ctx.pack)
+        if diff:
+            out.append({"text": ctx.reg.static("New vs yours: " + HL.card_text(diff[0]).lower()),
+                        "proof": ctx.reg.raw(diff[0].proof, f"highlight:{p.sku}")})
     return out

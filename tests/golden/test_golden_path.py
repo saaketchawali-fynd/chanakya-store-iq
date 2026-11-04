@@ -116,7 +116,7 @@ async def test_golden_path(tmp_path):
             'BMeru 55" QLED Pro',
             'CMeru 65" QLED Pro',
         ]
-        assert button_ids(out) == ["s:C1:demo", "s:C1:ofs", "s:C1:tryon"]  # offers next to the products
+        assert button_ids(out) == ["s:C1:demo", "s:C1:tryon", "s:C1:more"]  # demo guide, see at home, tell me more
         assert all(o["offer"]["text"] for o in card.data["options"])  # every option shows its offer (or none)
         assert "₹" not in texts(out) and "price" not in str(card.data)
         assert card.data["grid"] and card.data["options"][1]["points"]  # built from this home's answers
