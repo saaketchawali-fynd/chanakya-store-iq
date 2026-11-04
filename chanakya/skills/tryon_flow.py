@@ -112,8 +112,9 @@ async def menu(ctx: SkillContext) -> Reply:
     rows = []
     best = prods[0]
     rows.append(_row(ctx, "best", ctx.t("tm_best"), best.model))
-    same = [p for p in prods[1:] if p.category == best.category and p.spec("size_in") != best.spec("size_in")]
-    if best.category == "tv" and same:
+    same = [p for p in prods[1:] if p.category == best.category and p.spec("size_in")
+            and p.spec("size_in") != best.spec("size_in")]  # only sizes the data states (some names carry none)
+    if best.category == "tv" and best.spec("size_in") and same:
         a = ctx.reg.num(best.spec("size_in"), f"spec:{best.sku}:size_in")
         b = ctx.reg.num(same[0].spec("size_in"), f"spec:{same[0].sku}:size_in")
         rows.append(_row(ctx, "size", ctx.t("tm_size", a=a, b=b), ctx.t("tm_size_d")))

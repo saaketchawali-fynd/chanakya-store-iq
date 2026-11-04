@@ -262,11 +262,47 @@ def short_name(brand: str, specs: dict, mn: str | None, name: str) -> str:
 ENERGY_LABEL = re.compile(r"(?i)bee[-_ ]|energy[-_ ]?label|star[-_ ]?label")  # BEE star-label pictures are not views
 
 
-def price(p: dict, kind: str) -> int | None:
-    v = ((p.get("price") or {}).get(kind) or {}).get("min")
+def _rupees(v) -> int | None:
     if v is None:
         return None
     return int(v) if float(v).is_integer() else int(round(float(v)))
+
+
+PLACEHOLDER_SHARE = 0.25  # a selling price under a quarter of the MRP is a stand-in, not a price (75%+ off)
+
+
+def prices(p: dict) -> tuple[int | None, int | None, str]:
+    """(selling price, MRP, how it was chosen) from the listing's own fields (user, 5 Nov 2026).
+
+    The listing's price is a min–max over EVERY store, warehouses with no stock included, and those carry stand-in
+    prices (UAT: a 43" Sony at ₹1,000 in a DC with 0 stock, ₹45,990 at the store that sells it). So:
+      1. the backend's own `_custom_json.offer_price` when it lies inside the range (it matched the selling store
+         wherever it was present);
+      2. else, when the lowest price is under a quarter of the MRP, it is a stand-in: the highest one;
+      3. else the lowest, as before.
+    The MRP is taken from the same end of its range, so a 'you save' is never measured against another store."""
+    pr = p.get("price") or {}
+    eff, mrk = pr.get("effective") or {}, pr.get("marked") or {}
+    lo, hi = _rupees(eff.get("min")), _rupees(eff.get("max"))
+    m_lo, m_hi = _rupees(mrk.get("min")), _rupees(mrk.get("max"))
+    if lo is None:
+        return None, m_lo, "none"
+    hi = hi if hi is not None else lo
+    m_hi = m_hi if m_hi is not None else m_lo
+    if lo == hi:
+        return lo, m_lo, "listing"
+    op = _rupees((p.get("_custom_json") or {}).get("offer_price"))
+    if op is not None and lo <= op <= hi:
+        return op, (m_hi if op > lo else m_lo), "offer_price"
+    if m_hi and lo < PLACEHOLDER_SHARE * m_hi:
+        return hi, m_hi, "range_max"
+    return lo, m_lo, "range_min"
+
+
+def price(p: dict, kind: str) -> int | None:
+    """The selling price ('effective') or the MRP ('marked'), chosen by `prices`."""
+    eff, mrp, _ = prices(p)
+    return eff if kind == "effective" else mrp
 
 
 def map_product(p: dict, category: str) -> dict | None:

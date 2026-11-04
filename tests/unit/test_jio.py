@@ -61,7 +61,7 @@ def test_categories_from_the_backend():
 def test_product_facts_are_copied_not_invented():
     sony = map_product(item("Sony 108 cm (43 inch)"), "tv")
     assert sony["title"]["en"] == "Sony 108 cm (43 inch) Ultra HD 4K LED Smart TV, KD-43X7002E"  # verbatim
-    assert (sony["price"], sony["mrp"]) == (1000, 68900)  # the listing's effective and marked price, as returned
+    assert (sony["price"], sony["mrp"]) == (45990, 68900)  # its own selling price (offer_price), not a ₹1,000 stand-in
     assert sony["specs"]["size_in"] == 43 and sony["specs"]["resolution"] == "4K"
     assert sony["info"]["source"] == "jio" and sony["info"]["slug"]
     fridge = map_product(item("Panasonic 584 litres"), "fridge")
@@ -155,7 +155,7 @@ async def test_sync_loads_only_backend_data(tmp_path, jio_backend):
         assert not snap.charges and not snap.finance and not snap.exchange  # no source in the documented API
         assert "tariff" not in snap.guides and "size_tv" in snap.guides  # the agent's own sizing rules only
         sony = h.rt.facts.product_sync("491297651")
-        assert (sony.price, sony.mrp) == (1000, 68900) and not sony.stock_known and sony.in_stock
+        assert (sony.price, sony.mrp) == (45990, 68900) and not sony.stock_known and sony.in_stock
         assert [o.title["en"] for o in snap.offers] == ["Flat 10% off"]
         assert {pl.code for pl in snap.protection} == {"600562736", "600562710"}
         meta = await jio_sync.last_meta()
@@ -212,3 +212,25 @@ async def test_live_mode_removes_sample_data_left_in_the_database(tmp_path):
         assert h.rt.facts.snap.products == {} and not h.rt.facts.snap.offers
     finally:
         await h.close()
+
+
+def test_price_is_the_products_own_selling_price_not_a_warehouse_stand_in():
+    """User, 5 Nov 2026: the listing's price is a min–max over every store, zero-stock warehouses with stand-in
+    prices included (a 43" Sony at ₹1,000 there, ₹45,990 at the store that sells it). The price is always one of the
+    product's own values: its offer_price, else the range's end that is a real price; the MRP from the same end."""
+    import json
+    from pathlib import Path
+
+    from chanakya.truth import jio_map
+
+    items = json.loads(Path("tests/fixtures/jio/products.json").read_text())
+    items = items.get("items", items) if isinstance(items, dict) else items
+    by = {i["name"]: i for i in items}
+    sony = next(i for n, i in by.items() if n.startswith("Sony 108 cm (43 inch)"))
+    assert jio_map.prices(sony)[:2] == (45990, 68900)  # its offer_price, not the ₹1,000 stand-in
+    for it in items:
+        e, m = it["price"]["effective"], it["price"]["marked"]
+        eff, mrp, _ = jio_map.prices(it)
+        assert eff in {e["min"], e["max"], (it.get("_custom_json") or {}).get("offer_price")}  # never computed
+        assert mrp in {m["min"], m["max"]}
+        assert eff >= 0.25 * m["max"] or eff == e["max"]  # never a stand-in when a real price is there

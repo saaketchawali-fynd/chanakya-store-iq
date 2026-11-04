@@ -88,6 +88,8 @@ async def walk_to_options(h, content="movies"):
         ids = [b.id for m in out for b in m.buttons] + [r.id for m in out for s in (m.sections or []) for r in s.rows]
         if any(":slot:content:" in i for i in ids):
             nxt = f"s:C1:slot:content:{content}"
+        elif "s:C1:budget:none" in ids:  # needs decide here, not a price band (bands come from the real prices)
+            nxt = "s:C1:budget:none"
         else:
             nxt = next((i for i in ids if ":slot:" in i or ":dq:" in i or ":budget:" in i
                         or i.endswith(("photo_no", "readback_ok"))), None)
@@ -134,8 +136,8 @@ async def test_live_options_demo_and_choice(tmp_path, monkeypatch):
             assert "Bigger screen" not in cap and "5 years" not in cap  # no fixed claim
         best = next(o for o in card.data["options"] if o["is_best"])
         assert any(pt.get("proof") == "HDR10+" for pt in best["points"])  # movies → the product's own HDR10+
-        other = next(o for o in card.data["options"] if not o["is_best"])
-        assert "ClearAudio+" in caps[other["label"]]  # the real difference, from its own highlight
+        step = next(o for o in card.data["options"] if o["role"] == "step")
+        assert "55 inch vs 43 inch" in caps[step["label"]]  # one step up: the real difference, from the data
         out = await h.tap("s:C1:demo")
         check_floor(out)
         s = await h.rt.svc.sessions.by_code("919000000001", "C1")

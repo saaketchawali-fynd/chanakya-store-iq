@@ -85,4 +85,4 @@ async def test_backend_promotion_reaches_the_offer_card(hj):
     oc = next(m.card for m in out if m.card and m.card.template == "offer")
     p = hj.rt.facts.product_sync("491934634")
     assert "Flat 10% off" in str(oc.data)
-    assert oc.data["total_str"] == f"₹{p.price - round(p.price * 0.10):,}"  # 10% as stated, under the ₹3,000 cap
+    assert oc.data["total_str"] == f"₹{p.price - min(round(p.price * 0.10), 3000):,}"  # 10% as stated, capped at ₹3,000
