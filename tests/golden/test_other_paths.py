@@ -59,7 +59,7 @@ async def test_wm_smoke_rules(h):
     assert s.home.category == "wm"
     # the needs were told in one note (people, place, how often): the right machines now, from the note
     assert any(m.card and m.card.template == "options" for m in out)
-    assert out[0].body.startswith("Aapke note se: 5 log")
+    assert out[0].body.startswith("*Note se samjha:*\n• 5 log")  # what the note said, as bullets
     await h.tap("s:C1:shown")
     out = await h.tap("s:C1:opt:B")
     check_floor(out)

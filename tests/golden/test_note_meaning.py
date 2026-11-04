@@ -64,7 +64,7 @@ async def test_the_tv_they_have_is_never_the_fit(tmp_path, monkeypatch):
         card = next(m.card for m in out if m.card and m.card.template == "options")
         assert all(o["points"] for o in card.data["options"])  # every option says why it fits them
         assert "Abhi: Sony 43" in out[0].body and "Naye features chahiye" in out[0].body  # the note said back
-        assert button_ids(out) == ["s:C1:demo", "s:C1:tryon", "s:C1:more"]
+        assert set(button_ids(out)) >= {"s:C1:moreopts", "s:C1:demo"}  # happy with these? / more options
     finally:
         await h.close()
 
@@ -107,3 +107,46 @@ async def test_ruled_out_brand_and_needs_by_meaning(tmp_path, monkeypatch):
         assert wow["tag"] == "wow" and wow["do"] and wow["proof"]
     finally:
         await h.close()
+
+
+async def test_more_options_keeps_the_best_and_adds(h):
+    from chanakya.sim.harness import PHONES
+
+    await h.tap("g:new")
+    await h.tap("s:C1:lang:en")
+    out = await h.voice("assess_1")  # the needs in one note → the best fits at once
+    assert "s:C1:moreopts" in button_ids(out) and "Customer ko ye sahi lag rahe hain?" in out[0].body
+    s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+    before = dict(s.option_labels)
+    best_before = s.option_labels[next(k for k, r in s.extra["option_roles"].items() if r == "best")]
+    out = await h.tap("s:C1:moreopts")  # more options: a follow-up the note did not cover
+    check_floor(out)
+    for _ in range(3):
+        if any(m.card and m.card.template == "options" for m in out):
+            break
+        assert out[-1].body.startswith("*Follow-up")
+        nxt = next(b.id for b in out[-1].buttons if ":slot:" in b.id or ":dq:" in b.id)
+        rows = [r.id for m in out for sec in (m.sections or []) for r in sec.rows]
+        out = await (h.pick(nxt) if nxt in rows else h.tap(nxt))
+        check_floor(out)
+    card = next(m.card for m in out if m.card and m.card.template == "options")
+    s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+    assert all(s.option_labels.get(k) == v for k, v in before.items())  # the earlier picks stay, same labels
+    assert best_before in s.option_labels.values()
+    added = [k for k, r in s.extra["option_roles"].items() if r in ("new", "broader")]
+    assert added and len(s.option_labels) > len(before) and len(card.data["options"]) == len(s.option_labels)
+
+
+async def test_side_by_side_without_a_room_photo(h):
+    from tests.helpers import to_options
+
+    await to_options(h)
+    out = await h.tap("s:C1:cmpall")
+    check_floor(out)
+    card = next(m.card for m in out if m.card and m.card.template == "homecompare")
+    d = card.data
+    assert not d["in_room"] and len(d["cols"]) == 3 and all(c["photo"] for c in d["cols"])  # their product photos
+    titles = [sec["title"] for sec in d["sections"]]
+    assert titles[0] == "For your needs" and "Benefits for you" in titles and "Features" in titles
+    assert titles[-1] == "Cost and offers"
+    assert out[0].body.startswith("*Side-by-side*") and "s:C1:demo" in button_ids(out)

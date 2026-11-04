@@ -96,8 +96,11 @@ def check(
         if len(lines) > limits.FLOOR_MAX_LINES:
             c.violations.append(Violation("too_many_lines", f"{attr}:{len(lines)}"))
             c.fatal = True
-        if any(not ln.strip() for ln in lines):
-            setattr(msg, attr, "\n".join(ln for ln in lines if ln.strip()))
+        if any(not a.strip() and not b.strip() for a, b in zip(lines, lines[1:], strict=False)) or \
+                (lines and (not lines[0].strip() or not lines[-1].strip())):
+            from chanakya.core.coach import tidy  # spacing is fine: one blank line between blocks, never two
+
+            setattr(msg, attr, tidy(v))
             c.violations.append(Violation("empty_line", attr))
         if len(v) > mx:
             setattr(msg, attr, limits.truncate(v, mx))

@@ -29,7 +29,9 @@ def check_floor(msgs: list[OutMessage]) -> None:
     for m in msgs:
         for text in (m.body, m.caption):
             if text:
-                assert len(text.split("\n")) <= 3, f"> 3 lines: {text!r}"
+                lines = text.split("\n")
+                assert len(lines) <= 24, f"> 24 lines: {text!r}"  # well spaced, detailed, still scannable
+                assert not any(not a.strip() and not b.strip() for a, b in zip(lines, lines[1:], strict=False)), f"double gap: {text!r}"
                 assert not re.search(r"[०-९]", text)
                 low = text.lower()
                 assert not any(b in low for b in BANNED), text

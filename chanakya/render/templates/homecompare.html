@@ -1,72 +1,94 @@
 {% extends "base.html" %}
-{# See at home, compared (English): each option drawn alone on the customer's own wall, side by side, and under the
-   pictures how each meets THEIR needs (each cell the product's own value or highlight), then what really differs.
-   Every value comes from the product data or their Home Card. #}
-{% set cs = (cols|aslist)[:2] %}
-{% set rs = (rows|aslist)[:6] %}
+{# Side by side (English): the shortlisted products in columns — each on the customer's own wall when there is a room
+   photo, else its product photo — and under them one table in sections: their needs, the benefits for them, the
+   features, the cost and the offers. Every value comes from the product data or their Home Card. #}
+{% set cs = (cols|aslist)[:3] %}
+{% set n = cs|length %}
+{% set secs = (sections|aslist) %}
 {% block style %}
   .homechips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
   .hc { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; font-size: 22px;
         font-weight: 600; color: #E0E7FF; background: rgba(255,255,255,.1); border: 1.5px solid rgba(255,255,255,.16); }
-  .pics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pics { display: grid; gap: 14px; grid-template-columns: repeat({{ n }}, 1fr); }
   .pic { padding: 0; overflow: hidden; }
-  .pic .im { height: 300px; background: #0B1020; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .pic .im { height: {{ 300 if n == 2 else 230 }}px; background: #F1F3F7; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .pic .im.room { background: #0B1020; }
   .pic .im img { width: 100%; height: 100%; object-fit: cover; }
-  .pic .im img.prod { object-fit: contain; width: 80%; height: 80%; }
-  .pic .cap { padding: 14px 18px 16px; }
-  .pic .trow { display: flex; align-items: center; gap: 12px; }
-  .pic .letter { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--indigo); color: #fff;
-                 font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-  .pic.best .letter { background: var(--saffron); }
-  .pic h3 { margin: 0; font-size: 24px; line-height: 1.25; color: var(--ink); }
-  .pic .meta { margin-top: 6px; font-size: 20px; color: var(--muted); }
-  .pic .of { margin-top: 6px; font-size: 19px; font-weight: 700; color: var(--saffron-deep); }
+  .pic .im img.prod { object-fit: contain; width: 78%; height: 78%; }
+  .pic .cap { padding: 12px 16px 14px; }
+  .pic .trow { display: flex; align-items: center; gap: 10px; }
+  .letter { flex: none; width: 42px; height: 42px; border-radius: 12px; background: var(--indigo); color: #fff;
+            font-size: 22px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .pic.best .letter, th .letter.best { background: var(--saffron); }
+  .pic h3 { margin: 0; font-size: {{ 23 if n == 2 else 20 }}px; line-height: 1.25; color: var(--ink); }
+  .pic .meta { margin-top: 6px; font-size: 19px; color: var(--muted); }
+  .pic .tag { display: inline-block; margin-top: 6px; font-size: 16px; font-weight: 800; letter-spacing: 1px;
+              text-transform: uppercase; color: #3730A3; background: #EEF2FF; padding: 3px 10px; border-radius: 8px; }
   .pic.best { box-shadow: 0 0 0 3px #A5B4FC; }
-  .cmp { margin-top: 18px; padding: 16px 26px 8px; }
-  .cmp .k { font-size: 21px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted);
-            margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-  .cmp .k .ic { color: var(--saffron); }
-  table { width: 100%; border-collapse: collapse; }
-  th { padding: 2px 4px 8px; }
-  th .letter { width: 40px; height: 40px; border-radius: 12px; font-size: 21px; margin: 0 auto; background: var(--indigo);
-               color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
-  td { padding: 10px 4px; border-top: 2px solid var(--line); text-align: center; font-size: 23px; vertical-align: middle; }
-  td.need { text-align: left; font-size: 24px; font-weight: 700; color: var(--text); line-height: 1.28; width: 40%; padding-right: 12px; }
-  .cell { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 6px 12px; border-radius: 11px; }
+  .cmp { margin-top: 16px; padding: 8px 22px 10px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th { padding: 12px 4px 8px; }
+  th .letter { width: 38px; height: 38px; font-size: 20px; margin: 0 auto; }
+  tr.sec td { padding: 16px 4px 6px; border-top: none; text-align: left; font-size: 18px; font-weight: 800; letter-spacing: 1.4px;
+              text-transform: uppercase; color: var(--saffron-deep); }
+  td { padding: 10px 6px; border-top: 1.5px solid var(--line); text-align: center; font-size: {{ 21 if n == 2 else 19 }}px;
+       vertical-align: middle; line-height: 1.3; }
+  td.lab { text-align: left; font-weight: 700; color: var(--text); width: {{ 30 if n == 2 else 25 }}%; padding-right: 10px; }
+  .cell { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 5px 10px; border-radius: 10px; }
   .cell.good { background: var(--green-pale); color: var(--green-deep); }
   .cell.near { background: var(--saffron-pale); color: var(--saffron-deep); }
   .cell.no { color: var(--faint); font-weight: 600; }
   .cell.info { color: var(--ink); }
-  .nt { margin-top: 12px; font-size: 20px; color: var(--faint); text-align: center; }
+  .cell.price { color: var(--ink); font-size: {{ 26 if n == 2 else 22 }}px; font-weight: 800; }
+  .cell.offer { color: var(--saffron-deep); font-weight: 700; }
+  td.list { text-align: left; vertical-align: top; }
+  .bl { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; font-weight: 600; color: var(--ink); }
+  .bl .ic { flex: none; color: var(--green); margin-top: 3px; }
+  .bl .pf { display: block; margin-top: 2px; font-size: 0.82em; font-weight: 700; color: #3730A3; }
+  .nt { margin-top: 12px; font-size: 19px; color: var(--faint); text-align: center; }
 {% endblock %}
 {% block header %}
-  <div class="kicker">In your home</div>
-  <h1>Both on your wall, compared</h1>
+  <div class="kicker">{% if in_room %}In your home{% else %}Side by side{% endif %}</div>
+  <h1>{% if in_room %}On your wall, compared{% else %}Compared for your home{% endif %}</h1>
   {% if chips %}<div class="homechips">{% for c in (chips|aslist)[:5] %}<span class="hc">{% if loop.first %}{{ icon('home', 22) }}{% endif %}{{ c }}</span>{% endfor %}</div>{% endif %}
 {% endblock %}
 {% block content %}
   <section class="pics">
     {% for c in cs %}
     <div class="card pic{% if c.best %} best{% endif %}">
-      <div class="im">{% if c.photo %}<img src="{{ c.photo }}" alt=""{% if not c.is_room %} class="prod"{% endif %}>{% endif %}</div>
+      <div class="im{% if c.is_room %} room{% endif %}">{% if c.photo %}<img src="{{ c.photo }}" alt=""{% if not c.is_room %} class="prod"{% endif %}>{% endif %}</div>
       <div class="cap">
         <div class="trow"><span class="letter">{{ c.label }}</span><h3>{{ c.title }}</h3></div>
         <div class="meta num">{{ c.size }}{% if c.width %} · {{ c.width }} wide{% endif %}</div>
-        {% if c.offer %}<div class="of">{{ c.offer }}</div>{% endif %}
+        {% if c.best %}<span class="tag">Best fit</span>{% elif c.tag %}<span class="tag">{{ c.tag }}</span>{% endif %}
       </div>
     </div>
     {% endfor %}
   </section>
-  {% if rs %}
+  {% if secs or rows %}
   <section class="card cmp">
-    <div class="k">{{ icon('target', 22) }}For your home</div>
     <table>
-      <tr><th></th>{% for c in cs %}<th><span class="letter">{{ c.label }}</span></th>{% endfor %}</tr>
-      {% for r in rs %}
-      <tr><td class="need">{{ r.need }}</td>{% for cell in (r.cells|aslist)[:2] %}<td><span class="cell {{ cell.state }} num">{% if cell.state == 'good' %}{{ icon('check', 18, '', 3) }}{% endif %}{{ cell.value }}</span></td>{% endfor %}</tr>
+      <tr><th style="width: {{ 30 if n == 2 else 25 }}%"></th>{% for c in cs %}<th><span class="letter{% if c.best %} best{% endif %}">{{ c.label }}</span></th>{% endfor %}</tr>
+      {% for sec in secs %}
+      <tr class="sec"><td colspan="{{ n + 1 }}">{{ sec.title }}</td></tr>
+      {% for r in (sec.rows|aslist) %}
+      <tr>
+        {% if r.label %}<td class="lab">{{ r.label }}</td>{% else %}<td class="lab"></td>{% endif %}
+        {% for cell in (r.cells|aslist)[:n] %}
+        {% if cell.state == 'list' %}
+        <td class="list">{% for b in (cell.list|aslist)[:3] %}<div class="bl">{{ icon('check', 18, '', 3) }}<span>{{ b.text }}{% if b.proof %}<span class="pf num">{{ b.proof }}</span>{% endif %}</span></div>{% endfor %}{% if not cell.list %}<span class="cell no">—</span>{% endif %}</td>
+        {% else %}
+        <td><span class="cell {{ cell.state }} num">{% if cell.state == 'good' %}{{ icon('check', 16, '', 3) }}{% endif %}{{ cell.value }}</span></td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+      {% endfor %}
+      {% for r in (rows|aslist) %}
+      <tr><td class="lab">{{ r.need }}</td>{% for cell in (r.cells|aslist)[:n] %}<td><span class="cell {{ cell.state }} num">{% if cell.state == 'good' %}{{ icon('check', 16, '', 3) }}{% endif %}{{ cell.value }}</span></td>{% endfor %}</tr>
       {% endfor %}
     </table>
   </section>
   {% endif %}
-  <div class="nt">Same wall · true size · approximate preview</div>
+  <div class="nt">{% if in_room %}Same wall · true size · approximate preview{% else %}Send a room photo to see them on your wall{% endif %}</div>
 {% endblock %}

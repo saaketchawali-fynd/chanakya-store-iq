@@ -84,8 +84,8 @@ async def test_every_associate_message_offers_voice(h):
 
 async def test_later_steps_by_voice_in_three_languages(h):
     await to_options(h)
-    out = await h.say("demo dikhao")  # Hinglish: the demo guide card, then the first step to run
-    assert out[-1].body.startswith("*Bolo*") and "s:C1:shown" in button_ids(out)
+    out = await h.say("demo dikhao")  # Hinglish: the demo guide, in one message
+    assert out[-1].body.startswith("*Demo guide*") and "s:C1:shown" in button_ids(out)
     out = await h.say("घरच्यांना पाठवा")  # Marathi: send it to the family
     assert any(b.id in ("s:C1:qr", "s:C1:consent_tap") for b in out[0].buttons)
     out = await h.say("kal yaad dilana")  # a reminder

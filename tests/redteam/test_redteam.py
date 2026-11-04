@@ -107,7 +107,7 @@ async def test_07_out_of_stock_best_shows_nearby(h):
     await h.rt.svc.sessions.save(s)
     out = await h.tap("s:C1:options")
     check_floor(out)
-    assert "*B* Novex 55 OLED" in out[0].body and "2 din mein delivery" in out[0].body
+    assert "*B · Novex 55 OLED*" in out[0].body and "2 din mein delivery" in out[0].body  # its stock, said plainly
 
 
 async def test_08_injection_in_label_text(h):

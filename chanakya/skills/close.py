@@ -9,7 +9,7 @@ from chanakya.brain import packs as P
 from chanakya.core import repo, state
 from chanakya.core.buttons import encode
 from chanakya.core.clock import today
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, info_reply
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, OutMessage, Reply, Step
 from chanakya.i18n.lang import fill
 from chanakya.skills import common as C
@@ -426,7 +426,7 @@ async def objection(ctx: SkillContext, oid: str) -> Reply:
             ctx.asking.add(slot)
             cites = [slot]
     if not cites:
-        return ctx.reply(info_reply(ctx, f'{ctx.t("label_bolo")}: "{line}"', btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, line), btns))
     return ctx.reply(coach_reply(ctx, line, ctx.t("kyun_objection"), cites, btns))
 
 

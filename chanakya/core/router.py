@@ -566,7 +566,7 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "photo_no": lambda: assess.photo_no(ctx),
         "options": lambda: recommend.show_options(ctx),
         "shown": lambda: recommend.shown(ctx),
-        "demo2": lambda: recommend.demo2(ctx),
+        "demo2": lambda: recommend.demo(ctx),  # older messages: the guide again (one message now)
         "tryon": lambda: tryon_flow.tryon_request(ctx),
         "tmenu": lambda: tryon_flow.menu(ctx),
         "benefit_next": lambda: translate.benefit(ctx),
@@ -590,6 +590,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "ofs": lambda: recommend.offers_view(ctx),
         "upgrade": lambda: recommend.upgrade_view(ctx),
         "more": lambda: recommend.more_menu(ctx),
+        "moreopts": lambda: recommend.more_options(ctx),
+        "cmpall": lambda: recommend.side_by_side(ctx),
         "askdq": lambda: recommend.ask_more(ctx, None),
         "returning": lambda: returning.list_view(ctx),
         "view": lambda: view.show(ctx),

@@ -16,19 +16,19 @@ async def test_the_demo_is_a_plan_built_from_this_customer(h):
     await to_options(h)
     out = await h.tap("s:C1:demo")
     check_floor(out)
-    guide, m = out[0], out[-1]  # first the demo guide card (per product, wow first), then step 1 to run live
-    assert guide.card.template == "demo" and guide.card.data["products"][0]["steps"][0]["tag"] == "wow"
-    assert "Demo 1/" in m.body and m.footer and m.footer.startswith("Plan:")  # the order at a glance
-    assert "s:C1:demo2" in button_ids(out)
+    assert len(out) == 1  # the whole demo guide in ONE message (user, 4 Nov 2026), no "Demo 1/2" messages
+    m = out[0]
+    assert m.card.template == "demo" and m.card.data["products"][0]["steps"][0]["tag"] == "wow"
+    body = m.body
+    assert body.startswith("*Demo guide*") and "\n1. *Wow:*" in body and "\n2. " in body  # numbered, step by step
+    assert "▸ " in body  # how to show each step
+    assert "s:C1:shown" in button_ids(out)
     s = await session(h)
     plan = s.extra["demo_plan"]
     assert plan and plan[0]["kind"] in ("want", "recipe")
-    # each step names the values on both models, from the data
-    assert any(":" in part for part in m.body.split("·"))
-    for _ in range(len(plan) - 1):
-        out = await h.tap("s:C1:demo2")
-        assert "Demo " in out[0].body
-    out = await h.tap("s:C1:demo2")  # after the last step: which one felt right
+    out = await h.tap("s:C1:demo2")  # an older button: the guide again, still one message
+    assert len(out) == 1 and out[0].card.template == "demo"
+    out = await h.tap("s:C1:shown")  # demo done: which one felt right
     assert out[0].kind == "list"
 
 

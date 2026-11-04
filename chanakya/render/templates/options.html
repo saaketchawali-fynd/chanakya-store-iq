@@ -45,6 +45,7 @@
   .meta .ic { color: var(--faint); }
   .others { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px; }
   .others.n1 { grid-template-columns: 1fr; }
+  .others.n3 .opt .stage, .others.n4 .opt .stage { height: 96px; }
   .opt { padding: 0; overflow: hidden; }
   .opt .stage { height: 112px; border-radius: 30px 30px 0 0; }
   .opt .stage img { max-width: 76%; max-height: 80%; }
@@ -130,7 +131,7 @@
       <div class="stage">{% if o.image %}<img src="{{ o.image }}" alt="">{% else %}{{ icon('box', 80, 'ph', 1.4) }}{% endif %}</div>
       <div class="opt-body">
         <div class="trow">{% if o.label %}<span class="letter">{{ o.label }}</span>{% endif %}<h3>{{ o.title }}</h3></div>
-        {% set rl = L['role_' ~ o.role] if o.role in ('value', 'step') else '' %}
+        {% set rl = L['role_' ~ o.role] if o.role in ('value', 'step', 'new', 'broader') else '' %}
         {% if rl %}<span class="role {{ o.role }}{{ rl|dv }}">{{ rl }}</span>{% endif %}{% if o.stock_line %}<span class="stk">{{ o.stock_line }}</span>{% endif %}
         {% set opts_pts = (o.points|aslist)[:2] %}
         {% if opts_pts %}{% for p in opts_pts %}<div class="opt-pt num"><span class="bubble">{{ icon('check', 18, '', 3) }}</span><span>{{ p.text if p is mapping else p }}{% if p is mapping and p.proof %}<span class="pf">{{ p.proof }}</span>{% endif %}</span></div>{% endfor %}

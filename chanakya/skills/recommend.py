@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from chanakya.brain import packs as P
 from chanakya.brain.demos import pick_demo
 from chanakya.brain.fit import fit
@@ -58,7 +60,67 @@ def _option_set(ctx: SkillContext) -> OptionSet | None:
         left = [p for p in products if p.sku not in ex_sku and p.brand not in ex_brand]
         products = left if len([p for p in left if p.qty > 0 or p.nearby_qty > 0]) >= 1 else products
     products = upgrade_pool(ctx, products)
-    return compute_options(products, ctx.session.home, pack, ctx.facts.snap.guides, ctx.session.extra.get("wants"))
+    opts = compute_options(products, ctx.session.home, pack, ctx.facts.snap.guides, ctx.session.extra.get("wants"))
+    keep = ctx.x.get("keep_options")
+    if keep and opts is not None:  # more options asked for: the earlier best fits stay, the new / broader ones join
+        opts = merge_options(ctx, keep, opts, products)
+    return opts
+
+
+MAX_OPTIONS = 5
+LETTERS = "ABCDE"
+
+
+def merge_options(ctx: SkillContext, keep: dict, fresh, products: list):
+    """User, 4 Nov 2026: after the follow-up questions the earlier best fits stay (their labels and roles); the
+    products the new answers pick that were not shown join as 'new fit'; if the answers change nothing, the next best
+    fits for this home join as 'more options' (broader). At most five in all."""
+    from chanakya.brain.fit import fit
+    from chanakya.brain.options import Option, OptionSet
+
+    pack, home, g = ctx.pack, ctx.session.home, ctx.facts.snap.guides
+    roles = ctx.x.get("keep_roles") or {}
+    reasons = ctx.x.get("keep_reasons") or {}
+    out = []
+    for lab in sorted(keep):
+        p = ctx.facts.product_sync(keep[lab])
+        if p is not None:
+            out.append(Option(lab, roles.get(lab, "best" if not out else "value"), p, fit(p, home, pack, g),
+                              reasons.get(lab, "value_fit")))
+    have = {o.product.sku for o in out}
+    new = [o for o in fresh.options if o.product.sku not in have]
+    kind = "new"
+    if not new:  # the same picks: widen to the next best fits for this home that are on sale
+        kind = "broader"
+        pool = [p for p in products if p.sku not in have and (p.qty > 0 or p.nearby_qty > 0)
+                and p.brand not in set(ctx.x.get("excluded_brands") or [])]
+        scored = sorted(((fit(p, home, pack, g), p) for p in pool), key=lambda x: (-x[0].score, x[1].price))
+        new = [Option("", "broader", p, f, "alt") for f, p in scored if not f.excluded][:2]
+    free = [x for x in LETTERS if x not in {o.label for o in out}]
+    for o, lab in zip(new[: MAX_OPTIONS - len(out)], free, strict=False):
+        out.append(Option(lab, kind, o.product, o.fit, "alt"))
+    merged = OptionSet(out)
+    merged.merged = kind  # type: ignore[attr-defined]
+    return merged
+
+
+def current_options(ctx: SkillContext):
+    """The options as shown (labels, roles, reasons kept on the session), for the later steps; else computed."""
+    from chanakya.brain.fit import fit
+    from chanakya.brain.options import Option, OptionSet
+
+    s = ctx.session
+    if not s.option_labels:
+        return _option_set(ctx)
+    roles = s.extra.get("option_roles") or {}
+    reasons = s.extra.get("option_reason_keys") or {}
+    out = []
+    for lab in sorted(s.option_labels):
+        p = ctx.facts.product_sync(s.option_labels[lab])
+        if p is not None:
+            out.append(Option(lab, roles.get(lab) or state.option_role(s, lab) or "value", p,
+                              fit(p, s.home, ctx.pack, ctx.facts.snap.guides), reasons.get(lab, "value_fit")))
+    return OptionSet(out) if out else _option_set(ctx)
 
 
 def upgrade_pool(ctx: SkillContext, products: list) -> list:
@@ -101,6 +163,51 @@ def _reason(ctx: SkillContext, key: str, lang: str) -> str:
     from chanakya.i18n.lang import fill
 
     return fill(tpl, **vals)
+
+
+def note_block(ctx: SkillContext, note: dict) -> str:
+    """What the note was understood as, in bullets: the home facts; what they asked for; the TV they have now and
+    the wish for something newer; the needs it must meet."""
+    from chanakya.skills.assess import note_facts
+
+    home = ctx.session.home
+    facts = note_facts(ctx)
+    wants = want_labels(ctx, note.get("wants") or {})
+    meaning = meaning_labels(ctx)
+    asks = meaning[: len(home.asks)]
+    rest = meaning[len(home.asks):]
+    out = [ctx.t("note_head")]
+    if facts:
+        out.append("• " + " · ".join(facts[:5]))
+    if wants:
+        out.append("• " + ctx.t("note_line_wants", what=", ".join(wants)))
+    if rest:
+        out.append("• " + " · ".join(rest))
+    if asks:
+        out.append("• " + ctx.t("note_line_needs", what=", ".join(asks)))
+    return "\n".join(out)
+
+
+def option_block(ctx: SkillContext, o, opts, why: list[str] | None = None) -> str:
+    """'*A · Name* — best fit' and, as bullets, why it fits them: its reason, then its own points with proof."""
+    from chanakya.skills import fitview as FV
+
+    p = o.product
+    head = f"*{o.label} · {C.product_name(ctx, p)}*" + (f" — _{ctx.t('best_pick')}_" if o.role == "best" else "")
+    bullets = list(why or []) or [option_reason(ctx, o, opts, ctx.lang)]
+    lang = "mr" if ctx.lang == "mr" else "en"  # Hinglish reads the card's English benefit words best
+    for pt in FV.points(ctx, p, lang, 4):
+        if len(bullets) >= (3 if o.role == "best" else 2):
+            break
+        text = pt.get("text") if isinstance(pt, dict) else str(pt)
+        proof = pt.get("proof") if isinstance(pt, dict) else None
+        line = f"{text} ({proof})" if proof and proof not in text else text
+        same_size = "size" in text.lower() and any("size" in b.lower() for b in bullets)
+        if text and not same_size and not any(text.lower() in b.lower() for b in bullets):
+            bullets.append(line)
+    if not (p.qty > 0):
+        bullets.append(_stock_line(ctx, p))
+    return "\n".join([head] + [f"• {b}" for b in bullets if b])
 
 
 def meaning_labels(ctx: SkillContext, lang: str | None = None) -> list[str]:
@@ -167,6 +274,95 @@ async def more_menu(ctx: SkillContext) -> Reply:
     return ctx.reply(m)
 
 
+def uncovered(ctx: SkillContext) -> list[str]:
+    """The questions the note and the answers did not cover, that the data can act on (slot ids; 'dq' = the next
+    question about what the models on sale differ on). Same rules as 'Tell me more'."""
+    from chanakya.brain import data_questions as DQ
+    from chanakya.brain import highlights as HL
+
+    s, pack, home = ctx.session, ctx.pack, ctx.session.home
+    skip, avail = C.skipped(ctx), C._avail(ctx)
+    cands = list(dict.fromkeys([*pack.ask_order, *pack.required_slots]))
+    for th in HL.themes(pack.category):
+        cands += [n.slot for n in th.needs if n.slot and n.w >= HL.STRONG and HL.informative(th, avail)]
+    out = []
+    for sid in dict.fromkeys(cands):
+        sd = pack.slot(sid)
+        if sd is None or P.known(home, sid) or sid in skip or sd.phase in ("site", "close"):
+            continue
+        if sid in ("trigger", "old_size") and (home.existing or P.known(home, "trigger")):
+            continue
+        if sd.ask_if and not P.eval_slot_cond(home, sd.ask_if["slot"], {k: v for k, v in sd.ask_if.items() if k != "slot"},
+                                              pack):
+            continue
+        if any(th.id in home.asks for th in HL.themes(pack.category) if any(n.slot == sid for n in th.needs)):
+            continue
+        out.append(sid)
+    if DQ.next_data_question(pack, avail, set(s.extra.get("dq_done") or []), s.extra.get("wants") or {}) is not None:
+        out.append("dq")
+    return out
+
+
+FOLLOWUPS_MAX = 2
+
+
+async def more_options(ctx: SkillContext) -> Reply:
+    """'More options' after the note (user, 4 Nov 2026): a follow-up or two the note did not cover, then the earlier
+    best fits stay and the new (or broader) fits join, so they see all of them."""
+    s = ctx.session
+    ctx.x["keep_options"] = dict(s.option_labels)
+    ctx.x["keep_roles"] = dict(s.extra.get("option_roles") or {})
+    ctx.x["keep_reasons"] = dict(s.extra.get("option_reason_keys") or {})
+    ctx.x["followups"] = 0
+    ctx.ev("more_options_asked", shown=list(s.option_labels.values()))
+    return await _next_followup(ctx)
+
+
+async def _next_followup(ctx: SkillContext) -> Reply:
+    todo = uncovered(ctx)
+    if not todo or int(ctx.x.get("followups") or 0) >= FOLLOWUPS_MAX:
+        ctx.x.pop("more_q", None)
+        return await show_options(ctx, override_checked=True)
+    q = todo[0]
+    ctx.x["more_q"] = "chain:" + q
+    lead = ctx.t("followup_lead", n=ctx.reg.num(int(ctx.x.get("followups") or 0) + 1, "followup:no"))
+    if q == "dq":
+        m = C.data_question(ctx, force=True)
+        if m is None:
+            ctx.x["followups"] = FOLLOWUPS_MAX
+            return await _next_followup(ctx)
+    else:
+        m = C.question_reply(ctx, q)
+    m.body = f"{lead}\n\n{m.body}"
+    return ctx.reply(m)
+
+
+async def followup_answered(ctx: SkillContext) -> Reply:
+    ctx.x["followups"] = int(ctx.x.get("followups") or 0) + 1
+    return await _next_followup(ctx)
+
+
+async def side_by_side(ctx: SkillContext) -> Reply:
+    """The shortlisted products side by side: on their own wall when a room photo is there (each drawn alone),
+    else their product photos; their needs, benefits, features, cost and offers in one table."""
+    from chanakya.skills import sidebyside, tryon_flow
+
+    s = ctx.session
+    if len(s.option_labels) < 2:
+        return await demo(ctx)
+    if ctx.pack.placeable and await tryon_flow.has_room(ctx):  # their room: draw each one in it, then compare
+        return await tryon_flow.choose(ctx, "cmp", None)
+    best = state.best_label(s)
+    labs = [best] + [x for x in sorted(s.option_labels) if x != best]
+    card = sidebyside.build(ctx, labs)
+    if card is None:
+        return await prefer(ctx)
+    btns = [ctx.b("b_demo_guide", ctx.sid("demo")),
+            ctx.b("b_tryon", ctx.sid("tryon")) if ctx.pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")),
+            ctx.b("b_more_options", ctx.sid("moreopts"))]
+    return ctx.reply(info_reply(ctx, sidebyside.summary(ctx, labs), btns, card=card))
+
+
 async def ask_more(ctx: SkillContext, slot: str | None) -> Reply:
     """One question from 'Tell me more'; the answer re-picks the products at once."""
     ctx.x["more_q"] = slot or "dq"
@@ -205,6 +401,12 @@ def option_reason(ctx: SkillContext, o, opts, lang: str) -> str:
             if pts:
                 return _hl_text(ctx, pts[0], p, lang)
         return _reason(ctx, o.reason_key, lang)
+    if o.role in ("new", "broader") and best is not None:  # joined after the follow-ups: what it adds, from the data
+        diff = HL.differences(p, best.product, ctx.session.home, ctx.session.extra.get("wants") or {}, ctx.pack)
+        tag = ctx.t(f"reason_{o.role}", lang)
+        if diff:
+            return f"{tag}: " + _hl_text(ctx, diff[0], p, lang)
+        return tag
     if o.role != "step" or best is None:
         return _reason(ctx, o.reason_key, lang)
     bp = best.product
@@ -329,8 +531,12 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
     for o in opts.options:  # for the price watch: what they saw today
         remember(s, o.product, ctx.facts, today())
     s.extra["option_roles"] = {o.label: o.role for o in opts.options}
+    s.extra["option_reason_keys"] = {o.label: o.reason_key for o in opts.options}
+    merged = getattr(opts, "merged", None)
+    ctx.x.pop("keep_options", None)
     best, value, step = opts.by_role("best"), opts.by_role("value"), opts.by_role("step")
-    s.shortlist = [o.product.sku for o in (best, value, step) if o]
+    s.shortlist = [o.product.sku for o in opts.options if o.role == "best"] + [
+        o.product.sku for o in opts.options if o.role != "best"]
     from chanakya.skills.tryon_flow import add_interest, prefetch_photos
 
     add_interest(ctx, *s.shortlist)
@@ -343,31 +549,29 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
         value=value.product.sku if value else None,
         stepup=step.product.sku if step else None,
     )
-    lines, btns = [], []
-    for o in opts.options:
-        p = o.product
-        name = C.product_name(ctx, p)
-        reason_a = option_reason(ctx, o, opts, ctx.lang)
-        extra = "" if p.qty > 0 else f" ({_stock_line(ctx, p)})"
-        tag = f" ({ctx.t('best_pick')})" if o.role == "best" else ""
-        lines.append(f"*{o.label}* {name}{tag}: {reason_a}{extra}")
-        btns.append(C.option_button(ctx, o.label, p))
-    if note is not None:  # from the note: say so, and give the best pick's reasons in the note's own terms
-        from chanakya.skills.assess import note_facts
-
+    btns = [C.option_button(ctx, o.label, o.product) for o in opts.options]
+    blocks = []
+    if note is not None:  # from the note: what was understood, in bullets, then the products picked from it
         s.extra["from_note"] = True
-        facts = (note_facts(ctx) + want_labels(ctx, note.get("wants") or {}) + meaning_labels(ctx))[:6]
-        ack = ctx.t("note_ack", facts=" · ".join(facts), n=ctx.reg.num(len(opts.options), "options:count"),
-                    cat=ctx.t(f"brief_cat_{pack.category}"))
-        b = best
-        why = _note_reasons(ctx, b.product, set(note.get("slots") or []), note.get("wants") or {})
-        line_b = f"*{b.label}* {C.product_name(ctx, b.product)} ({ctx.t('best_pick')}): " + " · ".join(
-            why or [option_reason(ctx, b, opts, ctx.lang)])
-        rest = [f"*{o.label}* {C.product_name(ctx, o.product)}: {option_reason(ctx, o, opts, ctx.lang)}"
-                for o in opts.options if o.role != "best"]
-        lines = [ack, line_b, " · ".join(rest)] if rest else [ack, line_b]
+        blocks.append(note_block(ctx, note))
+        why_b = _note_reasons(ctx, best.product, set(note.get("slots") or []), note.get("wants") or {})
         ctx.ev("note_shortlist", slots=list(note.get("slots") or []), wants=list((note.get("wants") or {}).keys()),
-               best=b.product.sku)
+               best=best.product.sku)
+        blocks.append(ctx.t("note_fits_head", n=ctx.reg.num(len(opts.options), "options:count"),
+                            cat=ctx.t(f"brief_cat_{pack.category}")))
+    elif merged:  # after the follow-ups: what stayed and what joined
+        why_b = []
+        n_new = sum(1 for o in opts.options if o.role in ("new", "broader"))
+        blocks.append(ctx.t(f"opts_head_{merged}", n=ctx.reg.num(n_new, "options:new"),
+                            cat=ctx.t(f"brief_cat_{pack.category}")))
+        ctx.ev("options_widened", kind=merged, added=[o.product.sku for o in opts.options if o.role in ("new", "broader")])
+    else:
+        why_b = []
+        blocks.append(ctx.t("opts_head", n=ctx.reg.num(len(opts.options), "options:count"),
+                            cat=ctx.t(f"brief_cat_{pack.category}")))
+    for o in opts.options:  # one block per product: what it is, then why it fits them, as bullets
+        blocks.append(option_block(ctx, o, opts, why_b if o.role == "best" else None))
+    blocks.append(ctx.t("opts_hint"))
     card = C.english(ctx, lambda: options_card(ctx, opts))
     demo = pick_demo(opts, s.home, pack, ctx.facts.snap.guides)
     if demo:
@@ -375,9 +579,17 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
         s.demo_recipe = d.id
         ctx.x["demo_other"] = other
         ctx.x["demos_sent"] = [d.id]
-    btns = [ctx.b("b_demo_guide", ctx.sid("demo")),  # the next steps with the products (user, 4 Nov 2026)
-            ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")),
-            ctx.b("b_more_needs", ctx.sid("more"))]  # what the note did not cover, offers, another budget
+    many = len(opts.options) >= 2
+    if note is not None:  # after a note: are these right for them? yes → see them side by side; no → more options
+        blocks.append(ctx.t("note_ask_happy"))
+        btns = [ctx.b("b_happy", ctx.sid("cmpall") if many else ctx.sid("demo")),
+                ctx.b("b_more_options", ctx.sid("moreopts")), ctx.b("b_demo_guide", ctx.sid("demo"))]
+    else:  # the next steps with the products (user, 4 Nov 2026): compare in their home, the demo, or more
+        btns = [ctx.b("b_compare_all", ctx.sid("cmpall")) if many else ctx.b("b_demo_guide", ctx.sid("demo")),
+                ctx.b("b_demo_guide", ctx.sid("demo")) if many else (
+                    ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer"))),
+                ctx.b("b_more_needs", ctx.sid("more"))]
+    lines = ["\n\n".join(blocks)]
     m1 = info_reply(ctx, "\n".join(lines), btns, card=card)
     if ctx.x.pop("rerank_note", None):
         m1.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
@@ -407,7 +619,7 @@ def demo_plan(ctx: SkillContext) -> list[dict]:
     from chanakya.brain.demos import rank_demos
 
     s = ctx.session
-    opts = _option_set(ctx)
+    opts = current_options(ctx)
     best = opts.by_role("best") if opts else None
     if best is None:
         return []
@@ -527,70 +739,29 @@ def _values(ctx: SkillContext, key: str | None, best_lab: str, bp, other_lab: st
 
 
 async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
-    """The demo plan, one step at a time: 'Demo 1/3 · what they asked for', with both models' values."""
+    """The demo guide in ONE message (user, 4 Nov 2026): the guide card, and under it, for each product, numbered
+    steps to run one after another: their need first (the wow), then the rest. No 'Demo 1/2' messages."""
     s = ctx.session
     if not s.shortlist:
         return await show_options(ctx)
     key = sorted(s.option_labels.values())
     if ctx.x.get("demo_plan_for") != key or not ctx.x.get("demo_plan"):
-        ctx.x["demo_plan"], ctx.x["demo_plan_for"], ctx.x["demo_i"] = demo_plan(ctx), key, 0
+        ctx.x["demo_plan"], ctx.x["demo_plan_for"] = demo_plan(ctx), key
     plan = ctx.x["demo_plan"]
-    i = ctx.x.get("demo_i", 0) if i is None else i
-    guide = None
-    if i == 0 and ctx.x.get("demo_guide_for") != key:  # first: the whole demo, per product, on one card
-        card = await demo_guide_card(ctx)
-        if card is not None:
-            ctx.x["demo_guide_for"] = key
-            guide = info_reply(ctx, ctx.t("demo_guide_caption"), card=card)
-            ctx.ev("demo_guide_sent", products=len(card.data["products"]))
-    if not plan or i >= len(plan):
-        ctx.x["demo_i"] = 0
-        return await prefer(ctx)
-    ctx.x["demo_i"] = i
-    st = plan[i]
-    best_lab = state.best_label(s) or "B"
-    bp = ctx.facts.product_sync(s.option_labels[best_lab])
-    alone = not st.get("other")  # what they asked for, and every option has it: show it on the best pick
-    op = bp if alone else ctx.facts.product_sync(s.option_labels.get(st["other"]) or s.option_labels[best_lab])
-    head = ctx.t("demo_head", i=ctx.reg.num(i + 1, "demo:step"), n=ctx.reg.num(len(plan), "demo:steps"))
-    if st["kind"] in ("highlight", "distance"):
-        msg = _demo_extra(ctx, st, head, best_lab, bp, i + 1 < len(plan))
-        s.demo_recipe = f"{st['kind']}:{st.get('theme') or 'size'}"
-        sent = ctx.x.setdefault("demos_sent", [])
-        if s.demo_recipe not in sent:
-            sent.append(s.demo_recipe)
-        ctx.ev("demo_recipe_sent", recipe=s.demo_recipe, demo_step=i + 1, of=len(plan))
-        if i == 0 and len(plan) > 1:
-            msg.footer = ctx.t("demo_plan_line", steps=" → ".join(_step_title(ctx, x, ctx.lang) for x in plan))[:60]
-        return ctx.reply(*([guide] if guide else []), msg)
-    vals = "" if alone else _values(ctx, st.get("key"), best_lab, bp, st["other"], op)
-    if alone and st.get("key"):
-        v = PV.fmt_value(ctx, bp, st["key"], ctx.lang, customer=False) if st["key"] != "brand" else ctx.reg.raw(bp.brand, "product")
-        vals = ctx.t("demo_val_one", a=best_lab, va=v) if v else ""
-    has_next = i + 1 < len(plan)
-    s.demo_recipe = st.get("id") or f"{st['kind']}:{st['key']}"
-    sent = ctx.x.setdefault("demos_sent", [])
-    if s.demo_recipe not in sent:
-        sent.append(s.demo_recipe)
-    ctx.ev("demo_recipe_sent", recipe=s.demo_recipe, demo_step=i + 1, of=len(plan))
-    if st["kind"] == "recipe":
-        from chanakya.brain.demos import _rule_for_spec
-
-        d = ctx.pack.demo(st["id"])
-        rule = _rule_for_spec(ctx.pack, d.differs_on) if d.differs_on else None
-        reason_key = rule.id if rule is not None and rule.id in ctx.pack.reasons else None
-        ctx.x["demo_other"] = st["other"]
-        msg = demo_message(ctx, d, st["other"], reason_key=reason_key, why_prefix=head, why_suffix=vals,
-                           has_next=has_next)
-    else:
-        what_c, what_a = _step_title(ctx, st, ctx.clang), _step_title(ctx, st, ctx.lang)
-        say_key = "demo_want_one_say" if alone else f"demo_{st['kind']}_say"
-        say = ctx.tc(say_key, what=what_c, best=C.product_name(ctx, bp), other=C.product_name(ctx, op))
-        why = f"{head} · " + ctx.t(f"demo_{st['kind']}_why", what=what_a) + (f" · {vals}" if vals else "")
-        msg = coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next))
-    if i == 0 and len(plan) > 1:  # the plan at a glance: what to show first, then next
-        msg.footer = ctx.t("demo_plan_line", steps=" → ".join(_step_title(ctx, x, ctx.lang) for x in plan))[:60]
-    return ctx.reply(*([guide] if guide else []), msg)
+    first = plan[0] if plan else {"kind": "guide", "key": None}
+    s.demo_recipe = first.get("id") or f"{first['kind']}:{first.get('theme') or first.get('key') or ''}"
+    ctx.x["demos_sent"] = list(dict.fromkeys([*(ctx.x.get("demos_sent") or []), s.demo_recipe]))
+    ctx.ev("demo_recipe_sent", recipe=s.demo_recipe, demo_step=1, of=len(plan))
+    card = await demo_guide_card(ctx)
+    body = await demo_guide_text(ctx)
+    ctx.x["demo_guide_for"] = key
+    ctx.ev("demo_guide_sent", products=len(card.data["products"]) if card else 0)
+    btns = [ctx.b("b_shown", ctx.sid("shown")),
+            ctx.b("b_compare_all", ctx.sid("cmpall")) if len(s.option_labels) >= 2 else ctx.b("b_they_chose", ctx.sid("prefer")),
+            ctx.b("b_tryon", ctx.sid("tryon")) if ctx.pack.placeable else ctx.b("b_more_needs", ctx.sid("more"))]
+    msg = info_reply(ctx, body, btns, card=card)
+    msg.footer = ctx.t("guide_footer")
+    return ctx.reply(msg)
 
 
 # the demo guide (user, 4 Nov 2026): for each product, the wow first (their top need, shown the way that proves it),
@@ -598,14 +769,17 @@ async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
 GUIDE_STEPS = {"best": 3, "other": 2}
 
 
-async def guide_steps(ctx: SkillContext, p, other, n: int = 3) -> list[dict]:
+async def guide_steps(ctx: SkillContext, p, other, n: int = 3, lang: str = "en", say_lang: str = "en") -> list[dict]:
     """[{tag, title, proof, do, say}] for one product: their asks / needs first (pack benefits proven by a spec, the
-    product's own highlights), the size from their sofa, then its other highlights and one real difference."""
+    product's own highlights), the size from their sofa, then its other highlights and one real difference.
+    `lang`: the associate's words (what to show and do; Hinglish reads the English benefit words); `say_lang`: the
+    customer's language for the line to say."""
     from chanakya.brain import highlights as HL
     from chanakya.i18n.lang import fill as _fill
     from chanakya.skills import fitview as FV
     from chanakya.skills.translate import fill, matching
 
+    tl = "mr" if lang == "mr" else "en"  # titles: Marathi, else the English benefit words
     s, pack, home = ctx.session, ctx.pack, ctx.session.home
     wants = s.extra.get("wants") or {}
     name, oname = C.product_name(ctx, p), (C.product_name(ctx, other) if other is not None else "")
@@ -622,62 +796,115 @@ async def guide_steps(ctx: SkillContext, p, other, n: int = 3) -> list[dict]:
 
     def hl_step(pt) -> None:
         th = HL.theme(pack.category, pt.theme)
-        add(HL.card_text(pt), ctx.reg.raw(pt.proof, f"highlight:{p.sku}"), HL.demo_text(th, "en", alone=other is None),
-            HL.say(pt, "en") if pt.need else "", f"hl_{pt.theme}")
+        title = HL.card_text(pt) if tl == "en" else (pt.say.get("mr") or HL.card_text(pt))
+        add(title, ctx.reg.raw(pt.proof, f"highlight:{p.sku}"), HL.demo_text(th, lang, alone=other is None),
+            HL.say(pt, say_lang) if pt.need else "", f"hl_{pt.theme}")
 
     need_pts = HL.points(p, home, wants, pack, n=8, general=False)
     for pt in need_pts:  # 1. what they asked for in their own words (the note's meaning) leads
         if pt.need == "as_asked":
             hl_step(pt)
-    for b in matching(ctx, p):  # 2. spec-proven benefits for their answers, with the pack's own demo for that need
+    from chanakya.brain import packs as PK
+
+    for b in matching(ctx, p):  # 2. spec-proven benefits for their answers, with the demo for THAT spec
         if b.id == "b_size":
             continue  # the size is shown from their sofa (below), the same for one product or two
-        d = next((d for d in pack.demos if set(d.when_slots) & set(b.cites) and d.differs_on), None)
-        do = _fill(ctx.pick(d.steps, "en"), best=name, other=oname, steps=steps_n) if d and other is not None else ""
-        add(ctx.pick(b.card, "en"), FV._proof(ctx, p, b, "en"), do, await fill(ctx, ctx.pick(b.say, "en"), p, "en"), b.id)
+        bkeys = set((b.when_spec or {}).keys()) | {k for c in b.when_spec_any or [] for k in c}
+        d = next((d for d in pack.demos if d.differs_on in bkeys and PK.eval_slots_map(home, d.when_slots, pack)), None)
+        do = _fill(ctx.pick(d.steps, lang), best=name, other=oname, steps=steps_n) if d and other is not None else ""
+        th = next((t for t in HL.themes(pack.category) if bkeys & {sp["key"] for sp in t.specs}), None)
+        if th is not None:  # the same benefit as a highlight theme (apps → smart): one step, with that theme's demo
+            seen.add(f"hl_{th.id}")
+            do = do or HL.demo_text(th, lang, alone=other is None)
+        add(ctx.pick(b.card, tl), FV._proof(ctx, p, b, tl), do, await fill(ctx, ctx.pick(b.say, say_lang), p, say_lang),
+            b.id)
     for pt in need_pts:  # 3. their other needs its own highlights answer
         hl_step(pt)
     size = p.spec("size_in")
     if pack.category == "tv" and dist and size:
-        add("Right size from their sofa", ctx.reg.num(size, f"spec:{p.sku}:size_in", "inch"),
-            f"Stand the customer {steps_n} steps back, about their sofa distance",
-            "From where you'll sit, see how comfortably it fills your view.", "size")
+        add(ctx.t("guide_size_title", tl), ctx.reg.num(size, f"spec:{p.sku}:size_in", "inch"),
+            ctx.t("guide_size_do", lang, steps=steps_n), ctx.t("guide_size_say", say_lang), "size")
     for pt in HL.points(p, home, wants, pack, n=8, general=True):  # then: its other highlights, its own words
         if pt.need is None:
             hl_step(pt)
     if other is not None:
-        for d in _diffs(ctx, p, other, "en", 1):  # one real difference from the other option, as a fact
-            add(f"{d['label']}: {d['value']}", None, f"Point it out next to {oname}", "", f"diff_{d['label']}")
+        for d in _diffs(ctx, p, other, tl, 1):  # one real difference from the other option, as a fact
+            add(f"{d['label']}: {d['value']}", None, ctx.t("guide_diff_do", lang, other=oname), "", f"diff_{d['label']}")
     tags = ["wow", "then", "more"]
     for i, st in enumerate(out):
         st["tag"] = tags[min(i, 2)]
     return out[:n]
 
 
+def _guide_labs(ctx: SkillContext) -> tuple[str, list[str], dict]:
+    s = ctx.session
+    best_lab = state.best_label(s) or sorted(s.option_labels)[0]
+    labs = [best_lab] + [lab for lab in sorted(s.option_labels) if lab != best_lab]
+    return best_lab, labs, {lab: ctx.facts.product_sync(s.option_labels[lab]) for lab in labs}
+
+
+def _other_for(best_lab: str, lab: str, labs: list[str], prods: dict):
+    return prods.get(best_lab) if lab != best_lab else next((prods[x] for x in labs if x != best_lab), None)
+
+
+async def demo_guide_text(ctx: SkillContext) -> str:
+    """The whole demo in one message (user, 4 Nov 2026): for each product, numbered steps the associate runs one by
+    one: what to show (their need first, the wow), its proof, how to show it, and the line to say."""
+    best_lab, labs, prods = _guide_labs(ctx)
+    words = {"wow": ctx.t("guide_tag_wow"), "then": ctx.t("guide_tag_then"), "more": ctx.t("guide_tag_more")}
+    blocks = [ctx.t("guide_head")]
+    for lab in labs[:3]:
+        p = prods.get(lab)
+        if p is None:
+            continue
+        steps = await guide_steps(ctx, p, _other_for(best_lab, lab, labs, prods),
+                                  GUIDE_STEPS["best" if lab == best_lab else "other"], ctx.lang, ctx.clang)
+        if not steps:
+            continue
+        head = f"*{lab} · {C.product_name(ctx, p)}*" + (f" — _{ctx.t('best_pick')}_" if lab == best_lab else "")
+        lines = [head]
+        for i, st in enumerate(steps, 1):
+            proof = f" ({st['proof']})" if st.get("proof") else ""
+            lines.append(f"{ctx.reg.num(i, 'guide:step_no')}. *{words.get(st['tag'], '')}:* {st['title']}{proof}")
+            if st.get("do"):
+                lines.append(f"   ▸ {st['do']}")
+            if st.get("say") and st["tag"] == "wow":
+                lines.append(f'   _"{st["say"]}"_')
+        blocks.append("\n".join(lines))
+    blocks.append(ctx.t("guide_tail"))
+    text = "\n\n".join(blocks)
+    if len(text) > 1000:  # WhatsApp's limit with buttons: the lines to say go first, then the other products' how-to
+        text = "\n".join(ln for ln in text.split("\n") if not ln.strip().startswith('_"'))
+    if len(text) > 1000:
+        keep, out = True, []
+        for ln in text.split("\n"):
+            if re.match(r"^\*[A-E] · ", ln):  # a product's block: keep the how-to only for the best pick
+                keep = ln.startswith(f"*{best_lab} ")
+            if keep or not ln.strip().startswith("▸"):
+                out.append(ln)
+        text = "\n".join(out)
+    return text[:1020]
+
+
 async def demo_guide_card(ctx: SkillContext) -> Card | None:
     """One English card: for each product on the shortlist, the demo in order (wow first, then expand)."""
     from chanakya.skills import fitview as FV
 
-    opts = _option_set(ctx)
-    s = ctx.session
-    if not s.option_labels:
+    if not ctx.session.option_labels:
         return None
-    best_lab = state.best_label(s) or "B"
-    labs = [best_lab] + [lab for lab in sorted(s.option_labels) if lab != best_lab]
-    prods = {lab: ctx.facts.product_sync(s.option_labels[lab]) for lab in labs}
+    best_lab, labs, prods = _guide_labs(ctx)
     cols = []
     with ctx.as_lang("en"):
         for lab in labs:
             p = prods[lab]
             if p is None:
                 continue
-            other = prods.get(best_lab) if lab != best_lab else next((prods[x] for x in labs if x != best_lab), None)
-            steps = await guide_steps(ctx, p, other, GUIDE_STEPS["best" if lab == best_lab else "other"])
+            steps = await guide_steps(ctx, p, _other_for(best_lab, lab, labs, prods),
+                                      GUIDE_STEPS["best" if lab == best_lab else "other"])
             if steps:
                 cols.append({"label": lab, "title": C.product_title(ctx, p, "en"), "image": p.image,
                              "best": lab == best_lab, "steps": steps})
         chips = FV.home_chips(ctx, "en") + meaning_labels(ctx, "en")
-    _ = opts
     if not cols:
         return None
     return Card(template="demo", lang="en", data={"products": cols[:3], "chips": chips[:5]})  # type: ignore[arg-type]
@@ -731,7 +958,7 @@ async def prefer(ctx: SkillContext) -> Reply:
     if not s.option_labels:
         return await show_options(ctx)
     rows = []
-    opts = _option_set(ctx)
+    opts = current_options(ctx)
     for lab, sku in sorted(s.option_labels.items()):
         p = ctx.facts.product_sync(sku)
         o = opts.by_label(lab) if opts else None

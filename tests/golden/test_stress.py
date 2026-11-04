@@ -4,7 +4,7 @@ Each step does what a busy associate (or a customer, manager, expert, visitor) m
 offered, tap an old button from an earlier customer, pick a list row, send odd text, pressure lines, a photo, a
 voice note, switch language, start a new customer. After every step:
 - nothing crashed (no skill_failed / job_failed / deliver / render / persist error logged);
-- every message keeps the floor rules (≤ 3 lines, ≤ 3 buttons, titles ≤ 20 chars, no banned phrases);
+- every message keeps the floor rules (≤ 24 well-spaced lines, ≤ 3 buttons, titles ≤ 20 chars, no banned phrases);
 - the number firewall never had to block a message (no validator_violation event: nothing unsourced was said).
 STRESS_RUNS / STRESS_STEPS make it longer locally."""
 

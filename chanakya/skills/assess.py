@@ -217,9 +217,12 @@ def note_facts(ctx: SkillContext) -> list[str]:
     """This note's facts in the associate's words, numbers first: ['10 ft', '₹50,000', 'Dhoop aati hai', …]."""
     pack = ctx.pack
     nums, facts = [], []
+    has_now = bool(ctx.session.home.existing) if ctx.session else False
     for e in ctx.events:
         if e.type != "slot_filled":
             continue
+        if has_now and e.payload.get("slot") in ("trigger", "old_size"):
+            continue  # said once, as the TV they have now ("Abhi: Sony 32\"")
         sd = pack.slot(e.payload.get("slot")) if pack else None
         if not sd:
             continue
@@ -243,9 +246,12 @@ def noted_footer(ctx: SkillContext, source: str) -> str | None:
         return None
     pack = ctx.pack
     nums, facts = [], []
+    has_now = bool(ctx.session.home.existing) if ctx.session else False
     for e in ctx.events:
         if e.type != "slot_filled":
             continue
+        if has_now and e.payload.get("slot") in ("trigger", "old_size"):
+            continue  # said once, as the TV they have now ("Abhi: Sony 32\"")
         sd = pack.slot(e.payload.get("slot")) if pack else None
         if not sd:
             continue
@@ -280,6 +286,12 @@ async def tap_slot(ctx: SkillContext, slot: str, val: str) -> Reply:
     from chanakya.ai.schemas import SlotPair
 
     u.slots = [SlotPair(slot=slot, value=val)]
+    if ctx.x.get("more_q") == "chain:" + slot:  # a follow-up for more options: the next one, or the widened list
+        ctx.x.pop("more_q", None)
+        apply_understanding(ctx, u, "tap")
+        from chanakya.skills import recommend
+
+        return await recommend.followup_answered(ctx)
     if ctx.x.get("more_q") == slot:  # asked from 'Tell me more': the answer re-picks the products at once
         ctx.x.pop("more_q", None)
         apply_understanding(ctx, u, "tap")
@@ -488,7 +500,12 @@ async def data_answer(ctx: SkillContext, key: str, choice: str) -> Reply:
     if choice.isdigit() and int(choice) < len(vals):
         s.extra["wants"] = {**(s.extra.get("wants") or {}), key: vals[int(choice)]}
     ctx.ev("data_question_answered", key=key, value=str(vals[int(choice)]) if choice.isdigit() and int(choice) < len(vals) else "any")
-    if ctx.x.pop("more_q", None) == "dq" and s.shortlist:  # from 'Tell me more': re-pick the products
+    mq = ctx.x.pop("more_q", None)
+    if mq == "chain:dq" and s.shortlist:  # a follow-up for more options
+        from chanakya.skills import recommend
+
+        return await recommend.followup_answered(ctx)
+    if mq == "dq" and s.shortlist:  # from 'Tell me more': re-pick the products
         from chanakya.skills import recommend
 
         return await recommend.show_options(ctx, override_checked=True)

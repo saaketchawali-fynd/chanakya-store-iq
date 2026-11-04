@@ -21,9 +21,11 @@ def test_lines_buttons_titles():
     c = validator.check(m, reg, None, "hi", BANNED)
     assert not c.fatal
     assert len(c.msg.buttons) == 3 and all(len(b.title) <= 20 for b in c.msg.buttons)
-    four = OutMessage(to="1", kind="text", body="1\n2\n3\n4")
-    reg.static("1 2 3 4")
-    assert validator.check(four, reg, None, "hi", BANNED).fatal
+    long = OutMessage(to="1", kind="text", body="\n".join(str(i) for i in range(30)))
+    reg.static(" ".join(str(i) for i in range(30)))
+    assert validator.check(long, reg, None, "hi", BANNED).fatal  # past the line limit
+    spaced = OutMessage(to="1", kind="text", body="a\n\n\nb")
+    assert validator.check(spaced, reg, None, "hi", BANNED).msg.body == "a\n\nb"  # one gap kept, never two
 
 
 def test_coach_needs_kyun_and_known_cite():

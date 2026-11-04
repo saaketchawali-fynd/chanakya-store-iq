@@ -9,7 +9,7 @@ from chanakya.brain import packs as P
 from chanakya.channel.limits import truncate
 from chanakya.core import repo
 from chanakya.core.buttons import encode
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, info_reply, kyun_block
 from chanakya.core.contracts import Button, OutMessage, Reply
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -43,7 +43,7 @@ async def answer_from_library(ctx: SkillContext, entry) -> Reply:
     ctx.ev("expert_answered", sources=[src], qid=f"L{entry.id}", from_library=True)
     body = ctx.t("expert_library_answer", expert=entry.expert_name, text=ans.get("for_associate", ""))
     if ans.get("bolo"):
-        body += f'\n{ctx.t("label_bolo")}: "{ans["bolo"]}"'
+        body += "\n\n" + bolo_block(ctx, ans["bolo"])
     btns = [
         ctx.b("b_go", ctx.sid("go") if ctx.session else encode("g", "status")),
         ctx.b("b_status", encode("g", "status")),
@@ -87,7 +87,7 @@ async def ask(ctx: SkillContext, question: str, via_truth_check: bool = False, l
     if cites:
         msgs.append(coach_reply(ctx, hold, ctx.t("kyun_expert_hold"), cites, btns))
     else:
-        msgs.append(info_reply(ctx, f'{ctx.t("label_bolo")}: "{hold}"\n{ctx.t("kyun_expert_hold")}', btns))
+        msgs.append(info_reply(ctx, bolo_block(ctx, hold) + "\n\n" + kyun_block(ctx, ctx.t("kyun_expert_hold")), btns))
     if expert:
         elang = expert.lang or "en"
         ctx.reg.raw(question, "associate:question")
@@ -154,7 +154,7 @@ async def expert_message(ctx: SkillContext) -> Reply:
     body = ctx.t("expert_answer", alang, expert=ctx.staff.name, text=ans.for_associate)
     body = f"❓ {q.question[:90]}\n{body}"  # which question this answers
     if ans.bolo:
-        body += f'\n{ctx.t("label_bolo", alang)}: "{ans.bolo}"'
+        body += "\n\n" + bolo_block(ctx, ans.bolo, alang)
     nxt = [Button(id=encode("s", s.code, "go"), title=ctx.t("b_go", alang))] if s else []
     to_assoc = info_reply(ctx, body, nxt, to=q.associate_wa_id)
     to_assoc.session_id = s.id if s else None

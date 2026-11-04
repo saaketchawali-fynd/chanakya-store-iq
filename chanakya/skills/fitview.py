@@ -68,10 +68,17 @@ def points(ctx: SkillContext, p, lang: str, n: int = 3) -> list[dict]:
     from chanakya.brain import highlights as HL
     from chanakya.skills.translate import hl_points
 
+    done_themes = set()  # a pack benefit already said it (apps → the smart theme): not twice
+    for b in matching(ctx, p):
+        keys = set((b.when_spec or {}).keys()) | {k for c in b.when_spec_any or [] for k in c}
+        done_themes |= {th.id for th in HL.themes(p.category) if keys & {sp["key"] for sp in th.specs}}
+
     def add_hl(general: bool, upto: int) -> None:
         for pt in hl_points(ctx, p, n=6, general=general):
             if len(out) >= upto:
                 break
+            if pt.theme in done_themes and any(o.get("proof") for o in out if isinstance(o, dict)):
+                continue
             text = ctx.reg.static(HL.card_text(pt))
             if all((o.get("text") if isinstance(o, dict) else o) != text for o in out) and (general or pt.need):
                 out.append({"text": text, "proof": ctx.reg.raw(pt.proof, f"highlight:{p.sku}")})
@@ -201,8 +208,9 @@ def over_current(ctx: SkillContext, p) -> list[dict]:
     out = []
     size, old = p.spec("size_in"), ex.get("size_in")
     if size and old and float(size) > float(old):
-        out.append({"text": ctx.reg.static("Bigger than your current TV"),
-                    "proof": ctx.reg.num(size, f"spec:{p.sku}:size_in", '"') + " vs " + ctx.reg.num(old, "note:existing", '"')})
+        a = ctx.reg.num(size, f"spec:{p.sku}:size_in")
+        b = ctx.reg.num(old, "note:existing")
+        out.append({"text": ctx.reg.static("Bigger than your current TV"), "proof": f'{a}" vs {b}"'})
     oldp = ctx.facts.product_sync(ex["sku"]) if ex.get("sku") else None
     if oldp is not None:
         diff = HL.differences(p, oldp, home, ctx.session.extra.get("wants") or {}, ctx.pack)

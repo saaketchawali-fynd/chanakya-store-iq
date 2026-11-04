@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw
 from chanakya.brain import packs as P
 from chanakya.core import repo, state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, info_reply, kyun_block
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, Card, OutMessage, Reply, Step
 from chanakya.core.status import short_name
 from chanakya.skills import common as C
@@ -84,7 +84,7 @@ async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = F
         say = ctx.pick(ctx.packs.common_line("consent_ask"), ctx.clang)
         why = ctx.t("kyun_consent_note", note=note) if note else ctx.t("kyun_consent")
         if not cites:
-            return ctx.reply(info_reply(ctx, f'{ctx.t("label_bolo")}: "{say}"\n{why}', btns))
+            return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + kyun_block(ctx, why), btns))
         return ctx.reply(coach_reply(ctx, say, why, cites, btns))
     return await send_parivaar(ctx)
 

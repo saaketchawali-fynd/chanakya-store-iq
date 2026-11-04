@@ -241,8 +241,10 @@ def category_message(ctx: SkillContext) -> OutMessage:
     for r in rows:
         ctx.reg.static(r.title + " " + (r.description or ""))
     code = ctx.reg.raw(ctx.session.code, "session:code")
-    body = (f'{ctx.t("label_bolo")}: "{ctx.tc("bolo_opener")}"\n{ctx.t("label_kyun")}: {ctx.t("kyun_opener")}\n'
-            + ctx.t("st_new", code=code))
+    from chanakya.core.coach import bolo_block, kyun_block, status_block
+
+    body = (bolo_block(ctx, ctx.tc("bolo_opener")) + "\n\n" + kyun_block(ctx, ctx.t("kyun_opener")) + "\n\n"
+            + status_block(ctx.t("st_new", code=code)))
     return OutMessage(to=ctx.actor_wa_id, kind="list", body=body, list_button=truncate_title(ctx.t("list_product")),
                       sections=[ListSection(rows=rows)], footer=ctx.t("footer_voice_q"), allowed_numbers=ctx.reg.allowed())
 

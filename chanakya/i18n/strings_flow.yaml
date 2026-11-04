@@ -283,7 +283,7 @@ b_vlog_who: {hi: "{name} ke notes", mr: "{name} च्या नोट्स", e
 kpi_voice: {hi: "Voice notes", mr: "व्हॉइस नोट्स", en: "Voice notes"}
 kpi_voice_val: {hi: "{n} · {ok} samjhe", mr: "{n} · {ok} समजल्या", en: "{n} · {ok} understood"}
 # ---- the copilot's one line (associate only, each tip once per customer)
-tip_line: {hi: "Sujhav: {tip}", mr: "सूचना: {tip}", en: "Tip: {tip}"}
+tip_line: {hi: "*Sujhav:* {tip}", mr: "*सूचना:* {tip}", en: "*Tip:* {tip}"}
 tip_budget_gap: {hi: "{budget} mein is ghar ke size ka TV stock mein nahi; sabse sasta {low}. Budget ya size par pehle baat kijiye", mr: "{budget} मध्ये या घराच्या साइजचा स्टॉक नाही; सर्वात स्वस्त {low}. आधी बजेट किंवा साइजवर बोला", en: "Nothing in stock that suits this home fits {budget}; the lowest is {low}. Talk budget or size first"}
 tip_offer_soon: {hi: "{label} par '{title}' {date} ko khatam: demo ke baad zaroor bataiye", mr: "{label} वर '{title}' {date} ला संपते: डेमोनंतर नक्की सांगा", en: "'{title}' on {label} ends {date}: mention it after the demo"}
 tip_only_best: {hi: "Sirf {label} '{need}' poora karta hai: demo usi par", mr: "फक्त {label} '{need}' पूर्ण करतो: डेमो त्यावरच", en: "Only {label} meets '{need}': demo that one"}
@@ -452,3 +452,34 @@ row_more_offers_d: {hi: "Har product ka live offer, data se", mr: "प्रत�
 row_more_other: {hi: "Alag budget ya brand", mr: "वेगळं बजेट किंवा ब्रँड", en: "Other budget or brand"}
 row_more_other_d: {hi: "Kam, zyada ya doosra brand", mr: "कमी, जास्त किंवा दुसरा ब्रँड", en: "Lower, higher or another brand"}
 demo_guide_caption: {hi: "Demo guide: har product par pehle unki zaroorat (wow), phir baaki. Step-by-step neeche.", mr: "डेमो गाइड: प्रत्येक प्रॉडक्टवर आधी त्यांची गरज (wow), मग बाकी. स्टेप-बाय-स्टेप खाली.", en: "Demo guide: their need first on each product (the wow), then the rest. Step by step below."}
+# ---- the options message, well spaced (user, 4 Nov 2026)
+opts_head: {hi: "*Aapke ghar ke liye {n} {cat}* — card customer ko dikhaiye:", mr: "*तुमच्या घरासाठी {n} {cat}* — कार्ड ग्राहकाला दाखवा:", en: "*{n} {cat} for this home* — show them the card:"}
+note_head: {hi: "*Note se samjha:*", mr: "*नोटमधून समजलं:*", en: "*From the note:*"}
+note_line_wants: {hi: "Maanga: {what}", mr: "मागितलं: {what}", en: "Asked for: {what}"}
+note_line_needs: {hi: "Zaroorat: {what}", mr: "गरज: {what}", en: "Needs: {what}"}
+note_fits_head: {hi: "*Isse sabse sahi {n} {cat}* — card par:", mr: "*यावरून सर्वात योग्य {n} {cat}* — कार्डवर:", en: "*The {n} {cat} that fit best* — on the card:"}
+opts_hint: {hi: "_Daam demo ke baad · offers aur baaki sawaal 'Aur bataiye' mein_", mr: "_किंमत डेमोनंतर · ऑफर्स आणि बाकी प्रश्न 'अजून सांगा' मध्ये_", en: "_Price after the demo · offers and other questions under 'Tell me more'_"}
+# ---- the demo guide in one message (user, 4 Nov 2026)
+guide_head: {hi: "*Demo guide* — har product par pehle unki zaroorat dikhaiye (wow), phir baaki. Ek-ek step:", mr: "*डेमो गाइड* — प्रत्येक प्रॉडक्टवर आधी त्यांची गरज दाखवा (wow), मग बाकी. एक-एक स्टेप:", en: "*Demo guide* — on each product show their need first (the wow), then the rest. Step by step:"}
+guide_tag_wow: {hi: "Wow", mr: "Wow", en: "Wow"}
+guide_tag_then: {hi: "Phir", mr: "मग", en: "Then"}
+guide_tag_more: {hi: "Aur", mr: "आणखी", en: "Also"}
+guide_tail: {hi: "_Har step ke baad poochhiye: \"Kaisa laga?\" — jo pasand aaye, wahi aage._", mr: "_प्रत्येक स्टेपनंतर विचारा: \"कसं वाटलं?\" — जे आवडेल, तेच पुढे._", en: "_After each step ask: \"How does that feel?\" — go with what they like._"}
+guide_footer: {hi: "Demo ho jaye to 'Dikha diya' dabaiye", mr: "डेमो झाला की 'दाखवलं' दाबा", en: "When done, tap 'Shown'"}
+guide_size_title: {hi: "Right size from their sofa", mr: "सोफ्यावरून योग्य साइज", en: "Right size from their sofa"}
+guide_size_do: {hi: "Customer ko {steps} kadam peeche khada kariye — sofa jitni doori par", mr: "ग्राहकाला {steps} पावलं मागे उभं करा — सोफ्याइतक्या अंतरावर", en: "Stand the customer {steps} steps back, about their sofa distance"}
+guide_size_say: {hi: "जहाँ आप बैठेंगे, वहाँ से देखिए — कितना आराम से पूरा नज़र आता है।", mr: "जिथे तुम्ही बसाल तिथून पाहा — किती आरामात पूर्ण दिसतो.", en: "From where you'll sit, see how comfortably it fills your view."}
+guide_diff_do: {hi: "{other} ke saath dikhaiye", mr: "{other} सोबत दाखवा", en: "Point it out next to {other}"}
+b_compare_all: {hi: "Side-by-side", mr: "शेजारी तुलना", en: "Side by side"}
+# ---- after the note: happy, or more options; side by side (user, 4 Nov 2026)
+note_ask_happy: {hi: "*Customer ko ye sahi lag rahe hain?* Haan to side-by-side dikhaiye; nahi to aur options.", mr: "*ग्राहकाला हे योग्य वाटतायत का?* हो तर शेजारी तुलना दाखवा; नाही तर आणखी पर्याय.", en: "*Do these feel right to them?* If yes, show them side by side; if not, more options."}
+b_happy: {hi: "Haan, sahi hain", mr: "हो, योग्य आहेत", en: "Yes, these fit"}
+b_more_options: {hi: "Aur options", mr: "आणखी पर्याय", en: "More options"}
+opts_head_new: {hi: "*Pehle ke best fits wahi* + naye jawab se {n} naye {cat}:", mr: "*आधीचे best fits तसेच* + नव्या उत्तरांवरून {n} नवे {cat}:", en: "*The earlier best fits stay* + {n} new {cat} from the new answers:"}
+opts_head_broader: {hi: "*Naye jawab se best fits wahi rahe* — {n} aur {cat} dekhne ke liye:", mr: "*नव्या उत्तरांनंतरही best fits तेच* — पाहण्यासाठी आणखी {n} {cat}:", en: "*The new answers keep the same best fits* — {n} more {cat} to see:"}
+reason_new: {hi: "Naya fit", mr: "नवा फिट", en: "New fit"}
+reason_broader: {hi: "Aur option", mr: "आणखी पर्याय", en: "More option"}
+followup_lead: {hi: "*Follow-up {n}* — note mein ye nahi aaya:", mr: "*फॉलो-अप {n}* — नोटमध्ये हे आलं नाही:", en: "*Follow-up {n}* — the note didn't cover this:"}
+sbs_head: {hi: "*Side-by-side* — card customer ke saath dekhiye, har ek unki zaroorat par:", mr: "*शेजारी तुलना* — कार्ड ग्राहकासोबत पाहा, प्रत्येक त्यांच्या गरजेवर:", en: "*Side by side* — go through the card with them, each on their needs:"}
+sbs_tail_locked: {hi: "_Daam demo ke baad khulega · ab Demo guide se dikhaiye_", mr: "_किंमत डेमोनंतर · आता डेमो गाइडने दाखवा_", en: "_Prices open after the demo · next, show it with the Demo guide_"}
+sbs_tail: {hi: "_Jo pasand aaye, use 'Kaunsa sahi laga' se chuniye_", mr: "_जे आवडेल ते 'कोणता योग्य वाटला' मधून निवडा_", en: "_Pick the one they like under 'Which one felt right'_"}

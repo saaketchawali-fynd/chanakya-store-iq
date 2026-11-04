@@ -9,7 +9,7 @@ from chanakya.brain.fit import fit
 from chanakya.brain.options import candidate_set
 from chanakya.core import state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, info_reply
 from chanakya.core.contracts import Reply
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -79,7 +79,7 @@ async def myth(ctx: SkillContext, claim_id: str) -> Reply:
             ctx.asking.add(slot)
             cites = [slot]
     if not cites:
-        return ctx.reply(info_reply(ctx, f'{ctx.t("label_bolo")}: "{line}"', btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, line), btns))
     return ctx.reply(coach_reply(ctx, line, why, cites, btns))
 
 

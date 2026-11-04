@@ -85,7 +85,10 @@ async def test_a_vs_b_on_their_wall_in_one_picture(h):
     assert len(cards) == 1  # one card: both on their own wall, and how each meets their needs
     d = cards[0].card.data
     assert len(d["cols"]) == 2 and all(c["photo"] and c["is_room"] for c in d["cols"])  # their room, each drawn
-    assert d["rows"] and all(len(r["cells"]) == 2 for r in d["rows"])  # their needs, a cell per product
+    titles = [sec["title"] for sec in d["sections"]]
+    assert "Features" in titles and "Cost and offers" in titles  # a detailed table: needs, benefits, features, cost
+    assert all(len(r["cells"]) == 2 for sec in d["sections"] for r in sec["rows"])  # a cell per product
+    assert d["in_room"]
     ids = button_ids(cards)
     assert sum(1 for i in ids if ":tpick:" in i) == 2 and "s:C1:prefer" in ids
 

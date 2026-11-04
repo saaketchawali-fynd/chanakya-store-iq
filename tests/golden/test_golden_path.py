@@ -116,10 +116,17 @@ async def test_golden_path(tmp_path):
             'BMeru 55" QLED Pro',
             'CMeru 65" QLED Pro',
         ]
-        assert button_ids(out) == ["s:C1:demo", "s:C1:tryon", "s:C1:more"]  # demo guide, see at home, tell me more
+        assert button_ids(out) == ["s:C1:cmpall", "s:C1:demo", "s:C1:more"]  # side by side, demo guide, tell me more
         assert all(o["offer"]["text"] for o in card.data["options"])  # every option shows its offer (or none)
         assert "₹" not in texts(out) and "price" not in str(card.data)
         assert card.data["grid"] and card.data["options"][1]["points"]  # built from this home's answers
+        # 10a side by side: their room photo is here, so each option is drawn on their wall, then one detailed table
+        out = await step(h.tap, "s:C1:cmpall")
+        sbs = next(m.card for m in out if m.card and m.card.template == "homecompare")
+        assert sbs.data["in_room"] and len(sbs.data["cols"]) == 3
+        assert {sec["title"] for sec in sbs.data["sections"]} >= {"For your needs", "Features", "Cost and offers"}
+        cost = next(sec for sec in sbs.data["sections"] if sec["title"] == "Cost and offers")
+        assert all(c["value"] == "After the demo" for c in cost["rows"][0]["cells"])  # the price is still after the demo
         # 10b Ghar mein dekho → straight to the picture: B solid, C as the outline
         out = await step(h.tap, "s:C1:tryon")
         tryon = [m for m in out if m.image_bytes]

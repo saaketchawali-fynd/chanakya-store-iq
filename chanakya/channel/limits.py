@@ -14,7 +14,7 @@ LIST_ROWS_MAX = 10
 FOOTER_MAX = 60
 IMAGE_MAX_BYTES = 5 * 1024 * 1024
 AUDIO_MAX_BYTES = 16 * 1024 * 1024
-FLOOR_MAX_LINES = 3
+FLOOR_MAX_LINES = 24  # lines incl. single blank spacer lines (user, 4 Nov 2026: well spaced, detailed)
 
 
 def truncate(s: str, n: int) -> str:
