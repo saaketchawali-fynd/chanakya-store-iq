@@ -12,8 +12,15 @@ from chanakya.i18n.lang import pick
 from chanakya.truth.facts import FactsService, ProductWithStock
 from chanakya.truth.firewall import NumberRegistry
 
-SOUNDBAR_SKU = "SB-MER-21"
 SOUNDBAR_REASON = {"hi": "dialogue saaf", "mr": "संवाद स्पष्ट", "en": "clear dialogue"}
+ACC_REASON = {  # why an accessory is suggested: the answer that calls for it (short, on the card)
+    "soundbar_arc": {"hi": "dialogue saaf · HDMI ARC: ek cable", "mr": "संवाद स्पष्ट · HDMI ARC: एक केबल",
+                     "en": "clear dialogue · HDMI ARC: one cable"},
+    "tv_mount": {"hi": "deewar par lagane ke liye", "mr": "भिंतीवर लावण्यासाठी", "en": "for your wall"},
+    "stabiliser": {"hi": "voltage ki dikkat ke liye", "mr": "व्होल्टेजच्या त्रासासाठी", "en": "for the voltage swings"},
+    "wm_stand": {"hi": "geeli jagah par, zameen se upar", "mr": "ओल्या जागी, जमिनीपासून वर", "en": "keeps it off a wet floor"},
+    "laptop_bag": {"hi": "roz saath le jaane ke liye", "mr": "रोज सोबत नेण्यासाठी", "en": "to carry it every day"},
+}
 
 
 class CostLine(BaseModel):
@@ -37,6 +44,8 @@ class CostSheet(BaseModel):
     lifetime: dict | None = None
     sources: list[str] = []
     optional_count: int = 0
+    protection: dict | None = None  # the matching resQ plan, shown as a choice (not in the totals)
+    notes: list[str] = []  # what the install needs that the data has no price for ("Wall mount: store confirms")
 
 
 def _num(home: HomeCard, pack: Pack | None, name: str) -> float | None:
@@ -108,6 +117,7 @@ async def compute(
     cat = p.category
     lines: list[CostLine] = []
     sources: list[str] = []
+    notes: list[str] = []
 
     def add(code, title, amount, kind, source, reason=None, qty=None):
         if kind in ("sujhav", "optional") and code in exclude_codes:  # the customer removed it
@@ -166,21 +176,19 @@ async def compute(
                     f"protection:{pl.code}",
                     reason=pick(pl.reason, lang, reg),
                 )
-        if cat == "tv":
-            dist = number(home, "seat_distance", pack) if pack else None
-            sbv = values(home, "soundbar")
-            wants = any(v in ("no", "thinking") for v in sbv)
-            if "has" not in sbv and (wants or "yes" in values(home, "elders") or (dist is not None and dist >= 12)):
-                sb = facts.product_sync(SOUNDBAR_SKU, store_id)
-                if sb and sb.available:
-                    add(
-                        sb.sku,
-                        pick(sb.title, lang) or sb.model,
-                        sb.price,
-                        "sujhav",
-                        sb.price_source,
-                        reason=SOUNDBAR_REASON.get(lang),
-                    )
+        codes = " ".join(ln.code.upper() for ln in lines)
+        for kind, why in accessory_needs(p, home, pack):
+            if any(w in codes for w in {"tv_mount": ("BRACKET", "MOUNT"), "stabiliser": ("STAB",),
+                                        "wm_stand": ("STAND", "TROLLEY")}.get(kind, ())):
+                continue  # the charges already carry it
+            a = pick_accessory(facts, kind, p, store_id)
+            if a is None:
+                if kind == "tv_mount":
+                    notes.append("mount_confirm")
+                continue
+            add(a.sku, pick(a.title, lang) or a.model, a.price, "sujhav", a.price_source,
+                reason=pick(ACC_REASON.get("soundbar_arc" if why == "arc" else kind) or SOUNDBAR_REASON, lang)
+                if kind != "soundbar" or why == "arc" else SOUNDBAR_REASON.get(lang))
 
     zaroori = sum(line.amount for line in lines if line.kind in ("product", "zaroori"))
     with_sug = zaroori + sum(line.amount for line in lines if line.kind == "sujhav")
@@ -204,6 +212,8 @@ async def compute(
         lifetime=lifetime,
         sources=sources,
         optional_count=optional_count,
+        protection=_protection(p, await facts.protection(cat), reg, lang, {ln.code for ln in lines}),
+        notes=notes,
     )
 
 
@@ -242,3 +252,62 @@ async def lifetime_cost(
             price_diff_str=reg.inr(p.price - alt.price, f"calc:price_diff:{p.sku}:{alt.sku}"),
         )
     return out
+
+
+def accessory_needs(p: ProductWithStock, home: HomeCard, pack: Pack | None) -> list[tuple[str, str]]:
+    """[(accessory kind, why)] the customer's answers call for, for this product (Complete: the full setup)."""
+    cat = p.category
+    out: list[tuple[str, str]] = []
+    if cat == "tv":
+        dist = number(home, "seat_distance", pack) if pack else None
+        sbv = values(home, "soundbar")
+        if "has" not in sbv and (any(v in ("no", "thinking") for v in sbv) or "yes" in values(home, "elders")
+                                 or (dist is not None and dist >= 12)):
+            out.append(("soundbar", "arc" if p.spec("hdmi_arc") is True else "need"))
+        if "wall" in values(home, "mounting"):
+            out.append(("tv_mount", "wall"))
+    elif cat in ("ac", "fridge"):
+        slot = "power_issues" if cat == "ac" else "power_cuts"
+        if "yes" in values(home, slot) and p.spec("stabiliser_free") is not True:
+            out.append(("stabiliser", slot))
+    elif cat == "wm":
+        if any(v in ("bathroom", "balcony") for v in values(home, "space")):
+            out.append(("wm_stand", "wet"))
+    elif cat == "laptop":
+        if "daily" in values(home, "carry"):
+            out.append(("laptop_bag", "carry"))
+    return out
+
+
+def pick_accessory(facts: FactsService, kind: str, p: ProductWithStock, store_id: str | None = None):
+    """The accessory of this kind on sale that fits this product (a mount or bag only when its stated size range
+    covers it): the same brand first, then the lowest price."""
+    pool = [a for a in facts.products_sync(kind, store_id) if a.available
+            and (not (a.info or {}).get("for") or p.category in (a.info or {}).get("for"))]
+    if kind in ("tv_mount", "laptop_bag"):
+        size = p.spec("size_in" if kind == "tv_mount" else "screen_in")
+
+        def fits(a) -> bool:
+            rng = (a.info or {}).get("fits_in")
+            if not rng:
+                return kind == "laptop_bag"  # a bag with no stated size still carries it; a mount must say
+            return size is not None and float(rng[0]) <= float(size) <= float(rng[1])
+
+        pool = [a for a in pool if fits(a)]
+    if not pool:
+        return None
+    same = [a for a in pool if (a.brand or "").lower() == (p.brand or "").lower()]
+    return min(same or pool, key=lambda a: (a.price, a.sku))
+
+
+def _protection(p: ProductWithStock, plans: list, reg: NumberRegistry, lang: str, used: set[str]) -> dict | None:
+    """The resQ plan that covers this product (its price band), the longest cover first: years, price and per day.
+    Offered as a choice, never added to the totals until the customer adds it."""
+    ok = [pl for pl in plans if filter_holds(pl.filter, p) and pl.code not in used]
+    if not ok:
+        return None
+    pl = sorted(ok, key=lambda x: (-int(x.years or 0), x.price))[0]
+    days = max(1, int(pl.years or 1) * 365)
+    return {"code": pl.code, "title": pick(pl.title, lang, reg), "years": int(pl.years or 0),
+            "price_str": reg.inr(pl.price, f"protection:{pl.code}"),
+            "per_day_str": reg.inr(max(1, round(pl.price / days)), f"calc:protection_day:{pl.code}")}

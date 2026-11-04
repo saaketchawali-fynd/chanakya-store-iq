@@ -18,8 +18,8 @@ from chanakya.config import Settings
 from chanakya.core import clock
 from chanakya.log import get_log
 from chanakya.truth import db
-from chanakya.truth.jio import PLAN_LABELS, JioClient, JioError, category_of, is_protection
-from chanakya.truth.jio_map import map_product, map_promotions, map_protection
+from chanakya.truth.jio import PLAN_LABELS, JioClient, JioError, category_of, companion_of, is_protection
+from chanakya.truth.jio_map import map_accessory, map_product, map_promotions, map_protection
 from chanakya.truth.models import (
     AppSetting,
     Charge,
@@ -70,7 +70,8 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
     """(products, offers, protection plans, promotion errors) from the backend."""
     client = JioClient(s.jio_domain, s.jio_app_id, s.jio_app_token)
     try:
-        products, plans_raw, seen = [], [], set()
+        products, plans_raw, extras, seen = [], [], [], set()
+        others: dict[str, int] = {}
         async for _, items, _ in client.iter_products(page_size=50):
             for it in items:
                 if is_protection(it):
@@ -78,6 +79,15 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
                     continue
                 cat = category_of(it)
                 row = map_product(it, cat) if cat else None
+                if row is None and not cat and (kind := companion_of(it)):
+                    acc = map_accessory(it, kind)
+                    if acc and acc["sku"] not in seen:
+                        seen.add(acc["sku"])
+                        extras.append(acc)  # an accessory that completes a setup (no promotions fetched for it)
+                    continue
+                if not cat:
+                    for n in [c.get("name") or "?" for c in it.get("categories") or []][:1] or ["?"]:
+                        others[n] = others.get(n, 0) + 1
                 if row and row["sku"] not in seen:
                     seen.add(row["sku"])
                     products.append(row)
@@ -104,10 +114,12 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
         if lab and _label_category(lab):
             labels[lab] = _label_category(lab)
     plans = [x for x in (map_protection(it, labels) for it in plans_raw) if x]
+    FETCH_EXTRA.update(accessories=extras, unmapped=dict(sorted(others.items(), key=lambda x: -x[1])[:30]))
     return products, offers, plans, errors
 
 
 KEY_SPEC = {"tv": "size_in", "ac": "ton", "wm": "capacity_kg", "fridge": "capacity_l", "laptop": "ram_gb"}
+FETCH_EXTRA: dict = {}  # the last fetch's accessories and the backend categories it did not map (for /health)
 
 
 def catalog_report(products: list[dict]) -> dict:
@@ -188,16 +200,28 @@ async def sync(s: Settings, facts) -> dict:
     STATUS["running"] = True
     t0 = time.perf_counter()
     try:
+        FETCH_EXTRA.clear()
         products, offers, plans, errors = await fetch(s)
         if not products:
             raise JioError(None, "the catalogue returned no products in Chanakya's categories")
+        extras = list(FETCH_EXTRA.get("accessories") or [])
         counts = {"products": len(products), "offers": len(offers), "protection_plans": len(plans),
-                  "promotion_errors": errors}
+                  "promotion_errors": errors, "accessories": len(extras)}
         for r in products:
             counts[r["category"]] = counts.get(r["category"], 0) + 1
+        report = catalog_report(products)
+        acc: dict[str, dict] = {}
+        for r in extras:
+            a = acc.setdefault(r["category"], {"n": 0, "for": {}, "with_size_range": 0})
+            a["n"] += 1
+            for c in r["info"].get("for") or []:
+                a["for"][c] = a["for"].get(c, 0) + 1
+            a["with_size_range"] += 1 if r["info"].get("fits_in") else 0
+        report["accessories"] = acc
+        report["unmapped_categories"] = FETCH_EXTRA.get("unmapped") or {}
         meta = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "counts": counts, "domain": s.jio_domain,
-                "catalog": catalog_report(products)}
-        await write(s, products, offers, plans, meta)
+                "catalog": report}
+        await write(s, products + extras, offers, plans, meta)
         await facts.refresh()
         STATUS.update(last_ok_at=meta["at"], last_error=None, counts=counts)
         log.info("jio_sync_ok", ms=round((time.perf_counter() - t0) * 1000), **counts)

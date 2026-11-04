@@ -80,6 +80,51 @@ def _reason(ctx: SkillContext, key: str, lang: str) -> str:
     return fill(tpl, **vals)
 
 
+KEY_SIZE = (("size_in", "inch"), ("ton", "ton"), ("capacity_kg", "kg"), ("capacity_l", "L"), ("ram_gb", "GB RAM"))
+RANKS = {"resolution": ["HD", "Full HD", "4K", "8K"], "panel": ["LED", "Nanocell", "QLED", "MiniLED", "OLED"]}
+
+
+def _hl_text(ctx: SkillContext, pt, p, lang: str) -> str:
+    from chanakya.brain import highlights as HL
+
+    proof = ctx.reg.raw(pt.proof, f"highlight:{p.sku}")
+    text = pt.say.get("mr") if lang == "mr" and pt.say.get("mr") else HL.card_text(pt)  # Hinglish reads English fine
+    return ctx.reg.static(text) + f" ({proof})"
+
+
+def option_reason(ctx: SkillContext, o, opts, lang: str) -> str:
+    """Why this option, in facts (user, 4 Nov 2026): the best pick by the need it meets; a step up by what it really
+    adds over the best pick (a bigger size, a better picture class, a highlight the best one lacks); never a fixed
+    "bigger screen" when it is the same size. The value pick does cost less (options.py guarantees it)."""
+    from chanakya.brain import highlights as HL
+
+    best = opts.by_role("best")
+    p = o.product
+    if o.role == "best":
+        if o.reason_key == "value_fit" or o.reason_key not in ctx.pack.reasons:  # no spec rule to name: their need
+            pts = HL.points(p, ctx.session.home, ctx.session.extra.get("wants") or {}, ctx.pack, n=1, general=False)
+            if pts:
+                return _hl_text(ctx, pts[0], p, lang)
+        return _reason(ctx, o.reason_key, lang)
+    if o.role != "step" or best is None:
+        return _reason(ctx, o.reason_key, lang)
+    bp = best.product
+    for key, unit in KEY_SIZE:
+        a, b = p.spec(key), bp.spec(key)
+        if a and b and float(a) > float(b):
+            return ctx.t("reason_step_size", lang, a=ctx.reg.num(a, f"spec:{p.sku}:{key}", unit),
+                         b=ctx.reg.num(b, f"spec:{bp.sku}:{key}", unit))
+    for key, ladder in RANKS.items():
+        a, b = p.spec(key), bp.spec(key)
+        if a in ladder and b in ladder and ladder.index(a) > ladder.index(b):
+            return ctx.t("reason_step_spec", lang, label=ctx.reg.static(PV.label(key, lang)),
+                         a=ctx.reg.raw(str(a), f"spec:{p.sku}:{key}"), b=ctx.reg.raw(str(b), f"spec:{bp.sku}:{key}"))
+    diff = HL.differences(p, bp, ctx.session.home, ctx.session.extra.get("wants") or {}, ctx.pack)
+    if diff:
+        return ctx.t("reason_step_hl", lang, what=_hl_text(ctx, diff[0], p, lang))
+    return ctx.t("reason_step_other", lang)
+
+
 def _diffs(ctx: SkillContext, p, best, lang: str, n: int = 2) -> list[dict]:
     """What is different from the best pick, from the key specs (size first): facts, not adjectives."""
     if best is None:
@@ -115,7 +160,7 @@ def options_card(ctx: SkillContext, opts) -> Card:
                 "label": o.label,
                 "title": C.product_title(ctx, p, cl),
                 "role": o.role,
-                "reason": _reason(ctx, o.reason_key, cl),
+                "reason": option_reason(ctx, o, opts, cl),
                 "points": FV.points(ctx, p, cl, 3) if o.role == "best" else [],
                 "diffs": _diffs(ctx, p, best_p, cl) if o.role != "best" else [],
                 "stock_line": _stock_line(ctx, p, cl),
@@ -203,7 +248,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
     for o in opts.options:
         p = o.product
         name = C.product_name(ctx, p)
-        reason_a = _reason(ctx, o.reason_key, ctx.lang)
+        reason_a = option_reason(ctx, o, opts, ctx.lang)
         extra = "" if p.qty > 0 else f" ({_stock_line(ctx, p)})"
         tag = f" ({ctx.t('best_pick')})" if o.role == "best" else ""
         lines.append(f"*{o.label}* {name}{tag}: {reason_a}{extra}")
@@ -218,8 +263,8 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
         b = best
         why = _note_reasons(ctx, b.product, set(note.get("slots") or []), note.get("wants") or {})
         line_b = f"*{b.label}* {C.product_name(ctx, b.product)} ({ctx.t('best_pick')}): " + " · ".join(
-            why or [_reason(ctx, b.reason_key, ctx.lang)])
-        rest = [f"*{o.label}* {C.product_name(ctx, o.product)}: {_reason(ctx, o.reason_key, ctx.lang)}"
+            why or [option_reason(ctx, b, opts, ctx.lang)])
+        rest = [f"*{o.label}* {C.product_name(ctx, o.product)}: {option_reason(ctx, o, opts, ctx.lang)}"
                 for o in opts.options if o.role != "best"]
         lines = [ack, line_b, " · ".join(rest)] if rest else [ack, line_b]
         ctx.ev("note_shortlist", slots=list(note.get("slots") or []), wants=list((note.get("wants") or {}).keys()),
@@ -277,24 +322,59 @@ def demo_plan(ctx: SkillContext) -> list[dict]:
         return next((o.label for o in others if _val(o.product, key) is not None and str(_val(o.product, key)) != str(bv)),
                     None)
 
-    steps, used = [], set()
-    for key in s.extra.get("wants") or {}:  # 1. what they asked for (picture type, brand, size …), shown first
+    from chanakya.brain import highlights as HL
+
+    steps, used, fallbacks = [], set(), []
+    wants = s.extra.get("wants") or {}
+    for key in wants:  # 1. what they asked for (picture type, brand, size …), shown first
         if _val(best.product, key) is None:
             continue
         steps.append({"kind": "want", "key": key, "other": differs(key)})  # no other differs: show it on the best
         used.add(key)
-    for d, other, _ in rank_demos(opts, s.home, ctx.pack, ctx.facts.snap.guides):  # 2. their needs, strongest first
+    for d, other, score in rank_demos(opts, s.home, ctx.pack, ctx.facts.snap.guides):  # 2. their needs, strongest first
+        if score <= 0:
+            fallbacks.append((d, other))
+            continue
         if len(steps) >= MAX_STEPS - 1 or (d.differs_on and d.differs_on in used):
             continue
         steps.append({"kind": "recipe", "id": d.id, "other": other, "key": d.differs_on})
         if d.differs_on:
             used.add(d.differs_on)
+    hl = []  # 2b. their needs, where the products' own highlights differ (either way: the honest comparison)
+    for o in others:
+        for a, b, bonus in ((best, o, 0.0), (o, best, -0.1)):
+            pt = next((x for x in HL.differences(a.product, b.product, s.home, wants, ctx.pack) if x.need), None)
+            if pt:
+                hl.append((pt.weight + bonus, {"kind": "highlight", "theme": pt.theme, "on": a.label, "other": b.label}))
+    for _, st in sorted(hl, key=lambda x: -x[0]):
+        if len(steps) >= MAX_STEPS - 1 or f"hl:{st['theme']}" in used:
+            continue
+        steps.append(st)
+        used.add(f"hl:{st['theme']}")
     for key in FEATURE_KEYS.get(ctx.pack.category, []):  # 3. one more real difference in the data
         if len(steps) >= MAX_STEPS:
             break
         if key not in used and (lab := differs(key)):
             steps.append({"kind": "feature", "key": key, "other": lab})
+            used.add(key)
             break
+    if len(steps) < MAX_STEPS and others:  # 3b. or one the products' own highlights show
+        for o in others:
+            pt = next((x for x in HL.differences(best.product, o.product, s.home, wants, ctx.pack)
+                       if f"hl:{x.theme}" not in used), None)
+            if pt:
+                steps.append({"kind": "highlight", "theme": pt.theme, "on": best.label, "other": o.label})
+                used.add(f"hl:{pt.theme}")
+                break
+    if len(steps) < 2 and ctx.pack.category == "tv" and P.number(s.home, "seat_distance", ctx.pack) \
+            and not any(st.get("id") == "distance_demo" for st in steps):
+        same = all(_val(o.product, "size_in") == _val(best.product, "size_in") for o in others)
+        steps.append({"kind": "distance", "other": None} if same else
+                     {"kind": "recipe", "id": "distance_demo", "other": others[0].label if others else None,
+                      "key": "size_in"})
+    for d, other in fallbacks:  # last: a neutral demo that claims nothing (their own show)
+        if not steps and d.id == "own_content":
+            steps.append({"kind": "recipe", "id": d.id, "other": other, "key": None})
     return steps[:MAX_STEPS]
 
 
@@ -304,6 +384,14 @@ def _step_title(ctx: SkillContext, st: dict, lang: str) -> str:
     if st["kind"] == "recipe":
         d = ctx.pack.demo(st["id"])
         return pick(d.title, lang) if d else st["id"]
+    if st["kind"] == "highlight":
+        from chanakya.brain import highlights as HL
+
+        th = HL.theme(ctx.pack.category, st["theme"])
+        return th.label if th else st["theme"]
+    if st["kind"] == "distance":
+        d = ctx.pack.demo("distance_demo")
+        return pick(d.title, lang) if d else "distance"
     key = st["key"]
     if i18n_has(f"want_label_{key}"):
         return ctx.t(f"want_label_{key}", lang)
@@ -353,6 +441,16 @@ async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
     alone = not st.get("other")  # what they asked for, and every option has it: show it on the best pick
     op = bp if alone else ctx.facts.product_sync(s.option_labels.get(st["other"]) or s.option_labels[best_lab])
     head = ctx.t("demo_head", i=ctx.reg.num(i + 1, "demo:step"), n=ctx.reg.num(len(plan), "demo:steps"))
+    if st["kind"] in ("highlight", "distance"):
+        msg = _demo_extra(ctx, st, head, best_lab, bp, i + 1 < len(plan))
+        s.demo_recipe = f"{st['kind']}:{st.get('theme') or 'size'}"
+        sent = ctx.x.setdefault("demos_sent", [])
+        if s.demo_recipe not in sent:
+            sent.append(s.demo_recipe)
+        ctx.ev("demo_recipe_sent", recipe=s.demo_recipe, demo_step=i + 1, of=len(plan))
+        if i == 0 and len(plan) > 1:
+            msg.footer = ctx.t("demo_plan_line", steps=" → ".join(_step_title(ctx, x, ctx.lang) for x in plan))[:60]
+        return ctx.reply(msg)
     vals = "" if alone else _values(ctx, st.get("key"), best_lab, bp, st["other"], op)
     if alone and st.get("key"):
         v = PV.fmt_value(ctx, bp, st["key"], ctx.lang, customer=False) if st["key"] != "brand" else ctx.reg.raw(bp.brand, "product")
@@ -383,6 +481,36 @@ async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
     return ctx.reply(msg)
 
 
+def _demo_extra(ctx: SkillContext, st: dict, head: str, best_lab: str, bp, has_next: bool):
+    """A demo step from the products' own highlights ('For the elders: dialogue clearer on B, it has ClearAudio+; try
+    it on B, then on A'), or the distance check on the best pick when the sizes are the same."""
+    from chanakya.brain import highlights as HL
+
+    s = ctx.session
+    if st["kind"] == "distance":
+        ft = P.number(s.home, "seat_distance", ctx.pack)
+        size = bp.spec("size_in")
+        say = ctx.tc("demo_distance_one_say", best=C.product_name(ctx, bp))
+        why = f"{head} · " + ctx.t("demo_distance_one_why", ft=ctx.reg.num(ft, "card:seat_distance", "ft"),
+                                   size=ctx.reg.num(size, f"spec:{bp.sku}:size_in", "inch") if size else "")
+        return coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next))
+    on_p = ctx.facts.product_sync(s.option_labels.get(st["on"]) or bp.sku)
+    other_p = ctx.facts.product_sync(s.option_labels.get(st["other"]) or bp.sku)
+    pts = [x for x in HL.points(on_p, s.home, s.extra.get("wants") or {}, ctx.pack, n=10) if x.theme == st["theme"]]
+    th = HL.theme(ctx.pack.category, st["theme"])
+    if not pts or th is None:
+        return coach_reply(ctx, ctx.tc("demo_feature_say", what=_step_title(ctx, st, ctx.clang), best=C.product_name(ctx, on_p),
+                                       other=C.product_name(ctx, other_p)), head, C.known_cites(ctx),
+                           _demo_buttons(ctx, has_next))
+    pt = pts[0]
+    proof = ctx.reg.raw(pt.proof, f"highlight:{on_p.sku}")
+    say = ctx.reg.static(HL.say(pt, ctx.clang)) + " " + ctx.tc("demo_hl_cmp", on=C.product_name(ctx, on_p),
+                                                               other=C.product_name(ctx, other_p))
+    how = ctx.pick(th.demo, ctx.lang) if th.demo else ""
+    why = f"{head} · " + (f"{how} · " if how else "") + ctx.t("demo_hl_why", on=st["on"], proof=proof)
+    return coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next))
+
+
 def _demo_buttons(ctx: SkillContext, has_next: bool) -> list:
     btns = [ctx.b("b_shown", ctx.sid("shown"))]
     if has_next:
@@ -400,15 +528,15 @@ async def prefer(ctx: SkillContext) -> Reply:
     if not s.option_labels:
         return await show_options(ctx)
     rows = []
+    opts = _option_set(ctx)
     for lab, sku in sorted(s.option_labels.items()):
         p = ctx.facts.product_sync(sku)
-        role = {"value": "value_fit", "step": "step_up"}.get(state.option_role(s, lab))
-        reason = _reason(ctx, role, ctx.lang) if role else ""
-        if state.option_role(s, lab) == "best":
-            from chanakya.brain.fit import fit
-
-            top = fit(p, s.home, ctx.pack, ctx.facts.snap.guides).top_rule()
-            reason = _reason(ctx, top if top in ctx.pack.reasons else "value_fit", ctx.lang)
+        o = opts.by_label(lab) if opts else None
+        if o is not None and o.product.sku == sku:
+            reason = option_reason(ctx, o, opts, ctx.lang)
+        else:
+            role = {"value": "value_fit", "step": "step_up"}.get(state.option_role(s, lab))
+            reason = _reason(ctx, role, ctx.lang) if role else ""
         rows.append(ListRow(id=ctx.sid("opt", lab), title=truncate(f"{lab}: {p.model}", 24), description=truncate(reason, 72)))
         ctx.reg.raw(rows[-1].title, f"product:{sku}")
     if ctx.pack.placeable and len(s.option_labels) >= 2:  # A vs B on their wall, in one picture
@@ -649,6 +777,11 @@ def _gains(ctx: SkillContext, lower, higher) -> list[str]:
         if a and b and float(b) > float(a):
             out.append(ctx.t("upg_more", what=ctx.reg.num(b, f"spec:{higher.sku}:{key}", unit)))
             break
+    from chanakya.brain import highlights as HL
+
+    for pt in HL.differences(higher, lower, home, ctx.session.extra.get("wants") or {}, pack):
+        if pt.need and len(out) < 2:  # only what answers their need: 'adds ClearAudio+ for the elders'
+            out.append(ctx.t("reason_step_hl", what=_hl_text(ctx, pt, higher, ctx.lang)))
     return out[:2]
 
 

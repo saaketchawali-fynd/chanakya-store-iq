@@ -52,6 +52,7 @@ class SlotDef(_M):
     number: str | None = None
     ask_if: dict | None = None
     keywords: dict[str, list[str]] = {}
+    alt: dict | None = None  # {ask, why, quick: [values]}: asked this way when only the products' highlights act on it
 
     def value_title(self, value: str, lang: str) -> str:
         vt = self.value_titles.get(value)

@@ -2,7 +2,8 @@
 {# Product detail after a label scan: image, fit badge, key specs, highlights, pros/cons, price/offer/stock. #}
 {% set specs = (key_specs|aslist)[:6] %}
 {% set feats = (features|aslist)[:4] %}
-{% set ups = (pros|aslist)[:4] %}
+{% set mine = (made|aslist)[:3] %}
+{% set ups = [] if mine else (pros|aslist)[:4] %}
 {% set downs = (cons|aslist)[:3] %}
 {% set kind = badge_kind if badge_kind in ('good', 'partial', 'poor') else 'neutral' %}
 {% block style %}
@@ -47,12 +48,19 @@
   .buy .stock .ic.i-truck { color: var(--saffron); }
   .buy .stock .ic.i-alert { color: var(--red); }
   .note { font-size: 21px; color: var(--faint); }
+  .made { margin-top: 18px; padding: 22px 28px; border: 2px solid #C7D2FE; background: linear-gradient(180deg, #F5F7FF, #fff); }
+  .made .label .ic { color: var(--saffron); }
+  .made .pc { padding: 9px 0; font-size: 27px; font-weight: 600; color: var(--ink); }
+  .made .pc + .pc { border-top: 1.5px solid var(--line); }
+  .made .bubble { background: var(--green); color: #fff; }
+  .made .proof { display: inline-block; margin-left: 10px; padding: 3px 12px; border-radius: 999px; font-size: 20px;
+                 font-weight: 700; color: #3730A3; background: #EEF2FF; vertical-align: 2px; }
 {% endblock %}
 {% block hd_class %}{% if image or feats %} lift{% endif %}{% endblock %}
 {% block header %}
   <div class="hd-row">
     <div class="grow">
-      <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+      <div class="kicker{{ L.kicker|dv }}">{% if picked %}{{ L.picked }}{% else %}{{ L.kicker }}{% endif %}</div>
       <h1 class="{{ title|dv }}">{{ title or L.kicker }}</h1>
     </div>
     {% if badge or fit_str %}
@@ -76,6 +84,12 @@
     <div class="card specs n{{ specs|length }}">
       {% for s in specs %}<div class="sp"><span class="k">{{ s.label }}</span><span class="v num">{{ s.value }}</span></div>{% endfor %}
     </div>
+  </section>
+  {% endif %}
+  {% if mine %}
+  <section class="card made">
+    <div class="label{{ L.made|dv }}">{{ icon('home', 26) }}{{ L.made }}</div>
+    {% for x in mine %}<div class="pc"><span class="bubble">{{ icon('check', 20, '', 3) }}</span><span>{{ x.text }}{% if x.proof %}<span class="proof num">{{ x.proof }}</span>{% endif %}</span></div>{% endfor %}
   </section>
   {% endif %}
   {% if ups or downs %}

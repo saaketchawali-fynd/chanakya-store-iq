@@ -61,7 +61,7 @@
       {% endfor %}
       <div class="r num" style="margin-top:10px"><span class="k{{ L.after_offers|dv }}">{{ L.after_offers }}</span><span class="v">{{ payable_str }}</span></div>
     {% else %}
-      <div class="none{{ L.no_offer|dv }}">{{ L.no_offer }}</div>
+      {% set nolab = L.no_offer_any if pay_any else L.no_offer %}<div class="none{{ nolab|dv }}">{{ nolab }}</div>
     {% endif %}
     {% if extras_str %}<div class="r num"><span class="k{{ L.extras|dv }}">{{ L.extras }}</span><span class="v">+{{ extras_str }}</span></div>{% endif %}
     <div class="total num"><span class="k{{ L.total|dv }}">{{ L.total }}{% if extras_str %}<small>{{ L.total_note }}</small>{% endif %}</span><span class="v">{{ total_str }}</span></div>

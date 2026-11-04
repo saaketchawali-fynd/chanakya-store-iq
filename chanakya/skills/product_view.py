@@ -28,6 +28,7 @@ LABELS: dict[str, tuple[dict, str]] = {
     "wide_angle": ({"hi": "Wide viewing angle", "mr": "Wide viewing angle", "en": "Wide viewing angle"}, ""),
     "apps": ({"hi": "Apps", "mr": "Apps", "en": "Apps"}, ""),
     "hdmi_ports": ({"hi": "HDMI ports", "mr": "HDMI ports", "en": "HDMI ports"}, ""),
+    "hdmi_arc": ({"hi": "HDMI ARC", "mr": "HDMI ARC", "en": "HDMI ARC"}, ""),
     "usb_ports": ({"hi": "USB ports", "mr": "USB ports", "en": "USB ports"}, ""),
     "hdr_formats": ({"hi": "HDR", "mr": "HDR", "en": "HDR"}, ""),
     "os": ({"hi": "Operating system", "mr": "Operating system", "en": "Operating system"}, ""),

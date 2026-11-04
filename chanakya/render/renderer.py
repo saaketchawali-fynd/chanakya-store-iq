@@ -129,6 +129,8 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "pros": "Achhi baatein",
             "cons": "Dhyan dein",
             "fit": "ghar se match",
+            "made": "Aapke ghar ke liye",
+            "picked": "Aapki pasand",
         },
         "mr": {
             "kicker": "उत्पादन",
@@ -137,6 +139,8 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "pros": "चांगल्या गोष्टी",
             "cons": "लक्षात ठेवा",
             "fit": "घराशी जुळणी",
+            "made": "तुमच्या घरासाठी",
+            "picked": "तुमची निवड",
         },
         "en": {
             "kicker": "Product",
@@ -145,6 +149,8 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "pros": "Good for this home",
             "cons": "Keep in mind",
             "fit": "home match",
+            "made": "Made for your home",
+            "picked": "Your pick",
         },
     },
     "compare": {
@@ -179,6 +185,8 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "exchange": "एक्सचेंज",
             "lifetime": "चलाने का खर्च",
             "note": "बिल = कार्ड · कोई सरप्राइज़ नहीं",
+            "protect": "सुरक्षा (वैकल्पिक)",
+            "good_to_know": "साथ में",
         },
         "mr": {
             "title": "पूर्ण खर्च",
@@ -194,6 +202,8 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "exchange": "एक्सचेंज",
             "lifetime": "चालवण्याचा खर्च",
             "note": "बिल = कार्ड · कोणतंही सरप्राइज नाही",
+            "protect": "संरक्षण (पर्यायी)",
+            "good_to_know": "सोबत",
         },
         "en": {
             "title": "Full cost",
@@ -209,19 +219,21 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "exchange": "Exchange",
             "lifetime": "Running cost",
             "note": "Bill = card · no surprises",
+            "protect": "Protect it (optional)",
+            "good_to_know": "Included and noted",
         },
     },
     "offer": {
         "hi": {"title": "आज का ऑफ़र", "pay": "पेमेंट", "price": "दाम", "after_offers": "ऑफ़र के बाद",
-               "no_offer": "इस पेमेंट पर आज कोई ऑफ़र नहीं", "extras": "इंस्टॉलेशन और ज़रूरी सामान",
+               "no_offer": "इस पेमेंट पर आज कोई ऑफ़र नहीं", "no_offer_any": "आज इस मॉडल पर कोई ऑफ़र नहीं", "extras": "इंस्टॉलेशन और ज़रूरी सामान",
                "total": "आज का कुल खर्च", "total_note": "इंस्टॉलेशन समेत", "saving": "कुल बचत", "emi": "EMI",
                "exchange": "एक्सचेंज", "also": "दूसरे कार्ड पर भी", "note": "सिर्फ़ असली ऑफ़र · बिल = कार्ड"},
         "mr": {"title": "आजची ऑफर", "pay": "पेमेंट", "price": "किंमत", "after_offers": "ऑफरनंतर",
-               "no_offer": "या पेमेंटवर आज ऑफर नाही", "extras": "इन्स्टॉलेशन व आवश्यक साहित्य",
+               "no_offer": "या पेमेंटवर आज ऑफर नाही", "no_offer_any": "आज या मॉडेलवर ऑफर नाही", "extras": "इन्स्टॉलेशन व आवश्यक साहित्य",
                "total": "आजचा एकूण खर्च", "total_note": "इन्स्टॉलेशनसह", "saving": "एकूण बचत", "emi": "EMI",
                "exchange": "एक्सचेंज", "also": "दुसऱ्या कार्डवरही", "note": "फक्त खऱ्या ऑफर · बिल = कार्ड"},
         "en": {"title": "Today's offer", "pay": "Payment", "price": "Price", "after_offers": "After offers",
-               "no_offer": "No offer on this payment today", "extras": "Installation and required items",
+               "no_offer": "No offer on this payment today", "no_offer_any": "No live offer on this model today", "extras": "Installation and required items",
                "total": "Total today", "total_note": "installation included", "saving": "You save", "emi": "EMI",
                "exchange": "Exchange", "also": "Also with another card", "note": "Only real offers · bill = card"},
     },
@@ -1310,6 +1322,12 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
         rows.append(f"{lb['zaroori_total']}: {d.get('zaroori_total_str') or ''}")
         if d.get("with_suggestions_total_str"):
             rows.append(f"{lb['with_suggestions_total']}: {d['with_suggestions_total_str']}")
+        if d.get("mrp_text"):
+            rows.insert(1, str(d["mrp_text"]))
+        if d.get("protection"):
+            pr = d["protection"]
+            rows.append(f"{lb.get('protect', '')}: {pr.get('title')} {pr.get('price_str')} ({pr.get('note')})")
+        rows += [str(x) for x in aslist(d.get("included")) + aslist(d.get("notes"))]
         for k in ("exchange_text", "lifetime_text", "stamp"):
             if d.get(k):
                 rows.append(str(d[k]))

@@ -125,15 +125,6 @@ async def fill(ctx: SkillContext, text: str, p, lang: str) -> str:
     return " ".join(_fill(text, **vals).split())
 
 
-def ignored_specs(ctx: SkillContext, p, used_benefits: list) -> list[str]:
-    used = set()
-    for b in used_benefits:
-        used |= _spec_keys(b.when_spec)
-        for c in b.when_spec_any:
-            used |= _spec_keys(c)
-    return [k for k in p.specs if k not in used and k not in ("size_in", "apps")]
-
-
 async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
     s = ctx.session
     sp = ctx.facts.product_sync(read.sku) if read.sku else None
@@ -194,6 +185,39 @@ async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0) -> Reply:
     return await benefit(ctx, first=True)
 
 
+def _wants(ctx: SkillContext) -> dict:
+    return ctx.session.extra.get("wants") or {}
+
+
+def hl_points(ctx: SkillContext, p, n: int = 3, general: bool = False) -> list:
+    """The product's own highlights that answer this customer's needs (brain/highlights.py)."""
+    from chanakya.brain import highlights as HL
+
+    if ctx.pack is None or p.category != ctx.pack.category:
+        return []
+    return HL.points(p, ctx.session.home, _wants(ctx), ctx.pack, n=n, general=general)
+
+
+def hl_say(ctx: SkillContext, p, pt, lang: str) -> str:
+    """The customer line for a highlight point, its proof registered from the product's own highlight."""
+    from chanakya.brain import highlights as HL
+
+    ctx.reg.raw(pt.proof, f"highlight:{p.sku}")
+    return ctx.reg.static(HL.say(pt, lang))
+
+
+def _next_benefit(ctx: SkillContext, p, said: list, general: bool = False):
+    """('rule', benefit) from the pack (spec-proven), else ('hl', point) from the product's own highlights; the
+    strongest not yet said. A general highlight only when asked for (nothing for this home yet)."""
+    for b in matching(ctx, p):
+        if b.id not in said:
+            return "rule", b
+    for pt in hl_points(ctx, p, n=8, general=general):
+        if f"hl_{pt.theme}" not in said and (general or pt.need):
+            return "hl", pt
+    return None, None
+
+
 async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     x = ctx.x
     sku = x.get("label_sku") or ctx.session.chosen_sku or state.best_sku(ctx.session)
@@ -203,16 +227,18 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     said = x.setdefault("benefits_said", {}).setdefault(sku, [])
     if first:  # a (re)scan starts the benefits for this product again
         said.clear()
-    ms = matching(ctx, p)
-    nxt = next((b for b in ms if b.id not in said), None)
+    gate = state.options_gate_open(ctx.session, ctx.pack)
+    kind, nxt = _next_benefit(ctx, p, said)
+    if nxt is None and first and gate:  # the home is known but nothing of it matches: the product's own best point
+        kind, nxt = _next_benefit(ctx, p, said, general=True)
     if nxt is None and first:
         # no home facts match yet: show the product from the data, and steer back to the home questions
         card = await product_card_en(ctx, p)
         slot = C.pick_next_slot(ctx)
         btns = [ctx.b("b_next_q", ctx.sid("go")), ctx.b("b_compare", ctx.sid("compare")),
                 ctx.b("b_options", ctx.sid("options"))]
-        say = ctx.tc("bolo_label_intro", product=C.product_name(ctx, p))
         n = state.missing_for_options(ctx.session, ctx.pack)
+        say = ctx.tc("bolo_label_intro" if n else "bolo_label_ready", product=C.product_name(ctx, p))
         why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing")) if n else ctx.t("kyun_options_ready")
         cites = C.known_cites(ctx) or ([slot] if slot else [])
         if slot and not C.known_cites(ctx):
@@ -221,32 +247,77 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
             return ctx.reply(info_reply(ctx, say, btns, card=card))
         return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
     if nxt is None or len(said) >= 2:
-        return await ignore_line(ctx, p, ms)
+        return await ignore_line(ctx, p)
     lang = ctx.clang
-    text = ctx.pick(nxt.say_who, lang) if (nxt.say_who.get(lang) and ctx.session.home.sports_viewer) else ""
-    say = await fill(ctx, text or ctx.pick(nxt.say, lang), p, lang)
-    said.append(nxt.id)
-    ctx.ev("benefit_said", rule_id=nxt.id, cites=nxt.cites, sku=sku)
-    cite = nxt.cites[0] if nxt.cites else None
-    sd = ctx.pack.slot(cite) if cite else None
-    vt = ctx.reg.static(", ".join(sd.value_title(v, ctx.lang) for v in P.values(ctx.session.home, cite))) if sd else ""
-    n_ignored = len(ignored_specs(ctx, p, ms))
-    why = ctx.t("kyun_benefit", value=vt, n=ctx.reg.num(n_ignored, f"calc:ignored_specs:{sku}"))
+    if kind == "rule":
+        text = ctx.pick(nxt.say_who, lang) if (nxt.say_who.get(lang) and ctx.session.home.sports_viewer) else ""
+        say = await fill(ctx, text or ctx.pick(nxt.say, lang), p, lang)
+        rid, cites_all = nxt.id, list(nxt.cites)
+        cite = nxt.cites[0] if nxt.cites else None
+        sd = ctx.pack.slot(cite) if cite else None
+        vt = ctx.reg.static(", ".join(sd.value_title(v, ctx.lang) for v in P.values(ctx.session.home, cite))) if sd else ""
+        why = ctx.t("kyun_benefit", value=vt)
+    else:
+        say = hl_say(ctx, p, nxt, lang)
+        rid = f"hl_{nxt.theme}"
+        cites_all = [n.slot for n in _theme_needs(ctx, nxt.theme) if n.slot and P.known(ctx.session.home, n.slot)]
+        why = ctx.t("kyun_hl" if nxt.need else "kyun_hl_general", proof=ctx.reg.raw(nxt.proof, f"highlight:{p.sku}"))
+    said.append(rid)
+    ctx.ev("benefit_said", rule_id=rid, cites=cites_all, sku=sku)
     say = f"{say} {ctx.tc('trial_q')}"  # trial close: does this benefit matter to them?
     btns = [
-        ctx.b("b_matters", ctx.sid("bt", "yes", nxt.id)),
-        ctx.b("b_not_really", ctx.sid("bt", "no", nxt.id)),
+        ctx.b("b_matters", ctx.sid("bt", "yes", rid)),
+        ctx.b("b_not_really", ctx.sid("bt", "no", rid)),
         ctx.b("b_compare", ctx.sid("compare")),
     ]
     card = None
     if first:
         card = await product_card_en(ctx, p)
-        if not state.options_gate_open(ctx.session, ctx.pack):  # judge the fit only once the home is understood
+        if not gate:  # judge the fit only once the home is understood
             n = state.missing_for_options(ctx.session, ctx.pack)
             why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
             btns = [btns[0], btns[1], ctx.b("b_next_q", ctx.sid("go"))]
-    cites = [c for c in nxt.cites if P.known(ctx.session.home, c)] or nxt.cites
+    cites = [c for c in cites_all if P.known(ctx.session.home, c)] or cites_all or C.known_cites(ctx)
+    if not cites:
+        return ctx.reply(info_reply(ctx, say, btns, card=card))
     return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+
+
+async def made_for(ctx: SkillContext, p) -> OutMessage | None:
+    """Saral Samjhao at the moment of choice (user, 4 Nov 2026): the customer picked this one, so say back, in their
+    words, why it is right for THEIR home (their need + the product's own proof), with the 'Made for your home' card.
+    Once per chosen model; the next step (site questions, then the full cost) follows in the same reply."""
+    x = ctx.x
+    if x.get("made_for_sku") == p.sku or p.category != ctx.pack.category:
+        return None
+    lang = ctx.clang
+    rule = next(iter(matching(ctx, p)), None)
+    pts = hl_points(ctx, p, n=1, general=False)
+    if rule is not None:
+        say = await fill(ctx, ctx.pick(rule.say, lang), p, lang)
+        rid = rule.id
+    elif pts:
+        say, rid = hl_say(ctx, p, pts[0], lang), f"hl_{pts[0].theme}"
+    else:
+        return None  # nothing proven for this home: no empty praise
+    x["made_for_sku"] = p.sku
+    card = await product_card_en(ctx, p)
+    card.data["picked"] = True
+    card.data.pop("note", None)  # not read from a label here: their pick
+    if not card.data.get("made"):
+        return None
+    ctx.ev("made_for_sent", sku=p.sku, lead=rid, points=len(card.data["made"]))
+    msg = coach_reply(ctx, ctx.tc("bolo_made_for", line=say), ctx.t("kyun_made_for"), C.known_cites(ctx), [], card=card,
+                      status=False)
+    msg.kind = "image"
+    return msg
+
+
+def _theme_needs(ctx: SkillContext, theme_id: str) -> tuple:
+    from chanakya.brain import highlights as HL
+
+    th = HL.theme(ctx.pack.category, theme_id)
+    return th.needs if th else ()
 
 
 async def benefit_reply(ctx: SkillContext, answer: str, rule_id: str | None) -> Reply:
@@ -260,23 +331,61 @@ async def benefit_reply(ctx: SkillContext, answer: str, rule_id: str | None) -> 
     return await benefit(ctx)
 
 
+IGNORE_KEYS = {  # what a customer is often sold on, though every model of that size may have it
+    "tv": ["resolution", "wifi", "panel", "hdr_formats", "os"],
+    "ac": ["inverter", "star"],
+    "wm": ["automatic", "load"],
+    "fridge": ["frost_free", "door"],
+    "laptop": ["laptop_type", "os", "ram_gb"],
+}
+IGNORE_SHARE = 0.9
+IGNORE_MIN = 5
+
+
+def common_specs(ctx: SkillContext, p) -> list[tuple[str, str, int, int, str | None]]:
+    """[(spec key, its value, models with it, models of its size, size label)]: what (nearly) every model of this
+    product's key size in stock also has, so it is not a reason to pay more. From today's stock only."""
+    from chanakya.skills.brief import _bucket
+
+    cat = p.category
+    avail = [q for q in ctx.facts.products_sync(cat) if q.qty > 0 or q.nearby_qty > 0]
+    b = _bucket(cat, p)
+    same = [q for q in avail if (qb := _bucket(cat, q)) and qb[0] == b[0]] if b else avail
+    if len(same) < IGNORE_MIN:
+        return []
+    out = []
+    for key in IGNORE_KEYS.get(cat, []):
+        v = p.spec(key)
+        if v is None or v is False or v == "":
+            continue
+        n = sum(1 for q in same if str(q.spec(key)) == str(v))
+        if n >= IGNORE_SHARE * len(same):
+            out.append((key, PV.label(key, "en") if v is True else str(v), n, len(same), b[1] if b else None))
+    return out
+
+
 async def ignore_line(ctx: SkillContext, p, ms: list | None = None) -> Reply:
-    """After the benefits: the specs that do not matter for this home (only specs this product really has)."""
-    ms = ms if ms is not None else matching(ctx, p)
-    keys = [k for k in ignored_specs(ctx, p, ms) if k in PV.LABELS and not isinstance(p.spec(k), bool)]
-    names = [PV.label(k, ctx.clang) for k in keys[:2]]
+    """After the benefits, honestly: what is NOT a reason to pay more, only when today's stock proves it (nearly every
+    model of this size has it too). Otherwise nothing is called unimportant."""
     btns = [ctx.b("b_compare", ctx.sid("compare")), ctx.b("b_options", ctx.sid("options")),
             ctx.b("b_tryon", ctx.sid("tryon"))]
     if ctx.session.shortlist:
         btns[1] = ctx.b("b_cost_show", ctx.sid("cost_show"))
-    if not names:
+    common = common_specs(ctx, p)
+    if not common:
         return ctx.reply(info_reply(ctx, ctx.t("benefits_done"), btns[:2]))
-    ctx.ev("ignore_said", sku=p.sku, specs=keys[:2])
-    say = ctx.tc("bolo_ignore", specs=ctx.reg.static(", ".join(names)))
+    key, val, n, total, size = common[0]
+    ctx.ev("ignore_said", sku=p.sku, specs=[key], share=f"{n}/{total}")
+    spec = ctx.reg.raw(val, f"spec:{p.sku}:{key}")
+    size_t = ctx.reg.raw(size, f"stock:{p.category}:bucket") if size else ""
+    cat = ctx.pick(ctx.packs.get(p.category).label, ctx.clang)
+    say = ctx.tc("bolo_ignore_data" if size_t else "bolo_ignore_data_all", spec=spec, size=size_t, cat=cat)
+    why = ctx.t("kyun_ignore_data", n=ctx.reg.num(n, f"stock:{p.category}:{key}"),
+                total=ctx.reg.num(total, f"stock:{p.category}:bucket_count"), spec=spec)
     cites = C.known_cites(ctx)
     if not cites:
         return ctx.reply(info_reply(ctx, say, btns))
-    return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_ignore"), cites, btns))
+    return ctx.reply(coach_reply(ctx, say, why, cites, btns))
 
 
 def _badge(ctx: SkillContext, score: int, lang: str) -> tuple[str, str]:
@@ -325,6 +434,9 @@ async def product_card(ctx: SkillContext, p) -> Card:
     if mn:
         data["note"] = ctx.t("label_note", lang, model=ctx.reg.raw(mn, f"product:{p.sku}"))
     if state.options_gate_open(s, ctx.pack) and p.category == ctx.pack.category:
+        from chanakya.skills import fitview as FV
+
+        data["made"] = [x for x in FV.points(ctx, p, lang, 3) if isinstance(x, dict) and x.get("text")]  # for THIS home
         pros, cons, score = await pros_cons(ctx, p, lang)
         badge, kind = _badge(ctx, score, lang)
         data.update(pros=pros, cons=cons, badge=badge, badge_kind=kind,
@@ -337,12 +449,8 @@ async def benefit_card(ctx: SkillContext, p, ms: list) -> OutMessage:
     benefits = [
         {"icon": ICONS.get(b.id, "check"), "text": await fill(ctx, ctx.pick(b.card, lang), p, lang)} for b in ms[:3]
     ]
-    ign = ignored_specs(ctx, p, ms)[:3]
-    ignore_text = (
-        ctx.t("ignore_prefix", lang) + " " + ", ".join(ctx.pick(SPEC_LABELS.get(k, {"en": k}), lang) for k in ign)
-        if ign
-        else ""
-    )
+    common = common_specs(ctx, p)
+    ignore_text = ctx.t("ignore_prefix", lang) + " " + common[0][1] if common else ""
     card = Card(
         template="benefit",
         lang=lang,

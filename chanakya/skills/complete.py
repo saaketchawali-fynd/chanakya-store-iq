@@ -21,7 +21,7 @@ async def choose(ctx: SkillContext, label: str) -> Reply:
         return await show_options(ctx)
     s.chosen_sku = sku
     s.extra["chosen_label"] = label.upper()
-    return await show_cost(ctx)
+    return await _after_choice(ctx)
 
 
 async def choose_sku(ctx: SkillContext, sku: str) -> Reply:
@@ -32,7 +32,24 @@ async def choose_sku(ctx: SkillContext, sku: str) -> Reply:
     for lab, v in s.option_labels.items():
         if v == sku:
             s.extra["chosen_label"] = lab
-    return await show_cost(ctx)
+    return await _after_choice(ctx)
+
+
+async def _after_choice(ctx: SkillContext) -> Reply:
+    """They chose: first why it is right for their home ('Made for your home', Saral Samjhao), then the site
+    questions and the full cost, in one reply."""
+    from chanakya.skills.returning import out_of_stock_reply
+    from chanakya.skills.translate import made_for
+
+    s = ctx.session
+    p = ctx.facts.product_sync(s.chosen_sku) if s.chosen_sku else None
+    pre = None
+    if p is not None and state.price_gate_open(s, ctx.pack) and out_of_stock_reply(ctx, p.sku) is None:
+        pre = await made_for(ctx, p)
+    r = await show_cost(ctx)
+    if pre is not None:
+        r.messages.insert(0, pre)
+    return r
 
 
 def _pending_site_slot(ctx: SkillContext) -> str | None:
@@ -42,6 +59,8 @@ def _pending_site_slot(ctx: SkillContext) -> str | None:
     for sid in pack.complete_slots or [x for x in pack.site_needs if x in pack.cost_slots]:
         if P.known(home, sid):
             continue
+        if sid == "soundbar" and not any(a.available for a in ctx.facts.products_sync("soundbar")):
+            continue  # backwards from the data: no soundbar on sale, so the answer could change nothing
         sd = pack.slot(sid)
         if sd and sd.ask_if:
             cond = {k: v for k, v in sd.ask_if.items() if k != "slot"}
@@ -213,6 +232,22 @@ def kharcha_card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
         time=ctx.reg.raw(fmt.time_short(ctx.now), "clock:time"),
     )
     with_sug = sheet.with_suggestions_total_str if sheet.with_suggestions_total != sheet.zaroori_total else None
+    mrp_text = None
+    if p.mrp and p.mrp > p.price:  # the backend's own MRP: what they save on it today
+        mrp_text = ctx.t("kh_mrp", lang, mrp=ctx.reg.inr(p.mrp, p.price_source),
+                         save=ctx.reg.inr(p.mrp - p.price, f"calc:mrp_saving:{p.sku}"))
+    prot = None
+    if sheet.protection:
+        pr = sheet.protection
+        for k in ("price_str", "per_day_str"):
+            ctx.reg.raw(pr[k], f"protection:{pr['code']}")
+        prot = {"title": ctx.reg.raw(pr["title"], f"protection:{pr['code']}"), "price_str": pr["price_str"],
+                "note": ctx.t("kh_protect_note", lang, years=ctx.reg.num(pr["years"], f"protection:{pr['code']}:years"),
+                              day=pr["per_day_str"])}
+    included = []
+    if (p.info or {}).get("warranty_text"):
+        included.append(ctx.t("kh_warranty", lang, w=ctx.reg.raw(p.info["warranty_text"], f"product:{p.sku}:warranty")))
+    notes = install_notes(ctx, lang) + [ctx.t(f"kh_note_{n}", lang) for n in sheet.notes]
     return Card(
         template="kharcha",
         lang=lang,
@@ -227,8 +262,29 @@ def kharcha_card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
             "stamp": stamp,
             "optional_count": sheet.optional_count,
             "product_image": p.image,
+            "mrp_text": mrp_text,
+            "protection": prot,
+            "included": included,
+            "notes": notes[:4],
         },
     )
+
+
+def install_notes(ctx: SkillContext, lang: str) -> list[str]:
+    """The site answers the installer needs, as said by the customer ("Wall mount · Concrete wall"): the Complete
+    questions visibly count, even where the data has no price for the work."""
+    pack, home = ctx.pack, ctx.session.home
+    out = []
+    for sid in dict.fromkeys([*(pack.complete_slots or []), *(pack.site_needs or [])]):
+        if sid in ("soundbar",) or not P.known(home, sid):
+            continue
+        sd = pack.slot(sid)
+        if sd is None:
+            continue
+        vals = [v for v in P.values(home, sid) if v != "unknown"]
+        if vals:
+            out.append(ctx.reg.static(f"{ctx.pick(sd.title, lang)}: " + ", ".join(sd.value_title(v, lang) for v in vals)))
+    return out
 
 
 async def resend_card(ctx: SkillContext) -> Reply:

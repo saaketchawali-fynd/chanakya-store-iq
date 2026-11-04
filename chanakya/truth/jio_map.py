@@ -107,6 +107,11 @@ def _tv(p: dict, name: str, specs: dict, src: dict) -> None:
          "attributes.brightness")
     _put(specs, src, "speaker_w", _clean_num(_num(attr(p, "speaker_output", "audio_output", "sound_output",
                                                        "speaker-output"), "w\\b|watts?")), "attributes.speaker_output")
+    if "speaker_w" not in specs:  # "20W" in the product's own feature lines
+        lines = [*(p.get("highlights") or []), *_strip_html(attr(p, "features") or "")]
+        w = next((_num(x, r"w\b|watts?") for x in lines if re.fullmatch(r"\s*\d{1,3}\s?(w|watts?)\b.*", str(x), re.I)), None)
+        _put(specs, src, "speaker_w", _clean_num(w), "attributes.features")
+    _put(specs, src, "hdmi_arc", _yes(attr(p, "hdmi_arc", "hdmi-arc")), "attributes.hdmi_arc")
     _put(specs, src, "wifi", _yes(attr(p, "wi-fi", "wifi")), "attributes.wi-fi")
     hdr = attr(p, "hdr")
     if hdr and _yes(hdr) is not False:
@@ -129,6 +134,11 @@ def _ac(p: dict, name: str, specs: dict, src: dict) -> None:
         _put(specs, src, "inverter", True, "attributes.compressor-type")
     elif re.search(r"\binverter\b", name, re.I):
         _put(specs, src, "inverter", True, "name")
+    if "speaker_w" not in specs:  # "20W" in the product's own feature lines
+        lines = [*(p.get("highlights") or []), *_strip_html(attr(p, "features") or "")]
+        w = next((_num(x, r"w\b|watts?") for x in lines if re.fullmatch(r"\s*\d{1,3}\s?(w|watts?)\b.*", str(x), re.I)), None)
+        _put(specs, src, "speaker_w", _clean_num(w), "attributes.features")
+    _put(specs, src, "hdmi_arc", _yes(attr(p, "hdmi_arc", "hdmi-arc")), "attributes.hdmi_arc")
     _put(specs, src, "wifi", _yes(attr(p, "wi-fi", "wifi")), "attributes.wi-fi")
     _put(specs, src, "room_size_text", attr(p, "approx-room-size"), "attributes.approx-room-size")
 
@@ -183,6 +193,8 @@ def _fridge(p: dict, name: str, specs: dict, src: dict) -> None:
         _put(specs, src, "convertible", True, "name")
     if re.search(r"inverter", name, re.I):
         _put(specs, src, "inverter_compressor", True, "name")
+    _put(specs, src, "stabiliser_free", _yes(attr(p, "stabilizer-free-operation", "stabiliser-free-operation")),
+         "attributes.stabilizer-free-operation")
 
 
 def _laptop(p: dict, name: str, specs: dict, src: dict) -> None:
@@ -266,14 +278,16 @@ def map_product(p: dict, category: str) -> dict | None:
     dims, dsrc = _dims(p)
     src.update(dsrc)
     mn = model_number(p)
-    feats = list(p.get("highlights") or []) or _strip_html(attr(p, "features") or attr(p, "key-features") or "")
+    feats = [f for f in [*(p.get("highlights") or []), *_strip_html(attr(p, "features") or attr(p, "key-features") or "")]
+             if str(f).strip()]  # the highlights first, then the features list (both the backend's own words)
+    feats = list(dict.fromkeys(" ".join(str(f).split()) for f in feats))
     sku = str(p.get("item_code") or p.get("uid"))
     medias = [m.get("url") for m in p.get("medias") or [] if (m.get("type") or "image") == "image" and m.get("url")
               and PLACEHOLDER not in m.get("url")]  # the generic category picture is not this product
     info = {
         "source": "jio", "slug": p.get("slug"), "uid": p.get("uid"), "name": name, "model_number": mn,
         "warranty_text": attr(p, "warranty"), "colours": [c for c in [attr(p, "primary_color")] if c],
-        "features": [{"hi": f, "mr": f, "en": f} for f in feats[:8]], "spec_source": src,
+        "features": [{"hi": f, "mr": f, "en": f} for f in feats[:10]], "spec_source": src,
         "categories": [c.get("name") for c in p.get("categories") or []], "sellable": bool(p.get("sellable")),
         "teaser_tag": p.get("teaser_tag") if isinstance(p.get("teaser_tag"), str) else None,
         "images": medias[:6],  # every photo of this product: the try-on uses the first that cuts out cleanly
@@ -284,6 +298,53 @@ def map_product(p: dict, category: str) -> dict | None:
         "image": medias[0] if medias else None, "info": info, "price": eff, "mrp": mrp if mrp is not None else eff,
         "sellable": bool(p.get("sellable")),
     }
+
+
+# ---------------------------------------------------------------- accessories → products of their own kind
+def _fits_inches(name: str) -> list[float] | None:
+    """The TV sizes a mount or bag states it fits: "32-55 inch" / "up to 65 inch" / "for 15.6 inch laptops"."""
+    m = re.search(rf"{NUM}\s*(?:\"|inch(?:es)?|in\b)?\s*(?:-|–|to)\s*{NUM}\s*(?:\"|inch|in\b)", name, re.I)
+    if m:
+        lo, hi = float(m.group(1)), float(m.group(2))
+        return [lo, hi] if lo < hi else None
+    m = re.search(rf"(?:up ?to|upto|max(?:imum)?)\s*{NUM}\s*(?:\"|inch|in\b)", name, re.I)
+    if m:
+        return [0.0, float(m.group(1))]
+    return None
+
+
+def map_accessory(p: dict, kind: str) -> dict | None:
+    """A soundbar / TV mount / stabiliser / washer stand / laptop bag from one getProducts item: its own name, price,
+    picture and what it says it is for. Nothing invented: a mount with no stated size range has no `fits_in`."""
+    eff, mrp = price(p, "effective"), price(p, "marked")
+    if eff is None:
+        return None
+    name = (p.get("name") or "").strip()
+    brand = ((p.get("brand") or {}).get("name") or "").strip()
+    low = name.lower()
+    specs, src = {}, {}
+    if kind == "soundbar":
+        _put(specs, src, "speaker_w", _clean_num(_num(attr(p, "speaker_output", "audio_output", "output_power") or name,
+                                                       r"w\b|watts?")), "attributes.speaker_output/name")
+        ch = re.search(r"\b(\d\.\d)\s*(?:ch|channel)?\b", name)
+        _put(specs, src, "channels", ch.group(1) if ch else None, "name")
+        _put(specs, src, "hdmi_arc", _yes(attr(p, "hdmi_arc", "hdmi-arc")), "attributes.hdmi_arc")
+    fors = {"soundbar": ["tv"], "tv_mount": ["tv"], "wm_stand": ["wm"], "laptop_bag": ["laptop"]}.get(kind)
+    if kind == "stabiliser":
+        fors = [c for c, rx in (("ac", r"\bac\b|air ?condition"), ("fridge", r"refrigerator|fridge")) if re.search(rx, low)]
+        if not fors:
+            return None  # a stabiliser that does not say what it is for: not suggested (TVs, mainline …)
+    medias = [m.get("url") for m in p.get("medias") or [] if (m.get("type") or "image") == "image" and m.get("url")
+              and PLACEHOLDER not in m.get("url")]
+    mn = model_number(p)
+    info = {"source": "jio", "slug": p.get("slug"), "uid": p.get("uid"), "name": name, "model_number": mn,
+            "accessory": kind, "for": fors, "fits_in": _fits_inches(name), "warranty_text": attr(p, "warranty"),
+            "categories": [c.get("name") for c in p.get("categories") or []], "spec_source": src,
+            "sellable": bool(p.get("sellable")), "images": medias[:2], "features": []}
+    return {"sku": str(p.get("item_code") or p.get("uid")), "category": kind, "brand": brand,
+            "model": short_name(brand, {}, mn, name), "title": {"hi": name, "mr": name, "en": name}, "specs": specs,
+            "dims": {}, "energy": {}, "image": medias[0] if medias else None, "info": info, "price": eff,
+            "mrp": mrp if mrp is not None else eff, "sellable": bool(p.get("sellable"))}
 
 
 # ---------------------------------------------------------------- resQ plans (catalog items) → protection plans

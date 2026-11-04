@@ -53,7 +53,12 @@ async def test_live_flow_asks_only_what_the_stock_can_answer(tmp_path, monkeypat
                 break
             asked.append(slot.split(":")[3] if ":slot:" in slot else "dq")
             out = await h.tap(slot)
-        assert "room_light" not in asked and "content" not in asked  # the recorded TVs have no brightness/refresh
+        assert "room_light" not in asked  # the recorded TVs have no brightness, and no highlight acts on the light
+        # 'what do you watch?' stays: the TVs' own highlights differ on it (HDR / X-Reality on 3 of 5), and its Kyun
+        # says so from the stock
+        assert "content" in asked
+        q = next(m for m in h.ch.sent if m.msg.buttons and any(":slot:content:" in b.id for b in m.msg.buttons)).msg
+        assert "highlights" in q.body and "HDR / picture tech" in q.body
         check_floor(out)
     finally:
         await h.close()

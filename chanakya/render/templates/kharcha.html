@@ -50,6 +50,17 @@
   .ex .k { display: block; font-size: 22px; font-weight: 800; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; }
   .ex .k.dv { font-size: 24px; font-weight: 700; text-transform: none; }
   .ex .v { font-size: 27px; line-height: 1.36; color: var(--text); }
+  .mrpline { display: flex; align-items: center; gap: 10px; margin: -6px 0 10px; font-size: 24px; font-weight: 700;
+             color: var(--green-deep); }
+  .mrpline .ic { color: var(--green); }
+  .prot { margin-top: 18px; padding: 16px 30px 14px; border: 2px solid #C7D2FE; }
+  .prot .grp { border-top: none; padding-top: 0; margin-top: 0; color: #3730A3; }
+  .prot .grp .ic { color: var(--saffron); }
+  .prot .why { color: var(--muted); }
+  .gtk { margin-top: 18px; padding: 16px 30px 18px; }
+  .gtk .grp { border-top: none; padding-top: 0; margin-top: 0; }
+  .nt { display: flex; align-items: flex-start; gap: 12px; padding: 7px 0; font-size: 25px; color: var(--text); line-height: 1.35; }
+  .nt .ic { color: var(--green); margin-top: 4px; flex: none; }
   .stamp { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 22px 56px 30px;
            font-size: 23px; color: var(--muted); font-weight: 600; }
   .stamp .ic { color: var(--green); }
@@ -69,6 +80,7 @@
 {% block content %}
   <section class="card sheet">
     {% for ln in prod %}<div class="r prod num"><span class="t{{ ln.title|dv }}">{{ ln.title }}</span><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
+    {% if mrp_text %}<div class="mrpline num">{{ icon('tag', 22) }}{{ mrp_text }}</div>{% endif %}
     {% if req %}
     <div class="grp{{ L.req_group|dv }}">{{ icon('check-circle', 24, '', 2.4) }}{{ L.req_group }}</div>
     {% for ln in req %}<div class="r num"><span class="t{{ ln.title|dv }}">{{ ln.title }}</span><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
@@ -80,6 +92,19 @@
     <div class="grp{{ L.sug_group|dv }}">{{ icon('sparkle', 24) }}{{ L.sug_group }}</div>
     {% for ln in sug %}<div class="sg num"><div class="t{{ ln.title|dv }}">{{ ln.title }}{% if ln.reason %}<span class="why">{{ ln.reason }}</span>{% endif %}</div><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
     {% if with_suggestions_total_str %}<div class="t2 num"><span class="{{ L.with_suggestions_total|dv }}">{{ L.with_suggestions_total }}</span><span class="v">{{ with_suggestions_total_str }}</span></div>{% endif %}
+  </section>
+  {% endif %}
+  {% if protection %}
+  <section class="card prot">
+    <div class="grp{{ L.protect|dv }}">{{ icon('shield', 24) }}{{ L.protect }}</div>
+    <div class="sg num"><div class="t">{{ protection.title }}<span class="why">{{ protection.note }}</span></div><span class="a">{{ protection.price_str }}</span></div>
+  </section>
+  {% endif %}
+  {% set gtk = (included|aslist) + (notes|aslist) %}
+  {% if gtk %}
+  <section class="card gtk">
+    <div class="grp{{ L.good_to_know|dv }}">{{ icon('check-circle', 24, '', 2.4) }}{{ L.good_to_know }}</div>
+    {% for x in gtk %}<div class="nt num">{{ icon('check', 20, '', 3) }}<span>{{ x }}</span></div>{% endfor %}
   </section>
   {% endif %}
   {% if opt %}

@@ -56,6 +56,9 @@ async def offers(ctx: SkillContext) -> Reply:
         ctx.x["pending_close"] = True
         return ctx.reply(C.question_reply(ctx, "exchange_old"))
     pay = ctx.x.get("pay")
+    if not pay and not await _payment_matters(ctx):
+        ctx.x["pay"] = pay = "any"  # no offer or EMI in the data depends on how they pay: don't ask, show the price
+        ctx.ev("payment_not_asked", reason="no_offer_or_emi")
     if not pay:
         btns = [ctx.b("b_pay_card", ctx.sid("pay", "card")), ctx.b("b_pay_upi", ctx.sid("pay", "upi"))]
         emi = bool(await ctx.facts.finance(pack.category))  # EMI only when the data has EMI plans
@@ -69,6 +72,17 @@ async def offers(ctx: SkillContext) -> Reply:
         else:
             return ctx.reply(bank_list(ctx, pay))
     return await quote(ctx)
+
+
+async def _payment_matters(ctx: SkillContext) -> bool:
+    """Does the way they pay change anything in today's data: a live offer on this product (bank, card or any), or EMI
+    plans? On live data with no offers it does not, and the question is skipped."""
+    from chanakya.skills import product_view as PV
+
+    p = ctx.facts.product_sync(_sku(ctx))
+    if p is None:
+        return True
+    return bool(PV.live_offers_for(ctx, p)) or bool(await ctx.facts.finance(p.category))
 
 
 async def set_pay(ctx: SkillContext, how: str) -> Reply:
@@ -217,7 +231,8 @@ def offer_card(ctx: SkillContext, p, res, q, extras: int, total_str: str, pay: s
         ctx.reg.static(a.title)
     mrp_str = ctx.reg.inr(p.mrp, p.price_source) if getattr(p, "mrp", None) and p.mrp > p.price else None
     pay_text = (ctx.t("offer_caption_pay_card", lang, bank=bank) if pay == "card" and bank
-                else ctx.t("offer_caption_pay_emi", lang) if pay == "emi" else ctx.t("offer_caption_pay_upi", lang))
+                else ctx.t("offer_caption_pay_emi", lang) if pay == "emi"
+                else ctx.t("offer_caption_pay_any", lang) if pay == "any" else ctx.t("offer_caption_pay_upi", lang))
     exch = None
     if s.cost_snapshot and s.cost_snapshot.get("exchange_range"):
         lo, hi = s.cost_snapshot["exchange_range"]
@@ -233,6 +248,7 @@ def offer_card(ctx: SkillContext, p, res, q, extras: int, total_str: str, pay: s
             "product_title": C.product_title(ctx, p, lang),
             "product_image": p.image,
             "pay_text": ctx.reg.static(pay_text),
+            "pay_any": pay == "any",
             "mrp_str": mrp_str,
             "price_str": res.price_str,
             "offers": offers_rows,

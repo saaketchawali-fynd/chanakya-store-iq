@@ -1,0 +1,695 @@
+# Saral Samjhao from the backend's own words (user, 4 Nov 2026).
+#
+# A theme is found on a product when one of its product's own highlight lines (Jio `highlights` or the `features`
+# list) matches a line pattern. The `say` words state only what that highlight says, in daily-life terms; the
+# highlight itself is quoted as the proof. A theme matters to a customer when one of its `needs` holds on the
+# Home Card (or a want from the data questions); otherwise it is a general point ("also worth knowing").
+#
+# needs: {id, slot, in: [values]} | {id, slot, gte: n (numeric slot)} | {id, want: key}; w = how much it matters.
+# covers: fit rules that already judge this from a spec; when the product carries that spec, the rule decides.
+# specs: backend spec fields that show the theme too (when no highlight does): {key, line (which line's words),
+#        proof (for a yes/no flag; otherwise the value itself is quoted)}.
+# Technical terms stay English inside hi / mr (stabiliser, inverter, apps, HDR …).
+
+prefix:  # the customer's need, said first (Bolo, customer language)
+  elders: {en: "For the elders at home", hi: "घर के बड़ों के लिए", mr: "घरातील ज्येष्ठांसाठी"}
+  no_soundbar: {en: "Since there's no soundbar", hi: "साउंडबार नहीं है, तो", mr: "साउंडबार नाही, म्हणून"}
+  far_seat: {en: "From your sofa's distance", hi: "आपके सोफ़े की दूरी से भी", mr: "तुमच्या सोफ्याच्या अंतरावरूनही"}
+  movies: {en: "For your movie nights", hi: "आपकी मूवी नाइट्स के लिए", mr: "तुमच्या मूव्ही नाइट्ससाठी"}
+  serials: {en: "For the daily serials", hi: "रोज़ के सीरियल्स के लिए", mr: "रोजच्या मालिकांसाठी"}
+  kids: {en: "For the kids", hi: "बच्चों के लिए", mr: "मुलांसाठी"}
+  sports: {en: "For cricket and sports", hi: "क्रिकेट और स्पोर्ट्स के लिए", mr: "क्रिकेट आणि खेळांसाठी"}
+  gaming: {en: "For gaming", hi: "गेमिंग के लिए", mr: "गेमिंगसाठी"}
+  dim_room: {en: "In your dim room", hi: "कम रोशनी वाले कमरे में", mr: "कमी प्रकाशाच्या खोलीत"}
+  wide_seating: {en: "For the side seats", hi: "साइड में बैठने वालों के लिए", mr: "बाजूला बसणाऱ्यांसाठी"}
+  wall: {en: "On your wall", hi: "आपकी दीवार पर", mr: "तुमच्या भिंतीवर"}
+  as_asked: {en: "Just as you wanted", hi: "जैसा आप चाहते थे", mr: "तुम्हाला हवं तसं"}
+  power_cuts: {en: "With power cuts in your area", hi: "आपके इलाके में बिजली जाती है, तो", mr: "तुमच्याकडे वीज जाते, म्हणून"}
+  daily_shop: {en: "For your daily fresh shopping", hi: "रोज़ की ताज़ी ख़रीदारी के लिए", mr: "रोजच्या ताज्या खरेदीसाठी"}
+  weekly_shop: {en: "For your weekly shopping", hi: "हफ़्ते भर की ख़रीदारी के लिए", mr: "आठवड्याच्या खरेदीसाठी"}
+  frozen: {en: "For frozen food", hi: "फ़्रोज़न खाने के लिए", mr: "फ्रोझन पदार्थांसाठी"}
+  big_family: {en: "For a big family like yours", hi: "आपके बड़े परिवार के लिए", mr: "तुमच्या मोठ्या कुटुंबासाठी"}
+  family_wash: {en: "For your family's laundry", hi: "पूरे परिवार के कपड़ों के लिए", mr: "संपूर्ण कुटुंबाच्या कपड्यांसाठी"}
+  daily_wash: {en: "With a wash every day", hi: "रोज़ के कपड़ों के लिए", mr: "रोजच्या धुण्यासाठी"}
+  drying: {en: "Since you need clothes dry fast", hi: "कपड़े जल्दी सुखाने के लिए", mr: "कपडे लवकर सुकवण्यासाठी"}
+  wet_space: {en: "For a bathroom or balcony spot", hi: "बाथरूम या बालकनी में रखने के लिए", mr: "बाथरूम किंवा बाल्कनीसाठी"}
+  long_hours: {en: "For long hours of use", hi: "लंबे समय तक चलाने के लिए", mr: "दीर्घ वेळ वापरासाठी"}
+  sunny: {en: "For your sunny room", hi: "धूप वाले कमरे के लिए", mr: "उन्हाच्या खोलीसाठी"}
+  power_issues: {en: "With voltage problems at home", hi: "घर में वोल्टेज की दिक्कत है, तो", mr: "घरी व्होल्टेजचा त्रास आहे, म्हणून"}
+  app: {en: "Since you like phone control", hi: "फ़ोन से चलाने के लिए", mr: "फोनवरून चालवण्यासाठी"}
+  carry_daily: {en: "Since you carry it every day", hi: "रोज़ साथ ले जाने के लिए", mr: "रोज सोबत नेण्यासाठी"}
+  battery: {en: "Since battery matters to you", hi: "बैटरी ज़रूरी है, तो", mr: "बॅटरी महत्त्वाची आहे, म्हणून"}
+  student: {en: "For college work", hi: "कॉलेज के काम के लिए", mr: "कॉलेजच्या कामासाठी"}
+  office_sw: {en: "For your Office work", hi: "Office के काम के लिए", mr: "Office च्या कामासाठी"}
+  professional: {en: "For your work", hi: "आपके काम के लिए", mr: "तुमच्या कामासाठी"}
+  design: {en: "For design and CAD work", hi: "डिज़ाइन और CAD के काम के लिए", mr: "डिझाइन आणि CAD कामासाठी"}
+  coding: {en: "For coding", hi: "कोडिंग के लिए", mr: "कोडिंगसाठी"}
+  general: {en: "Also worth knowing", hi: "साथ ही", mr: "शिवाय"}
+
+say:  # {prefix}: {line}. It has '{proof}'.
+  en: "{prefix}: {line}. It has '{proof}'."
+  hi: "{prefix}: {line}। इसमें '{proof}' है।"
+  mr: "{prefix}: {line}. यात '{proof}' आहे."
+
+themes:
+  tv:
+    - id: sound
+      label: "sound features"
+      specs: [{key: dialogue_enhance, line: 0, proof: "Dialogue enhance"}, {key: dolby_atmos, line: 1, proof: "Dolby Atmos"}]
+      needs:
+        - {id: elders, slot: elders, in: ["yes"], w: 2}
+        - {id: no_soundbar, slot: soundbar, in: ["no", thinking], w: 1.5}
+        - {id: far_seat, slot: seat_distance, gte: 10, w: 1}
+      covers: [dialogue_ok]
+      general: 0.5
+      lines:
+        - rx: 'dialogue|clear ?voice|clear ?audio|voice clarity'
+          en: "voices and dialogue come through clearer"
+          hi: "आवाज़ और डायलॉग ज़्यादा साफ़ सुनाई देते हैं"
+          mr: "आवाज आणि संवाद अधिक स्पष्ट ऐकू येतात"
+        - rx: 'atmos|\bdts\b|surround|virtual ?:?x|object tracking|3d sound|spatial'
+          en: "sound that fills the room, all around you"
+          hi: "आवाज़ पूरे कमरे में चारों तरफ़ से आती है"
+          mr: "आवाज संपूर्ण खोलीत चहूबाजूंनी येतो"
+        - rx: 'audio booster|sound booster|dolby audio|\b\d{2}\s?w\b|\bwatts?\b|speakers?\b|\bbass\b'
+          en: "fuller, louder sound from the TV itself"
+          hi: "टीवी से ही भरपूर, दमदार आवाज़"
+          mr: "टीव्हीमधूनच भरपूर, दमदार आवाज"
+      demo:
+        hi: "Dono par same kam volume mein ek dialogue scene chalaiye"
+        en: "Play a dialogue scene at the same low volume on both"
+        mr: "दोन्हीवर सारख्या कमी आवाजात एक संवादाचा सीन लावा"
+    - id: picture
+      label: "HDR / picture tech"
+      specs: [{key: hdr_formats, line: 0}]
+      needs:
+        - {id: movies, slot: content, in: [movies], w: 2}
+        - {id: serials, slot: content, in: [serials], w: 1}
+        - {id: dim_room, slot: room_light, in: [dim], w: 1}
+        - {id: as_asked, want: panel, w: 1.5}
+        - {id: as_asked, want: resolution, w: 1.5}
+      covers: [dark_ok]
+      general: 0.6
+      lines:
+        - rx: 'dolby vision|hdr ?10|\bhdr\b|\bhlg\b|high dynamic range'
+          en: "more detail in the bright and the dark parts of every scene"
+          hi: "हर सीन के उजले और अंधेरे हिस्सों में ज़्यादा डिटेल"
+          mr: "प्रत्येक दृश्याच्या उजळ आणि गडद भागांत अधिक तपशील"
+        - rx: 'dimming|contrast|true black|deep black'
+          en: "deeper blacks in night and movie scenes"
+          hi: "रात और मूवी के सीन में गहरा काला रंग"
+          mr: "रात्रीच्या आणि चित्रपटाच्या दृश्यांत गडद काळा रंग"
+        - rx: 'upscal|x-?reality|picture processor|crystal processor|ai processor|4k processor|\balpha \d'
+          en: "everyday channels and YouTube look sharper"
+          hi: "रोज़ के चैनल और YouTube भी ज़्यादा शार्प दिखते हैं"
+          mr: "रोजचे चॅनेल आणि YouTube अधिक स्पष्ट दिसतात"
+        - rx: 'hexa drive|colou?r|quantum|nano ?cell|\bqled\b|triluminos|billion'
+          en: "richer, more natural colours"
+          hi: "ज़्यादा गहरे और असली रंग"
+          mr: "अधिक गडद आणि नैसर्गिक रंग"
+      demo:
+        hi: "Dono par ek andhera movie scene (HDR demo) saath-saath chalaiye"
+        en: "Play a dark movie scene (HDR demo) on both, side by side"
+        mr: "दोन्हीवर एक गडद चित्रपट दृश्य (HDR demo) शेजारी-शेजारी लावा"
+    - id: smart
+      label: "casting / smart apps"
+      specs: [{key: os, line: 1}, {key: apps, line: 1}]
+      needs:
+        - {id: kids, slot: content, in: [kids], w: 1.5}
+        - {id: movies, slot: content, in: [movies], w: 1}
+        - {id: serials, slot: content, in: [serials], w: 1}
+        - {id: as_asked, want: os, w: 2}
+      general: 0.5
+      lines:
+        - rx: 'chromecast|airplay|screen ?mirror|miracast|wireless display|\bcast\b'
+          en: "photos and videos from your phone go on the big screen in one tap"
+          hi: "फ़ोन की फ़ोटो और वीडियो एक टैप में बड़ी स्क्रीन पर"
+          mr: "फोनमधले फोटो आणि व्हिडिओ एका टॅपमध्ये मोठ्या स्क्रीनवर"
+        - rx: 'google tv|android|webos|tizen|vidaa|fire ?tv|play store|netflix|prime video|youtube|hotstar|\bapps?\b'
+          en: "your streaming apps right on the TV, no extra box"
+          hi: "आपकी streaming apps सीधे टीवी पर, कोई अलग बॉक्स नहीं"
+          mr: "तुमची streaming apps थेट टीव्हीवर, वेगळा बॉक्स नको"
+      demo:
+        hi: "Customer ke apne phone se ek video cast kariye"
+        en: "Cast a video from the customer's own phone"
+        mr: "ग्राहकाच्या स्वतःच्या फोनवरून एक व्हिडिओ कास्ट करा"
+    - id: remote
+      label: "smart remote"
+      needs:
+        - {id: elders, slot: elders, in: ["yes"], w: 1.5}
+      general: 0.3
+      lines:
+        - rx: 'voice (search|remote|control)|google assistant|alexa|assistant'
+          en: "find shows just by speaking into the remote"
+          hi: "रिमोट में बोलकर ही शो ढूँढिए"
+          mr: "रिमोटमध्ये बोलूनच शो शोधा"
+        - rx: 'bt smart remote|bluetooth remote|smart remote'
+          en: "a simple remote that works without pointing at the TV"
+          hi: "आसान रिमोट, टीवी की तरफ़ घुमाए बिना चलता है"
+          mr: "सोपा रिमोट, टीव्हीकडे न रोखता चालतो"
+      demo:
+        hi: "Remote customer ke haath mein dijiye, khud chala kar dekhein"
+        en: "Hand the remote to the customer and let them try it"
+        mr: "रिमोट ग्राहकाच्या हातात द्या, स्वतः चालवून पाहू द्या"
+    - id: gaming
+      label: "game mode"
+      needs:
+        - {id: gaming, slot: content, in: [gaming], w: 2}
+      covers: [motion_ok]
+      general: 0.3
+      lines:
+        - rx: '\ballm\b|\bvrr\b|game mode|gaming|playstation|xbox|low latency'
+          en: "smooth, quick-response gaming"
+          hi: "स्मूथ और तेज़ रिस्पॉन्स वाली गेमिंग"
+          mr: "स्मूथ आणि जलद प्रतिसादाचं गेमिंग"
+      demo:
+        hi: "Game mode on karke ek fast game clip chalaiye"
+        en: "Switch on game mode and play a fast game clip"
+        mr: "Game mode सुरू करून एक वेगवान गेम क्लिप लावा"
+    - id: motion
+      label: "motion tech"
+      needs:
+        - {id: sports, slot: content, in: [sports], w: 2}
+        - {id: sports, slot: content, in: [sports_some], w: 1}
+      covers: [motion_ok, motion_some]
+      general: 0.3
+      lines:
+        - rx: 'motion|\bmemc\b|\b1[24]0\s?hz\b|motionflow|judder'
+          en: "fast action stays smooth, like a cricket ball in flight"
+          hi: "तेज़ एक्शन स्मूथ, जैसे उड़ती क्रिकेट बॉल"
+          mr: "वेगवान ॲक्शन स्मूथ, जसा उडता क्रिकेट बॉल"
+      demo:
+        hi: "Dono par ek fast cricket clip chalaiye"
+        en: "Play a fast cricket clip on both"
+        mr: "दोन्हीवर एक वेगवान क्रिकेट क्लिप लावा"
+    - id: angle
+      label: "IPS / wide angle"
+      specs: [{key: wide_angle, line: 0, proof: "Wide viewing angle"}]
+      needs:
+        - {id: wide_seating, slot: seating, in: [wide], w: 2}
+      covers: [angle_ok]
+      general: 0.3
+      lines:
+        - rx: '\bips\b|wide (viewing )?angle'
+          en: "colours stay true even from the side seats"
+          hi: "साइड से देखने पर भी रंग सही रहते हैं"
+          mr: "बाजूने पाहिलं तरी रंग योग्य राहतात"
+      demo:
+        hi: "Customer ke saath side wali seat se dono dekhiye"
+        en: "Walk to the side seat with the customer and compare"
+        mr: "ग्राहकासोबत बाजूच्या जागेवरून दोन्ही पाहा"
+    - id: eyes
+      label: "eye comfort"
+      needs:
+        - {id: kids, slot: content, in: [kids], w: 1}
+        - {id: elders, slot: elders, in: ["yes"], w: 1}
+      general: 0.3
+      lines:
+        - rx: 'eye (comfort|care)|blue light|flicker'
+          en: "easier on the eyes over long viewing"
+          hi: "लंबे समय देखने पर भी आँखों को आराम"
+          mr: "दीर्घ वेळ पाहिलं तरी डोळ्यांना आराम"
+      demo:
+        hi: "Eye comfort setting customer ko dikhaiye"
+        en: "Show the customer the eye comfort setting"
+        mr: "ग्राहकाला eye comfort सेटिंग दाखवा"
+    - id: slim
+      label: "slim design"
+      needs:
+        - {id: wall, slot: mounting, in: [wall], w: 1}
+      general: 0.2
+      lines:
+        - rx: 'bezel|frameless|\bslim\b|\bthin\b'
+          en: "a slim look that suits a wall"
+          hi: "पतला लुक, दीवार पर सुंदर लगता है"
+          mr: "सडपातळ लुक, भिंतीवर छान दिसतो"
+      demo:
+        hi: "TV ka side profile customer ko dikhaiye"
+        en: "Show the customer the TV's side profile"
+        mr: "ग्राहकाला टीव्हीची बाजू दाखवा"
+
+  fridge:
+    - id: power
+      label: "power-cut features"
+      specs: [{key: stabiliser_free, line: 0, proof: "Stabiliser-free"}]
+      needs:
+        - {id: power_cuts, slot: power_cuts, in: ["yes"], w: 2}
+      covers: [power_ok, retention_ok]
+      general: 0.3
+      lines:
+        - rx: 'stabili[sz]er[- ]?free|wide voltage'
+          en: "runs through voltage ups and downs without a stabiliser"
+          hi: "वोल्टेज ऊपर-नीचे हो, बिना stabiliser के चलता है"
+          mr: "व्होल्टेज वर-खाली झाला तरी stabiliser शिवाय चालतो"
+        - rx: 'cool ?pack\b.*\b(hours?|frozen|power)|keeps? (food )?frozen|cooling retention|power cut|hours of cooling'
+          en: "food stays frozen for hours in a power cut"
+          hi: "बिजली जाने पर भी घंटों तक खाना जमा रहता है"
+          mr: "वीज गेली तरी तासन्तास अन्न गोठलेलं राहतं"
+      demo:
+        hi: "Ye feature unit par customer ko dikhaiye"
+        en: "Show this feature on the unit to the customer"
+        mr: "हे फीचर ग्राहकाला युनिटवर दाखवा"
+    - id: fresh
+      label: "freshness features"
+      needs:
+        - {id: daily_shop, slot: shopping, in: [daily], w: 1.5}
+        - {id: weekly_shop, slot: shopping, in: [weekly], w: 1.5}
+      covers: [fresh_ok]
+      general: 0.4
+      lines:
+        - rx: '\bveg|crisper|fresh|humidity|moisture|twin cooling|multi ?flow|multi air'
+          en: "vegetables and fruit stay fresh for longer"
+          hi: "सब्ज़ी और फल ज़्यादा दिन ताज़े रहते हैं"
+          mr: "भाज्या आणि फळं जास्त दिवस ताजी राहतात"
+      demo:
+        hi: "Vegetable box aur cooling vents khol kar dikhaiye"
+        en: "Open the vegetable box and show the cooling vents"
+        mr: "Vegetable box आणि कूलिंग व्हेंट्स उघडून दाखवा"
+    - id: convertible
+      label: "convertible modes"
+      specs: [{key: convertible, line: 0, proof: "Convertible"}]
+      needs:
+        - {id: weekly_shop, slot: shopping, in: [weekly], w: 1.5}
+        - {id: big_family, slot: family_size, in: [f5plus], w: 1}
+      covers: [freezer_ok]
+      general: 0.3
+      lines:
+        - rx: 'convertible|\d+ modes|flex ?zone'
+          en: "the freezer turns into extra fridge space when you need it"
+          hi: "ज़रूरत हो तो फ़्रीज़र भी फ़्रिज बन जाता है"
+          mr: "गरज असेल तेव्हा फ्रीजरच फ्रिज बनतो"
+      demo:
+        hi: "Convertible modes ka panel customer ko chala kar dikhaiye"
+        en: "Switch through the convertible modes on the panel"
+        mr: "पॅनलवर convertible modes बदलून दाखवा"
+    - id: family
+      label: "big-family size"
+      needs:
+        - {id: big_family, slot: family_size, in: [f5plus], w: 1.5}
+      general: 0
+      lines:
+        - rx: 'famil|members'
+          en: "made for a big family"
+          hi: "बड़े परिवार के हिसाब से बना"
+          mr: "मोठ्या कुटुंबासाठी बनवलेला"
+      demo:
+        hi: "Andar ki shelves aur jagah customer ko dikhaiye"
+        en: "Show the shelves and space inside"
+        mr: "आतले शेल्फ आणि जागा दाखवा"
+    - id: freeze
+      label: "fast freeze / ice"
+      needs:
+        - {id: frozen, slot: shopping, in: [frozen], w: 1.5}
+      general: 0.3
+      lines:
+        - rx: 'power freeze|quick freeze|fast freez|ice maker|ice tray|twist ice'
+          en: "fast freezing, and ice when you need it"
+          hi: "जल्दी जमाना, और ज़रूरत पर बर्फ़"
+          mr: "लवकर गोठवणं, आणि हवा तेव्हा बर्फ"
+      demo:
+        hi: "Freezer khol kar ice tray aur quick freeze dikhaiye"
+        en: "Open the freezer: show the ice tray and quick freeze"
+        mr: "फ्रीजर उघडून ice tray आणि quick freeze दाखवा"
+    - id: inverter
+      label: "inverter compressor"
+      specs: [{key: inverter_compressor, line: 0, proof: "Inverter compressor"}]
+      general: 0.6
+      lines:
+        - rx: 'inverter'
+          en: "quieter cooling that uses less power"
+          hi: "कम आवाज़ में ठंडा, बिजली भी कम"
+          mr: "कमी आवाजात थंड, वीजही कमी"
+      demo:
+        hi: "Energy label par star rating dikhaiye"
+        en: "Show the star rating on the energy label"
+        mr: "Energy label वरचं star rating दाखवा"
+    - id: smell
+      label: "deodoriser"
+      general: 0.3
+      lines:
+        - rx: 'deodori[sz]|odou?r|anti-?bacteria'
+          en: "keeps the fridge fresh-smelling"
+          hi: "फ़्रिज में बदबू नहीं"
+          mr: "फ्रिजमध्ये वास येत नाही"
+      demo:
+        hi: "Deodoriser customer ko andar dikhaiye"
+        en: "Show the deodoriser inside"
+        mr: "आतला deodoriser दाखवा"
+
+  wm:
+    - id: hygiene
+      label: "steam / hygiene wash"
+      needs:
+        - {id: family_wash, slot: family_size, in: [f5plus], w: 1}
+      general: 0.5
+      lines:
+        - rx: 'steam|hygien|allerg|bacteria|germ'
+          en: "an extra-clean hygiene wash"
+          hi: "अतिरिक्त साफ़, हाइजीन वॉश"
+          mr: "अधिक स्वच्छ, हायजिन वॉश"
+      demo:
+        hi: "Panel par steam / hygiene programme dikhaiye"
+        en: "Show the steam / hygiene programme on the panel"
+        mr: "पॅनलवर steam / hygiene programme दाखवा"
+    - id: speed
+      label: "quick wash"
+      needs:
+        - {id: daily_wash, slot: wash_load, in: [daily], w: 1.5}
+      general: 0.4
+      lines:
+        - rx: 'quick|express|speed ?wash|super speed|\d+\s?min|turbo ?wash'
+          en: "a fast wash when you're short of time"
+          hi: "जल्दी में हों तो तेज़ वॉश"
+          mr: "घाईत असाल तर जलद वॉश"
+      demo:
+        hi: "Panel par quick wash ka time customer ko dikhaiye"
+        en: "Show the quick-wash time on the panel"
+        mr: "पॅनलवर quick wash ची वेळ दाखवा"
+    - id: dry
+      label: "drying"
+      needs:
+        - {id: drying, slot: drying, in: ["yes"], w: 2}
+      covers: [dry_ok]
+      general: 0.3
+      lines:
+        - rx: 'dryer|drying|air turbo|heat pump|spin dry'
+          en: "clothes come out drier, ready to hang"
+          hi: "कपड़े ज़्यादा सूखे निकलते हैं, तुरंत सुखाने लायक"
+          mr: "कपडे अधिक कोरडे निघतात, लगेच वाळत घालण्याजोगे"
+      demo:
+        hi: "Dry / spin programme panel par dikhaiye"
+        en: "Show the dry / spin programme on the panel"
+        mr: "पॅनलवर dry / spin programme दाखवा"
+    - id: clean
+      label: "stain / filter tech"
+      needs:
+        - {id: family_wash, slot: family_size, in: [f3_4, f5plus], w: 1}
+      general: 0.4
+      lines:
+        - rx: 'stain|ecobubble|bubble|pulsator|storm'
+          en: "tough dirt and stains come out better"
+          hi: "ज़िद्दी मैल और दाग बेहतर निकलते हैं"
+          mr: "हट्टी मळ आणि डाग अधिक चांगले निघतात"
+        - rx: 'magic filter|\blint\b|\bfilter\b'
+          en: "lint is caught, so clothes stay clean"
+          hi: "रुएँ फ़िल्टर में रुकते हैं, कपड़े साफ़ रहते हैं"
+          mr: "धागे फिल्टरमध्ये अडकतात, कपडे स्वच्छ राहतात"
+      demo:
+        hi: "Drum aur filter khol kar customer ko dikhaiye"
+        en: "Open the drum and the filter for the customer"
+        mr: "ड्रम आणि फिल्टर उघडून ग्राहकाला दाखवा"
+    - id: body
+      label: "rust-proof body"
+      needs:
+        - {id: wet_space, slot: space, in: [bathroom, balcony], w: 1.5}
+      general: 0.2
+      lines:
+        - rx: '\brust|corrosi'
+          en: "a rust-proof body for a wet bathroom or balcony"
+          hi: "जंग-रहित बॉडी, गीले बाथरूम या बालकनी के लिए"
+          mr: "गंजरोधक बॉडी, ओल्या बाथरूम किंवा बाल्कनीसाठी"
+      demo:
+        hi: "Body aur base customer ko chhoo kar dikhaiye"
+        en: "Let the customer feel the body and the base"
+        mr: "ग्राहकाला बॉडी आणि बेस हाताळून पाहू द्या"
+    - id: inverter
+      label: "inverter motor"
+      specs: [{key: inverter_motor, line: 0, proof: "Inverter motor"}]
+      general: 0.5
+      lines:
+        - rx: 'inverter|\bbldc\b|direct drive'
+          en: "runs quieter and uses less power"
+          hi: "कम आवाज़, कम बिजली"
+          mr: "कमी आवाज, कमी वीज"
+      demo:
+        hi: "Chalate hue awaaz customer ko sunwaiye"
+        en: "Run it and let the customer hear how quiet it is"
+        mr: "चालवून ग्राहकाला आवाज ऐकवा"
+    - id: smart
+      label: "app control"
+      general: 0.3
+      lines:
+        - rx: 'smartthings|thinq|wi-?fi|smart (pairing|connect|control)|ai control|\bapp\b'
+          en: "pick programmes and track the wash from your phone"
+          hi: "फ़ोन से प्रोग्राम चुनिए और वॉश देखिए"
+          mr: "फोनवरून प्रोग्राम निवडा आणि वॉश पाहा"
+      demo:
+        hi: "App ki screen customer ko phone par dikhaiye"
+        en: "Show the app screen on a phone"
+        mr: "फोनवर app ची स्क्रीन दाखवा"
+    - id: self_clean
+      label: "drum clean"
+      general: 0.3
+      lines:
+        - rx: 'drum clean|tub clean|stay ?clean|self[- ]clean'
+          en: "keeps the drum clean, no smell"
+          hi: "ड्रम साफ़ रहता है, बदबू नहीं"
+          mr: "ड्रम स्वच्छ राहतो, वास नाही"
+      demo:
+        hi: "Panel par drum clean programme dikhaiye"
+        en: "Show the drum-clean programme on the panel"
+        mr: "पॅनलवर drum clean programme दाखवा"
+
+  ac:
+    - id: inverter
+      label: "inverter"
+      specs: [{key: inverter, line: 0, proof: "Inverter"}]
+      needs:
+        - {id: long_hours, slot: hours_per_day, in: [h4_8, h_gt8], w: 2}
+      covers: [star_ok]
+      general: 0.5
+      lines:
+        - rx: 'inverter'
+          en: "cools steadily and saves power over long hours"
+          hi: "लंबे समय तक एक-सा ठंडा, बिजली की बचत"
+          mr: "दीर्घ वेळ एकसारखा थंडावा, वीज बचत"
+      demo:
+        hi: "Energy label par star rating aur inverter customer ko dikhaiye"
+        en: "Show the star rating and inverter on the energy label"
+        mr: "Energy label वर star rating आणि inverter दाखवा"
+    - id: fast
+      label: "turbo cooling"
+      needs:
+        - {id: sunny, slot: sun_exposure, in: ["yes"], w: 1.5}
+      general: 0.3
+      lines:
+        - rx: 'turbo|fast cool|\bjet\b|power ?cool|rapid|super cool'
+          en: "cools the room faster on hot afternoons"
+          hi: "गर्म दोपहर में कमरा जल्दी ठंडा"
+          mr: "गरम दुपारी खोली लवकर थंड"
+      demo:
+        hi: "Remote par turbo button chala kar dikhaiye"
+        en: "Press the turbo button on the remote"
+        mr: "रिमोटवर turbo बटण दाबून दाखवा"
+    - id: voltage
+      label: "voltage protection"
+      needs:
+        - {id: power_issues, slot: power_issues, in: ["yes"], w: 2}
+      general: 0.3
+      lines:
+        - rx: 'stabili[sz]er[- ]?free|wide voltage|voltage (range|fluctuation|protection)|built-?in stabili'
+          en: "handles voltage swings without a separate stabiliser"
+          hi: "वोल्टेज ऊपर-नीचे हो, अलग stabiliser की ज़रूरत नहीं"
+          mr: "व्होल्टेज वर-खाली झाला तरी वेगळा stabiliser नको"
+      demo:
+        hi: "Spec sheet par voltage range customer ko dikhaiye"
+        en: "Show the voltage range on the spec sheet"
+        mr: "Spec sheet वर voltage range दाखवा"
+    - id: smart
+      label: "Wi-Fi / app"
+      specs: [{key: wifi, line: 0, proof: "Wi-Fi"}]
+      needs:
+        - {id: app, slot: app_control, in: ["yes"], w: 2}
+      covers: [wifi_ok]
+      general: 0.3
+      lines:
+        - rx: 'wi-?fi|smart ?(ac|control|app)|\bapp\b|alexa|google'
+          en: "switch it on from your phone before you reach home"
+          hi: "घर पहुँचने से पहले फ़ोन से चालू कीजिए"
+          mr: "घरी पोहोचण्याआधी फोनवरून सुरू करा"
+      demo:
+        hi: "Phone par app ki screen dikhaiye"
+        en: "Show the app screen on a phone"
+        mr: "फोनवर app ची स्क्रीन दाखवा"
+    - id: comfort
+      label: "sleep / iFeel"
+      general: 0.4
+      lines:
+        - rx: 'sleep|\bi ?feel\b|ifeel|follow me|comfort'
+          en: "a comfortable temperature right where you sit and sleep"
+          hi: "जहाँ बैठें या सोएँ, वहीं आरामदायक तापमान"
+          mr: "जिथे बसता किंवा झोपता, तिथेच आरामदायक तापमान"
+      demo:
+        hi: "Remote par sleep / iFeel mode dikhaiye"
+        en: "Show the sleep / iFeel mode on the remote"
+        mr: "रिमोटवर sleep / iFeel mode दाखवा"
+    - id: air
+      label: "air filter"
+      general: 0.4
+      lines:
+        - rx: '\bfilter|pm ?2\.?5|anti-?bacteria|self[- ]?clean|purif'
+          en: "cleaner air in the room"
+          hi: "कमरे में साफ़ हवा"
+          mr: "खोलीत स्वच्छ हवा"
+      demo:
+        hi: "Front panel khol kar filter dikhaiye"
+        en: "Open the front panel and show the filter"
+        mr: "फ्रंट पॅनल उघडून फिल्टर दाखवा"
+    - id: copper
+      label: "copper coils"
+      general: 0.3
+      lines:
+        - rx: 'copper'
+          en: "copper coils that cool well and last"
+          hi: "copper coil, अच्छी कूलिंग और टिकाऊ"
+          mr: "copper coil, चांगलं कूलिंग आणि टिकाऊ"
+      demo:
+        hi: "Spec sheet par copper condenser dikhaiye"
+        en: "Show the copper condenser on the spec sheet"
+        mr: "Spec sheet वर copper condenser दाखवा"
+
+  laptop:
+    - id: battery
+      label: "long battery"
+      needs:
+        - {id: battery, slot: battery_need, in: ["yes"], w: 2}
+        - {id: carry_daily, slot: carry, in: [daily], w: 1.5}
+      general: 0.4
+      lines:
+        - rx: 'battery|\bhours?\b|\bhrs\b|all[- ]day'
+          en: "a battery built for long days away from a socket"
+          hi: "चार्जर से दूर लंबे दिन के लिए बैटरी"
+          mr: "चार्जरपासून दूर दीर्घ दिवसासाठी बॅटरी"
+      demo:
+        hi: "Battery settings mein bacha hua time customer ko dikhaiye"
+        en: "Show the battery time left in the settings"
+        mr: "Battery settings मध्ये उरलेला वेळ दाखवा"
+    - id: office
+      label: "MS Office"
+      needs:
+        - {id: office_sw, slot: software, in: [office], w: 2}
+        - {id: student, slot: user, in: [student], w: 1.5}
+        - {id: professional, slot: user, in: [professional], w: 1}
+      general: 0.4
+      lines:
+        - rx: '(microsoft |ms ?)office|ms ?365|office (home|20\d\d)'
+          en: "MS Office comes with it, nothing extra to buy"
+          hi: "MS Office साथ में आता है, अलग से कुछ नहीं ख़रीदना"
+          mr: "MS Office सोबत येतं, वेगळं काही विकत घ्यायला नको"
+      demo:
+        hi: "Start menu mein Office apps khol kar dikhaiye"
+        en: "Open the Office apps from the start menu"
+        mr: "Start menu मधून Office apps उघडून दाखवा"
+    - id: graphics
+      label: "graphics card"
+      needs:
+        - {id: gaming, slot: gaming, in: ["yes"], w: 2}
+        - {id: design, slot: software, in: [cad], w: 2}
+        - {id: design, slot: course, in: [design], w: 1.5}
+      general: 0.3
+      lines:
+        - rx: '\brtx\b|geforce|radeon|nvidia|dedicated graphics'
+          en: "a separate graphics card for games and design software"
+          hi: "गेम्स और डिज़ाइन सॉफ़्टवेयर के लिए अलग graphics card"
+          mr: "गेम्स आणि डिझाइन सॉफ्टवेअरसाठी वेगळं graphics card"
+      demo:
+        hi: "Ek game ya design app khol kar chala kar dikhaiye"
+        en: "Open a game or a design app and run it"
+        mr: "एक गेम किंवा डिझाइन ॲप उघडून चालवून दाखवा"
+    - id: calls
+      label: "camera / mic"
+      needs:
+        - {id: student, slot: user, in: [student], w: 1}
+        - {id: professional, slot: user, in: [professional], w: 1}
+      general: 0.3
+      lines:
+        - rx: 'camera|webcam|facetime|microphone|\bmics?\b'
+          en: "clear video calls and online classes"
+          hi: "साफ़ वीडियो कॉल और ऑनलाइन क्लास"
+          mr: "स्पष्ट व्हिडिओ कॉल आणि ऑनलाइन क्लास"
+      demo:
+        hi: "Camera app khol kar customer ko khud dekhne dijiye"
+        en: "Open the camera app and let the customer see themself"
+        mr: "Camera app उघडून ग्राहकाला स्वतःला पाहू द्या"
+    - id: light
+      label: "light build"
+      needs:
+        - {id: carry_daily, slot: carry, in: [daily], w: 2}
+      general: 0.2
+      lines:
+        - rx: 'thinnest|lightest|light ?weight|\blight\b(?!ing)|portable|fanless|\bslim\b'
+          en: "light and slim to carry every day"
+          hi: "हल्का और पतला, रोज़ ले जाने लायक"
+          mr: "हलका आणि सडपातळ, रोज नेण्याजोगा"
+      demo:
+        hi: "Laptop customer ke haath mein dekar wazan mehsoos karwaiye"
+        en: "Hand the laptop to the customer to feel the weight"
+        mr: "लॅपटॉप ग्राहकाच्या हातात देऊन वजन जाणवू द्या"
+    - id: fast
+      label: "SSD"
+      needs:
+        - {id: coding, slot: software, in: [coding], w: 1}
+      general: 0.4
+      lines:
+        - rx: '\bssd\b|ultrafast|nvme'
+          en: "starts in seconds and opens apps quickly"
+          hi: "सेकंडों में चालू, apps जल्दी खुलते हैं"
+          mr: "काही सेकंदांत सुरू, apps लवकर उघडतात"
+      demo:
+        hi: "Restart karke start hone ka time dikhaiye"
+        en: "Restart it and show how fast it starts"
+        mr: "Restart करून सुरू होण्याचा वेळ दाखवा"
+    - id: fold
+      label: "flip / touch"
+      needs:
+        - {id: design, slot: course, in: [design], w: 1.5}
+      general: 0.3
+      lines:
+        - rx: '\bflip\b|convertible|x360|2[- ]in[- ]1'
+          en: "folds into a tablet for notes and sketching"
+          hi: "मोड़कर tablet बना लीजिए, नोट्स और स्केच के लिए"
+          mr: "दुमडून tablet बनवा, नोट्स आणि स्केचसाठी"
+        - rx: 'touch ?screen'
+          en: "a touch screen for quick notes"
+          hi: "जल्दी नोट्स के लिए touch screen"
+          mr: "पटकन नोट्ससाठी touch screen"
+      demo:
+        hi: "Screen ko mod kar ya chhoo kar dikhaiye"
+        en: "Fold or touch the screen to show it"
+        mr: "स्क्रीन दुमडून किंवा स्पर्श करून दाखवा"
+    - id: secure
+      label: "fingerprint / Touch ID"
+      general: 0.3
+      lines:
+        - rx: 'touch id|fingerprint|face (unlock|id|recognition)|windows hello|security chip|\bt2\b'
+          en: "unlocks with a touch, and your files stay private"
+          hi: "एक टच से अनलॉक, फ़ाइलें सुरक्षित"
+          mr: "एका टचने अनलॉक, फाइल्स सुरक्षित"
+      demo:
+        hi: "Fingerprint / Touch ID se unlock karke dikhaiye"
+        en: "Unlock it with the fingerprint / Touch ID"
+        mr: "Fingerprint / Touch ID ने अनलॉक करून दाखवा"
+    - id: keyboard
+      label: "backlit keyboard"
+      general: 0.3
+      lines:
+        - rx: 'backlit'
+          en: "a backlit keyboard for typing in dim light"
+          hi: "कम रोशनी में टाइप करने के लिए backlit keyboard"
+          mr: "कमी प्रकाशात टाइप करण्यासाठी backlit keyboard"
+      demo:
+        hi: "Keyboard ki light on karke dikhaiye"
+        en: "Switch on the keyboard light"
+        mr: "Keyboard ची लाइट सुरू करून दाखवा"
+    - id: screen
+      label: "sharp display"
+      general: 0.3
+      lines:
+        - rx: 'retina|\boled\b|true tone|\bfhd\b|full hd|wuxga|\bips\b'
+          en: "a sharp screen that stays comfortable for long hours"
+          hi: "शार्प स्क्रीन, लंबे समय भी आरामदायक"
+          mr: "स्पष्ट स्क्रीन, दीर्घ वेळही आरामदायक"
+      demo:
+        hi: "Ek photo full screen khol kar dikhaiye"
+        en: "Open a photo full screen"
+        mr: "एक फोटो फुल स्क्रीन उघडून दाखवा"

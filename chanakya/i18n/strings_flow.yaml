@@ -96,7 +96,6 @@ trial_q: {hi: "ये आपके लिए काम का है?", mr: "ह
 b_matters: {hi: "Haan, kaam ka", mr: "हो, कामाचं", en: "Yes, matters"}
 b_not_really: {hi: "Utna nahi", mr: "तितकं नाही", en: "Not really"}
 b_ignore: {hi: "Kya chhodein", mr: "काय सोडायचं", en: "What to ignore"}
-bolo_ignore: {hi: "{specs} जैसी चीज़ें आपके घर के लिए ज़्यादा फ़र्क नहीं डालतीं — उनके लिए ज़्यादा देने की ज़रूरत नहीं।", mr: "{specs} सारख्या गोष्टी तुमच्या घरासाठी फारसा फरक पाडत नाहीत — त्यासाठी जास्त देण्याची गरज नाही.", en: "Things like {specs} won't change much for your home, so there's no need to pay extra for them."}
 kyun_ignore: {hi: "Kya chhodna hai, ye batane se bharosa badhta hai", mr: "काय सोडायचं हे सांगितल्याने विश्वास वाढतो", en: "Saying what to ignore builds trust"}
 
 # ---------- complete ----------
@@ -139,6 +138,7 @@ b_send_family: {hi: "Ghar walon ko bhejo", mr: "घरच्यांना प�
 delivery_booked: {hi: "Delivery {day} pakki", mr: "डिलिव्हरी {day} नक्की", en: "Delivery {day} booked"}
 kyun_close_choice: {hi: "Haan/na nahi, do din ka vikalp — faisla customer ka", mr: "हो/नाही नाही, दोन दिवसांचा पर्याय — निर्णय ग्राहकाचा", en: "A choice of two days, not yes or no; the customer decides"}
 offer_caption_pay_upi: {hi: "UPI / cash", mr: "UPI / रोख", en: "UPI / cash"}
+offer_caption_pay_any: {hi: "Kisi bhi payment se", mr: "कोणत्याही पेमेंटने", en: "Any payment"}
 offer_caption_pay_card: {hi: "{bank} card", mr: "{bank} कार्ड", en: "{bank} card"}
 offer_caption_pay_emi: {hi: "EMI", mr: "EMI", en: "EMI"}
 
@@ -238,6 +238,7 @@ bolo_offer_line: {hi: "इस पर अभी {title} है: {detail}{till}।
 kyun_offer_line: {hi: "System ka live offer, {product} par lagta hai", mr: "सिस्टमची लाइव्ह ऑफर, {product} वर लागू", en: "A live offer from the system that applies to {product}"}
 # ---- every question: what the answer decides, from today's stock
 kyun_tail_band: {hi: "stock mein {lo}–{hi}, jawab sahi wala chunega", mr: "स्टॉकमध्ये {lo}–{hi}, उत्तर योग्य ते निवडेल", en: "in stock {lo}–{hi}; the answer picks the right one"}
+kyun_tail_hl: {hi: "stock ke {total} mein se {n} {cat} ki highlights mein {feature}; jawab sahi wala chunega", mr: "स्टॉकमधील {total} पैकी {n} {cat} च्या highlights मध्ये {feature}; उत्तर योग्य ते निवडेल", en: "{n} of {total} {cat} in stock list {feature}; the answer picks the right one"}
 kyun_tail_rule: {hi: "{need}: stock ke {total} mein se {n} {cat} sahi", mr: "{need}: स्टॉकमधील {total} पैकी {n} {cat} योग्य", en: "{need}: {n} of {total} {cat} in stock qualify"}
 footer_heard: {hi: "Suna: “{text}”", mr: "ऐकलं: “{text}”", en: "Heard: “{text}”"}
 # ---- the Family Card (English, one card): desirable, clear, one final number
@@ -421,3 +422,18 @@ demo_val_one: {hi: "{a}: {va}", mr: "{a}: {va}", en: "{a}: {va}"}
 demo_want_one_say: {hi: "आपने {what} कहा था — {best} में वही है, ख़ुद देखिए।", mr: "तुम्ही {what} म्हणाला होतात — {best} मध्ये तेच आहे, स्वतः पाहा.", en: "You asked for {what}: {best} has it, see for yourself."}
 b_dq_explain: {hi: "Farak samjhaiye", mr: "फरक समजावा", en: "Explain difference"}
 dqx_why: {hi: "Pehle farak samjhaiye, phir customer khud chunega · stock: {counts}", mr: "आधी फरक समजावा, मग ग्राहक स्वतः निवडेल · स्टॉक: {counts}", en: "Explain first, then let them choose · in stock: {counts}"}
+# ---- option reasons from real differences (user, 4 Nov 2026): never "bigger screen" for the same size
+reason_step_size: {hi: "Bada: {a} vs {b}", mr: "मोठा: {a} vs {b}", en: "Bigger: {a} vs {b}"}
+reason_step_spec: {hi: "Behtar {label}: {a} vs {b}", mr: "अधिक चांगलं {label}: {a} vs {b}", en: "Better {label}: {a} vs {b}"}
+reason_step_hl: {hi: "Extra: {what}", mr: "अधिक: {what}", en: "Adds: {what}"}
+reason_step_other: {hi: "Wahi zaroorat, doosra model — tulna ke liye", mr: "तीच गरज, दुसरं मॉडेल — तुलनेसाठी", en: "Meets the same needs; another model to compare"}
+# ---- demo steps from the products' own highlights (user, 4 Nov 2026)
+demo_hl_cmp: {hi: "पहले {on} पर देखिए, फिर {other} पर।", mr: "आधी {on} वर पाहा, मग {other} वर.", en: "Try it on {on}, then on {other}."}
+demo_hl_why: {hi: "{on} ki apni highlight: '{proof}'", mr: "{on} ची स्वतःची highlight: '{proof}'", en: "{on}'s own highlight: '{proof}'"}
+demo_distance_one_say: {hi: "अपने सोफ़े जितनी दूरी पर खड़े होकर देखिए — {best} आराम से पूरी नज़र में आता है?", mr: "तुमच्या सोफ्याइतक्या अंतरावर उभं राहून पाहा — {best} आरामात पूर्ण नजरेत येतो का?", en: "Stand at your sofa distance: does {best} fill your view comfortably?"}
+demo_distance_one_why: {hi: "Doori demo: {ft} par {size} — size ka bharosa", mr: "अंतर डेमो: {ft} वर {size} — साइजचा विश्वास", en: "Distance demo: {size} at {ft}, so they trust the size"}
+# ---- the full setup on the bill (user, 4 Nov 2026): MRP saving, protection per day, warranty, install notes
+kh_mrp: {hi: "MRP {mrp} · aaj bachat {save}", mr: "MRP {mrp} · आज बचत {save}", en: "MRP {mrp} · you save {save}"}
+kh_protect_note: {hi: "{years} saal ka cover · roz ka {day} · chahein to jodein", mr: "{years} वर्षांचं कव्हर · रोजचे {day} · हवं तर जोडा", en: "{years}-year cover · about {day} a day · add it if you like"}
+kh_warranty: {hi: "Warranty: {w}", mr: "Warranty: {w}", en: "Warranty: {w}"}
+kh_note_mount_confirm: {hi: "Wall mount: sahi wala store pakka karega", mr: "Wall mount: योग्य तो स्टोअर निश्चित करेल", en: "Wall mount: the store confirms the right one"}

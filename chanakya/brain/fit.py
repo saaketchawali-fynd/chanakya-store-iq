@@ -166,5 +166,11 @@ def fit(product, home: HomeCard, pack: Pack, guides: dict) -> FitResult:
         num += rule.weight * m
         den += rule.weight
         contribs.append(Contribution(rule.id, rule.weight, m))
+    from chanakya.brain import highlights as HL
+
+    for rid, w, m in HL.contributions(product, home, pack):  # needs the product's own highlights answer (live data)
+        num += w * m
+        den += w
+        contribs.append(Contribution(rid, w, m))
     score = round(100 * num / den) if den else 50
     return FitResult(score=score, contributions=contribs, excluded=excluded)

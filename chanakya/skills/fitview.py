@@ -64,12 +64,26 @@ def points(ctx: SkillContext, p, lang: str, n: int = 3) -> list[dict]:
         out.append({"text": ctx.reg.static(text), "proof": _proof(ctx, p, b, lang)})
         if len(out) >= n:
             break
+    from chanakya.brain import highlights as HL
+    from chanakya.skills.translate import hl_points
+
+    def add_hl(general: bool, upto: int) -> None:
+        for pt in hl_points(ctx, p, n=6, general=general):
+            if len(out) >= upto:
+                break
+            text = ctx.reg.static(HL.card_text(pt))
+            if all((o.get("text") if isinstance(o, dict) else o) != text for o in out) and (general or pt.need):
+                out.append({"text": text, "proof": ctx.reg.raw(pt.proof, f"highlight:{p.sku}")})
+
+    add_hl(False, n)  # the product's own highlights that answer their needs (live data has few spec benefits)
     from chanakya.skills.common import asked_for
 
     for _, val in asked_for(ctx, lang):  # what they asked for about the product itself (picture type, brand …)
         if len(out) >= n + 2:
             break
         out.append(val)
+    if len(out) < 2:
+        add_hl(True, 2)  # nothing more for this home: the product's own best highlight, still its own words
     return out
 
 
@@ -132,6 +146,24 @@ def needs_grid(ctx: SkillContext, options: list[tuple[str, object]], lang: str, 
         out.append({"need": title, "cells": cells})
         if len(out) >= rows:
             break
+    from chanakya.brain import highlights as HL
+
+    wants = ctx.session.extra.get("wants") or {}
+    for th in HL.themes(pack.category):  # their needs that only the products' own highlights can show (live data)
+        if len(out) >= rows:
+            break
+        w, need = HL.triggered(th, home, wants, pack)
+        if need is None or w < HL.STRONG:
+            continue
+        cells, any_has = [], False
+        for label, p in options:
+            f = HL.found(p, pack.category).get(th.id)
+            any_has = any_has or f is not None
+            cells.append({"label": label, "value": ctx.reg.raw(f.proof, f"highlight:{p.sku}") if f else "—",
+                          "state": "good" if f else "no"})
+        title = HL.need_label(need, lang)
+        if any_has and title and not any(r["need"] == title for r in out):
+            out.append({"need": ctx.reg.static(title), "cells": cells})
     return out
 
 

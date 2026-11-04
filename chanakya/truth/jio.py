@@ -125,3 +125,36 @@ def is_protection(p: dict) -> bool:
     """A resQ / extended-warranty plan sold as a catalog item."""
     names = " ".join(_category_names(p)).lower()
     return "extended warranty" in names or ((p.get("brand") or {}).get("name") or "").lower() == "resq"
+
+
+# ---------------------------------------------------------------- accessories that complete a setup (user, 4 Nov 2026)
+# What Reliance Digital sells next to the main product, from the backend's own category and product names: the
+# Complete step suggests them only when the customer's answers call for them (soundbar for elders, wall mount for a
+# wall, stabiliser for power cuts …). The match is reported on /health (catalog.accessories) so it can be checked.
+COMPANIONS = (
+    ("soundbar", re.compile(r"sound ?bars?|home theat(?:er|re)|tv speakers?", re.I), None),
+    ("tv_mount", re.compile(r"(?:tv|television|lcd|led)\b.*\b(?:wall )?(?:mounts?|brackets?)|(?:wall )?(?:mounts?|brackets?)\b.*\b(?:tv|television)",
+                            re.I), None),
+    ("stabiliser", re.compile(r"stabili[sz]ers?", re.I), None),
+    ("wm_stand", re.compile(r"(?:washing machine|washer)\b.*\b(?:stand|trolley)|(?:stand|trolley)\b.*\b(?:washing machine|washer)",
+                            re.I), None),
+    ("laptop_bag", re.compile(r"laptop (?:bag|backpack|sleeve|case)|\bbackpack\b", re.I), None),
+)
+ACCESSORY_KINDS = tuple(k for k, _, _ in COMPANIONS)
+
+
+def companion_of(p: dict) -> str | None:
+    """The accessory kind (soundbar, tv_mount, stabiliser, wm_stand, laptop_bag) of a catalogue item, from its own
+    category names first, then its name; None for everything else (main products, plans, other accessories)."""
+    if is_protection(p):
+        return None
+    names = " | ".join(_category_names(p))
+    name = p.get("name") or ""
+    for kind, rx, _ in COMPANIONS:
+        if rx.search(names):
+            return kind
+    if any(ACCESSORY.search(n) for n in _category_names(p)) or not _category_names(p):
+        for kind, rx, _ in COMPANIONS:  # filed under a general accessories category: its own name decides
+            if rx.search(name):
+                return kind
+    return None

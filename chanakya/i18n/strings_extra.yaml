@@ -47,7 +47,13 @@ label_dikhao_btn: {hi: "Dikhao", mr: "दाखवा", en: "Show"}
 
 # ---------- coaching reasons (Kyun) ----------
 because: {hi: "kyunki", mr: "कारण", en: "because"}
-kyun_benefit: {hi: "Card mein '{value}' hai. Baaki {n} features is ghar ke liye kam zaroori", mr: "कार्डमध्ये '{value}' आहे. बाकी {n} फीचर्स या घरासाठी कमी महत्त्वाचे", en: "The card says '{value}'. The other {n} features matter less for this home"}
+kyun_benefit: {hi: "Card mein '{value}' hai — isliye ye fayda pehle", mr: "कार्डमध्ये '{value}' आहे — म्हणून हा फायदा आधी", en: "The card says '{value}', so this benefit comes first"}
+kyun_hl: {hi: "Ghar ki zaroorat + product ki apni highlight: '{proof}'", mr: "घराची गरज + प्रॉडक्टची स्वतःची highlight: '{proof}'", en: "Their need + the product's own highlight: '{proof}'"}
+kyun_hl_general: {hi: "Product ki apni highlight: '{proof}' — ghar se poochh kar pakka kariye", mr: "प्रॉडक्टची स्वतःची highlight: '{proof}' — घराबद्दल विचारून पक्कं करा", en: "The product's own highlight: '{proof}'; check it against their home"}
+bolo_label_ready: {hi: "यह {product} है — खास बातें कार्ड पर हैं। आपके घर के हिसाब से इसे बाकी विकल्पों से मिलाकर दिखाऊँ?", mr: "हा {product} आहे — खास गोष्टी कार्डवर आहेत. तुमच्या घराप्रमाणे इतर पर्यायांशी तुलना करून दाखवू का?", en: "This is the {product}; the highlights are on the card. Shall I compare it with the other options for your home?"}
+bolo_ignore_data: {hi: "यहाँ लगभग हर {size} {cat} में {spec} है — तो सिर्फ़ इसके लिए ज़्यादा मत दीजिए, अपनी ज़रूरत पर तुलना कीजिए।", mr: "इथे जवळजवळ प्रत्येक {size} {cat} मध्ये {spec} आहे — म्हणून फक्त त्यासाठी जास्त देऊ नका, तुमच्या गरजेवर तुलना करा.", en: "Nearly every {size} {cat} here has {spec}, so don't pay more just for that; compare on what you need."}
+bolo_ignore_data_all: {hi: "यहाँ लगभग हर {cat} में {spec} है — तो सिर्फ़ इसके लिए ज़्यादा मत दीजिए, अपनी ज़रूरत पर तुलना कीजिए।", mr: "इथे जवळजवळ प्रत्येक {cat} मध्ये {spec} आहे — म्हणून फक्त त्यासाठी जास्त देऊ नका, तुमच्या गरजेवर तुलना करा.", en: "Nearly every {cat} here has {spec}, so don't pay more just for that; compare on what you need."}
+kyun_ignore_data: {hi: "Stock: {total} mein se {n} mein {spec} — ye farak nahi daalta", mr: "स्टॉक: {total} पैकी {n} मध्ये {spec} — यात फरक नाही", en: "Stock: {n} of {total} have {spec}; it doesn't set them apart"}
 kyun_complete: {hi: "Koi surprise nahi = bharosa", mr: "कोणतंही सरप्राइज नाही = विश्वास", en: "No surprise = trust"}
 kyun_consent: {hi: "Bina consent kuch nahi bhejte", mr: "संमतीशिवाय काहीही पाठवत नाही", en: "Nothing is sent without consent"}
 kyun_delivery: {hi: "Do din ka vikalp — faisla customer ka, din data se", mr: "दोन दिवसांचा पर्याय — निर्णय ग्राहकाचा, दिवस डेटामधून", en: "Two days to choose from: the customer decides; dates come from data"}
@@ -340,3 +346,6 @@ b_show_more: {hi: "Aur dikhao", mr: "आणखी दाखवा", en: "Show mo
 tryon_bolo_item: {hi: "ये आपकी जगह में {product} — असली नाप में।", mr: "ही तुमच्या जागेत {product} — खऱ्या मापात.", en: "Here is the {product} in your space, true to scale."}
 tryon_bolo_combo: {hi: "ये आपकी जगह में सब साथ में — असली नाप में।", mr: "हे सगळं तुमच्या जागेत एकत्र — खऱ्या मापात.", en: "Here they are together in your space, true to scale."}
 room_photo_ack: {hi: "Photo mil gayi. Kuch second mein deewar par dikhata hoon.", mr: "फोटो मिळाला. काही सेकंदात भिंतीवर दाखवतो.", en: "Got the photo. Showing it on their wall in a few seconds."}
+# ---- Saral Samjhao at the moment of choice (user, 4 Nov 2026)
+bolo_made_for: {hi: "बढ़िया चुनाव। {line}", mr: "छान निवड. {line}", en: "Great choice. {line}"}
+kyun_made_for: {hi: "Pasand pakki karwaiye: unki zaroorat + product ka apna saboot, phir poora kharcha", mr: "निवड पक्की करा: त्यांची गरज + प्रॉडक्टचा स्वतःचा पुरावा, मग पूर्ण खर्च", en: "Lock in the choice: their need + the product's own proof, then the full cost"}

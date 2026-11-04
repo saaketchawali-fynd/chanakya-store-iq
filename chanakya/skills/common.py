@@ -139,12 +139,16 @@ def question_reply(
     pack = ctx.pack
     sd = pack.slot(slot_id)
     ctx.asking.add(slot_id)
-    say = say_override or ctx.pick(sd.ask, ctx.clang)
-    why = why_override or ctx.pick(sd.why)
+    alt = sd.alt if sd.alt and by_highlights(ctx, slot_id) else None  # asked for what the highlights act on
+    say = say_override or ctx.pick((alt or {}).get("ask") or sd.ask, ctx.clang)
+    why = why_override or ctx.pick((alt or {}).get("why") or sd.why)
     if not why_override:
         tail = question_tail(ctx, slot_id)
         if tail:
             why = f"{why.rstrip('.')} · {tail}"
+    if buttons is None and alt and alt.get("quick"):
+        buttons = [Button(id=ctx.sid("slot", slot_id, v), title=truncate_title(sd.value_title(v, ctx.lang)))
+                   for v in alt["quick"][:2]]
     btns = list(buttons) if buttons is not None else quick_buttons(ctx, slot_id)
     if buttons is None or len(btns) < 3:  # voice first: a voice button on every question (all answers one tap away)
         btns = btns[:2] + [ctx.b("b_voice_answer", ctx.sid("voiceq", slot_id))]
@@ -158,6 +162,23 @@ def question_reply(
 BAND_SPEC = {"size_band": ("size_in", "inch"), "ton_band": ("ton", "ton")}
 
 
+def by_highlights(ctx: SkillContext, slot_id: str) -> bool:
+    """This question is asked only because the products' own highlights act on its answer (its spec rules cannot
+    judge today's stock): e.g. 'what do you watch?' on live TVs, which carry no refresh rate."""
+    from chanakya.brain import data_questions as DQ
+    from chanakya.brain import highlights as HL
+
+    pack = ctx.pack
+    rules = [r for r in pack.fit_rules if r.slot == slot_id]
+    if not rules or ctx.session is None:
+        return False
+    avail = [p for p in ctx.facts.products_sync(pack.category) if p.qty > 0 or p.nearby_qty > 0]
+    g = ctx.facts.snap.guides
+    if any(DQ.rule_informative(r, avail, ctx.session.home, pack, g) for r in rules):
+        return False
+    return HL.slot_informative(pack, slot_id, avail)
+
+
 def question_tail(ctx: SkillContext, slot_id: str) -> str | None:
     """What this answer decides, in numbers from today's stock (the reason the question is worth asking):
     'Sunny room: 41 of 98 TVs in stock qualify' / 'In stock: 32–85 inch; the answer picks the right size'."""
@@ -168,8 +189,20 @@ def question_tail(ctx: SkillContext, slot_id: str) -> str | None:
     avail = [p for p in ctx.facts.products_sync(pack.category) if p.qty > 0 or p.nearby_qty > 0]
     if len(avail) < 3:
         return None
-    r = max(rules, key=lambda r: r.weight)
     cat = ctx.t(f"brief_cat_{pack.category}")
+    from chanakya.brain import data_questions as DQ
+    from chanakya.brain import highlights as HL
+
+    g0 = ctx.facts.snap.guides
+    if not any(DQ.rule_informative(r, avail, ctx.session.home, pack, g0) for r in rules):
+        st = HL.slot_stats(pack, slot_id, avail)  # asked because the products' own highlights act on the answer
+        if not st:
+            return None
+        th = HL.theme(pack.category, st[0])
+        return ctx.t("kyun_tail_hl", feature=ctx.reg.static(th.label if th else st[0]),
+                     n=ctx.reg.num(st[1], f"stock:{pack.category}:hl_{st[0]}"),
+                     total=ctx.reg.num(len(avail), f"stock:{pack.category}:available"), cat=cat)
+    r = max(rules, key=lambda r: r.weight)
     if r.kind in BAND_SPEC:
         key, unit = BAND_SPEC[r.kind]
         vals = sorted({float(p.spec(key)) for p in avail if p.spec(key)})

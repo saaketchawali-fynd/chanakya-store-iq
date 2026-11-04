@@ -7,6 +7,8 @@
 2. In their place, at most two questions about what the models on sale really differ on (picture type, smart TV
    system, inverter, load type, door type, laptop type, brand …), with the answers taken from the stock itself.
    An answer becomes a 'want' that filters the shortlist.
+3. A question is kept when the products' own highlights can act on its answer (brain/highlights.py): e.g. "what do
+   you watch?" on live data, where "movies" picks the models whose highlights show HDR or local dimming.
 Questions without fit rules (why now, room, the cost and site questions) are not judged here."""
 
 from __future__ import annotations
@@ -72,10 +74,13 @@ def rule_informative(rule, avail: list, home, pack, guides: dict) -> bool:
 
 def skip_slots(pack, avail: list, home, guides: dict) -> set[str]:
     """The home questions that cannot pick a product today (every one of their fit rules is uninformative)."""
+    from chanakya.brain import highlights as HL
+
     by_slot: dict[str, list] = {}
     for r in pack.fit_rules:
         by_slot.setdefault(r.slot, []).append(r)
-    return {sid for sid, rules in by_slot.items() if not any(rule_informative(r, avail, home, pack, guides) for r in rules)}
+    skip = {sid for sid, rules in by_slot.items() if not any(rule_informative(r, avail, home, pack, guides) for r in rules)}
+    return {sid for sid in skip if not HL.slot_informative(pack, sid, avail)}  # the products' own highlights can
 
 
 def split(avail: list, key: str) -> list[tuple[object, int]]:

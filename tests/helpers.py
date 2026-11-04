@@ -38,7 +38,7 @@ def check_floor(msgs: list[OutMessage]) -> None:
         assert len({b.title for b in m.buttons}) == len(m.buttons)
         if m.coach:
             assert m.why_cites, m.body
-            assert any(raw("label_kyun", lg) in (m.body or "") for lg in ("hi", "mr", "en"))
+            assert any(raw("label_kyun", lg) in (m.body or m.caption or "") for lg in ("hi", "mr", "en"))  # image: caption
 
 
 def texts(msgs: list[OutMessage]) -> str:

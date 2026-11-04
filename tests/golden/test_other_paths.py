@@ -22,9 +22,11 @@ async def test_ac_path(h):
     assert s.option_labels["B"] == "AC-MER-15-5S", s.option_labels
     await h.tap("s:C1:shown")
     out = await h.tap("s:C1:opt:B")
+    made = out[0]  # first, why it is right for their home (Saral Samjhao at the choice), then the site questions
+    assert made.card and made.card.template == "product" and made.card.data["picked"] and made.card.data["made"]
     asked = []
     for _ in range(4):  # the AC story: outdoor spot, pipe run, wall hole are asked before the cost
-        q = out[0]
+        q = out[-1]
         if q.card:
             break
         ids = button_ids(out)

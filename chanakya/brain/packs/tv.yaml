@@ -143,6 +143,10 @@ slots:
       kids: {hi: "Bachche/cartoon", mr: "मुलं/कार्टून", en: "Kids/cartoons"}
       gaming: {hi: "Gaming", mr: "गेमिंग", en: "Gaming"}
     priors: {sports: 0.4, sports_some: 0.4, few_sports: 0.2}
+    alt:  # live data has no refresh rate to judge sports by: ask what the TVs' own highlights can act on
+      ask: {hi: "घर में टीवी पर ज़्यादातर क्या चलता है — मूवी/OTT, बच्चों के शो, या सीरियल/न्यूज़?", mr: "घरी टीव्हीवर बहुतेक काय चालतं — सिनेमे/OTT, मुलांचे शो, की मालिका/बातम्या?", en: "What's mostly on the TV at home: movies/OTT, kids' shows, or serials/news?"}
+      why: {hi: "Jo dekhte hain wahi feature kaam ka: movies ke liye HDR, bachchon ke liye apps", mr: "जे पाहतात तेच फीचर कामाचं: सिनेमांसाठी HDR, मुलांसाठी apps", en: "What they watch decides the feature: HDR for movies, apps for kids"}
+      quick: [movies, kids]
     keywords:
       sports: ["cricket", "match", "sports", "football", "ipl", "har match", "every match", "क्रिकेट", "मैच", "खेळ", "हर मैच", "प्रत्येक मॅच"]
       sports_some: ["kabhi kabhi match", "kabhi-kabhi match", "sometimes cricket", "match kabhi kabhi", "कभी कभी मैच", "कधी कधी मॅच"]

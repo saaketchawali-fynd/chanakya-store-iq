@@ -62,9 +62,12 @@ async def test_bill_offers_and_close_use_only_backend_data(hj):
     p = hj.rt.facts.product_sync(s.chosen_sku)
     assert lines[0]["title"] in NAMES and k.data["zaroori_total_str"] == f"₹{p.price:,}"
     out = await hj.tap("s:C1:offers")
-    assert button_ids(out) == ["s:C1:pay:card", "s:C1:pay:upi"]  # no EMI plans in the backend → no EMI choice
-    assert "EMI" not in out[0].body
-    out = await hj.tap("s:C1:pay:card")  # no bank offers → straight to the offer card, no empty bank list
+    assert "EMI" not in out[0].body  # no EMI plans in the backend → no EMI choice
+    if s.chosen_sku == "491934634":  # the model with a live offer: how they pay can matter, so it is asked
+        assert button_ids(out) == ["s:C1:pay:card", "s:C1:pay:upi"]
+        out = await hj.tap("s:C1:pay:card")  # no bank offers → straight to the offer card, no empty bank list
+    else:  # no offer and no EMI depend on the payment: not asked, the price straight away
+        assert not any(":pay:" in b for b in button_ids(out))
     oc = next(m.card for m in out if m.card and m.card.template == "offer")
     assert oc.data["price_str"] == f"₹{p.price:,}"
     out = await hj.tap("s:C1:delivery")

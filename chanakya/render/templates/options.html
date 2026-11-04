@@ -127,6 +127,7 @@
         <div class="trow">{% if o.label %}<span class="letter">{{ o.label }}</span>{% endif %}<h3>{{ o.title }}</h3></div>
         {% set rl = L['role_' ~ o.role] if o.role in ('value', 'step') else '' %}
         {% if rl %}<span class="role {{ o.role }}{{ rl|dv }}">{{ rl }}</span>{% endif %}{% if o.stock_line %}<span class="stk">{{ o.stock_line }}</span>{% endif %}
+        {% if o.reason and not (o.diffs|aslist) %}<div class="df num"><b>{{ o.reason }}</b></div>{% endif %}
         {% for d in (o.diffs|aslist)[:2] %}<div class="df num">{{ d.label }} · <b>{{ d.value }}</b></div>{% endfor %}
         {% set of = o.offer or {} %}
         {% if of.text %}<div class="ofr{% if of.none %} none{% endif %}{{ of.text|dv }}">{{ icon('tag', 20) }}<span>{{ of.text }}</span></div>{% endif %}
