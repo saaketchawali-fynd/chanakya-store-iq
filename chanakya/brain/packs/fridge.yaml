@@ -15,7 +15,7 @@ slots:
   - id: trigger
     phase: open
     title: {hi: "Kyun abhi", mr: "आत्ता का", en: "Why now"}
-    ask: {hi: "पुराना फ्रिज बदलना है, या नया ले रहे हैं?", mr: "जुना फ्रिज बदलायचा आहे, की नवीन घेताय?", en: "Is this replacing an old fridge, or a new one?"}
+    ask: {hi: "Purana fridge badalna hai, ya naya le rahe hain?", mr: "जुना फ्रिज बदलायचा आहे, की नवीन घेताय?", en: "Is this replacing an old fridge, or a new one?"}
     why: {hi: "Purana ho to wahi anchor hai: size, exchange aur jagah pehle se pata", mr: "जुनं असेल तर तेच माप: साइज, एक्सचेंज आणि जागा आधीच माहीत", en: "A replacement tells us the size, the exchange and the space already"}
     quick:
       - {id: replace, title: {hi: "Purana badalna", mr: "जुना बदलायचा", en: "Replacing old"}}
@@ -34,7 +34,7 @@ slots:
     phase: life
     number: family_size
     title: {hi: "Ghar ke log", mr: "घरातील लोक", en: "People at home"}
-    ask: {hi: "घर में कितने लोग हैं?", mr: "घरात किती लोक आहेत?", en: "How many people live at home?"}
+    ask: {hi: "Ghar mein kitne log hain?", mr: "घरात किती लोक आहेत?", en: "How many people live at home?"}
     why: {hi: "Logon se litre tay hote hain", mr: "लोकांवरून litre ठरतात", en: "People decide the litres"}
     quick:
       - {id: f1_2, number: 2, title: {hi: "1–2 log", mr: "1–2 लोक", en: "1–2 people"}}
@@ -54,7 +54,7 @@ slots:
   - id: shopping
     phase: life
     title: {hi: "Kharidari", mr: "खरेदी", en: "Shopping"}
-    ask: {hi: "सब्ज़ी-दूध रोज़ लाते हैं, या हफ़्ते भर का एक साथ? फ्रोज़न चीज़ें भी रखते हैं?", mr: "भाजी-दूध रोज आणता, की आठवड्याचं एकदम? फ्रोझन पदार्थही ठेवता?", en: "Do you buy vegetables and milk daily, or a week's stock at once? Frozen food too?"}
+    ask: {hi: "Sabzi-doodh roz laate hain, ya hafte bhar ka ek saath? Frozen cheezein bhi rakhte hain?", mr: "भाजी-दूध रोज आणता, की आठवड्याचं एकदम? फ्रोझन पदार्थही ठेवता?", en: "Do you buy vegetables and milk daily, or a week's stock at once? Frozen food too?"}
     why: {hi: "Isse freezer aur sabzi ke dabbe ka size tay hota hai", mr: "यावरून फ्रीझर आणि भाजीच्या डब्याचा आकार ठरतो", en: "This decides the freezer and the vegetable box size"}
     quick:
       - {id: daily, title: {hi: "Roz taaza", mr: "रोज ताजं", en: "Fresh, daily"}}
@@ -74,7 +74,7 @@ slots:
     phase: life
     number: fridge_width_cm
     title: {hi: "Jagah ki chaudai", mr: "जागेची रुंदी", en: "Space width"}
-    ask: {hi: "किचन में फ्रिज की जगह कितनी चौड़ी है?", mr: "किचनमध्ये फ्रिजची जागा किती रुंद आहे?", en: "How wide is the fridge spot in the kitchen?"}
+    ask: {hi: "Kitchen mein fridge ki jagah kitni chaudi hai?", mr: "किचनमध्ये फ्रिजची जागा किती रुंद आहे?", en: "How wide is the fridge spot in the kitchen?"}
     why: {hi: "Jagah se door type tay hota hai — single, double ya side-by-side", mr: "जागेवरून दरवाज्याचा प्रकार ठरतो — सिंगल, डबल की साइड-बाय-साइड", en: "The width decides single door, double door or side-by-side"}
     quick:
       - {id: w_lt65, number: 62, title: {hi: "65 cm se kam", mr: "65 cm पेक्षा कमी", en: "Under 65 cm"}}
@@ -90,7 +90,7 @@ slots:
   - id: power_cuts
     phase: life
     title: {hi: "Bijli", mr: "वीज", en: "Power"}
-    ask: {hi: "आपके यहाँ बिजली जाती है या वोल्टेज ऊपर-नीचे होता है?", mr: "तुमच्याकडे वीज जाते का, किंवा व्होल्टेज कमी-जास्त होतं का?", en: "Do you get power cuts or voltage drops?"}
+    ask: {hi: "Aapke yahan bijli jaati hai ya voltage upar-neeche hota hai?", mr: "तुमच्याकडे वीज जाते का, किंवा व्होल्टेज कमी-जास्त होतं का?", en: "Do you get power cuts or voltage drops?"}
     why: {hi: "Bijli jaane par thandak aur stabiliser ka kharcha isi se tay", mr: "वीज गेल्यावर थंडावा आणि स्टॅबिलायझरचा खर्च यावरून ठरतो", en: "This decides cooling in a cut and whether a stabiliser is needed"}
     quick:
       - {id: "yes", title: {hi: "Haan, hota hai", mr: "हो, होतं", en: "Yes, often"}}
@@ -105,7 +105,7 @@ slots:
   - id: decider
     phase: life
     title: {hi: "Faisla", mr: "निर्णय", en: "Decider"}
-    ask: {hi: "फ़ैसला आप ही लेंगे या घर पर किसी से पूछना है?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
+    ask: {hi: "Faisla aap hi lenge ya ghar par kisi se poochna hai?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
     why: {hi: "Jo faisla karega, use bhi poori jaankari pahunche", mr: "जो निर्णय घेईल त्यालाही पूर्ण माहिती पोहोचावी", en: "Whoever decides should get the full picture"}
     quick:
       - {id: self, title: {hi: "Khud", mr: "स्वतः", en: "Myself"}}
@@ -120,7 +120,7 @@ slots:
   - id: exchange_old
     phase: tech
     title: {hi: "Exchange", mr: "एक्सचेंज", en: "Exchange"}
-    ask: {hi: "पुराना फ्रिज चालू हालत में है?", mr: "जुना फ्रिज चालू स्थितीत आहे?", en: "Is the old fridge still working?"}
+    ask: {hi: "Purana fridge chalu haalat mein hai?", mr: "जुना फ्रिज चालू स्थितीत आहे?", en: "Is the old fridge still working?"}
     why: {hi: "Exchange ki keemat isi se tay hoti hai", mr: "एक्सचेंजची किंमत यावरून ठरते", en: "This decides the exchange value"}
     quick:
       - {id: yes_working, title: {hi: "Haan, chalta hai", mr: "हो, चालतो", en: "Yes, working"}}
@@ -135,7 +135,7 @@ slots:
   - id: socket_near
     phase: site
     title: {hi: "Socket", mr: "सॉकेट", en: "Socket"}
-    ask: {hi: "फ्रिज की जगह के पास बिजली का सॉकेट है?", mr: "फ्रिजच्या जागेजवळ सॉकेट आहे?", en: "Is there a power socket near the fridge spot?"}
+    ask: {hi: "Fridge ki jagah ke paas bijli ka socket hai?", mr: "फ्रिजच्या जागेजवळ सॉकेट आहे?", en: "Is there a power socket near the fridge spot?"}
     why: {hi: "Delivery ke din extension na lagana pade", mr: "डिलिव्हरीच्या दिवशी एक्स्टेंशन लागू नये", en: "So no extension cord is needed on delivery day"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -150,7 +150,7 @@ slots:
   - id: floor_lift
     phase: site
     title: {hi: "Manzil", mr: "मजला", en: "Floor"}
-    ask: {hi: "घर कौन-सी मंज़िल पर है, लिफ़्ट है?", mr: "घर कोणत्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
+    ask: {hi: "Ghar kaunse floor par hai, lift hai?", mr: "घर कोणत्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
     why: {hi: "Bade fridge ke liye lift ya seedhi ki chaudai dekhni hai", mr: "मोठ्या फ्रिजसाठी लिफ्ट किंवा जिन्याची रुंदी बघायची", en: "A big fridge needs a lift or a wide staircase"}
     quick:
       - {id: lift, title: {hi: "Lift hai", mr: "लिफ्ट आहे", en: "Has a lift"}}
@@ -184,88 +184,88 @@ benefits:
     when_spec: {capacity_l: {gte: 1}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "{capacity_l} L मतलब {people} लोगों का हफ़्ते भर का दूध, सब्ज़ी और बचा खाना आराम से।", mr: "{capacity_l} L म्हणजे {people} लोकांचं आठवड्याचं दूध, भाजी आणि उरलेलं जेवण आरामात.", en: "{capacity_l} litres: a week's milk, vegetables and leftovers for {people} people, with room to spare."}
-    card: {hi: "हफ़्ते भर का सामान आराम से", mr: "आठवड्याचं सामान आरामात", en: "A week's food, with room"}
+    say: {hi: "{capacity_l} L matlab {people} logon ka hafte bhar ka doodh, sabzi aur bacha khana aaram se.", mr: "{capacity_l} L म्हणजे {people} लोकांचं आठवड्याचं दूध, भाजी आणि उरलेलं जेवण आरामात.", en: "{capacity_l} litres: a week's milk, vegetables and leftovers for {people} people, with room to spare."}
+    card: {hi: "Hafte bhar ka saamaan aaram se", mr: "आठवड्याचं सामान आरामात", en: "A week's food, with room"}
   - id: b_freezer
     weight: 2
     when_spec: {freezer_l: {gte: 70}}
     when_slots: {shopping: {in: [weekly, frozen]}}
     cites: [shopping]
-    say: {hi: "{freezer_l} L का फ्रीज़र — आइसक्रीम, मटर और हफ़्ते भर का स्टॉक एक साथ।", mr: "{freezer_l} L चा फ्रीझर — आइसक्रीम, मटार आणि आठवड्याचा स्टॉक एकत्र.", en: "A {freezer_l}-litre freezer: ice cream, frozen peas and a week's stock together."}
-    card: {hi: "बड़ा फ्रीज़र, हफ़्ते का स्टॉक", mr: "मोठा फ्रीझर, आठवड्याचा स्टॉक", en: "Big freezer for the week"}
+    say: {hi: "{freezer_l} L ka freezer — ice cream, matar aur hafte bhar ka stock ek saath.", mr: "{freezer_l} L चा फ्रीझर — आइसक्रीम, मटार आणि आठवड्याचा स्टॉक एकत्र.", en: "A {freezer_l}-litre freezer: ice cream, frozen peas and a week's stock together."}
+    card: {hi: "Bada freezer, hafte ka stock", mr: "मोठा फ्रीझर, आठवड्याचा स्टॉक", en: "Big freezer for the week"}
   - id: b_convertible
     weight: 1.5
     when_spec: {convertible: {eq: true}}
     when_slots: {shopping: {known: true}}
     cites: [shopping]
-    say: {hi: "मेहमान आएँ या सब्ज़ी ज़्यादा हो, तो फ्रीज़र को फ्रिज बना लीजिए।", mr: "पाहुणे आले किंवा भाजी जास्त असेल, तर फ्रीझरचा फ्रिज करा.", en: "Guests coming or extra vegetables? Turn the freezer into fridge space."}
-    card: {hi: "फ्रीज़र को फ्रिज बनाइए", mr: "फ्रीझरचा फ्रिज करा", en: "Freezer turns into fridge"}
+    say: {hi: "Mehmaan aayein ya sabzi zyada ho, to freezer ko fridge bana lijiye.", mr: "पाहुणे आले किंवा भाजी जास्त असेल, तर फ्रीझरचा फ्रिज करा.", en: "Guests coming or extra vegetables? Turn the freezer into fridge space."}
+    card: {hi: "Freezer ko fridge banaiye", mr: "फ्रीझरचा फ्रिज करा", en: "Freezer turns into fridge"}
   - id: b_fresh
     weight: 1.5
     when_spec: {crisper_l: {gte: 25}}
     when_slots: {shopping: {in: [daily]}}
     cites: [shopping]
-    say: {hi: "{crisper_l} L का सब्ज़ी का डिब्बा — रोज़ की हरी सब्ज़ी ज़्यादा दिन ताज़ा।", mr: "{crisper_l} L चा भाजीचा डबा — रोजची हिरवी भाजी जास्त दिवस ताजी.", en: "A {crisper_l}-litre vegetable box: daily greens stay fresh longer."}
-    card: {hi: "सब्ज़ी ज़्यादा दिन ताज़ा", mr: "भाजी जास्त दिवस ताजी", en: "Greens stay fresh longer"}
+    say: {hi: "{crisper_l} L ka sabzi ka dabba — roz ki hari sabzi zyada din taaza.", mr: "{crisper_l} L चा भाजीचा डबा — रोजची हिरवी भाजी जास्त दिवस ताजी.", en: "A {crisper_l}-litre vegetable box: daily greens stay fresh longer."}
+    card: {hi: "Sabzi zyada din taaza", mr: "भाजी जास्त दिवस ताजी", en: "Greens stay fresh longer"}
   - id: b_power
     weight: 2
     when_spec: {stabiliser_free: {eq: true}}
     when_slots: {power_cuts: {in: ["yes"]}}
     cites: [power_cuts]
-    say: {hi: "स्टेबलाइज़र की ज़रूरत नहीं, और बिजली जाने पर {cooling_retention_h} h तक ठंडा रहता है।", mr: "स्टॅबिलायझरची गरज नाही, आणि वीज गेल्यावर {cooling_retention_h} h थंड राहतो.", en: "No stabiliser needed, and it stays cold for {cooling_retention_h} hours in a power cut."}
-    card: {hi: "बिजली जाने पर भी ठंडा", mr: "वीज गेली तरी थंड", en: "Cold even in power cuts"}
+    say: {hi: "Stabiliser ki zaroorat nahi, aur bijli jaane par {cooling_retention_h} h tak thanda rehta hai.", mr: "स्टॅबिलायझरची गरज नाही, आणि वीज गेल्यावर {cooling_retention_h} h थंड राहतो.", en: "No stabiliser needed, and it stays cold for {cooling_retention_h} hours in a power cut."}
+    card: {hi: "Bijli jaane par bhi thanda", mr: "वीज गेली तरी थंड", en: "Cold even in power cuts"}
   - id: b_inverter
     weight: 1
     when_spec: {inverter_compressor: {eq: true}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "इन्वर्टर कंप्रेसर — आवाज़ कम, और 24 h चलने पर भी बिल कम।", mr: "इन्व्हर्टर कंप्रेसर — आवाज कमी, आणि 24 h चालूनही बिल कमी.", en: "Inverter compressor: quieter, and a lower bill though it runs 24 hours."}
-    card: {hi: "कम आवाज़, कम बिल", mr: "कमी आवाज, कमी बिल", en: "Quiet, lower bill"}
+    say: {hi: "Inverter compressor — awaaz kam, aur 24 h chalne par bhi bill kam.", mr: "इन्व्हर्टर कंप्रेसर — आवाज कमी, आणि 24 h चालूनही बिल कमी.", en: "Inverter compressor: quieter, and a lower bill though it runs 24 hours."}
+    card: {hi: "Kam awaaz, kam bill", mr: "कमी आवाज, कमी बिल", en: "Quiet, lower bill"}
   - id: b_frost
     weight: 0.8
     when_spec: {frost_free: {eq: true}}
     when_slots: {shopping: {known: true}}
     cites: [shopping]
-    say: {hi: "फ्रॉस्ट-फ्री — बर्फ़ नहीं जमती, हर हफ़्ते डीफ़्रॉस्ट की झंझट नहीं।", mr: "फ्रॉस्ट-फ्री — बर्फ साचत नाही, दर आठवड्याला डीफ्रॉस्टची कटकट नाही.", en: "Frost-free: no ice build-up, no weekly defrosting."}
-    card: {hi: "डीफ़्रॉस्ट की झंझट नहीं", mr: "डीफ्रॉस्टची कटकट नाही", en: "No defrosting"}
+    say: {hi: "Frost-free — barf nahi jamti, har hafte defrost ki jhanjhat nahi.", mr: "फ्रॉस्ट-फ्री — बर्फ साचत नाही, दर आठवड्याला डीफ्रॉस्टची कटकट नाही.", en: "Frost-free: no ice build-up, no weekly defrosting."}
+    card: {hi: "Defrost ki jhanjhat nahi", mr: "डीफ्रॉस्टची कटकट नाही", en: "No defrosting"}
 demos:
   - id: shelf_load
     title: {hi: "Shelf demo", mr: "शेल्फ डेमो", en: "Shelf demo"}
     when_slots: {family_size: {known: true}}
     differs_on: capacity_l
     steps: {hi: "{best} aur {other} ka darwaza kholkar 2-litre bottle aur sabzi ke dabbe ki jagah dikhaiye", mr: "{best} आणि {other} चा दरवाजा उघडून 2 L बाटली आणि भाजीच्या डब्याची जागा दाखवा", en: "Open {best} and {other}; show where a 2-litre bottle and the vegetable box go"}
-    say: {hi: "देखिए, {best} में आपके घर का हफ़्ते भर का सामान आराम से आएगा।", mr: "बघा, {best} मध्ये तुमच्या घराचं आठवड्याचं सामान आरामात बसेल.", en: "See how a week's food for your home fits easily in {best}."}
+    say: {hi: "Dekhiye, {best} mein aapke ghar ka hafte bhar ka saamaan aaram se aayega.", mr: "बघा, {best} मध्ये तुमच्या घराचं आठवड्याचं सामान आरामात बसेल.", en: "See how a week's food for your home fits easily in {best}."}
   - id: freezer_pull
     title: {hi: "Freezer demo", mr: "फ्रीझर डेमो", en: "Freezer demo"}
     when_slots: {shopping: {in: [weekly, frozen]}}
     differs_on: freezer_l
     steps: {hi: "Dono ka freezer kholkar frozen packet ki jagah dikhaiye", mr: "दोघांचा फ्रीझर उघडून फ्रोझन पाकिटांची जागा दाखवा", en: "Open both freezers and show the room for frozen packs"}
-    say: {hi: "हफ़्ते का स्टॉक यहाँ आएगा — {best} में जगह देखिए।", mr: "आठवड्याचा स्टॉक इथे बसेल — {best} मधली जागा बघा.", en: "A week's stock goes here: see the room in {best}."}
+    say: {hi: "Hafte ka stock yahan aayega — {best} mein jagah dekhiye.", mr: "आठवड्याचा स्टॉक इथे बसेल — {best} मधली जागा बघा.", en: "A week's stock goes here: see the room in {best}."}
   - id: power_label
     title: {hi: "Bijli ka label", mr: "विजेचं लेबल", en: "Power label"}
     when_slots: {power_cuts: {in: ["yes"]}}
     differs_on: stabiliser_free
     steps: {hi: "Label par 'stabiliser-free' aur voltage range ungli se dikhaiye", mr: "लेबलवर 'stabiliser-free' आणि व्होल्टेज रेंज बोटाने दाखवा", en: "Point to 'stabiliser-free' and the voltage range on the label"}
-    say: {hi: "ये लाइन देखिए — {best} को अलग स्टेबलाइज़र नहीं चाहिए।", mr: "ही ओळ बघा — {best} ला वेगळा स्टॅबिलायझर लागत नाही.", en: "See this line: {best} needs no separate stabiliser."}
+    say: {hi: "Yeh line dekhiye — {best} ko alag stabiliser nahi chahiye.", mr: "ही ओळ बघा — {best} ला वेगळा स्टॅबिलायझर लागत नाही.", en: "See this line: {best} needs no separate stabiliser."}
 myths:
   - id: fr_bigger_better
     short: {hi: "Bada fridge hi behtar", mr: "मोठा फ्रिजच चांगला", en: "Bigger fridge is better"}
     belief: "A bigger fridge is always better"
     proof: shelf_load
     keywords: ["sabse bada fridge", "bada fridge achha", "bigger fridge better", "बड़ा फ्रिज", "मोठा फ्रिज"]
-    line: {hi: "सही, बड़े फ्रिज में ज़्यादा आता है। पर परिवार के हिसाब से सही litre लें तो जगह और बिल दोनों बचते हैं।", mr: "बरोबर, मोठ्या फ्रिजमध्ये जास्त बसतं. पण कुटुंबानुसार योग्य litre घेतल्यास जागा आणि बिल दोन्ही वाचतात.", en: "True, a bigger fridge holds more. The right litres for your family save space and the bill."}
+    line: {hi: "Sahi, bade fridge mein zyada aata hai. Par parivaar ke hisaab se sahi litre lein to jagah aur bill dono bachte hain.", mr: "बरोबर, मोठ्या फ्रिजमध्ये जास्त बसतं. पण कुटुंबानुसार योग्य litre घेतल्यास जागा आणि बिल दोन्ही वाचतात.", en: "True, a bigger fridge holds more. The right litres for your family save space and the bill."}
   - id: fr_frost_free_bill
     short: {hi: "Frost-free = zyada bill", mr: "फ्रॉस्ट-फ्री = जास्त बिल", en: "Frost-free = big bill"}
     belief: "Frost-free fridges use much more electricity"
     proof: power_label
     keywords: ["frost free bill", "frost free zyada bijli", "frost free more electricity", "फ्रॉस्ट फ्री बिल", "फ्रॉस्ट फ्री जास्त वीज"]
-    line: {hi: "सही सवाल, फ्रॉस्ट-फ्री में पंखा चलता है। इस मॉडल का बिल लगभग {monthly_bill} महीना है — लेबल पर लिखा है।", mr: "योग्य प्रश्न, फ्रॉस्ट-फ्रीमध्ये पंखा चालतो. या मॉडेलचं बिल साधारण {monthly_bill} महिना आहे — लेबलवर लिहिलंय.", en: "Fair question: frost-free runs a fan. This model costs about {monthly_bill} a month to run; it's on the label."}
+    line: {hi: "Sahi sawaal, frost-free mein pankha chalta hai. Is model ka bill lagbhag {monthly_bill} mahina hai — label par likha hai.", mr: "योग्य प्रश्न, फ्रॉस्ट-फ्रीमध्ये पंखा चालतो. या मॉडेलचं बिल साधारण {monthly_bill} महिना आहे — लेबलवर लिहिलंय.", en: "Fair question: frost-free runs a fan. This model costs about {monthly_bill} a month to run; it's on the label."}
   - id: fr_stabiliser_needed
     short: {hi: "Stabiliser zaroori hai", mr: "स्टॅबिलायझर लागतोच", en: "Stabiliser is a must"}
     belief: "Every fridge needs a stabiliser"
     proof: power_label
     keywords: ["stabiliser chahiye", "stabilizer lagega", "need stabiliser", "स्टेबलाइज़र चाहिए", "स्टॅबिलायझर लागेल"]
-    line: {hi: "पहले ज़रूरी था, सही। कई नए फ्रिज बिना स्टेबलाइज़र चलते हैं — लेबल पर वोल्टेज रेंज देखते हैं।", mr: "आधी गरजेचा होता, बरोबर. अनेक नवीन फ्रिज स्टॅबिलायझरशिवाय चालतात — लेबलवर व्होल्टेज रेंज बघू.", en: "It used to be needed, yes. Many new fridges run without one: let's check the voltage range on the label."}
+    line: {hi: "Pehle zaroori tha, sahi. Kai naye fridge bina stabiliser chalte hain — label par voltage range dekhte hain.", mr: "आधी गरजेचा होता, बरोबर. अनेक नवीन फ्रिज स्टॅबिलायझरशिवाय चालतात — लेबलवर व्होल्टेज रेंज बघू.", en: "It used to be needed, yes. Many new fridges run without one: let's check the voltage range on the label."}
 site_needs: [socket_near, floor_lift]
 quiz:
   - id: fr_q1
@@ -297,9 +297,9 @@ quiz:
     explain: {hi: "Poora kharcha: stabiliser chahiye to card par likhiye, ya stabiliser-free model dikhaiye.", mr: "पूर्ण खर्च: स्टॅबिलायझर लागत असेल तर कार्डवर लिहा, किंवा stabiliser-free मॉडेल दाखवा.", en: "Full cost: put the stabiliser on the card, or show a stabiliser-free model."}
 
 needs:
-  capacity_ok: {hi: "परिवार के लिए litre", mr: "कुटुंबासाठी litre", en: "Litres for your family"}
-  width_fit: {hi: "किचन की जगह में फ़िट", mr: "किचनच्या जागेत बसतो", en: "Fits your kitchen spot"}
-  freezer_ok: {hi: "हफ़्ते भर का स्टॉक", mr: "आठवड्याचा साठा", en: "A week's stock"}
-  fresh_ok: {hi: "रोज़ की ताज़ी सब्ज़ी", mr: "रोजची ताजी भाजी", en: "Daily fresh vegetables"}
-  power_ok: {hi: "बिजली कटौती, stabiliser नहीं", mr: "वीज कपात, stabiliser नको", en: "Power cuts, no stabiliser"}
-  retention_ok: {hi: "बिजली जाने पर ठंडक", mr: "वीज गेल्यावर थंडावा", en: "Cold during a power cut"}
+  capacity_ok: {hi: "Parivaar ke liye litre", mr: "कुटुंबासाठी litre", en: "Litres for your family"}
+  width_fit: {hi: "Kitchen ki jagah mein fit", mr: "किचनच्या जागेत बसतो", en: "Fits your kitchen spot"}
+  freezer_ok: {hi: "Hafte bhar ka stock", mr: "आठवड्याचा साठा", en: "A week's stock"}
+  fresh_ok: {hi: "Roz ki taazi sabzi", mr: "रोजची ताजी भाजी", en: "Daily fresh vegetables"}
+  power_ok: {hi: "Power cut, stabiliser nahi", mr: "वीज कपात, stabiliser नको", en: "Power cuts, no stabiliser"}
+  retention_ok: {hi: "Bijli jaane par thandak", mr: "वीज गेल्यावर थंडावा", en: "Cold during a power cut"}

@@ -1,0 +1,339 @@
+# Every message, from shift start to the end (user, 5 Nov 2026): well formatted, well spaced, written in full
+# sentences, detailed enough to read and act on in a glance, and with the customer present in it.
+#   - a bold title line says what the message is; a blank line; full sentences, • bullets or 1. 2. 3. steps;
+#     a last italic line names the next tap when it helps
+#   - associate text in their language (Hindi = Roman Hinglish); messages to the customer's phone warm and personal
+#   - units and technical terms stay English; every number still comes from the data or the registry
+# Each key lives in this file only (loaded last by i18n.lang).
+
+# ---------------------------------------------------------------- Taiyari: before the shift
+ask_staff_name:
+  hi: "*Chanakya mein swagat hai.*\n\nPehle, aapka naam kya hai? Yahi naam customer ke Family Card par jayega, taaki unhe yaad rahe ki kisne madad ki."
+  mr: "*चाणक्यमध्ये स्वागत आहे.*\n\nआधी, तुमचं नाव काय? हेच नाव ग्राहकाच्या फॅमिली कार्डवर जाईल, म्हणजे त्यांना आठवेल कोणी मदत केली."
+  en: "*Welcome to Chanakya.*\n\nFirst, what's your name? It goes on the Family Card your customers get, so they remember who helped them."
+welcome_new_staff:
+  hi: "*Namaste {name} ji!* Main Chanakya hoon, floor par aapka sales saathi.\n\n*Aaj aise chalenge:*\n1. Chhota pre-read: aaj ka stock aur offers\n2. 45 second ki training\n3. Phir customer: unke ghar ki baat voice note mein boliye, main har agli line dunga"
+  mr: "*नमस्कार {name}!* मी चाणक्य, फ्लोअरवरचा तुमचा सेल्स साथी.\n\n*आजचा दिवस असा:*\n1. छोटा आढावा: आजचा स्टॉक आणि ऑफर्स\n2. 45 सेकंदांचं प्रशिक्षण\n3. मग ग्राहक: त्यांच्या घराबद्दल व्हॉइस नोटमध्ये सांगा, मी प्रत्येक पुढची ओळ देईन"
+  en: "*Namaste {name}!* I'm Chanakya, your sales partner on the floor.\n\n*How today goes:*\n1. A quick pre-read: today's stock and offers\n2. A 45-second training\n3. Then your customers: tell me about their home in a voice note, and I'll give you each next line"
+brief_pre_caption:
+  hi: "*Aaj ka pre-read* upar card par hai:\n• {n} {cat} stock mein\n• {n_off} offer chalu, jaldi khatam hone wale pehle\n\nEk baar padh lijiye. Phir neeche tap karke aaj ki 45 second ki training dekhiye."
+  mr: "*आजचा आढावा* वरच्या कार्डवर आहे:\n• {n} {cat} स्टॉकमध्ये\n• {n_off} ऑफर चालू, लवकर संपणाऱ्या आधी\n\nएकदा वाचा. मग खाली टॅप करून आजचं 45 सेकंदांचं प्रशिक्षण बघा."
+  en: "*Today's pre-read* is on the card above:\n• {n} {cat} in stock\n• {n_off} offers live, the ones ending soonest first\n\nRead it once. Then tap below for today's 45-second training."
+clip_why_first:
+  hi: "*Aaj ki training: {step}* · 45 sec\nChaar kadam, floor ka ek asli udaharan, aur aaj try karne ki ek baat."
+  mr: "*आजचं प्रशिक्षण: {step}* · 45 sec\nचार पावलं, फ्लोअरवरचं एक खरं उदाहरण, आणि आज करून बघायची एक गोष्ट."
+  en: "*Today's training: {step}* · 45 sec\nFour moves, one real floor example, and one thing to try today."
+clip_why_last:
+  hi: "*Aaj ki training: {step}* · 45 sec\nPichhli baar is step par {n}/2 aaya tha, isliye aaj isi par focus."
+  mr: "*आजचं प्रशिक्षण: {step}* · 45 sec\nमागच्या वेळी या पायरीवर {n}/2 मिळाले, म्हणून आज यावर लक्ष."
+  en: "*Today's training: {step}* · 45 sec\nYour last score on this step was {n}/2, so it's today's focus."
+clip_then_ready:
+  hi: "*Training dekh li?*\n\nIska ek kaam aaj har customer ke saath yaad rakhiye. Floor ke liye taiyaar hon to neeche tap kijiye."
+  mr: "*प्रशिक्षण पाहिलं?*\n\nत्यातली एक गोष्ट आज प्रत्येक ग्राहकासोबत लक्षात ठेवा. फ्लोअरसाठी तयार असाल तर खाली टॅप करा."
+  en: "*Watched it?*\n\nKeep its one thing in mind with every customer today. Tap below when you're ready for the floor."
+ready_title: {hi: "*Shabash {name} ji, aap taiyaar hain.*", mr: "*छान {name}, तुम्ही तयार आहात.*", en: "*You're ready, {name}.*"}
+ready_title_plain: {hi: "*Shabash, aap taiyaar hain.*", mr: "*छान, तुम्ही तयार आहात.*", en: "*You're ready.*"}
+ready_body:
+  hi: "*Aaj ka ek kaam:*\n> {tip}\n\n*Customer aayein to:*\n1. Pehle muskura kar swagat; phone baad mein.\n2. *Naya customer* dabaiye, ya unki baat voice note mein bhejiye."
+  mr: "*आजची एक गोष्ट:*\n> {tip}\n\n*ग्राहक आले की:*\n1. आधी हसून स्वागत; फोन नंतर.\n2. *नवीन ग्राहक* दाबा, किंवा त्यांचं म्हणणं व्हॉइस नोटमध्ये पाठवा."
+  en: "*Today's one thing:*\n> {tip}\n\n*When a customer walks in:*\n1. Greet them first; the phone can wait.\n2. Tap *New customer*, or send a voice note of what they tell you."
+
+# ---------------------------------------------------------------- Ghar Samjho: the home
+room_photo_send:
+  hi: "*Kamre ki photo*\n\n1. Unse phone mein kamre ki photo kholne ko kahiye\n2. Deewar ke saamne se li hui sabse achhi, poori deewar dikhe\n3. Yahan bhejiye (woh pehle aapko WhatsApp kar sakte hain)\n\n_Main picks ko unki apni jagah mein, sahi size mein dikhaunga._"
+  mr: "*खोलीचा फोटो*\n\n1. त्यांना फोनमध्ये खोलीचा फोटो उघडायला सांगा\n2. भिंतीसमोरून काढलेला सर्वात चांगला, पूर्ण भिंत दिसेल असा\n3. इथे पाठवा (ते आधी तुम्हाला WhatsApp करू शकतात)\n\n_मी निवडलेले मॉडेल त्यांच्याच जागेत, खऱ्या आकारात दाखवेन._"
+  en: "*Getting the room photo*\n\n1. Ask them to open a photo of the room on their phone\n2. Facing the wall works best, with the whole wall in view\n3. Send it here (they can WhatsApp it to you first)\n\n_I'll show the picks in their own space, at true size._"
+voiceq_prompt:
+  hi: "*Main sun raha hoon.*\n\n\"{question}\" ka jawab unke shabdon mein voice note mein bhejiye.\n\nYa yahan tap kijiye:"
+  mr: "*मी ऐकतोय.*\n\n\"{question}\" याचं उत्तर त्यांच्या शब्दांत व्हॉइस नोटमध्ये पाठवा.\n\nकिंवा इथे टॅप करा:"
+  en: "*I'm listening.*\n\nSend their answer to \"{question}\" as a voice note, in their own words.\n\nOr tap one here:"
+readback_edit_body:
+  hi: "*Kya badalna hai?*\n\nJo baat galat hai woh chuniye, phir sahi jawab tap kijiye."
+  mr: "*काय बदलायचं?*\n\nजी गोष्ट चुकली ती निवडा, मग योग्य उत्तर टॅप करा."
+  en: "*What should change?*\n\nPick the fact that's wrong, then tap the right answer."
+
+# ---------------------------------------------------------------- Pehle Maano: their doubts
+doubt_list_body:
+  hi: "*Customer ne kya kaha?*\n\nUnke shabdon ke sabse kareeb wali shanka chuniye; main aisi line dunga jo pehle sahmati de, phir samjhaye. List mein nahi? Voice note bhejiye."
+  mr: "*ग्राहक काय म्हणाले?*\n\nत्यांच्या शब्दांच्या सर्वात जवळची शंका निवडा; मी अशी ओळ देईन जी आधी सहमती देते, मग समजावते. यादीत नाही? व्हॉइस नोट पाठवा."
+  en: "*What did they say?*\n\nPick the doubt closest to their words, and I'll give you a line that agrees first, then explains. Not in the list? Send it as a voice note."
+doubt_voice_prompt:
+  hi: "*Boliye.*\n\nCustomer ne jo kaha, unke shabdon mein voice note mein boliye. Main imaandari se jawab dene wali line dunga."
+  mr: "*बोला.*\n\nग्राहक जे म्हणाले ते त्यांच्या शब्दांत व्हॉइस नोटमध्ये सांगा. मी प्रामाणिक उत्तराची ओळ देईन."
+  en: "*Go ahead.*\n\nSay what the customer said, in their words, in a voice note. I'll give you the line to answer it honestly."
+row_other_doubt_d: {hi: "Unki baat voice note mein boliye", mr: "त्यांचं म्हणणं व्हॉइस नोटमध्ये सांगा", en: "Say their words in a voice note"}
+
+# ---------------------------------------------------------------- price asked before the demo
+bolo_price_later:
+  hi: "Aaj ke offers ke saath sahi daam zaroor bataunga. Pehle dekh lijiye kaunse aapke ghar ke liye sahi hain, taaki aap sahi cheezon ki tulna karein."
+  mr: "आजच्या ऑफर्ससह नेमकी किंमत नक्की सांगेन. आधी बघा कोणते तुमच्या घराला योग्य आहेत, म्हणजे तुम्ही योग्य गोष्टींची तुलना कराल."
+  en: "I'll give you the exact price with today's offers. First let me show you which ones fit your home, so you compare the right ones."
+kyun_price_later:
+  hi: "Daam demo ke baad, taaki woh fit dekhkar faisla karein, sirf number dekhkar nahi"
+  mr: "किंमत डेमोनंतर, म्हणजे ते फिट बघून ठरवतील, फक्त आकडा बघून नाही"
+  en: "Price after the demo, so they decide on fit, not just the number"
+gate_price_assess: {hi: "Pehle ghar ke {n} aur sawaal, phir demo", mr: "आधी घराचे आणखी {n} प्रश्न, मग डेमो", en: "{n} more home questions first, then the demo"}
+gate_price: {hi: "Pehle {best} ka farak dikhaiye", mr: "आधी {best} चा फरक दाखवा", en: "Show {best}'s difference first"}
+gate_price_no_options: {hi: "Pehle options dikhaiye, phir farak", mr: "आधी पर्याय दाखवा, मग फरक", en: "Show the options first, then the difference"}
+do_price_later:
+  hi: "Muskuraiye aur aage badhiye. Agar woh zor dein, to neeche ka button dabaiye: main imaandar range dunga."
+  mr: "हसा आणि पुढे चला. त्यांनी आग्रह केला तर खालचं बटण दाबा: मी प्रामाणिक रेंज देईन."
+  en: "Smile and keep going. If they insist, tap the button below and I'll give you an honest range."
+
+# ---------------------------------------------------------------- Dikhao: is the extra money worth it?
+upg_head: {hi: "*Extra paisa worth hai?* Is ghar ke liye, har step up:", mr: "*जास्त पैसे योग्य आहेत?* या घरासाठी, प्रत्येक पुढची पायरी:", en: "*Worth the extra money?* For this home, each step up:"}
+upg_step: {hi: "*{a} → {b}* · {pa} → {pb}", mr: "*{a} → {b}* · {pa} → {pb}", en: "*{a} → {b}* · {pa} → {pb}"}
+upg_cost: {hi: "• +{diff}, 5 saal mein roz lagbhag {day}", mr: "• +{diff}, 5 वर्षांत दररोज सुमारे {day}", en: "• +{diff}, about {day} a day over 5 years"}
+upg_adds: {hi: "• Milta hai: {what}", mr: "• मिळतं: {what}", en: "• Adds: {what}"}
+upg_nothing: {hi: "• Is ghar ke liye kuch naya nahi: {lower} kaafi hai", mr: "• या घरासाठी काही नवीन नाही: {lower} पुरेसा", en: "• Nothing new for this home: {lower} is enough"}
+upg_more: {hi: "bada, {what}", mr: "मोठा, {what}", en: "bigger, {what}"}
+do_upgrade:
+  hi: "Total nahi, roz ka amount bataiye; phir faisla unpar chhodiye."
+  mr: "एकूण नाही, रोजची रक्कम सांगा; मग निर्णय त्यांच्यावर सोडा."
+  en: "Say the per-day amount, not the total; then let them decide."
+
+# ---------------------------------------------------------------- Daam Aakhir Mein: payment and the offer
+bank_body:
+  hi: "*Unke paas kis bank ka card hai?*\n\nIs product par har bank ka offer neeche hai, aaj ke data se. Unka bank chuniye."
+  mr: "*त्यांच्याकडे कोणत्या बँकेचं कार्ड आहे?*\n\nया प्रॉडक्टवर प्रत्येक बँकेची ऑफर खाली आहे, आजच्या डेटामधून. त्यांची बँक निवडा."
+  en: "*Which bank's card do they have?*\n\nEach bank's offer on this product is shown below, from today's data. Pick theirs."
+bank_body_emi:
+  hi: "*EMI kis bank ke card par?*\n\nBank se tay hota hai kaunsa EMI plan aur offer lagega; sab neeche hain. Card nahi hai? Bina card wala EMI chuniye."
+  mr: "*EMI कोणत्या बँकेच्या कार्डवर?*\n\nकोणता EMI प्लॅन आणि ऑफर लागू होईल ते बँकेवर ठरतं; सगळे खाली आहेत. कार्ड नाही? कार्डशिवाय EMI निवडा."
+  en: "*EMI on which bank's card?*\n\nThe bank decides which EMI plan and offer apply; each is shown below. No card? Pick no-card EMI."
+row_no_card_emi_d: {hi: "Bina credit card, EMI plan data se", mr: "क्रेडिट कार्डशिवाय, EMI प्लॅन डेटामधून", en: "Without a credit card, plans from the data"}
+kyun_offers:
+  hi: "Aaj ka offer: {offer}, −{amount} ({date} tak) · Offer ke baad product: {payable}"
+  mr: "आजची ऑफर: {offer}, −{amount} ({date} पर्यंत) · ऑफरनंतर प्रॉडक्ट: {payable}"
+  en: "Today's offer: {offer}, −{amount} (until {date}) · The product after the offer: {payable}"
+kyun_no_offer:
+  hi: "Aaj is model par data mein koi offer nahi · Product: {payable}"
+  mr: "आज या मॉडेलवर डेटामध्ये ऑफर नाही · प्रॉडक्ट: {payable}"
+  en: "No offer on this model in today's data · The product: {payable}"
+
+# ---------------------------------------------------------------- Rishta: consent, Family Card, task, installation
+consent_qr_caption:
+  hi: "*Unki consent, 3 steps mein:*\n1. Phone unki taraf kijiye, unhe yeh QR scan karne dijiye\n2. Unke phone par WhatsApp khulega, message taiyaar\n3. Woh 'Send' dabayein; Family Card turant unke paas"
+  mr: "*त्यांची संमती, 3 पावलांत:*\n1. फोन त्यांच्याकडे वळवा, हा QR स्कॅन करू द्या\n2. त्यांच्या फोनवर WhatsApp उघडेल, मेसेज तयार\n3. ते 'Send' दाबतील; फॅमिली कार्ड लगेच त्यांच्याकडे"
+  en: "*Their consent, in 3 steps:*\n1. Turn your phone to them and let them scan this QR\n2. WhatsApp opens on their phone, with the message ready\n3. They tap Send; the Family Card reaches them at once"
+consent_done:
+  hi: "*{name} jud gaye* ({time} par consent).\n\nAb se Family Card aur updates unhe yahin se bhej sakte hain."
+  mr: "*{name} जोडले गेले* ({time} ला संमती).\n\nआता फॅमिली कार्ड आणि अपडेट्स त्यांना इथूनच पाठवू शकता."
+  en: "*{name} is connected* (consent at {time}).\n\nFrom now on, the Family Card and updates can go to them here."
+parivaar_sent:
+  hi: "*{name} ko Parivaar Card bhej diya.*\n\nAb unke phone par hai: unke ghar ke liye chuna product, poora kharcha, aur aage kya hoga.\n\n_Aage: neeche ke steps, ek-ek karke._"
+  mr: "*{name} यांना परिवार कार्ड पाठवलं.*\n\nआता त्यांच्या फोनवर आहे: त्यांच्या घरासाठी निवडलेलं प्रॉडक्ट, पूर्ण खर्च, आणि पुढे काय होईल.\n\n_पुढे: खालची पावलं, एकेक करून._"
+  en: "*Family Card sent to {name}.*\n\nThey now have it on their own phone: the product picked for their home, the full cost and what happens next.\n\n_Next: the steps below, one at a time._"
+parivaar_sent_presale:
+  hi: "*Sab kuch ab {name} ke paas hai.*\n\nParivaar ghar par saath baithkar suggestion, poora kharcha aur aaj ke offers dekh sakta hai.\n\n_Aage: ek follow-up task banaiye, taaki baat aage badhe._"
+  mr: "*सगळं आता {name} यांच्याकडे आहे.*\n\nकुटुंब घरी एकत्र बसून सूचना, पूर्ण खर्च आणि आजच्या ऑफर्स बघू शकतं.\n\n_पुढे: एक फॉलो-अप टास्क बनवा, म्हणजे बोलणं पुढे जाईल._"
+  en: "*Everything is with {name} now.*\n\nThe family can look at the suggestion, the full cost and today's offers at home, together.\n\n_Next: set a follow-up task, so the sale stays alive._"
+task_when_ask:
+  hi: "*{name} ko dobara call kab karein?*\n\nSamay chuniye; main tab yaad dila dunga."
+  mr: "*{name} यांना पुन्हा कॉल कधी करायचा?*\n\nवेळ निवडा; मी तेव्हा आठवण करून देईन."
+  en: "*When should you call {name} back?*\n\nPick a time; I'll remind you then."
+task_when_today_evening: {hi: "aaj shaam", mr: "आज संध्याकाळी", en: "this evening"}
+task_when_tomorrow: {hi: "kal", mr: "उद्या", en: "tomorrow"}
+task_when_weekend: {hi: "weekend par", mr: "वीकेंडला", en: "this weekend"}
+task_done:
+  hi: "*Follow-up taiyaar:* {name} ko {when} call.\n\nMain tab yaad dila dunga. Yeh aapki zimmedari."
+  mr: "*फॉलो-अप ठरला:* {name} यांना {when} कॉल.\n\nमी तेव्हा आठवण करेन. ही जबाबदारी तुमची."
+  en: "*Follow-up set:* call {name} {when}.\n\nI'll remind you then. This one is yours."
+task_done_ack:
+  hi: "*Ho gaya, shabash!*\n\nHar follow-up call customer ko wapas laata hai."
+  mr: "*झालं, छान!*\n\nप्रत्येक फॉलो-अप कॉल ग्राहकाला परत आणतो."
+  en: "*Done, well done!*\n\nEvery call back brings a customer closer to coming back."
+task_snoozed: {hi: "*Theek hai, kal.* Isi samay yaad dila dunga.", mr: "*ठीक आहे, उद्या.* याच वेळी आठवण करेन.", en: "*OK, tomorrow then.* I'll remind you at this time."}
+task_reminder: {hi: "*Yaad dilana: {title}*", mr: "*आठवण: {title}*", en: "*Reminder: {title}*"}
+task_reminder_say:
+  hi: "Call par garmjoshi se shuru kijiye:\n> Namaste, main Reliance Digital se {associate} bol raha hoon. Visit ke baad koi sawaal ho to bataiye, main madad karunga."
+  mr: "कॉलवर आपुलकीने सुरुवात करा:\n> नमस्कार, मी Reliance Digital मधून {associate} बोलतोय. भेटीनंतर काही प्रश्न असेल तर सांगा, मी मदत करेन."
+  en: "When you call, open warmly:\n> Namaste, this is {associate} from Reliance Digital. Any question since your visit? I'm happy to help."
+install_slot_ask:
+  hi: "*Installation kab karein?*\n\nCustomer ke saath slot chuniye. Installer ko site ki jaankari diye gaye jawabon se mil jayegi."
+  mr: "*इन्स्टॉलेशन कधी करायचं?*\n\nग्राहकासोबत वेळ निवडा. इन्स्टॉलरला साइटची माहिती दिलेल्या उत्तरांवरून मिळेल."
+  en: "*When should we install?*\n\nPick a slot with the customer. The installer gets the site details from the answers already given."
+install_job_head: {hi: "*Installation book ho gaya* · job #{id}", mr: "*इन्स्टॉलेशन बुक झालं* · जॉब #{id}", en: "*Installation booked* · job #{id}"}
+install_job_when: {hi: "• Kab: {slot}", mr: "• कधी: {slot}", en: "• When: {slot}"}
+install_job_missing:
+  hi: "_Jo baaki hai woh unke jaane se pehle pooch lijiye, taaki installer taiyaar aaye._"
+  mr: "_जे राहिलं ते ते जाण्याआधी विचारा, म्हणजे इन्स्टॉलर तयारीने येईल._"
+  en: "_Ask the missing ones before they leave, so the installer comes ready._"
+not_asked_yet: {hi: "abhi poocha nahi", mr: "अजून विचारलं नाही", en: "not asked yet"}
+installed_ok:
+  hi: "*{name} ka {product} lag gaya aur chal raha hai.*\n\nUnhone khud WhatsApp par confirm kiya."
+  mr: "*{name} यांचा {product} बसवला आणि चालू आहे.*\n\nत्यांनी स्वतः WhatsApp वर कळवलं."
+  en: "*{name}'s {product} is installed and working.*\n\nThey confirmed it themselves on WhatsApp."
+install_problem_assoc:
+  hi: "*{name} ka {product}: installation mein samasya.*\n\nManager ko bata diya hai. Abhi call kijiye aur boliye:\n> Takleef ke liye maafi. Maine manager ko bata diya hai, hum ise theek karenge."
+  mr: "*{name} यांचा {product}: इन्स्टॉलेशनमध्ये समस्या.*\n\nमॅनेजरला कळवलं आहे. आत्ता कॉल करा आणि बोला:\n> त्रासाबद्दल माफ करा. मी मॅनेजरला कळवलंय, आम्ही हे ठीक करू."
+  en: "*{name}'s {product}: installation problem.*\n\nThe manager has been told. Call them now and say:\n> Sorry for the trouble. I've told my manager, and we'll fix it."
+cust_wants_talk:
+  hi: "*{name} baat karna chahte hain.*\n\nAbhi call kijiye aur boliye:\n> Namaste, main Reliance Digital se bol raha hoon. Kya madad karun?"
+  mr: "*{name} बोलू इच्छितात.*\n\nआत्ता कॉल करा आणि बोला:\n> नमस्कार, मी Reliance Digital मधून बोलतोय. काय मदत करू?"
+  en: "*{name} wants to talk.*\n\nCall them now and say:\n> Namaste, calling from Reliance Digital. How can I help?"
+cust_msg_assoc:
+  hi: "*{name} ka message:*\n> {text}\n\n_Jawab dene ke liye 'r ' likh kar apna message bhejiye._"
+  mr: "*{name} यांचा मेसेज:*\n> {text}\n\n_उत्तर देण्यासाठी 'r ' लिहून तुमचा मेसेज पाठवा._"
+  en: "*Message from {name}:*\n> {text}\n\n_To reply, type 'r ' and then your message._"
+cust_change_assoc:
+  hi: "*{name} installation ka din badalna chahte hain.*\n\nCall kijiye aur saath mein naya din tay kijiye."
+  mr: "*{name} इन्स्टॉलेशनचा दिवस बदलू इच्छितात.*\n\nकॉल करा आणि मिळून नवीन दिवस ठरवा."
+  en: "*{name} wants to change the installation day.*\n\nCall them and fix a new day together."
+cust_change_rebook:
+  hi: "*{name} installation ka din badalna chahte hain.*\n\nUnse baat karke naya slot chuniye:"
+  mr: "*{name} इन्स्टॉलेशनचा दिवस बदलू इच्छितात.*\n\nत्यांच्याशी बोलून नवीन वेळ निवडा:"
+  en: "*{name} wants to change the installation day.*\n\nTalk to them and pick a new slot:"
+cust_visit_assoc:
+  hi: "*{name} visit book karna chahte hain.*\n\nKal 11:00 ka task bana diya hai: call karke samay tay kijiye."
+  mr: "*{name} भेट बुक करू इच्छितात.*\n\nउद्या 11:00 चा टास्क बनवला आहे: कॉल करून वेळ ठरवा."
+  en: "*{name} wants to book a visit.*\n\nA task is set for tomorrow, 11:00: call them to fix the time."
+
+# ---------------------------------------------------------------- the customer's own phone
+cust_welcome:
+  hi: "*नमस्ते!* मैं चाणक्य, Reliance Digital (टेस्ट) से, {associate} जी के साथ।\n\n{associate} जी आपका पूरा ब्योरा यहीं भेजेंगे।"
+  mr: "*नमस्कार!* मी चाणक्य, Reliance Digital (टेस्ट) मधून, {associate} यांच्यासोबत.\n\n{associate} तुमचा पूर्ण तपशील इथेच पाठवतील."
+  en: "*Namaste!* This is Chanakya from Reliance Digital (test), with {associate}.\n\n{associate} will send your full summary here."
+cust_photo_hint:
+  hi: "आप यहाँ अपने कमरे की फ़ोटो भी भेज सकते हैं, प्रॉडक्ट अपनी जगह में देखने के लिए।"
+  mr: "तुम्ही इथे खोलीचा फोटोही पाठवू शकता, प्रॉडक्ट तुमच्या जागेत बघण्यासाठी."
+  en: "You can also send a photo of your room here, to see the product in your own space."
+parivaar_caption:
+  hi: "*{name} जी, आपके घर के लिए चुना गया {product}.*\n\nकार्ड पर सब एक जगह है: क्यों सही है, पूरा खर्च और आगे क्या होगा।\n\nकोई सवाल? यहीं लिखिए, या नीचे टैप कीजिए।"
+  mr: "*{name} जी, तुमच्या घरासाठी निवडलेला {product}.*\n\nकार्डवर सगळं एकाच ठिकाणी: का योग्य आहे, पूर्ण खर्च आणि पुढे काय होईल.\n\nकाही प्रश्न? इथेच लिहा, किंवा खाली टॅप करा."
+  en: "*{name} ji, here is your {product}, picked for your home.*\n\nThe card has everything in one place: why it fits, the full cost and what happens next.\n\nAny question? Just write here, or tap below."
+parivaar_caption_noname:
+  hi: "*आपके घर के लिए चुना गया {product}.*\n\nकार्ड पर सब एक जगह है: क्यों सही है, पूरा खर्च और आगे क्या होगा।\n\nकोई सवाल? यहीं लिखिए, या नीचे टैप कीजिए।"
+  mr: "*तुमच्या घरासाठी निवडलेला {product}.*\n\nकार्डवर सगळं एकाच ठिकाणी: का योग्य आहे, पूर्ण खर्च आणि पुढे काय होईल.\n\nकाही प्रश्न? इथेच लिहा, किंवा खाली टॅप करा."
+  en: "*Here is your {product}, picked for your home.*\n\nThe card has everything in one place: why it fits, the full cost and what happens next.\n\nAny question? Just write here, or tap below."
+cust_install_booked:
+  hi: "*आपका इंस्टॉलेशन बुक हो गया:* {slot}।\n\nजगह खाली रखें और पास में सॉकेट तैयार रखें। कोई सवाल हो तो यहीं लिखिए।"
+  mr: "*तुमचं इन्स्टॉलेशन बुक झालं:* {slot}.\n\nजागा मोकळी ठेवा आणि जवळ सॉकेट तयार ठेवा. काही प्रश्न असल्यास इथेच लिहा."
+  en: "*Your installation is booked:* {slot}.\n\nPlease keep the spot clear and a power socket close by. Any question? Just write here."
+cust_install_d1:
+  hi: "*आपका इंस्टॉलेशन कल, {slot} है।*\n\nजल्दी हो जाए, इसके लिए:\n• जगह खाली रखें\n• पास में सॉकेट तैयार रखें\n\nनीचे टैप करके पक्का करें, या दिन बदलें।"
+  mr: "*तुमचं इन्स्टॉलेशन उद्या, {slot} आहे.*\n\nलवकर व्हावं म्हणून:\n• जागा मोकळी ठेवा\n• जवळ सॉकेट तयार ठेवा\n\nखाली टॅप करून निश्चित करा, किंवा दिवस बदला."
+  en: "*Your installation is tomorrow, {slot}.*\n\nTo make it quick:\n• Keep the spot clear\n• Keep a power socket ready nearby\n\nTap below to confirm, or to change the day."
+cust_install_check:
+  hi: "*आपका {product} लग गया और ठीक चल रहा है?*\n\nनीचे टैप कीजिए। कुछ ठीक न हो तो बताइए, स्टोर आपको कॉल करेगा।"
+  mr: "*तुमचा {product} बसवला आणि नीट चालू आहे?*\n\nखाली टॅप करा. काही बरोबर नसेल तर सांगा, स्टोअर तुम्हाला कॉल करेल."
+  en: "*Is your {product} installed and working well?*\n\nTap below. If anything isn't right, tell us and the store will call you."
+cust_working_ack:
+  hi: "*बहुत बढ़िया, आनंद लीजिए!*\n\nआगे कोई भी सवाल हो, चलाने के बारे में या कुछ और, बस यहीं लिखिए।"
+  mr: "*छान, आनंद घ्या!*\n\nपुढे कोणताही प्रश्न असला, वापराबद्दल किंवा इतर, फक्त इथे लिहा."
+  en: "*Wonderful, enjoy it!*\n\nAny question later, about using it or anything else, just write here."
+cust_d7:
+  hi: "*सब ठीक चल रहा है?*\n\nचलाने के बारे में कोई भी सवाल हो तो यहीं लिखिए; हमें मदद करके ख़ुशी होगी।"
+  mr: "*सगळं नीट चालू आहे?*\n\nवापराबद्दल कोणताही प्रश्न असेल तर इथे लिहा; मदत करायला आनंद होईल."
+  en: "*How is everything working?*\n\nAny question about using it, just write here; we're happy to help."
+cust_ready_ack: {hi: "*धन्यवाद!* कल इंस्टॉलर आपसे मिलेंगे।", mr: "*धन्यवाद!* उद्या इन्स्टॉलर तुम्हाला भेटतील.", en: "*Thank you!* The installer will see you tomorrow."}
+cust_change_ack: {hi: "*कोई बात नहीं।* हम कॉल करके आपकी सुविधा का नया दिन तय करेंगे।", mr: "*काही हरकत नाही.* आम्ही कॉल करून तुमच्या सोयीचा नवीन दिवस ठरवू.", en: "*No problem.* We'll call you to fix a new day that suits you."}
+cust_problem_ack: {hi: "*माफ़ कीजिए।* हम तुरंत देख रहे हैं: {associate} जी जल्द आपसे बात करेंगे।", mr: "*माफ करा.* आम्ही लगेच पाहतोय: {associate} लवकरच तुमच्याशी बोलतील.", en: "*Sorry about that.* We're on it: {associate} will call you shortly."}
+cust_talk_ack: {hi: "*ज़रूर।* वे जल्द आपसे बात करेंगे।", mr: "*नक्की.* ते लवकरच तुमच्याशी बोलतील.", en: "*Sure.* They'll talk to you shortly."}
+cust_visit_ack: {hi: "*ज़रूर।* कल सुबह आपको कॉल करके विज़िट का समय तय करेंगे।", mr: "*नक्की.* उद्या सकाळी कॉल करून भेटीची वेळ ठरवू.", en: "*Sure.* We'll call you tomorrow morning to fix the visit."}
+
+# ---------------------------------------------------------------- Seekh: the end of a customer, the score
+review_ask:
+  hi: "*{name} ke saath kya hua?*\n\nAapke jawab se score aur agla kadam tay hoga."
+  mr: "*{name} यांच्यासोबत काय झालं?*\n\nतुमच्या उत्तरावरून स्कोअर आणि पुढचं पाऊल ठरेल."
+  en: "*How did it end with {name}?*\n\nYour answer sets the score and the next step."
+price_first_ask:
+  hi: "*Daam ki baat pehle kisne ki?*\n\nIsse aapke coaching tips bante hain; sach bataiye."
+  mr: "*किंमत आधी कोणी काढली?*\n\nयावरून तुमच्या कोचिंग टिप्स ठरतात; खरं सांगा."
+  en: "*Who mentioned the price first?*\n\nIt shapes your coaching tips; answer honestly."
+lost_reason_ask:
+  hi: "*Unhone kyun nahi liya?*\n\nVoice note ya text mein bataiye, ho sake to unke shabdon mein. Isse follow-up aur kal ke tips behtar honge."
+  mr: "*त्यांनी का घेतलं नाही?*\n\nव्हॉइस नोट किंवा टेक्स्टमध्ये सांगा, जमलं तर त्यांच्या शब्दांत. फॉलो-अप आणि उद्याच्या टिप्ससाठी उपयोगी."
+  en: "*Why didn't they buy?*\n\nSay it in a voice note or type it, in their words if you can. It helps the follow-up and tomorrow's tips."
+score_guide: {hi: "*{score}/14 — Guide level!*", mr: "*{score}/14 — गाइड लेव्हल!*", en: "*{score}/14 — Guide level!*"}
+score_plain: {hi: "*{score}/14 — achha kaam.*", mr: "*{score}/14 — छान काम.*", en: "*{score}/14 — good work.*"}
+review_best: {hi: "*Aaj sabse achha:* {text}", mr: "*आज सर्वोत्तम:* {text}", en: "*Best today:* {text}"}
+review_next: {hi: "*Agli baar:* {text}", mr: "*पुढच्या वेळी:* {text}", en: "*Next time:* {text}"}
+score_history:
+  hi: "*Aapke pichhle score* (har ek 14 mein se):\n{totals}\n\n_Guide level 11 aur usse upar._"
+  mr: "*तुमचे मागचे स्कोअर* (प्रत्येकी 14 पैकी):\n{totals}\n\n_गाइड लेव्हल 11 आणि त्यावर._"
+  en: "*Your recent scores* (each out of 14):\n{totals}\n\n_Guide level is 11 and above._"
+wins_none:
+  hi: "*Din abhi shuru hua hai.*\n\nAaj ka pehla Parivaar Card bas ek customer door hai."
+  mr: "*दिवस आत्ताच सुरू झालाय.*\n\nआजचं पहिलं परिवार कार्ड फक्त एका ग्राहकावर आहे."
+  en: "*The day has just started.*\n\nYour first Family Card of the day is one customer away."
+wins_cards_one: {hi: "1 Parivaar Card", mr: "1 परिवार कार्ड", en: "1 Family Card"}
+wins_sales_one: {hi: "1 sale", mr: "1 विक्री", en: "1 sale"}
+wins_answered_one: {hi: "1 jawab", mr: "1 उत्तर", en: "1 answered"}
+
+# ---------------------------------------------------------------- everywhere: help, menu, status, the fallback
+help_body:
+  hi: "*Chanakya kaise madad karta hai*\n\n• *Voice note*: customer ne jo bataya woh boliye; main agli line dunga\n• *Photo*: shelf ka label (is ghar ke fayde) ya unka kamra (product unki deewar par)\n• *menu*: yeh list, kabhi bhi\n\nNeeche chuniye:"
+  mr: "*चाणक्य कशी मदत करतो*\n\n• *व्हॉइस नोट*: ग्राहकाने जे सांगितलं ते सांगा; मी पुढची ओळ देईन\n• *फोटो*: शेल्फवरचं लेबल (या घरासाठी फायदे) किंवा त्यांची खोली (प्रॉडक्ट त्यांच्या भिंतीवर)\n• *menu*: ही यादी, कधीही\n\nखाली निवडा:"
+  en: "*How Chanakya helps*\n\n• *Voice note*: say what the customer told you; I'll give the next line\n• *Photo*: a shelf label (benefits for this home) or their room (the product on their wall)\n• *menu*: this list, any time\n\nPick below:"
+menu_clang_d: {hi: "Abhi: {language}. Bolo lines isi mein aati hain", mr: "आत्ता: {language}. बोला ओळी याच भाषेत येतात", en: "Now: {language}. The lines to say come in this language"}
+menu_status_d: {hi: "Customer kahan tak pahunche, Home Card ke saath", mr: "ग्राहक कुठपर्यंत आले, होम कार्डसह", en: "Where this customer stands, with the Home Card"}
+menu_catalog_d: {hi: "Aaj ke models, specs aur offers, data se", mr: "आजचे मॉडेल, स्पेक्स आणि ऑफर्स, डेटामधून", en: "Today's models, specs and offers, from the data"}
+menu_lang_d: {hi: "In messages ki aapki apni bhasha", mr: "या मेसेजची तुमची स्वतःची भाषा", en: "Your own language for these messages"}
+fallback_body:
+  hi: "*Yeh samajh nahi aaya.*\n\nDobara voice note mein boliye, ya neeche se chuniye."
+  mr: "*हे समजलं नाही.*\n\nपुन्हा व्हॉइस नोटमध्ये सांगा, किंवा खालून निवडा."
+  en: "*I didn't catch that one.*\n\nSay it again as a voice note, or pick one below."
+status_none:
+  hi: "*Abhi koi customer khula nahi hai.*\n\nKoi aaye to 'Naya customer' dabaiye, ya seedha voice note bhejiye."
+  mr: "*सध्या कोणताही ग्राहक उघडा नाही.*\n\nकोणी आलं की 'नवीन ग्राहक' दाबा, किंवा थेट व्हॉइस नोट पाठवा."
+  en: "*No customer open right now.*\n\nWhen someone walks in, tap New customer, or just send a voice note."
+status_head: {hi: "*{who}: abhi kahan tak pahunche*", mr: "*{who}: आत्ता कुठपर्यंत आले*", en: "*Where {who} stands*"}
+status_tail: {hi: "_Unhone jo bataya, woh Home Card par hai._", mr: "_त्यांनी जे सांगितलं ते होम कार्डवर आहे._", en: "_What they told you is on the Home Card._"}
+resume_body:
+  hi: "*Aage kya karein?*\n\nCustomer abhi jahan hain, us hisaab se agla kadam chuniye."
+  mr: "*पुढे काय?*\n\nग्राहक आत्ता जिथे आहेत त्याप्रमाणे पुढचं पाऊल निवडा."
+  en: "*What next?*\n\nPick the step that fits where they are now."
+benefits_done:
+  hi: "*Is ghar ke zaroori fayde ho gaye.*\n\nAb unhe options dikhayein?"
+  mr: "*या घरासाठी महत्त्वाचे फायदे सांगून झाले.*\n\nआता त्यांना पर्याय दाखवायचे?"
+  en: "*That covers the benefits that matter for this home.*\n\nShow them the options next?"
+compare_send:
+  hi: "*Doosra label bhejiye.*\n\nDoosre model ke shelf label ki saaf photo, lagbhag 20 cm se, bina flash."
+  mr: "*दुसरं लेबल पाठवा.*\n\nदुसऱ्या मॉडेलच्या शेल्फ लेबलचा स्पष्ट फोटो, सुमारे 20 cm वरून, फ्लॅशशिवाय."
+  en: "*Send the second label.*\n\nA clear photo of the other model's shelf label, from about 20 cm, without flash."
+label_send:
+  hi: "*Label ki photo bhejiye.*\n\nShelf label ki saaf photo, lagbhag 20 cm se, bina flash. Main is ghar ke fayde bataunga."
+  mr: "*लेबलचा फोटो पाठवा.*\n\nशेल्फ लेबलचा स्पष्ट फोटो, सुमारे 20 cm वरून, फ्लॅशशिवाय. मी या घरासाठी फायदे सांगेन."
+  en: "*Send a photo of the label.*\n\nA clear photo of the shelf label, from about 20 cm, without flash. I'll give you the benefits for this home."
+image_other:
+  hi: "*Yeh label hai ya unka kamra?*\n\nFayde ke liye shelf label bhejiye, ya product unki jagah mein dekhne ke liye kamre ki photo."
+  mr: "*हे लेबल आहे की त्यांची खोली?*\n\nफायद्यांसाठी शेल्फ लेबल पाठवा, किंवा प्रॉडक्ट त्यांच्या जागेत बघण्यासाठी खोलीचा फोटो."
+  en: "*Is this a label or their room?*\n\nSend a shelf label for the benefits, or a room photo to see the product in their space."
+
+# ---------------------------------------------------------------- the manager and the expert
+manager_help:
+  hi: "*Aapka store, abhi*\n\n• *Floor*: kaun kis customer ke saath, kis step par\n• *Digest*: aaj ke score aur coaching kahan\n• *Approvals*: discount ki maang baaki\n\nNeeche chuniye, ya voice note mein poochiye."
+  mr: "*तुमचं स्टोअर, आत्ता*\n\n• *Floor*: कोण कोणत्या ग्राहकासोबत, कोणत्या पायरीवर\n• *Digest*: आजचे स्कोअर आणि कोचिंग कुठे\n• *मंजुरी*: सवलतीच्या मागण्या बाकी\n\nखाली निवडा, किंवा व्हॉइस नोटमध्ये विचारा."
+  en: "*Your store, right now*\n\n• *Floor*: who is with which customer, at which step\n• *Digest*: today's scores and where to coach\n• *Approvals*: discount requests waiting\n\nPick below, or ask by voice note."
+floor_now:
+  hi: "*Floor abhi*\n• Customer: {a}\n• Demo baaki: {d}\n• Expert sawaal khule: {e}"
+  mr: "*फ्लोअर आत्ता*\n• ग्राहक: {a}\n• डेमो बाकी: {d}\n• एक्सपर्ट प्रश्न उघडे: {e}"
+  en: "*Floor right now*\n• Customers: {a}\n• Demos pending: {d}\n• Expert questions open: {e}"
+floor_today:
+  hi: "*Aaj*\n• Baat-cheet: {s}\n• Guide level: {n} mein se {g}\n• Median score: {m}/14"
+  mr: "*आज*\n• संवाद: {s}\n• गाइड लेव्हल: {n} पैकी {g}\n• मीडियन स्कोअर: {m}/14"
+  en: "*Today*\n• Conversations: {s}\n• Guide level: {g} of {n}\n• Median score: {m}/14"
+floor_follow: {hi: "• Follow-up baaki: {t}\n• Install risk: {r}", mr: "• फॉलो-अप बाकी: {t}\n• इन्स्टॉल धोका: {r}", en: "• Follow-ups due: {t}\n• Installs at risk: {r}"}
+digest_gap:
+  hi: "*{name}: aaj {step} sabse kam.*\n\nUnhe iski 45 second ki clip bhejein?"
+  mr: "*{name}: आज {step} सर्वात कमी.*\n\nत्यांना याची 45 सेकंदांची क्लिप पाठवू?"
+  en: "*{name}: {step} is the lowest step today.*\n\nSend them the 45-second clip for it?"
+team_body:
+  hi: "*Aaj ki team*\n\nHar associate ki baat-cheet aur median score. Kisi par tap karke unki voice notes dekhiye."
+  mr: "*आजची टीम*\n\nप्रत्येकाचे संवाद आणि मीडियन स्कोअर. कोणावरही टॅप करून त्यांच्या व्हॉइस नोट्स बघा."
+  en: "*Today's team*\n\nEach associate's conversations and median score. Tap one to see their voice notes."
+team_row: {hi: "Baat-cheet: {s} · median score {m}", mr: "संवाद: {s} · मीडियन स्कोअर {m}", en: "Conversations: {s} · median score {m}"}
+approval_for_manager:
+  hi: "*Approval chahiye:* {name} ({code})\n\nCustomer discount maang rahe hain. Sirf data ke offers de sakte hain."
+  mr: "*मंजुरी हवी:* {name} ({code})\n\nग्राहक सूट मागत आहेत. फक्त डेटामधले ऑफर देता येतील."
+  en: "*Approval needed:* {name} ({code})\n\nThe customer wants a discount. Only offers in the data can be given."
+approval_sent:
+  hi: "*Manager ko bhej diya.*\n\nTab tak customer ko data ke offers dikhaiye."
+  mr: "*मॅनेजरला पाठवलं.*\n\nतोपर्यंत ग्राहकाला डेटामधले ऑफर दाखवा."
+  en: "*Sent to the manager.*\n\nMeanwhile, show the customer the offers in the data."
+expert_question: {hi: "*{associate} ka sawaal* ({cat}, {code}):\n> {question}", mr: "*{associate} यांचा प्रश्न* ({cat}, {code}):\n> {question}", en: "*Question from {associate}* ({cat}, {code}):\n> {question}"}
+expert_answer_prompt:
+  hi: "_Jawab text ya voice note mein bhejiye; seedha associate tak jayega._"
+  mr: "_उत्तर टेक्स्ट किंवा व्हॉइस नोटमध्ये पाठवा; थेट असोसिएटकडे जाईल._"
+  en: "_Answer as text or a voice note; it goes straight to the associate._"

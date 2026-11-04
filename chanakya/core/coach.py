@@ -22,6 +22,8 @@ def _one_line(s: str) -> str:
 #   *Kyun*: the reason, in a full sentence
 #   • each further fact on its own bullet
 #
+#   *Karo*: what to do with the customer right now (user, 5 Nov 2026: engaged customer presence)
+#
 #   _C1 · TV · Ghar 2/4 · …_   (the status, quiet) — or the copilot tip, which replaces it
 def bolo_block(ctx: SkillContext, say: str, lang: str | None = None) -> str:
     return f'{ctx.t("label_bolo", lang or ctx.lang)}:\n> {_one_line(say).strip(chr(34))}'
@@ -32,6 +34,25 @@ def kyun_block(ctx: SkillContext, why: str, lang: str | None = None) -> str:
     if not parts:
         return f'{ctx.t("label_kyun", lang or ctx.lang)}:'
     return "\n".join([f'{ctx.t("label_kyun", lang or ctx.lang)}: {parts[0]}'] + [f"• {p}" for p in parts[1:]])
+
+
+def do_block(ctx: SkillContext, key: str | None, lang: str | None = None) -> str:
+    """The Karo line for this moment: what to do with the customer while saying it (look at them, let them finish,
+    turn the phone to them, hand over the remote, pause after the price). A moment with variants (key_1, key_2, …)
+    takes the next one each time, so the same line never comes twice in a row. '' when the moment has no line."""
+    from chanakya.i18n import lang as i18n
+
+    if not key:
+        return ""
+    variants = [f"{key}_{i}" for i in range(1, 6) if i18n.has(f"{key}_{i}")]
+    if variants:
+        x = ctx.session.extra if ctx.session else {}
+        n = int(x.get("do_n", 0))
+        x["do_n"] = n + 1
+        key = variants[n % len(variants)]
+    elif not i18n.has(key):
+        return ""
+    return f'{ctx.t("label_do", lang or ctx.lang)}: {_one_line(ctx.t(key, lang))}'
 
 
 def status_block(text: str, tip: bool = False) -> str:
@@ -48,8 +69,13 @@ def coach_reply(
     card: Card | None = None,
     status: bool = True,
     footer: str | None = None,
+    do: str | None = None,
 ) -> OutMessage:
+    """`do`: the key of this moment's Karo line (see do_block)."""
     body = bolo_block(ctx, say) + "\n\n" + kyun_block(ctx, why)
+    karo = do_block(ctx, do)
+    if karo:
+        body += "\n\n" + karo
     st, is_tip = (status_line(ctx) if status else ""), False
     if status:  # the copilot: one quiet line, only when a fact calls for it (the status is one tap away)
         from chanakya.skills.copilot import tip

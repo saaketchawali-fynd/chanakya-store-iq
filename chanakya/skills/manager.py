@@ -40,7 +40,7 @@ async def floor(ctx: SkillContext) -> Reply:
         if (j.site_needs or {}).get("_risks") or j.status == "problem"
     ]
     n = ctx.reg.num
-    body = "\n".join(
+    body = "\n\n".join(  # sections: right now, then today (with the follow-ups and install risks)
         [
             ctx.t(
                 "floor_now",
@@ -54,8 +54,9 @@ async def floor(ctx: SkillContext) -> Reply:
                 g=n(g, "calc:floor"),
                 n=n(len(totals), "calc:floor"),
                 m=n(med, "calc:floor"),
-            ),
-            ctx.t("floor_follow", t=n(len(tasks), "calc:floor"), r=n(len(risk), "calc:floor")),
+            )
+            + "\n"
+            + ctx.t("floor_follow", t=n(len(tasks), "calc:floor"), r=n(len(risk), "calc:floor")),
         ]
     )
     ctx.reg.static("14")

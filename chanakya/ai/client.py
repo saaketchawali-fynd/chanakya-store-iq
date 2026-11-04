@@ -239,7 +239,7 @@ class AIClient:
 
             part = types.Part.from_bytes(data=audio, mime_type=_audio_mime(mime)) if audio is not None else (text or "")
             names = {"hi": "Hindi (Roman script, Hinglish)", "mr": "Marathi (Devanagari)", "en": "English"}
-            cust = {"hi": "Hindi (Devanagari)", "mr": "Marathi (Devanagari)", "en": "English"}
+            cust = {"hi": "Hindi (Roman script, Hinglish)", "mr": "Marathi (Devanagari)", "en": "English"}
             try:
                 return await self.gemini.json(
                     [part, f"ASSOCIATE language: {names.get(assoc_lang)}. CUSTOMER language: {cust.get(cust_lang)}."],

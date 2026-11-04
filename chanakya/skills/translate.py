@@ -9,7 +9,7 @@ from chanakya.brain import packs as P
 from chanakya.brain.fit import fit
 from chanakya.channel.limits import truncate
 from chanakya.core import state
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
 from chanakya.core.contracts import Card, ListRow, ListSection, OutMessage, Reply
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
@@ -155,11 +155,17 @@ async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
                 allowed_numbers=ctx.reg.allowed(),
             )
         )
-    return await show_sku(ctx, sku, conf)
+    return await show_sku(ctx, sku, conf, scanned=True)
 
 
-async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0) -> Reply:
+async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0, scanned: bool = False) -> Reply:
+    """`scanned`: a photo of the shelf label (its price is printed there, so it is said at once); a product asked
+    about by voice or a button keeps the price for after the demo."""
     x = ctx.x
+    if scanned:
+        x["label_scanned"] = sku
+    elif x.get("label_scanned") != sku:
+        x.pop("label_scanned", None)
     prod = ctx.facts.product_sync(sku)
     home = ctx.session.home
     if prod and ctx.packs.get(prod.category) and (home.category is None or (home.category != prod.category and not home.slots)):
@@ -243,9 +249,11 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         cites = C.known_cites(ctx) or ([slot] if slot else [])
         if slot and not C.known_cites(ctx):
             ctx.asking.add(slot)
+        facts = card_facts(ctx, p, card)
         if not cites:
-            return ctx.reply(info_reply(ctx, say, btns, card=card))
-        return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+            return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + "\n".join(f"• {f}" for f in facts)
+                                        + "\n\n" + do_block(ctx, "do_benefit"), btns, card=card))
+        return ctx.reply(coach_reply(ctx, say, " · ".join([why, *facts]), cites, btns, card=card, do="do_benefit"))
     if nxt is None or len(said) >= 2:
         return await ignore_line(ctx, p)
     lang = ctx.clang
@@ -278,9 +286,25 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
             why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
             btns = [btns[0], btns[1], ctx.b("b_next_q", ctx.sid("go"))]
     cites = [c for c in cites_all if P.known(ctx.session.home, c)] or cites_all or C.known_cites(ctx)
+    facts = card_facts(ctx, p, card) if card is not None else []
     if not cites:
-        return ctx.reply(info_reply(ctx, say, btns, card=card))
-    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+        body = bolo_block(ctx, say) + ("\n\n" + "\n".join(f"• {f}" for f in facts) if facts else "")
+        return ctx.reply(info_reply(ctx, body + "\n\n" + do_block(ctx, "do_benefit"), btns, card=card))
+    return ctx.reply(coach_reply(ctx, say, " · ".join([why, *facts]), cites, btns, card=card, do="do_benefit"))
+
+
+def card_facts(ctx: SkillContext, p, card: Card) -> list[str]:
+    """What the product card does not show (it is the reference design, user 5 Nov 2026), said in the message: a
+    scanned label's shelf price and MRP saving, its live offer (or none), and the match for this home."""
+    d = card.data or {}
+    out = []
+    if d.get("price_str"):
+        out.append(ctx.t("fact_price", price=d["price_str"]) + (f", {d['mrp_str'].replace(' · ', ', ')}"
+                                                                if d.get("mrp_str") else ""))
+    out.append(ctx.t("fact_offer", offer=PV.offer_line(ctx, p, ctx.lang)["text"].replace(" · ", ", ")))
+    if d.get("fit_str"):
+        out.append(ctx.t("fact_fit", fit=d["fit_str"]))
+    return out
 
 
 async def made_for(ctx: SkillContext, p) -> OutMessage | None:
@@ -301,14 +325,15 @@ async def made_for(ctx: SkillContext, p) -> OutMessage | None:
     else:
         return None  # nothing proven for this home: no empty praise
     x["made_for_sku"] = p.sku
-    card = await product_card_en(ctx, p)
+    with ctx.as_lang("en"):
+        chip = ctx.t("pdp_picked")
+    card = await product_card_en(ctx, p, chip=chip, chip_kind="best")
     card.data["picked"] = True
-    card.data.pop("note", None)  # not read from a label here: their pick
     if not card.data.get("made"):
         return None
     ctx.ev("made_for_sent", sku=p.sku, lead=rid, points=len(card.data["made"]))
     msg = coach_reply(ctx, ctx.tc("bolo_made_for", line=say), ctx.t("kyun_made_for"), C.known_cites(ctx), [], card=card,
-                      status=False)
+                      status=False, do="do_made_for")
     msg.kind = "image"
     return msg
 
@@ -384,8 +409,8 @@ async def ignore_line(ctx: SkillContext, p, ms: list | None = None) -> Reply:
                 total=ctx.reg.num(total, f"stock:{p.category}:bucket_count"), spec=spec)
     cites = C.known_cites(ctx)
     if not cites:
-        return ctx.reply(info_reply(ctx, say, btns))
-    return ctx.reply(coach_reply(ctx, say, why, cites, btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + do_block(ctx, "do_ignore"), btns))
+    return ctx.reply(coach_reply(ctx, say, why, cites, btns, do="do_ignore"))
 
 
 def _badge(ctx: SkillContext, score: int, lang: str) -> tuple[str, str]:
@@ -409,38 +434,88 @@ async def pros_cons(ctx: SkillContext, p, lang: str) -> tuple[list[str], list[st
 
 def _price_ok(ctx: SkillContext, *skus: str) -> bool:
     """The price is said after the demo; a scanned label shows it at once (it is printed on the shelf tag)."""
-    return state.price_gate_open(ctx.session, ctx.pack) or ctx.x.get("label_sku") in skus
+    return state.price_gate_open(ctx.session, ctx.pack) or ctx.x.get("label_scanned") in skus
 
 
-async def product_card_en(ctx: SkillContext, p) -> Card:
-    """The product details card: one card in English for the customer and the associate (no copy)."""
+async def product_card_en(ctx: SkillContext, p, **chip) -> Card:
+    """The product page: one card in English for the customer and the associate (no copy)."""
     with ctx.as_lang("en"):
-        return await product_card(ctx, p)
+        return await product_card(ctx, p, **chip)
 
 
-async def product_card(ctx: SkillContext, p) -> Card:
-    """Label scan → the product, straight from the database; the fit for this home once enough is known."""
+async def product_card(ctx: SkillContext, p, chip: str | None = None, chip_label: str | None = None,
+                       chip_kind: str | None = None) -> Card:
+    """The product page (user, 5 Nov 2026: like an e-commerce product page), straight from the database: the brand
+    (its logo when the backend has one), the name, a subtitle of its own specs, the photo and more real photos; what
+    it means for THIS home first (once the home is understood: their needs and asks, each with the product's own
+    proof), then its other highlights; the key features as tiles; the offer, the price (after the demo or a label
+    scan), stock and warranty. `chip`: 'Best fit for your home' on an option (with its letter), 'Picked' once chosen;
+    a scanned label shows the fit badge instead."""
     lang = ctx.clang
     s = ctx.session
+    info = p.info or {}
     stock = C.stock_line(ctx, p, lang)
-    data = {"title": C.product_title(ctx, p, lang), "image": p.image, "key_specs": PV.key_specs(ctx, p, lang, 6),
-            "features": PV.features(ctx, p, lang, 4), "stock_line": stock, "offer_text": PV.offer_line(ctx, p, lang)["text"],
-            "price_str": ctx.reg.inr(p.price, p.price_source) if _price_ok(ctx, p.sku) else None}
+    off = PV.offer_line(ctx, p, lang)
+    specs = PV.key_specs(ctx, p, lang, 6)
+    feats = PV.features(ctx, p, lang, 5)
+    full = C.product_title(ctx, p, lang)
+    data = {"title": full if len(full) <= 28 else C.product_name(ctx, p),  # the backend's long names: the short one
+            "brand": ctx.reg.static(p.brand or ""), "image": p.image,
+            "brand_logo": info.get("brand_logo"), "subtitle": PV.subtitle(ctx, p, lang),
+            "gallery": [u for u in info.get("gallery") or [] if u and u != p.image][:3],
+            "key_specs": specs, "features": feats[:4], "stock_line": stock, "offer_text": off["text"],
+            "offer_none": off["none"],
+            "price_str": ctx.reg.inr(p.price, p.price_source) if _price_ok(ctx, p.sku) else None,
+            "chip": chip, "chip_label": chip_label, "chip_kind": chip_kind}
+    if not any(x.get("key") == "warranty" for x in specs):
+        data["warranty"] = PV.fmt_value(ctx, p, "warranty", lang)
     if data["price_str"] and p.mrp and p.mrp > p.price:  # the backend's MRP: what they save today
         pct = round((p.mrp - p.price) * 100 / p.mrp)
         data["mrp_str"] = ctx.t("pc_mrp", lang, mrp=ctx.reg.inr(p.mrp, p.price_source),
                                 pct=ctx.reg.num(pct, f"calc:mrp_saving:{p.sku}"))
-    mn = (p.info or {}).get("model_number")
-    if mn:
+    mn = info.get("model_number")
+    if mn and not chip:
         data["note"] = ctx.t("label_note", lang, model=ctx.reg.raw(mn, f"product:{p.sku}"))
+    also = [{"text": f, "icon": "sparkle"} for f in feats]
     if state.options_gate_open(s, ctx.pack) and p.category == ctx.pack.category:
         from chanakya.skills import fitview as FV
 
-        data["made"] = [x for x in FV.points(ctx, p, lang, 3) if isinstance(x, dict) and x.get("text")]  # for THIS home
-        pros, cons, score = await pros_cons(ctx, p, lang)
-        badge, kind = _badge(ctx, score, lang)
-        data.update(pros=pros, cons=cons, badge=badge, badge_kind=kind,
-                    fit_str=ctx.reg.num(score, f"calc:fit:{p.sku}") + "%")
+        pts = [x for x in FV.points(ctx, p, lang, 4) if isinstance(x, dict) and x.get("text")]  # for THIS home
+        needs = [dict(x, tag=ctx.t("pdp_asked", lang) if x.get("kind") == "asked" else None)
+                 for x in pts if x.get("kind") in ("need", "asked")]
+        general = [x for x in pts if x.get("kind") == "general"]
+        said = {x["text"].lower() for x in needs + general}
+        also = general + [x for x in also if x["text"].lower() not in said]  # then its own words, not said twice
+        data.update(needs=needs[:4], made=needs[:3] or pts[:3])
+        if not chip:  # a scanned label: the fit for this home, and what to keep in mind
+            pros, cons, score = await pros_cons(ctx, p, lang)
+            badge, kind = _badge(ctx, score, lang)
+            data.update(pros=pros, cons=cons, badge=badge, badge_kind=kind,
+                        fit_str=ctx.reg.num(score, f"calc:fit:{p.sku}") + "%")
+    tiles = [str(x.get("value") or "").lower() for x in specs if len(str(x.get("value") or "")) >= 3]
+    also = [x for x in also if not any(v in x["text"].lower() for v in tiles)]  # not the tiles said again
+    data["also"] = also[: 5 - min(len(data.get("needs") or []), 4)]
+    # the card (the reference design): four rows, their needs first, each with the product's own proof; three tiles,
+    # each one of its own photos (or a close view of its one photo) with its own specs
+    rows, proofs = [], []
+    for x in (data.get("needs") or []) + data["also"]:
+        proof = x.get("proof")
+        if any(pf in x["text"].lower() for pf in proofs):
+            continue  # its words are an earlier row's proof ('YouTube, Netflix apps' after '… (YouTube, Netflix)')
+        if proof:
+            proofs.append(str(proof).lower())
+        nb = str(proof).replace(" ", "\u00a0") if proof else ""  # the proof stays on one line ('120 Hz')
+        text = f"{x['text']} ({nb})" if proof and str(proof).lower() not in x["text"].lower() else x["text"]
+        plain = text.replace("\u00a0", " ").lower()
+        if any(plain in r["text"].replace("\u00a0", " ").lower() for r in rows):
+            continue  # an earlier row already says it ('20 W speakers' as its proof)
+        rows.append({"text": text, "icon": x.get("icon") or "sparkle"})
+    data["rows"] = rows[:4]
+    shots = data["gallery"]
+    tall = p.category in ("fridge", "wm")  # one photo only: close views of it, like the reference's details
+    crops = ["zoom-top", None, "zoom-bottom"] if tall else ["zoom-corner", None, "zoom-base"]
+    data["tiles"] = [dict(tl, image=shots[i] if i < len(shots) else p.image, crop=None if i < len(shots) else crops[i])
+                     for i, tl in enumerate(PV.tiles(ctx, p, lang))]
     return Card(template="product", lang=lang, data=data)  # type: ignore[arg-type]
 
 

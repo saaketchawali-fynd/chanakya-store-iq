@@ -90,6 +90,12 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         ctx.x["pending_cost"] = True
         return ctx.reply(C.question_reply(ctx, site))
     ctx.x.pop("pending_cost", None)
+    from chanakya.skills import addons
+
+    if addons.decided(ctx) is None and not resend:  # what goes well with it, before the full cost
+        r = await addons.offer(ctx)
+        if r is not None:
+            return r
     sheet = await _sheet(ctx, "en")  # one bill, in English, for the customer and the associate
     s.cost_snapshot = sheet.model_dump(mode="json")
     state.advance(s, Step.COMPLETE)
@@ -119,14 +125,15 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
         ctx.b("b_show_customer", ctx.sid("cost_show")),
     ]
     say = ctx.pick(ctx.packs.common_line("complete_line"), ctx.clang)
-    msg = coach_reply(ctx, say, why, cites, btns, card=card)
+    msg = coach_reply(ctx, say, why, cites, btns, card=card, do="do_kharcha")
     if ctx.x.pop("removed_note", None):
         msg.footer = ctx.x.pop("removed_footer", None) or msg.footer
     return ctx.reply(msg)
 
 
 async def remove_menu(ctx: SkillContext) -> Reply:
-    """'Remove an item': the suggested / optional lines, one tap each; required charges cannot be removed."""
+    """'Remove an item': the suggested / optional lines and what they added, one tap each; required charges cannot be
+    removed."""
     from chanakya.channel.limits import truncate, truncate_title
     from chanakya.core.contracts import ListRow, ListSection
 
@@ -136,8 +143,10 @@ async def remove_menu(ctx: SkillContext) -> Reply:
     sheet = hisaab.CostSheet.model_validate(s.cost_snapshot)
     rows = []
     for ln in sheet.lines:
-        if ln.kind in ("sujhav", "optional"):
+        if ln.kind in ("sujhav", "optional", "addon"):
             ctx.reg.raw(ln.amount_str, f"snapshot:{ln.code}")
+            if ln.reason:
+                ctx.reg.raw(ln.reason, f"snapshot:{ln.code}:reason")
             rows.append(ListRow(id=ctx.sid("cost_drop", ln.code), title=truncate(ln.title, 24),
                                 description=truncate(f"{ln.amount_str}" + (f" · {ln.reason}" if ln.reason else ""), 72)))
     if sheet.optional_count and not ctx.x.get("optional_on"):
@@ -191,7 +200,14 @@ async def _sheet(ctx: SkillContext, lang: str) -> hisaab.CostSheet:
         include_suggestions=not ctx.x.get("suggestions_off"),
         include_optional=bool(ctx.x.get("optional_on")),
         exclude_codes=tuple(ctx.x.get("dropped_codes") or ()),
+        addons=_addons(ctx),
     )
+
+
+def _addons(ctx: SkillContext) -> dict | None:
+    from chanakya.skills import addons
+
+    return addons.decided(ctx)
 
 
 def _card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
@@ -209,6 +225,8 @@ def kharcha_card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
     ]
     for ln in sheet.lines:
         ctx.reg.raw(ln.title, f"line:{ln.code}")
+        if ln.reason:  # an add-on's reason carries its bundle discount, computed from the offer row
+            ctx.reg.raw(ln.reason, f"line:{ln.code}:reason")
     exch = (
         ctx.t("exchange_text", lang, low=sheet.exchange_range[0], high=sheet.exchange_range[1])
         if sheet.exchange_range
@@ -255,6 +273,8 @@ def kharcha_card(ctx: SkillContext, sheet: hisaab.CostSheet) -> Card:
             "customer_name": s.home.customer_name or "",
             "product_title": C.product_title(ctx, p, lang),
             "lines": lines,
+            "labels": ({"total_note": ctx.t("kh_total_note_addons", lang)}
+                       if any(ln.kind == "addon" for ln in sheet.lines) else None),
             "zaroori_total_str": sheet.zaroori_total_str,
             "with_suggestions_total_str": with_sug,
             "exchange_text": exch,

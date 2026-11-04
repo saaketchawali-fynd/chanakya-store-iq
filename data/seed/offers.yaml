@@ -1,72 +1,72 @@
 # TEST DATA ONLY — offers (dates in 2026; update before the live test)
 - {id: OFF-HDFC-10, kind: bank, bank: HDFC, pct: 10, max_discount: 5000, min_amount: 30000, categories: [tv, ac, wm, fridge, laptop],
    stack_group: bank, valid_from: 2026-10-25, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "HDFC कार्ड पर 10% छूट", mr: "HDFC कार्डवर 10% सूट", en: "10% off on HDFC cards"}, test_data: true}
+   title: {hi: "HDFC card par 10% chhoot", mr: "HDFC कार्डवर 10% सूट", en: "10% off on HDFC cards"}, test_data: true}
 - {id: OFF-SBI-7, kind: bank, bank: SBI, pct: 7.5, max_discount: 4000, min_amount: 25000, categories: [tv, ac, wm, fridge],
    stack_group: bank, valid_from: 2026-10-25, valid_to: 2026-11-10, with_emi: true,
-   title: {hi: "SBI कार्ड पर 7.5% छूट", mr: "SBI कार्डवर 7.5% सूट", en: "7.5% off on SBI cards"}, test_data: true}
+   title: {hi: "SBI card par 7.5% chhoot", mr: "SBI कार्डवर 7.5% सूट", en: "7.5% off on SBI cards"}, test_data: true}
 - {id: OFF-EXCH-TV, kind: exchange_bonus, flat: 2000, min_amount: 0, categories: [tv], filter: {size_in_min: 55}, stack_group: exchange,
    valid_from: 2026-10-25, valid_to: 2026-11-12, requires: {slot: exchange_old, in: [yes_working, yes_dead]}, with_emi: true,
-   title: {hi: "एक्सचेंज पर ₹2,000 बोनस", mr: "एक्सचेंजवर ₹2,000 बोनस", en: "₹2,000 exchange bonus"}, test_data: true}
+   title: {hi: "Exchange par ₹2,000 bonus", mr: "एक्सचेंजवर ₹2,000 बोनस", en: "₹2,000 exchange bonus"}, test_data: true}
 - {id: OFF-BUNDLE-SB, kind: bundle, flat: 3000, categories: [soundbar], filter: {with_tv_panel_in: [QLED, OLED, MiniLED], with_tv_size_min: 55},
    stack_group: bundle, valid_from: 2026-10-25, valid_to: 2026-11-30, with_emi: true,
-   title: {hi: "TV के साथ साउंडबार पर ₹3,000 छूट", mr: "TV सोबत साउंडबारवर ₹3,000 सूट", en: "₹3,000 off a soundbar with the TV"}, test_data: true}
+   title: {hi: "TV ke saath soundbar par ₹3,000 chhoot", mr: "TV सोबत साउंडबारवर ₹3,000 सूट", en: "₹3,000 off a soundbar with the TV"}, test_data: true}
 - {id: OFF-ICICI-LAP, kind: cashback, bank: ICICI, flat: 2500, min_amount: 50000, categories: [laptop], stack_group: bank,
    valid_from: 2026-10-25, valid_to: 2026-11-20, with_emi: true,
-   title: {hi: "ICICI कार्ड पर ₹2,500 कैशबैक", mr: "ICICI कार्डवर ₹2,500 कॅशबॅक", en: "₹2,500 cashback on ICICI cards"}, test_data: true}
+   title: {hi: "ICICI card par ₹2,500 cashback", mr: "ICICI कार्डवर ₹2,500 कॅशबॅक", en: "₹2,500 cashback on ICICI cards"}, test_data: true}
 # --- added offers (TEST DATA): SKU / brand instant, festive through Diwali (8 Nov), more banks, one expired, one future
 - {id: OFF-ARK55Q-2K, kind: instant, flat: 2000, min_amount: 0, categories: [tv], filter: {skus: [TV-ARK-55-QL60]}, stack_group: instant,
    valid_from: 2026-10-28, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "Arka 55 inch QLED पर ₹2,000 की छूट", mr: "Arka 55 inch QLED वर ₹2,000 सूट", en: "₹2,000 off Arka 55-inch QLED"}, test_data: true}
+   title: {hi: "Arka 55 inch QLED par ₹2,000 ki chhoot", mr: "Arka 55 inch QLED वर ₹2,000 सूट", en: "₹2,000 off Arka 55-inch QLED"}, test_data: true}
 - {id: OFF-NOVEX-TV-10K, kind: instant, flat: 10000, min_amount: 0, categories: [tv], filter: {skus: [TV-NOV-48-OL120, TV-NOV-55-ML144, TV-NOV-65-OL120]}, stack_group: instant,
    valid_from: 2026-10-25, valid_to: 2026-11-08, with_emi: true,
-   title: {hi: "दिवाली: चुनिंदा Novex TV पर ₹10,000 की छूट", mr: "दिवाळी: निवडक Novex TV वर ₹10,000 सूट", en: "Diwali: ₹10,000 off select Novex TVs"}, test_data: true}
+   title: {hi: "Diwali: chuninda Novex TV par ₹10,000 ki chhoot", mr: "दिवाळी: निवडक Novex TV वर ₹10,000 सूट", en: "Diwali: ₹10,000 off select Novex TVs"}, test_data: true}
 - {id: OFF-MER15W-2500, kind: instant, flat: 2500, min_amount: 0, categories: [ac], filter: {skus: [AC-MER-15-5SW]}, stack_group: instant,
    valid_from: 2026-10-30, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "Meru 1.5T Wi-Fi AC पर ₹2,500 की छूट", mr: "Meru 1.5T Wi-Fi AC वर ₹2,500 सूट", en: "₹2,500 off Meru 1.5T Wi-Fi AC"}, test_data: true}
+   title: {hi: "Meru 1.5T Wi-Fi AC par ₹2,500 ki chhoot", mr: "Meru 1.5T Wi-Fi AC वर ₹2,500 सूट", en: "₹2,500 off Meru 1.5T Wi-Fi AC"}, test_data: true}
 - {id: OFF-NOV8FL-4K, kind: instant, flat: 4000, min_amount: 0, categories: [wm], filter: {skus: [WM-NOV-8-FL]}, stack_group: instant,
    valid_from: 2026-10-28, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "Novex 8 kg फ्रंट लोड पर ₹4,000 की छूट", mr: "Novex 8 kg फ्रंट लोडवर ₹4,000 सूट", en: "₹4,000 off Novex 8 kg front load"}, test_data: true}
+   title: {hi: "Novex 8 kg front load par ₹4,000 ki chhoot", mr: "Novex 8 kg फ्रंट लोडवर ₹4,000 सूट", en: "₹4,000 off Novex 8 kg front load"}, test_data: true}
 - {id: OFF-ARKGAMER-5K, kind: instant, flat: 5000, min_amount: 0, categories: [laptop], filter: {skus: [LP-ARK-H-16G]}, stack_group: instant,
    valid_from: 2026-10-28, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "Arka Gamer 15 पर ₹5,000 की छूट", mr: "Arka Gamer 15 वर ₹5,000 सूट", en: "₹5,000 off Arka Gamer 15"}, test_data: true}
+   title: {hi: "Arka Gamer 15 par ₹5,000 ki chhoot", mr: "Arka Gamer 15 वर ₹5,000 सूट", en: "₹5,000 off Arka Gamer 15"}, test_data: true}
 - {id: OFF-DIWALI-TV75, kind: instant, flat: 7500, min_amount: 0, categories: [tv], filter: {size_in_min: 75}, stack_group: instant,
    valid_from: 2026-10-25, valid_to: 2026-11-08, with_emi: true,
-   title: {hi: "दिवाली: 75 inch+ TV पर ₹7,500 की छूट", mr: "दिवाळी: 75 inch+ TV वर ₹7,500 सूट", en: "Diwali: ₹7,500 off 75-inch+ TVs"}, test_data: true}
+   title: {hi: "Diwali: 75 inch+ TV par ₹7,500 ki chhoot", mr: "दिवाळी: 75 inch+ TV वर ₹7,500 सूट", en: "Diwali: ₹7,500 off 75-inch+ TVs"}, test_data: true}
 - {id: OFF-ARKA-AC, kind: instant, flat: 2000, min_amount: 30000, categories: [ac], filter: {brands: [Arka]}, stack_group: instant,
    valid_from: 2026-10-25, valid_to: 2026-11-08, with_emi: true,
-   title: {hi: "दिवाली: Arka AC पर ₹2,000 की छूट", mr: "दिवाळी: Arka AC वर ₹2,000 सूट", en: "Diwali: ₹2,000 off Arka ACs"}, test_data: true}
+   title: {hi: "Diwali: Arka AC par ₹2,000 ki chhoot", mr: "दिवाळी: Arka AC वर ₹2,000 सूट", en: "Diwali: ₹2,000 off Arka ACs"}, test_data: true}
 - {id: OFF-MERU-WM, kind: instant, pct: 7.5, max_discount: 3000, min_amount: 30000, categories: [wm], filter: {brands: [Meru]}, stack_group: instant,
    valid_from: 2026-10-25, valid_to: 2026-11-08, with_emi: true,
-   title: {hi: "दिवाली: Meru वॉशिंग मशीन पर 7.5% छूट", mr: "दिवाळी: Meru वॉशिंग मशीनवर 7.5% सूट", en: "Diwali: 7.5% off Meru washing machines"}, test_data: true}
+   title: {hi: "Diwali: Meru washing machine par 7.5% chhoot", mr: "दिवाळी: Meru वॉशिंग मशीनवर 7.5% सूट", en: "Diwali: 7.5% off Meru washing machines"}, test_data: true}
 - {id: OFF-NOVEX-LAP, kind: instant, pct: 5, max_discount: 6000, min_amount: 0, categories: [laptop], filter: {brands: [Novex]}, stack_group: instant,
    valid_from: 2026-11-01, valid_to: 2026-11-20, with_emi: true,
-   title: {hi: "Novex लैपटॉप पर 5% छूट", mr: "Novex लॅपटॉपवर 5% सूट", en: "5% off Novex laptops"}, test_data: true}
+   title: {hi: "Novex laptop par 5% chhoot", mr: "Novex लॅपटॉपवर 5% सूट", en: "5% off Novex laptops"}, test_data: true}
 - {id: OFF-ARKA-LAP, kind: instant, flat: 2000, min_amount: 30000, categories: [laptop], filter: {brands: [Arka]}, stack_group: instant,
    valid_from: 2026-10-30, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "Arka लैपटॉप पर ₹2,000 की छूट", mr: "Arka लॅपटॉपवर ₹2,000 सूट", en: "₹2,000 off Arka laptops"}, test_data: true}
+   title: {hi: "Arka laptop par ₹2,000 ki chhoot", mr: "Arka लॅपटॉपवर ₹2,000 सूट", en: "₹2,000 off Arka laptops"}, test_data: true}
 - {id: OFF-ICICI-7, kind: bank, bank: ICICI, pct: 7.5, max_discount: 4000, min_amount: 25000, categories: [ac, wm, fridge], stack_group: bank,
    valid_from: 2026-10-25, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "ICICI कार्ड पर 7.5% छूट", mr: "ICICI कार्डवर 7.5% सूट", en: "7.5% off on ICICI cards"}, test_data: true}
+   title: {hi: "ICICI card par 7.5% chhoot", mr: "ICICI कार्डवर 7.5% सूट", en: "7.5% off on ICICI cards"}, test_data: true}
 - {id: OFF-AXIS-10, kind: bank, bank: Axis, pct: 10, max_discount: 4000, min_amount: 20000, categories: [ac, wm, laptop], stack_group: bank,
    valid_from: 2026-11-01, valid_to: 2026-11-12, with_emi: true,
-   title: {hi: "Axis कार्ड पर 10% छूट", mr: "Axis कार्डवर 10% सूट", en: "10% off on Axis cards"}, test_data: true}
+   title: {hi: "Axis card par 10% chhoot", mr: "Axis कार्डवर 10% सूट", en: "10% off on Axis cards"}, test_data: true}
 - {id: OFF-KOTAK-7500, kind: bank, bank: Kotak, flat: 7500, min_amount: 75000, categories: [tv, laptop], stack_group: bank,
    valid_from: 2026-10-30, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "Kotak कार्ड पर ₹7,500 की छूट", mr: "Kotak कार्डवर ₹7,500 सूट", en: "₹7,500 off on Kotak cards"}, test_data: true}
+   title: {hi: "Kotak card par ₹7,500 ki chhoot", mr: "Kotak कार्डवर ₹7,500 सूट", en: "₹7,500 off on Kotak cards"}, test_data: true}
 - {id: OFF-NAVRATRI-AC, kind: instant, flat: 3000, min_amount: 0, categories: [ac], stack_group: instant,
    valid_from: 2026-09-22, valid_to: 2026-10-31, with_emi: true,
-   title: {hi: "नवरात्रि: AC पर ₹3,000 की छूट", mr: "नवरात्री: AC वर ₹3,000 सूट", en: "Navratri: ₹3,000 off ACs"}, test_data: true}
+   title: {hi: "Navratri: AC par ₹3,000 ki chhoot", mr: "नवरात्री: AC वर ₹3,000 सूट", en: "Navratri: ₹3,000 off ACs"}, test_data: true}
 - {id: OFF-NEWYEAR-LAP, kind: instant, pct: 5, max_discount: 3000, min_amount: 0, categories: [laptop], stack_group: instant,
    valid_from: 2026-12-24, valid_to: 2027-01-05, with_emi: true,
-   title: {hi: "नया साल: लैपटॉप पर 5% छूट", mr: "नवीन वर्ष: लॅपटॉपवर 5% सूट", en: "New Year: 5% off laptops"}, test_data: true}
+   title: {hi: "Naya saal: laptop par 5% chhoot", mr: "नवीन वर्ष: लॅपटॉपवर 5% सूट", en: "New Year: 5% off laptops"}, test_data: true}
 # --- fridge offers
 - {id: OFF-MER-FR-3K, kind: instant, flat: 3000, min_amount: 0, categories: [fridge], filter: {skus: [FR-MER-265-DD, FR-MER-340-DD]}, stack_group: instant,
    valid_from: 2026-10-28, valid_to: 2026-11-15, with_emi: true,
-   title: {hi: "Meru 265 L और 340 L फ्रिज पर ₹3,000 की छूट", mr: "Meru 265 L आणि 340 L फ्रिजवर ₹3,000 सूट", en: "₹3,000 off Meru 265 L and 340 L fridges"}, test_data: true}
+   title: {hi: "Meru 265 L aur 340 L fridge par ₹3,000 ki chhoot", mr: "Meru 265 L आणि 340 L फ्रिजवर ₹3,000 सूट", en: "₹3,000 off Meru 265 L and 340 L fridges"}, test_data: true}
 - {id: OFF-DIWALI-FR-SBS, kind: instant, flat: 5000, min_amount: 0, categories: [fridge], filter: {skus: [FR-MER-580-SBS, FR-NOV-650-SBS]}, stack_group: instant,
    valid_from: 2026-10-25, valid_to: 2026-11-08, with_emi: true,
-   title: {hi: "दिवाली: साइड-बाय-साइड फ्रिज पर ₹5,000 की छूट", mr: "दिवाळी: साइड-बाय-साइड फ्रिजवर ₹5,000 सूट", en: "Diwali: ₹5,000 off side-by-side fridges"}, test_data: true}
+   title: {hi: "Diwali: side-by-side fridge par ₹5,000 ki chhoot", mr: "दिवाळी: साइड-बाय-साइड फ्रिजवर ₹5,000 सूट", en: "Diwali: ₹5,000 off side-by-side fridges"}, test_data: true}
 - {id: OFF-EXCH-FR, kind: exchange_bonus, flat: 1500, min_amount: 25000, categories: [fridge], stack_group: exchange,
    valid_from: 2026-10-25, valid_to: 2026-11-15, requires: {slot: exchange_old, in: [yes_working, yes_dead]}, with_emi: true,
-   title: {hi: "पुराने फ्रिज के एक्सचेंज पर ₹1,500 बोनस", mr: "जुन्या फ्रिजच्या एक्सचेंजवर ₹1,500 बोनस", en: "₹1,500 bonus when you exchange an old fridge"}, test_data: true}
+   title: {hi: "Purane fridge ke exchange par ₹1,500 bonus", mr: "जुन्या फ्रिजच्या एक्सचेंजवर ₹1,500 बोनस", en: "₹1,500 bonus when you exchange an old fridge"}, test_data: true}

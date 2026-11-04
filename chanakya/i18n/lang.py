@@ -21,7 +21,7 @@ class _SafeDict(dict):
         return "{" + key + "}"
 
 
-_EMOJI = re.compile("[\U0001F300-\U0001FAFF\u2600-\u27BF\u2B50\u23F0-\u23FF\uFE0F]")
+_EMOJI = re.compile("[\U0001F100-\U0001F1FF\U0001F300-\U0001FAFF\u2600-\u27BF\u2B50\u23F0-\u23FF\uFE0F]")  # 🆕 too
 
 
 _CHECK = "[\u2713\u2714\u2705]"
@@ -40,7 +40,7 @@ def clean(text: str) -> str:
 @lru_cache
 def strings() -> dict[str, dict[str, str]]:
     out: dict[str, dict[str, str]] = {}
-    for name in ("strings.yaml", "strings_extra.yaml", "strings_flow.yaml"):
+    for name in ("strings.yaml", "strings_extra.yaml", "strings_flow.yaml", "strings_msgs.yaml", "strings_cards.yaml"):
         p = HERE / name
         if p.exists():
             data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}

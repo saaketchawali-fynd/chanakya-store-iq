@@ -190,7 +190,7 @@ class Floor:
         d = pack.needs.get(rule_id) if pack else None
         if not d:
             return None
-        text = pick(d, "en" if self.lang == "hi" else self.lang)
+        text = pick(d, self.lang)
         dist = P.number(self.home, "seat_distance", pack)
         if "{distance}" in text and dist:
             text = text.replace("{distance}", fmt.num(dist))

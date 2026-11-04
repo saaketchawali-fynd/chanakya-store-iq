@@ -11,7 +11,7 @@ from chanakya.ai import rules
 from chanakya.brain.packs import load_packs
 from chanakya.truth import jio_sync
 from chanakya.truth.jio import JioClient
-from tests.helpers import button_ids, check_floor
+from tests.helpers import button_ids, check_floor, option_pages, options_view, texts
 from tests.unit import test_jio as TJ
 
 PACKS = load_packs()
@@ -61,9 +61,9 @@ async def test_the_tv_they_have_is_never_the_fit(tmp_path, monkeypatch):
         picked = [h.rt.facts.product_sync(x) for x in s.option_labels.values()]
         assert SONY43 not in s.option_labels.values()  # never the TV they already have
         assert all((p.spec("size_in") or 0) >= 43 for p in picked)  # an upgrade is never smaller
-        card = next(m.card for m in out if m.card and m.card.template == "options")
-        assert all(o["points"] for o in card.data["options"])  # every option says why it fits them
-        assert "Abhi: Sony 43" in out[0].body and "Naye features chahiye" in out[0].body  # the note said back
+        card = options_view(out)
+        assert all(o["points"] for o in card.data["options"])  # every option's page says why it fits them
+        assert "Abhi: Sony 43" in texts(out) and "Naye features chahiye" in texts(out)  # the note said back
         assert set(button_ids(out)) >= {"s:C1:moreopts", "s:C1:demo"}  # happy with these? / more options
     finally:
         await h.close()
@@ -81,7 +81,7 @@ async def test_ruled_out_brand_and_needs_by_meaning(tmp_path, monkeypatch):
         assert "Reconnect" in (s.extra.get("excluded_brands") or [])
         brands = {h.rt.facts.product_sync(x).brand for x in s.option_labels.values()}
         assert "Reconnect" not in brands
-        card = next(m.card for m in out if m.card and m.card.template == "options")
+        card = options_view(out)
         proofs = {pt.get("proof") for o in card.data["options"] for pt in o["points"] if isinstance(pt, dict)}
         assert proofs & {"ClearAudio+", "Chromecast", "20W", "Audio Booster Plus"}  # their needs, the products' own words
         # 'Tell me more': only what the note did not cover
@@ -96,7 +96,7 @@ async def test_ruled_out_brand_and_needs_by_meaning(tmp_path, monkeypatch):
             out = await h.pick(q)
             first = next(b.id for m in out for b in m.buttons if f":slot:{slot}:" in b.id)
             out = await h.tap(first)
-            assert any(m.card and m.card.template == "options" for m in out)
+            assert options_view(out) is not None
         # the demo guide: per product, the wow first is their need
         out = await h.tap("s:C1:demo")
         check_floor(out)
@@ -115,26 +115,26 @@ async def test_more_options_keeps_the_best_and_adds(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:en")
     out = await h.voice("assess_1")  # the needs in one note → the best fits at once
-    assert "s:C1:moreopts" in button_ids(out) and "Customer ko ye sahi lag rahe hain?" in out[0].body
+    assert "s:C1:moreopts" in button_ids(out) and "Customer ko ye sahi lag rahe hain?" in out[-1].body
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     before = dict(s.option_labels)
     best_before = s.option_labels[next(k for k, r in s.extra["option_roles"].items() if r == "best")]
     out = await h.tap("s:C1:moreopts")  # more options: a follow-up the note did not cover
     check_floor(out)
     for _ in range(3):
-        if any(m.card and m.card.template == "options" for m in out):
+        if options_view(out) is not None:
             break
         assert out[-1].body.startswith("*Follow-up")
         nxt = next(b.id for b in out[-1].buttons if ":slot:" in b.id or ":dq:" in b.id)
         rows = [r.id for m in out for sec in (m.sections or []) for r in sec.rows]
         out = await (h.pick(nxt) if nxt in rows else h.tap(nxt))
         check_floor(out)
-    card = next(m.card for m in out if m.card and m.card.template == "options")
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     assert all(s.option_labels.get(k) == v for k, v in before.items())  # the earlier picks stay, same labels
     assert best_before in s.option_labels.values()
     added = [k for k, r in s.extra["option_roles"].items() if r in ("new", "broader")]
-    assert added and len(s.option_labels) > len(before) and len(card.data["options"]) == len(s.option_labels)
+    assert added and len(s.option_labels) > len(before)
+    assert set(option_pages(out)) == set(added)  # a page for each product that joined (the others were just shown)
 
 
 async def test_side_by_side_without_a_room_photo(h):

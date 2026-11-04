@@ -15,7 +15,7 @@ from chanakya.core.clock import today
 from chanakya.sim.harness import PHONES
 from chanakya.truth import jio_sync
 from chanakya.truth.jio import JioClient
-from tests.helpers import button_ids, check_floor, pick, to_options
+from tests.helpers import button_ids, check_floor, options_view, pick, to_options
 from tests.unit.test_jio import ITEMS, PROMO, backend, item, live
 
 
@@ -63,8 +63,8 @@ async def test_live_data_brief_never_invents_stock_counts(tmp_path, monkeypatch)
 
 async def test_offers_are_always_with_the_products(h):
     out = await to_options(h)
-    card = out[0].card
-    assert all(o["offer"]["text"] for o in card.data["options"])
+    card = options_view(out)
+    assert all(o["offer"]["text"] for o in card.data["options"])  # each product page shows its offer
     out = await h.tap("s:C1:more")  # 'Tell me more' with the products: the offers on these are one row away
     assert "s:C1:ofs" in [r.id for m in out for sec in (m.sections or []) for r in sec.rows]
     out = await h.pick("s:C1:ofs")
@@ -89,7 +89,7 @@ async def test_no_offers_says_so_plainly(tmp_path, monkeypatch):
         for b in ("s:C1:slot:trigger:new_home", "s:C1:photo_no", "s:C1:readback_ok"):
             out = await h.tap(b)
         out = await h.tap("s:C1:options")
-        assert all(o["offer"]["none"] for o in out[0].card.data["options"])
+        assert all(o["offer"]["none"] for o in options_view(out).data["options"])
         out = await h.tap("s:C1:ofs")
         assert "live offer" in out[0].body.lower() and out[0].buttons  # honest, and a next step
     finally:
@@ -141,7 +141,7 @@ async def test_voice_note_with_nothing_new_shows_what_was_heard(h, monkeypatch):
 async def test_one_card_per_visual_everywhere(h):
     """Options, bill, offer card and try-on: one visual each, in English (no copy for the associate)."""
     out = await to_options(h, photo="room_living.jpg")
-    assert sum(1 for m in out if m.card) == 1
+    assert sum(1 for m in out if m.card) == len(options_view(out).data["options"])  # one page per option, no copy
     await h.tap("s:C1:shown")
     out = await pick(h)
     assert sum(1 for m in out if m.card or m.image_bytes) == 1 and all(m.card.lang == "en" for m in out if m.card)

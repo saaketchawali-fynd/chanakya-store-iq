@@ -22,7 +22,7 @@ from chanakya.core.contracts import HomeCard
 from chanakya.truth import jio_sync
 from chanakya.truth.jio import JioClient, category_of, companion_of
 from chanakya.truth.jio_map import map_accessory, map_product
-from tests.helpers import check_floor
+from tests.helpers import answer_complete, check_floor, options_view
 from tests.unit import test_jio as TJ
 
 PACKS = load_packs()
@@ -61,7 +61,7 @@ def test_highlights_quote_the_products_own_words_for_this_home():
     lap = product("Asus Vivobook 16X")
     assert HL.points(lap, home("laptop", user="student"), {}, PACKS.get("laptop"), general=False)[0].theme == "office"
     say = HL.say(pts[0], "hi")
-    assert "ClearAudio+" in say and "घर के बड़ों के लिए" in say
+    assert "ClearAudio+" in say and "Ghar ke bado ke liye" in say  # Hindi in Roman Hinglish
 
 
 def test_a_negative_highlight_is_never_a_benefit():
@@ -127,14 +127,15 @@ async def test_live_options_demo_and_choice(tmp_path, monkeypatch):
     h = await TJ.live(tmp_path)
     try:
         out = await walk_to_options(h)
-        card = next(m.card for m in out if m.card)
+        card = options_view(out)
+        caps = {m.card.data["chip_label"]: m.body or m.caption for m in out if m.card and m.card.template == "product"}
         by = {o["label"]: o for o in card.data["options"]}
-        for o in card.data["options"]:
-            assert "Bigger screen" not in o["reason"] and "5 years" not in o["reason"]  # no fixed claim
+        for cap in caps.values():
+            assert "Bigger screen" not in cap and "5 years" not in cap  # no fixed claim
         best = next(o for o in card.data["options"] if o["is_best"])
         assert any(pt.get("proof") == "HDR10+" for pt in best["points"])  # movies → the product's own HDR10+
         other = next(o for o in card.data["options"] if not o["is_best"])
-        assert "ClearAudio+" in other["reason"]  # the real difference, from its own highlight
+        assert "ClearAudio+" in caps[other["label"]]  # the real difference, from its own highlight
         out = await h.tap("s:C1:demo")
         check_floor(out)
         s = await h.rt.svc.sessions.by_code("919000000001", "C1")
@@ -183,7 +184,7 @@ async def test_live_complete_is_the_full_setup(tmp_path, monkeypatch):
     h = await TJ.live(tmp_path)
     try:
         out = await walk_to_options(h)
-        card = next(m.card for m in out if m.card)
+        card = options_view(out)
         lab = next(o["label"] for o in card.data["options"] if o["is_best"])
         meta = await jio_sync.last_meta()
         assert meta["counts"]["accessories"] == 3 and meta["catalog"]["accessories"]["tv_mount"]["with_size_range"] == 2
@@ -195,13 +196,18 @@ async def test_live_complete_is_the_full_setup(tmp_path, monkeypatch):
         assert any("s:C1:slot:soundbar:" in b.id for m in out for b in m.buttons)  # a soundbar is on sale: ask
         out = await h.tap("s:C1:slot:soundbar:no")
         check_floor(out)
-        k = next(m.card for m in out if m.card and m.card.template == "kharcha")
-        sug = {ln["title"]: ln for ln in k.data["lines"] if ln["tag"] == "sujhav"}
+        ao = next(m.card for m in out if m.card and m.card.template == "addons")  # "Complete it", before the cost
+        sug = {x["title"]: x for x in ao.data["items"]}
         assert "Panasonic SC-HTB100 2.1 Soundbar 120 W" in sug and "HDMI ARC" in sug[
-            "Panasonic SC-HTB100 2.1 Soundbar 120 W"]["reason"]  # the TV has ARC: one cable
+            "Panasonic SC-HTB100 2.1 Soundbar 120 W"]["why"]  # the TV has ARC: one cable
         assert "Reconnect Fixed TV Wall Mount for 32-55 inch TVs" in sug  # fits 43 inch; the 65-85 one does not
         assert "Reconnect Tilt TV Wall Mount for 65-85 inch TVs" not in sug
-        assert k.data["with_suggestions_total_str"] and k.data["mrp_text"].startswith("MRP")
+        assert all(x["image"] for x in ao.data["items"] if "Wall Mount" in x["title"] or "Soundbar" in x["title"])
+        out = await h.tap("s:C1:addons:all")
+        k = next(m.card for m in out if m.card and m.card.template == "kharcha")
+        added = {ln["title"] for ln in k.data["lines"] if ln["tag"] == "addon"}
+        assert {"Panasonic SC-HTB100 2.1 Soundbar 120 W", "Reconnect Fixed TV Wall Mount for 32-55 inch TVs"} <= added
+        assert k.data["zaroori_total_str"] == ao.data["total_str"] and k.data["mrp_text"].startswith("MRP")
         assert any(x.startswith("Warranty:") for x in k.data["included"])  # the backend's own warranty
         assert "Mounting: On the wall" in k.data["notes"] and "Wall type: Solid wall" in k.data["notes"]  # they count
     finally:
@@ -213,13 +219,15 @@ async def test_live_no_soundbar_question_without_soundbars_and_no_pay_question(t
     h = await TJ.live(tmp_path)
     try:
         out = await walk_to_options(h)
-        card = next(m.card for m in out if m.card)
+        card = options_view(out)
         lab = next(o["label"] for o in card.data["options"] if o["is_best"])
         await h.tap("s:C1:demo")
         await h.tap("s:C1:shown")
         await h.pick(f"s:C1:opt:{lab}")
         await h.tap("s:C1:slot:mounting:wall")
         out = await h.tap("s:C1:slot:wall_type:concrete")
+        assert not any("s:C1:slot:soundbar:" in b.id for m in out for b in m.buttons)
+        out = await answer_complete(h, out)  # "Complete it" (a protection plan in the data), then the cost
         k = next(m.card for m in out if m.card)
         assert k.template == "kharcha"  # no soundbar on sale: the soundbar question would change nothing
         assert any("store confirms" in x for x in k.data["notes"])  # no mount in the data: said honestly
@@ -237,13 +245,7 @@ async def test_sample_bill_shows_protection_as_a_choice(h):
 
     await to_options(h)
     await h.tap("s:C1:shown")
-    out = await h.pick("s:C1:opt:B")
-    for _ in range(4):
-        q = out[-1]
-        if q.card and q.card.template == "kharcha":
-            break
-        slot = next(b.id for b in q.buttons if ":slot:" in b.id)
-        out = await h.tap(slot)
+    out = await answer_complete(h, await h.pick("s:C1:opt:B"))
     k = out[-1].card
     assert k.template == "kharcha"
     pr = k.data.get("protection")

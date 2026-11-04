@@ -13,43 +13,43 @@
 # Technical terms stay English inside hi / mr (stabiliser, inverter, apps, HDR …).
 
 prefix:  # the customer's need, said first (Bolo, customer language)
-  elders: {en: "For the elders at home", hi: "घर के बड़ों के लिए", mr: "घरातील ज्येष्ठांसाठी"}
-  no_soundbar: {en: "Since there's no soundbar", hi: "साउंडबार नहीं है, तो", mr: "साउंडबार नाही, म्हणून"}
-  far_seat: {en: "From your sofa's distance", hi: "आपके सोफ़े की दूरी से भी", mr: "तुमच्या सोफ्याच्या अंतरावरूनही"}
-  movies: {en: "For your movie nights", hi: "आपकी मूवी नाइट्स के लिए", mr: "तुमच्या मूव्ही नाइट्ससाठी"}
-  serials: {en: "For the daily serials", hi: "रोज़ के सीरियल्स के लिए", mr: "रोजच्या मालिकांसाठी"}
-  kids: {en: "For the kids", hi: "बच्चों के लिए", mr: "मुलांसाठी"}
-  sports: {en: "For cricket and sports", hi: "क्रिकेट और स्पोर्ट्स के लिए", mr: "क्रिकेट आणि खेळांसाठी"}
-  gaming: {en: "For gaming", hi: "गेमिंग के लिए", mr: "गेमिंगसाठी"}
-  dim_room: {en: "In your dim room", hi: "कम रोशनी वाले कमरे में", mr: "कमी प्रकाशाच्या खोलीत"}
-  wide_seating: {en: "For the side seats", hi: "साइड में बैठने वालों के लिए", mr: "बाजूला बसणाऱ्यांसाठी"}
-  wall: {en: "On your wall", hi: "आपकी दीवार पर", mr: "तुमच्या भिंतीवर"}
-  as_asked: {en: "Just as you wanted", hi: "जैसा आप चाहते थे", mr: "तुम्हाला हवं तसं"}
-  power_cuts: {en: "With power cuts in your area", hi: "आपके इलाके में बिजली जाती है, तो", mr: "तुमच्याकडे वीज जाते, म्हणून"}
-  daily_shop: {en: "For your daily fresh shopping", hi: "रोज़ की ताज़ी ख़रीदारी के लिए", mr: "रोजच्या ताज्या खरेदीसाठी"}
-  weekly_shop: {en: "For your weekly shopping", hi: "हफ़्ते भर की ख़रीदारी के लिए", mr: "आठवड्याच्या खरेदीसाठी"}
-  frozen: {en: "For frozen food", hi: "फ़्रोज़न खाने के लिए", mr: "फ्रोझन पदार्थांसाठी"}
-  big_family: {en: "For a big family like yours", hi: "आपके बड़े परिवार के लिए", mr: "तुमच्या मोठ्या कुटुंबासाठी"}
-  family_wash: {en: "For your family's laundry", hi: "पूरे परिवार के कपड़ों के लिए", mr: "संपूर्ण कुटुंबाच्या कपड्यांसाठी"}
-  daily_wash: {en: "With a wash every day", hi: "रोज़ के कपड़ों के लिए", mr: "रोजच्या धुण्यासाठी"}
-  drying: {en: "Since you need clothes dry fast", hi: "कपड़े जल्दी सुखाने के लिए", mr: "कपडे लवकर सुकवण्यासाठी"}
-  wet_space: {en: "For a bathroom or balcony spot", hi: "बाथरूम या बालकनी में रखने के लिए", mr: "बाथरूम किंवा बाल्कनीसाठी"}
-  long_hours: {en: "For long hours of use", hi: "लंबे समय तक चलाने के लिए", mr: "दीर्घ वेळ वापरासाठी"}
-  sunny: {en: "For your sunny room", hi: "धूप वाले कमरे के लिए", mr: "उन्हाच्या खोलीसाठी"}
-  power_issues: {en: "With voltage problems at home", hi: "घर में वोल्टेज की दिक्कत है, तो", mr: "घरी व्होल्टेजचा त्रास आहे, म्हणून"}
-  app: {en: "Since you like phone control", hi: "फ़ोन से चलाने के लिए", mr: "फोनवरून चालवण्यासाठी"}
-  carry_daily: {en: "Since you carry it every day", hi: "रोज़ साथ ले जाने के लिए", mr: "रोज सोबत नेण्यासाठी"}
-  battery: {en: "Since battery matters to you", hi: "बैटरी ज़रूरी है, तो", mr: "बॅटरी महत्त्वाची आहे, म्हणून"}
-  student: {en: "For college work", hi: "कॉलेज के काम के लिए", mr: "कॉलेजच्या कामासाठी"}
-  office_sw: {en: "For your Office work", hi: "Office के काम के लिए", mr: "Office च्या कामासाठी"}
-  professional: {en: "For your work", hi: "आपके काम के लिए", mr: "तुमच्या कामासाठी"}
-  design: {en: "For design and CAD work", hi: "डिज़ाइन और CAD के काम के लिए", mr: "डिझाइन आणि CAD कामासाठी"}
-  coding: {en: "For coding", hi: "कोडिंग के लिए", mr: "कोडिंगसाठी"}
-  general: {en: "Also worth knowing", hi: "साथ ही", mr: "शिवाय"}
+  elders: {en: "For the elders at home", hi: "Ghar ke bado ke liye", mr: "घरातील ज्येष्ठांसाठी"}
+  no_soundbar: {en: "Since there's no soundbar", hi: "Soundbar nahi hai, to", mr: "साउंडबार नाही, म्हणून"}
+  far_seat: {en: "From your sofa's distance", hi: "Aapke sofe ki doori se bhi", mr: "तुमच्या सोफ्याच्या अंतरावरूनही"}
+  movies: {en: "For your movie nights", hi: "Aapki movie nights ke liye", mr: "तुमच्या मूव्ही नाइट्ससाठी"}
+  serials: {en: "For the daily serials", hi: "Roz ke serials ke liye", mr: "रोजच्या मालिकांसाठी"}
+  kids: {en: "For the kids", hi: "Bachchon ke liye", mr: "मुलांसाठी"}
+  sports: {en: "For cricket and sports", hi: "Cricket aur sports ke liye", mr: "क्रिकेट आणि खेळांसाठी"}
+  gaming: {en: "For gaming", hi: "Gaming ke liye", mr: "गेमिंगसाठी"}
+  dim_room: {en: "In your dim room", hi: "Kam roshni wale kamre mein", mr: "कमी प्रकाशाच्या खोलीत"}
+  wide_seating: {en: "For the side seats", hi: "Side mein baithne walon ke liye", mr: "बाजूला बसणाऱ्यांसाठी"}
+  wall: {en: "On your wall", hi: "Aapki deewar par", mr: "तुमच्या भिंतीवर"}
+  as_asked: {en: "Just as you wanted", hi: "Jaisa aap chahte the", mr: "तुम्हाला हवं तसं"}
+  power_cuts: {en: "With power cuts in your area", hi: "Aapke area mein bijli jaati hai, to", mr: "तुमच्याकडे वीज जाते, म्हणून"}
+  daily_shop: {en: "For your daily fresh shopping", hi: "Roz ki taazi kharidari ke liye", mr: "रोजच्या ताज्या खरेदीसाठी"}
+  weekly_shop: {en: "For your weekly shopping", hi: "Hafte bhar ki kharidari ke liye", mr: "आठवड्याच्या खरेदीसाठी"}
+  frozen: {en: "For frozen food", hi: "Frozen khane ke liye", mr: "फ्रोझन पदार्थांसाठी"}
+  big_family: {en: "For a big family like yours", hi: "Aapke bade parivaar ke liye", mr: "तुमच्या मोठ्या कुटुंबासाठी"}
+  family_wash: {en: "For your family's laundry", hi: "Poore parivaar ke kapdon ke liye", mr: "संपूर्ण कुटुंबाच्या कपड्यांसाठी"}
+  daily_wash: {en: "With a wash every day", hi: "Roz ke kapdon ke liye", mr: "रोजच्या धुण्यासाठी"}
+  drying: {en: "Since you need clothes dry fast", hi: "Kapde jaldi sukhane ke liye", mr: "कपडे लवकर सुकवण्यासाठी"}
+  wet_space: {en: "For a bathroom or balcony spot", hi: "Bathroom ya balcony mein rakhne ke liye", mr: "बाथरूम किंवा बाल्कनीसाठी"}
+  long_hours: {en: "For long hours of use", hi: "Lambe samay tak chalane ke liye", mr: "दीर्घ वेळ वापरासाठी"}
+  sunny: {en: "For your sunny room", hi: "Dhoop wale kamre ke liye", mr: "उन्हाच्या खोलीसाठी"}
+  power_issues: {en: "With voltage problems at home", hi: "Ghar mein voltage ki dikkat hai, to", mr: "घरी व्होल्टेजचा त्रास आहे, म्हणून"}
+  app: {en: "Since you like phone control", hi: "Phone se chalane ke liye", mr: "फोनवरून चालवण्यासाठी"}
+  carry_daily: {en: "Since you carry it every day", hi: "Roz saath le jaane ke liye", mr: "रोज सोबत नेण्यासाठी"}
+  battery: {en: "Since battery matters to you", hi: "Battery zaroori hai, to", mr: "बॅटरी महत्त्वाची आहे, म्हणून"}
+  student: {en: "For college work", hi: "College ke kaam ke liye", mr: "कॉलेजच्या कामासाठी"}
+  office_sw: {en: "For your Office work", hi: "Office ke kaam ke liye", mr: "Office च्या कामासाठी"}
+  professional: {en: "For your work", hi: "Aapke kaam ke liye", mr: "तुमच्या कामासाठी"}
+  design: {en: "For design and CAD work", hi: "Design aur CAD ke kaam ke liye", mr: "डिझाइन आणि CAD कामासाठी"}
+  coding: {en: "For coding", hi: "Coding ke liye", mr: "कोडिंगसाठी"}
+  general: {en: "Also worth knowing", hi: "Saath hi", mr: "शिवाय"}
 
 say:  # {prefix}: {line}. It has '{proof}'.
   en: "{prefix}: {line}. It has '{proof}'."
-  hi: "{prefix}: {line}। इसमें '{proof}' है।"
+  hi: "{prefix}: {line}. Ismein '{proof}' hai."
   mr: "{prefix}: {line}. यात '{proof}' आहे."
 
 themes:
@@ -68,15 +68,15 @@ themes:
       lines:
         - rx: 'dialogue|clear ?voice|clear ?audio|voice clarity'
           en: "voices and dialogue come through clearer"
-          hi: "आवाज़ और डायलॉग ज़्यादा साफ़ सुनाई देते हैं"
+          hi: "awaaz aur dialogue zyada saaf sunai dete hain"
           mr: "आवाज आणि संवाद अधिक स्पष्ट ऐकू येतात"
         - rx: 'atmos|\bdts\b|surround|virtual ?:?x|object tracking|3d sound|spatial'
           en: "sound that fills the room, all around you"
-          hi: "आवाज़ पूरे कमरे में चारों तरफ़ से आती है"
+          hi: "awaaz poore kamre mein chaaron taraf se aati hai"
           mr: "आवाज संपूर्ण खोलीत चहूबाजूंनी येतो"
         - rx: 'audio booster|sound booster|dolby audio|\b\d{2}\s?w\b|\bwatts?\b|speakers?\b|\bbass\b'
           en: "fuller, louder sound from the TV itself"
-          hi: "टीवी से ही भरपूर, दमदार आवाज़"
+          hi: "TV se hi bharpoor, damdaar awaaz"
           mr: "टीव्हीमधूनच भरपूर, दमदार आवाज"
       demo:
         hi: "Dono par same kam volume mein ek dialogue scene chalaiye"
@@ -98,19 +98,19 @@ themes:
       lines:
         - rx: 'dolby vision|hdr ?10|\bhdr\b|\bhlg\b|high dynamic range'
           en: "more detail in the bright and the dark parts of every scene"
-          hi: "हर सीन के उजले और अंधेरे हिस्सों में ज़्यादा डिटेल"
+          hi: "har scene ke ujle aur andhere hisson mein zyada detail"
           mr: "प्रत्येक दृश्याच्या उजळ आणि गडद भागांत अधिक तपशील"
         - rx: 'dimming|contrast|true black|deep black'
           en: "deeper blacks in night and movie scenes"
-          hi: "रात और मूवी के सीन में गहरा काला रंग"
+          hi: "raat aur movie ke scene mein gehra kaala rang"
           mr: "रात्रीच्या आणि चित्रपटाच्या दृश्यांत गडद काळा रंग"
         - rx: 'upscal|x-?reality|picture processor|crystal processor|ai processor|4k processor|\balpha \d'
           en: "everyday channels and YouTube look sharper"
-          hi: "रोज़ के चैनल और YouTube भी ज़्यादा शार्प दिखते हैं"
+          hi: "roz ke channel aur YouTube bhi zyada sharp dikhte hain"
           mr: "रोजचे चॅनेल आणि YouTube अधिक स्पष्ट दिसतात"
         - rx: 'hexa drive|colou?r|quantum|nano ?cell|\bqled\b|triluminos|billion'
           en: "richer, more natural colours"
-          hi: "ज़्यादा गहरे और असली रंग"
+          hi: "zyada gehre aur asli rang"
           mr: "अधिक गडद आणि नैसर्गिक रंग"
       demo:
         hi: "Dono par ek andhera movie scene (HDR demo) saath-saath chalaiye"
@@ -129,11 +129,11 @@ themes:
       lines:
         - rx: 'chromecast|airplay|screen ?mirror|miracast|wireless display|\bcast\b'
           en: "photos and videos from your phone go on the big screen in one tap"
-          hi: "फ़ोन की फ़ोटो और वीडियो एक टैप में बड़ी स्क्रीन पर"
+          hi: "phone ki photo aur video ek tap mein badi screen par"
           mr: "फोनमधले फोटो आणि व्हिडिओ एका टॅपमध्ये मोठ्या स्क्रीनवर"
         - rx: 'google tv|android|webos|tizen|vidaa|fire ?tv|play store|netflix|prime video|youtube|hotstar|\bapps?\b'
           en: "your streaming apps right on the TV, no extra box"
-          hi: "आपकी streaming apps सीधे टीवी पर, कोई अलग बॉक्स नहीं"
+          hi: "aapki streaming apps seedhe TV par, koi alag box nahi"
           mr: "तुमची streaming apps थेट टीव्हीवर, वेगळा बॉक्स नको"
       demo:
         hi: "Unka pasandida app kholiye, ya unke phone se ek video cast kariye"
@@ -148,11 +148,11 @@ themes:
       lines:
         - rx: 'voice (search|remote|control)|google assistant|alexa|assistant'
           en: "find shows just by speaking into the remote"
-          hi: "रिमोट में बोलकर ही शो ढूँढिए"
+          hi: "remote mein bolkar hi show dhoondhiye"
           mr: "रिमोटमध्ये बोलूनच शो शोधा"
         - rx: 'bt smart remote|bluetooth remote|smart remote'
           en: "a simple remote that works without pointing at the TV"
-          hi: "आसान रिमोट, टीवी की तरफ़ घुमाए बिना चलता है"
+          hi: "aasaan remote, TV ki taraf ghumaye bina chalta hai"
           mr: "सोपा रिमोट, टीव्हीकडे न रोखता चालतो"
       demo:
         hi: "Remote customer ke haath mein dijiye, khud chala kar dekhein"
@@ -168,7 +168,7 @@ themes:
       lines:
         - rx: '\ballm\b|\bvrr\b|game mode|gaming|playstation|xbox|low latency'
           en: "smooth, quick-response gaming"
-          hi: "स्मूथ और तेज़ रिस्पॉन्स वाली गेमिंग"
+          hi: "smooth aur tez response wali gaming"
           mr: "स्मूथ आणि जलद प्रतिसादाचं गेमिंग"
       demo:
         hi: "Game mode on karke ek fast game clip chalaiye"
@@ -186,7 +186,7 @@ themes:
       lines:
         - rx: 'motion|\bmemc\b|\b1[24]0\s?hz\b|motionflow|judder'
           en: "fast action stays smooth, like a cricket ball in flight"
-          hi: "तेज़ एक्शन स्मूथ, जैसे उड़ती क्रिकेट बॉल"
+          hi: "tez action bhi smooth, jaise udti cricket ball"
           mr: "वेगवान ॲक्शन स्मूथ, जसा उडता क्रिकेट बॉल"
       demo:
         hi: "Dono par ek fast cricket clip chalaiye"
@@ -204,7 +204,7 @@ themes:
       lines:
         - rx: '\bips\b|wide (viewing )?angle'
           en: "colours stay true even from the side seats"
-          hi: "साइड से देखने पर भी रंग सही रहते हैं"
+          hi: "side se dekhne par bhi rang sahi rehte hain"
           mr: "बाजूने पाहिलं तरी रंग योग्य राहतात"
       demo:
         hi: "Customer ke saath side wali seat se dono dekhiye"
@@ -220,7 +220,7 @@ themes:
       lines:
         - rx: 'eye (comfort|care)|blue light|flicker'
           en: "easier on the eyes over long viewing"
-          hi: "लंबे समय देखने पर भी आँखों को आराम"
+          hi: "lambe samay dekhne par bhi aankhon ko aaram"
           mr: "दीर्घ वेळ पाहिलं तरी डोळ्यांना आराम"
       demo:
         hi: "Eye comfort setting customer ko dikhaiye"
@@ -235,7 +235,7 @@ themes:
       lines:
         - rx: 'bezel|frameless|\bslim\b|\bthin\b'
           en: "a slim look that suits a wall"
-          hi: "पतला लुक, दीवार पर सुंदर लगता है"
+          hi: "patla look, deewar par sundar lagta hai"
           mr: "सडपातळ लुक, भिंतीवर छान दिसतो"
       demo:
         hi: "TV ka side profile customer ko dikhaiye"
@@ -254,11 +254,11 @@ themes:
       lines:
         - rx: 'stabili[sz]er[- ]?free|wide voltage'
           en: "runs through voltage ups and downs without a stabiliser"
-          hi: "वोल्टेज ऊपर-नीचे हो, बिना stabiliser के चलता है"
+          hi: "voltage upar-neeche ho, bina stabiliser ke chalta hai"
           mr: "व्होल्टेज वर-खाली झाला तरी stabiliser शिवाय चालतो"
         - rx: 'cool ?pack\b.*\b(hours?|frozen|power)|keeps? (food )?frozen|cooling retention|power cut|hours of cooling'
           en: "food stays frozen for hours in a power cut"
-          hi: "बिजली जाने पर भी घंटों तक खाना जमा रहता है"
+          hi: "bijli jaane par bhi ghanton tak khana jama rehta hai"
           mr: "वीज गेली तरी तासन्तास अन्न गोठलेलं राहतं"
       demo:
         hi: "Ye feature unit par customer ko dikhaiye"
@@ -275,7 +275,7 @@ themes:
       lines:
         - rx: '\bveg|crisper|fresh|humidity|moisture|twin cooling|multi ?flow|multi air'
           en: "vegetables and fruit stay fresh for longer"
-          hi: "सब्ज़ी और फल ज़्यादा दिन ताज़े रहते हैं"
+          hi: "sabzi aur phal zyada din taaze rehte hain"
           mr: "भाज्या आणि फळं जास्त दिवस ताजी राहतात"
       demo:
         hi: "Vegetable box aur cooling vents khol kar dikhaiye"
@@ -293,7 +293,7 @@ themes:
       lines:
         - rx: 'convertible|\d+ modes|flex ?zone'
           en: "the freezer turns into extra fridge space when you need it"
-          hi: "ज़रूरत हो तो फ़्रीज़र भी फ़्रिज बन जाता है"
+          hi: "zaroorat ho to freezer bhi fridge ban jaata hai"
           mr: "गरज असेल तेव्हा फ्रीजरच फ्रिज बनतो"
       demo:
         hi: "Convertible modes ka panel customer ko chala kar dikhaiye"
@@ -307,7 +307,7 @@ themes:
       lines:
         - rx: 'famil|members'
           en: "made for a big family"
-          hi: "बड़े परिवार के हिसाब से बना"
+          hi: "bade parivaar ke hisaab se bana"
           mr: "मोठ्या कुटुंबासाठी बनवलेला"
       demo:
         hi: "Andar ki shelves aur jagah customer ko dikhaiye"
@@ -322,7 +322,7 @@ themes:
       lines:
         - rx: 'power freeze|quick freeze|fast freez|ice maker|ice tray|twist ice'
           en: "fast freezing, and ice when you need it"
-          hi: "जल्दी जमाना, और ज़रूरत पर बर्फ़"
+          hi: "jaldi jamata hai, aur zaroorat par barf"
           mr: "लवकर गोठवणं, आणि हवा तेव्हा बर्फ"
       demo:
         hi: "Freezer khol kar ice tray aur quick freeze dikhaiye"
@@ -335,7 +335,7 @@ themes:
       lines:
         - rx: 'inverter'
           en: "quieter cooling that uses less power"
-          hi: "कम आवाज़ में ठंडा, बिजली भी कम"
+          hi: "kam awaaz mein thanda, bijli bhi kam"
           mr: "कमी आवाजात थंड, वीजही कमी"
       demo:
         hi: "Energy label par star rating dikhaiye"
@@ -347,7 +347,7 @@ themes:
       lines:
         - rx: 'deodori[sz]|odou?r|anti-?bacteria'
           en: "keeps the fridge fresh-smelling"
-          hi: "फ़्रिज में बदबू नहीं"
+          hi: "fridge mein badboo nahi"
           mr: "फ्रिजमध्ये वास येत नाही"
       demo:
         hi: "Deodoriser customer ko andar dikhaiye"
@@ -364,7 +364,7 @@ themes:
       lines:
         - rx: 'steam|hygien|allerg|bacteria|germ'
           en: "an extra-clean hygiene wash"
-          hi: "अतिरिक्त साफ़, हाइजीन वॉश"
+          hi: "extra saaf, hygiene wash"
           mr: "अधिक स्वच्छ, हायजिन वॉश"
       demo:
         hi: "Panel par steam / hygiene programme dikhaiye"
@@ -379,7 +379,7 @@ themes:
       lines:
         - rx: 'quick|express|speed ?wash|super speed|\d+\s?min|turbo ?wash'
           en: "a fast wash when you're short of time"
-          hi: "जल्दी में हों तो तेज़ वॉश"
+          hi: "jaldi mein hon to tez wash"
           mr: "घाईत असाल तर जलद वॉश"
       demo:
         hi: "Panel par quick wash ka time customer ko dikhaiye"
@@ -395,7 +395,7 @@ themes:
       lines:
         - rx: 'dryer|drying|air turbo|heat pump|spin dry'
           en: "clothes come out drier, ready to hang"
-          hi: "कपड़े ज़्यादा सूखे निकलते हैं, तुरंत सुखाने लायक"
+          hi: "kapde zyada sookhe nikalte hain, turant sukhane laayak"
           mr: "कपडे अधिक कोरडे निघतात, लगेच वाळत घालण्याजोगे"
       demo:
         hi: "Dry / spin programme panel par dikhaiye"
@@ -410,11 +410,11 @@ themes:
       lines:
         - rx: 'stain|ecobubble|bubble|pulsator|storm'
           en: "tough dirt and stains come out better"
-          hi: "ज़िद्दी मैल और दाग बेहतर निकलते हैं"
+          hi: "ziddi mitti aur daag behtar nikalte hain"
           mr: "हट्टी मळ आणि डाग अधिक चांगले निघतात"
         - rx: 'magic filter|\blint\b|\bfilter\b'
           en: "lint is caught, so clothes stay clean"
-          hi: "रुएँ फ़िल्टर में रुकते हैं, कपड़े साफ़ रहते हैं"
+          hi: "lint filter mein rukta hai, kapde saaf rehte hain"
           mr: "धागे फिल्टरमध्ये अडकतात, कपडे स्वच्छ राहतात"
       demo:
         hi: "Drum aur filter khol kar customer ko dikhaiye"
@@ -428,7 +428,7 @@ themes:
       lines:
         - rx: '\brust|corrosi'
           en: "a rust-proof body for a wet bathroom or balcony"
-          hi: "जंग-रहित बॉडी, गीले बाथरूम या बालकनी के लिए"
+          hi: "rust-proof body, geele bathroom ya balcony ke liye"
           mr: "गंजरोधक बॉडी, ओल्या बाथरूम किंवा बाल्कनीसाठी"
       demo:
         hi: "Body aur base customer ko chhoo kar dikhaiye"
@@ -441,7 +441,7 @@ themes:
       lines:
         - rx: 'inverter|\bbldc\b|direct drive'
           en: "runs quieter and uses less power"
-          hi: "कम आवाज़, कम बिजली"
+          hi: "kam awaaz, kam bijli"
           mr: "कमी आवाज, कमी वीज"
       demo:
         hi: "Chalate hue awaaz customer ko sunwaiye"
@@ -453,7 +453,7 @@ themes:
       lines:
         - rx: 'smartthings|thinq|wi-?fi|smart (pairing|connect|control)|ai control|\bapp\b'
           en: "pick programmes and track the wash from your phone"
-          hi: "फ़ोन से प्रोग्राम चुनिए और वॉश देखिए"
+          hi: "phone se programme chuniye aur wash dekhiye"
           mr: "फोनवरून प्रोग्राम निवडा आणि वॉश पाहा"
       demo:
         hi: "App ki screen customer ko phone par dikhaiye"
@@ -465,7 +465,7 @@ themes:
       lines:
         - rx: 'drum clean|tub clean|stay ?clean|self[- ]clean'
           en: "keeps the drum clean, no smell"
-          hi: "ड्रम साफ़ रहता है, बदबू नहीं"
+          hi: "drum saaf rehta hai, badboo nahi"
           mr: "ड्रम स्वच्छ राहतो, वास नाही"
       demo:
         hi: "Panel par drum clean programme dikhaiye"
@@ -484,7 +484,7 @@ themes:
       lines:
         - rx: 'inverter'
           en: "cools steadily and saves power over long hours"
-          hi: "लंबे समय तक एक-सा ठंडा, बिजली की बचत"
+          hi: "lambe samay tak ek-sa thanda, bijli ki bachat"
           mr: "दीर्घ वेळ एकसारखा थंडावा, वीज बचत"
       demo:
         hi: "Energy label par star rating aur inverter customer ko dikhaiye"
@@ -499,7 +499,7 @@ themes:
       lines:
         - rx: 'turbo|fast cool|\bjet\b|power ?cool|rapid|super cool'
           en: "cools the room faster on hot afternoons"
-          hi: "गर्म दोपहर में कमरा जल्दी ठंडा"
+          hi: "garam dopahar mein kamra jaldi thanda"
           mr: "गरम दुपारी खोली लवकर थंड"
       demo:
         hi: "Remote par turbo button chala kar dikhaiye"
@@ -514,7 +514,7 @@ themes:
       lines:
         - rx: 'stabili[sz]er[- ]?free|wide voltage|voltage (range|fluctuation|protection)|built-?in stabili'
           en: "handles voltage swings without a separate stabiliser"
-          hi: "वोल्टेज ऊपर-नीचे हो, अलग stabiliser की ज़रूरत नहीं"
+          hi: "voltage upar-neeche ho, alag stabiliser ki zaroorat nahi"
           mr: "व्होल्टेज वर-खाली झाला तरी वेगळा stabiliser नको"
       demo:
         hi: "Spec sheet par voltage range customer ko dikhaiye"
@@ -531,7 +531,7 @@ themes:
       lines:
         - rx: 'wi-?fi|smart ?(ac|control|app)|\bapp\b|alexa|google'
           en: "switch it on from your phone before you reach home"
-          hi: "घर पहुँचने से पहले फ़ोन से चालू कीजिए"
+          hi: "ghar pahunchne se pehle phone se chalu kijiye"
           mr: "घरी पोहोचण्याआधी फोनवरून सुरू करा"
       demo:
         hi: "Phone par app ki screen dikhaiye"
@@ -543,7 +543,7 @@ themes:
       lines:
         - rx: 'sleep|\bi ?feel\b|ifeel|follow me|comfort'
           en: "a comfortable temperature right where you sit and sleep"
-          hi: "जहाँ बैठें या सोएँ, वहीं आरामदायक तापमान"
+          hi: "jahan baithein ya soyein, wahin aaramdayak temperature"
           mr: "जिथे बसता किंवा झोपता, तिथेच आरामदायक तापमान"
       demo:
         hi: "Remote par sleep / iFeel mode dikhaiye"
@@ -555,7 +555,7 @@ themes:
       lines:
         - rx: '\bfilter|pm ?2\.?5|anti-?bacteria|self[- ]?clean|purif'
           en: "cleaner air in the room"
-          hi: "कमरे में साफ़ हवा"
+          hi: "kamre mein saaf hawa"
           mr: "खोलीत स्वच्छ हवा"
       demo:
         hi: "Front panel khol kar filter dikhaiye"
@@ -567,7 +567,7 @@ themes:
       lines:
         - rx: 'copper'
           en: "copper coils that cool well and last"
-          hi: "copper coil, अच्छी कूलिंग और टिकाऊ"
+          hi: "copper coil, achhi cooling aur tikaau"
           mr: "copper coil, चांगलं कूलिंग आणि टिकाऊ"
       demo:
         hi: "Spec sheet par copper condenser dikhaiye"
@@ -585,7 +585,7 @@ themes:
       lines:
         - rx: 'battery|\bhours?\b|\bhrs\b|all[- ]day'
           en: "a battery built for long days away from a socket"
-          hi: "चार्जर से दूर लंबे दिन के लिए बैटरी"
+          hi: "charger se door lambe din ke liye battery"
           mr: "चार्जरपासून दूर दीर्घ दिवसासाठी बॅटरी"
       demo:
         hi: "Battery settings mein bacha hua time customer ko dikhaiye"
@@ -602,7 +602,7 @@ themes:
       lines:
         - rx: '(microsoft |ms ?)office|ms ?365|office (home|20\d\d)'
           en: "MS Office comes with it, nothing extra to buy"
-          hi: "MS Office साथ में आता है, अलग से कुछ नहीं ख़रीदना"
+          hi: "MS Office saath mein aata hai, alag se kuch nahi khareedna"
           mr: "MS Office सोबत येतं, वेगळं काही विकत घ्यायला नको"
       demo:
         hi: "Start menu mein Office apps khol kar dikhaiye"
@@ -619,7 +619,7 @@ themes:
       lines:
         - rx: '\brtx\b|geforce|radeon|nvidia|dedicated graphics'
           en: "a separate graphics card for games and design software"
-          hi: "गेम्स और डिज़ाइन सॉफ़्टवेयर के लिए अलग graphics card"
+          hi: "games aur design software ke liye alag graphics card"
           mr: "गेम्स आणि डिझाइन सॉफ्टवेअरसाठी वेगळं graphics card"
       demo:
         hi: "Ek game ya design app khol kar chala kar dikhaiye"
@@ -635,7 +635,7 @@ themes:
       lines:
         - rx: 'camera|webcam|facetime|microphone|\bmics?\b'
           en: "clear video calls and online classes"
-          hi: "साफ़ वीडियो कॉल और ऑनलाइन क्लास"
+          hi: "saaf video call aur online class"
           mr: "स्पष्ट व्हिडिओ कॉल आणि ऑनलाइन क्लास"
       demo:
         hi: "Camera app khol kar customer ko khud dekhne dijiye"
@@ -650,7 +650,7 @@ themes:
       lines:
         - rx: 'thinnest|lightest|light ?weight|\blight\b(?!ing)|portable|fanless|\bslim\b'
           en: "light and slim to carry every day"
-          hi: "हल्का और पतला, रोज़ ले जाने लायक"
+          hi: "halka aur patla, roz le jaane laayak"
           mr: "हलका आणि सडपातळ, रोज नेण्याजोगा"
       demo:
         hi: "Laptop customer ke haath mein dekar wazan mehsoos karwaiye"
@@ -664,7 +664,7 @@ themes:
       lines:
         - rx: '\bssd\b|ultrafast|nvme'
           en: "starts in seconds and opens apps quickly"
-          hi: "सेकंडों में चालू, apps जल्दी खुलते हैं"
+          hi: "seconds mein chalu, apps jaldi khulte hain"
           mr: "काही सेकंदांत सुरू, apps लवकर उघडतात"
       demo:
         hi: "Restart karke start hone ka time dikhaiye"
@@ -678,11 +678,11 @@ themes:
       lines:
         - rx: '\bflip\b|convertible|x360|2[- ]in[- ]1'
           en: "folds into a tablet for notes and sketching"
-          hi: "मोड़कर tablet बना लीजिए, नोट्स और स्केच के लिए"
+          hi: "modkar tablet bana lijiye, notes aur sketch ke liye"
           mr: "दुमडून tablet बनवा, नोट्स आणि स्केचसाठी"
         - rx: 'touch ?screen'
           en: "a touch screen for quick notes"
-          hi: "जल्दी नोट्स के लिए touch screen"
+          hi: "jaldi notes ke liye touch screen"
           mr: "पटकन नोट्ससाठी touch screen"
       demo:
         hi: "Screen ko mod kar ya chhoo kar dikhaiye"
@@ -694,7 +694,7 @@ themes:
       lines:
         - rx: 'touch id|fingerprint|face (unlock|id|recognition)|windows hello|security chip|\bt2\b'
           en: "unlocks with a touch, and your files stay private"
-          hi: "एक टच से अनलॉक, फ़ाइलें सुरक्षित"
+          hi: "ek touch se unlock, files surakshit"
           mr: "एका टचने अनलॉक, फाइल्स सुरक्षित"
       demo:
         hi: "Fingerprint / Touch ID se unlock karke dikhaiye"
@@ -706,7 +706,7 @@ themes:
       lines:
         - rx: 'backlit'
           en: "a backlit keyboard for typing in dim light"
-          hi: "कम रोशनी में टाइप करने के लिए backlit keyboard"
+          hi: "kam roshni mein type karne ke liye backlit keyboard"
           mr: "कमी प्रकाशात टाइप करण्यासाठी backlit keyboard"
       demo:
         hi: "Keyboard ki light on karke dikhaiye"
@@ -718,7 +718,7 @@ themes:
       lines:
         - rx: 'retina|\boled\b|true tone|\bfhd\b|full hd|wuxga|\bips\b'
           en: "a sharp screen that stays comfortable for long hours"
-          hi: "शार्प स्क्रीन, लंबे समय भी आरामदायक"
+          hi: "sharp screen, lambe samay tak bhi aaramdayak"
           mr: "स्पष्ट स्क्रीन, दीर्घ वेळही आरामदायक"
       demo:
         hi: "Ek photo full screen khol kar dikhaiye"

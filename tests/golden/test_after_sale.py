@@ -47,7 +47,7 @@ async def test_reminder_buttons_act_on_their_own_customer_next_day(h):
     assert len(rem.buttons) == 3  # [Customer ko bhejo] [Ho gaya ✓] [Kal yaad dilao]
     done = next(b.id for b in rem.buttons if ":taskdone:" in b.id)
     out = await h.tap(done)
-    assert "Shabash" in out[0].body or "done" in out[0].body.lower()
+    assert "shabash" in out[0].body.lower() or "done" in out[0].body.lower()
     assert not [t for t in await repo.tasks_open(PHONES["associate"]) if t.session_id == shah.id]
     today = await session(h)
     assert today.id != shah.id and today.step.value != "closed"  # the new customer was not touched
@@ -70,7 +70,7 @@ async def test_follow_through_after_install_booking(h):
     out = await h.tap("s:C1:task")  # still possible after the score
     assert "s:C1:task_when:tomorrow" in button_ids(out)
     out = await h.tap("s:C1:task_when:tomorrow")
-    assert out and "Ek second" not in out[0].body
+    assert out and "samajh nahi aaya" not in out[0].body
 
 
 async def test_lost_reason_is_captured(h):
@@ -78,9 +78,9 @@ async def test_lost_reason_is_captured(h):
     await h.tap("s:C1:khatam")
     await h.tap("s:C1:outcome:lost")
     out = await h.tap("s:C1:pricefirst:customer")
-    assert any("Kyun" in (m.body or "") or "why" in (m.body or "").lower() for m in out)
+    assert any("kyun" in (m.body or "").lower() or "why" in (m.body or "").lower() for m in out)
     out = await h.say("customer ko price zyada laga")
-    assert "Ek second" not in out[0].body
+    assert "samajh nahi aaya" not in out[0].body
     s = await session(h)
     assert s.awaiting is None and await repo.events_for(s.id, ["lost_reason"])
 

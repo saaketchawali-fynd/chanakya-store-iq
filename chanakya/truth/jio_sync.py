@@ -83,7 +83,7 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
                     acc = map_accessory(it, kind)
                     if acc and acc["sku"] not in seen:
                         seen.add(acc["sku"])
-                        extras.append(acc)  # an accessory that completes a setup (no promotions fetched for it)
+                        extras.append(acc)  # an accessory that completes a setup (its own promotions fetched too)
                     continue
                 if not cat:
                     for n in [c.get("name") or "?" for c in it.get("categories") or []][:1] or ["?"]:
@@ -103,11 +103,11 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
                 except JioError:
                     errors += 1
 
-        await asyncio.gather(*(one(r) for r in products if r["info"].get("slug")))
+        await asyncio.gather(*(one(r) for r in products + extras if (r.get("info") or {}).get("slug")))
     finally:
         await client.close()
     today = clock.now().date()
-    offers = map_promotions(promos, {r["sku"]: r["category"] for r in products}, today)
+    offers = map_promotions(promos, {r["sku"]: r["category"] for r in products + extras}, today)  # add-ons' own
     labels = {}
     for it in plans_raw:
         lab = ((it.get("attributes") or {}).get("fg-product-category") or "").strip().lower()

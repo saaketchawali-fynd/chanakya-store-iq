@@ -15,7 +15,7 @@ slots:
   - id: trigger
     phase: open
     title: {hi: "Kyun abhi", mr: "आत्ता का", en: "Why now"}
-    ask: {hi: "पुरानी मशीन बदलनी है, या नई ले रहे हैं?", mr: "जुनी मशीन बदलायची आहे, की नवीन घेताय?", en: "Is this replacing an old machine, or a new one?"}
+    ask: {hi: "Purani machine badalni hai, ya nayi le rahe hain?", mr: "जुनी मशीन बदलायची आहे, की नवीन घेताय?", en: "Is this replacing an old machine, or a new one?"}
     why: {hi: "Purana ho to wahi anchor hai: size, exchange aur jagah pehle se pata", mr: "जुनं असेल तर तेच माप: साइज, एक्सचेंज आणि जागा आधीच माहीत", en: "A replacement tells us the size, the exchange and the space already"}
     quick:
       - {id: replace, title: {hi: "Purani badalni", mr: "जुनी बदलायची", en: "Replacing old"}}
@@ -34,7 +34,7 @@ slots:
     phase: life
     number: family_size
     title: {hi: "Parivaar", mr: "कुटुंब", en: "Family size"}
-    ask: {hi: "घर में कितने लोग हैं?", mr: "घरात किती लोक आहेत?", en: "How many people live at home?"}
+    ask: {hi: "Ghar mein kitne log hain?", mr: "घरात किती लोक आहेत?", en: "How many people live at home?"}
     why: {hi: "Logon se sahi kg tay hota hai", mr: "लोकांवरून योग्य kg ठरतं", en: "Family size decides the right kg"}
     quick:
       - {id: f1_2, number: 2, title: {hi: "1–2 log", mr: "1–2 लोक", en: "1–2 people"}}
@@ -55,7 +55,7 @@ slots:
     multi: true
     phase: life
     title: {hi: "Dhulai kitni", mr: "धुलाई किती", en: "Wash load"}
-    ask: {hi: "कपड़े कितनी बार धुलते हैं — रोज़, एक दिन छोड़कर, या हफ़्ते में?", mr: "कपडे किती वेळा धुता — रोज, एक दिवसाआड, की आठवड्याला?", en: "How often do you wash: daily, every other day, or weekly?"}
+    ask: {hi: "Kapde kitni baar dhulte hain — roz, ek din chhodkar, ya hafte mein?", mr: "कपडे किती वेळा धुता — रोज, एक दिवसाआड, की आठवड्याला?", en: "How often do you wash: daily, every other day, or weekly?"}
     why: {hi: "Isse kg aur programme tay hota hai", mr: "यावरून kg आणि प्रोग्राम ठरतो", en: "This decides kg and programmes"}
     quick:
       - {id: daily, title: {hi: "Roz", mr: "रोज", en: "Daily"}}
@@ -78,7 +78,7 @@ slots:
   - id: space
     phase: life
     title: {hi: "Kahan rakhenge", mr: "कुठे ठेवणार", en: "Where it goes"}
-    ask: {hi: "मशीन कहाँ रखेंगे — बाथरूम, बालकनी या किचन?", mr: "मशीन कुठे ठेवणार — बाथरूम, बाल्कनी की किचन?", en: "Where will the machine go: bathroom, balcony or kitchen?"}
+    ask: {hi: "Machine kahan rakhenge — bathroom, balcony ya kitchen?", mr: "मशीन कुठे ठेवणार — बाथरूम, बाल्कनी की किचन?", en: "Where will the machine go: bathroom, balcony or kitchen?"}
     why: {hi: "Geela farsh ho to stand sujhav", mr: "ओला फरशी असेल तर स्टँड सुचवू", en: "A wet floor means we suggest a stand"}
     quick:
       - {id: bathroom, title: {hi: "Bathroom", mr: "बाथरूम", en: "Bathroom"}}
@@ -98,7 +98,7 @@ slots:
     phase: tech
     number: niche_width_cm
     title: {hi: "Jagah ki chaudai", mr: "जागेची रुंदी", en: "Space width"}
-    ask: {hi: "जहाँ मशीन रखेंगे, वो जगह कितनी चौड़ी है?", mr: "जिथे मशीन ठेवणार, ती जागा किती रुंद आहे?", en: "How wide is the space where the machine will go?"}
+    ask: {hi: "Jahan machine rakhenge, wo jagah kitni chaudi hai?", mr: "जिथे मशीन ठेवणार, ती जागा किती रुंद आहे?", en: "How wide is the space where the machine will go?"}
     why: {hi: "Jagah mein fit ho, wahi model dikhayenge", mr: "जागेत बसेल तेच मॉडेल दाखवू", en: "We only show models that fit the space"}
     quick:
       - {id: n_lt60, number: 55, title: {hi: "60 cm se kam", mr: "60 cm पेक्षा कमी", en: "Under 60 cm"}}
@@ -118,7 +118,7 @@ slots:
   - id: water
     phase: tech
     title: {hi: "Paani", mr: "पाणी", en: "Water"}
-    ask: {hi: "आपके यहाँ पानी खारा/भारी है?", mr: "तुमच्याकडे पाणी खारट/जड आहे का?", en: "Is the water hard or salty where you live?"}
+    ask: {hi: "Aapke yahan paani khara/bhari hai?", mr: "तुमच्याकडे पाणी खारट/जड आहे का?", en: "Is the water hard or salty where you live?"}
     why: {hi: "Bhari paani mein heater wali machine behtar", mr: "जड पाण्यात हीटरची मशीन चांगली", en: "Hard water needs a heater"}
     quick:
       - {id: hard, title: {hi: "Haan, khara", mr: "हो, खारट", en: "Yes, hard"}}
@@ -137,7 +137,7 @@ slots:
   - id: load_pref
     phase: life
     title: {hi: "Top/front load", mr: "टॉप/फ्रंट लोड", en: "Top/front load"}
-    ask: {hi: "ऊपर से कपड़े डालने वाली पसंद है या सामने से?", mr: "वरून कपडे घालायची आवडते की समोरून?", en: "Do you prefer loading from the top or the front?"}
+    ask: {hi: "Upar se kapde daalne wali pasand hai, ya saamne se?", mr: "वरून कपडे घालायची आवडते की समोरून?", en: "Do you prefer loading from the top or the front?"}
     why: {hi: "Pasand aur jagah dono dekhni hai", mr: "आवड आणि जागा दोन्ही बघायची", en: "Both preference and space matter"}
     quick:
       - {id: top, title: {hi: "Top load", mr: "टॉप लोड", en: "Top load"}}
@@ -156,7 +156,7 @@ slots:
   - id: elders_back
     phase: life
     title: {hi: "Jhukna mushkil", mr: "वाकणं कठीण", en: "Bending is hard"}
-    ask: {hi: "कपड़े डालने वाले को झुकने में तकलीफ़ होती है?", mr: "कपडे घालणाऱ्याला वाकायला त्रास होतो का?", en: "Does the person loading clothes find bending hard?"}
+    ask: {hi: "Kapde daalne wale ko jhukne mein takleef hoti hai?", mr: "कपडे घालणाऱ्याला वाकायला त्रास होतो का?", en: "Does the person loading clothes find bending hard?"}
     why: {hi: "Jhukna mushkil ho to top load aasaan", mr: "वाकणं कठीण असेल तर टॉप लोड सोपं", en: "If bending is hard, top load is easier"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -172,7 +172,7 @@ slots:
   - id: drying
     phase: life
     title: {hi: "Monsoon sukhana", mr: "पावसात वाळवणं", en: "Monsoon drying"}
-    ask: {hi: "बारिश में कपड़े सुखाने की दिक्कत होती है?", mr: "पावसात कपडे वाळवायचा त्रास होतो का?", en: "Is drying clothes in the monsoon a problem?"}
+    ask: {hi: "Baarish mein kapde sukhane ki dikkat hoti hai?", mr: "पावसात कपडे वाळवायचा त्रास होतो का?", en: "Is drying clothes in the monsoon a problem?"}
     why: {hi: "Zyada RPM se kapde jaldi sukhte hain", mr: "जास्त RPM ने कपडे लवकर वाळतात", en: "Higher RPM dries clothes faster"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -188,7 +188,7 @@ slots:
   - id: decider
     phase: life
     title: {hi: "Faisla kaun", mr: "निर्णय कोण", en: "Decider"}
-    ask: {hi: "फ़ैसला आप ही लेंगे या घर पर किसी से पूछना है?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
+    ask: {hi: "Faisla aap hi lenge, ya ghar par kisi se poochna hai?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
     why: {hi: "Jo decide karega, use Parivaar Card bhejenge", mr: "जो निर्णय घेईल त्याला परिवार कार्ड पाठवू", en: "We'll send the family card to the decider"}
     quick:
       - {id: self, title: {hi: "Khud", mr: "स्वतः", en: "Myself"}}
@@ -207,7 +207,7 @@ slots:
   - id: exchange_old
     phase: tech
     title: {hi: "Purani machine", mr: "जुनी मशीन", en: "Old machine"}
-    ask: {hi: "पुरानी मशीन एक्सचेंज करनी है?", mr: "जुनी मशीन एक्सचेंज करायची आहे का?", en: "Would you like to exchange your old machine?"}
+    ask: {hi: "Purani machine exchange karni hai?", mr: "जुनी मशीन एक्सचेंज करायची आहे का?", en: "Would you like to exchange your old machine?"}
     why: {hi: "Exchange se kharcha kam ho sakta hai", mr: "एक्सचेंजने खर्च कमी होऊ शकतो", en: "Exchange can lower the cost"}
     quick:
       - {id: yes_working, title: {hi: "Haan, chalti hai", mr: "हो, चालू आहे", en: "Yes, working"}}
@@ -226,7 +226,7 @@ slots:
   - id: tap_near
     phase: site
     title: {hi: "Nal paas", mr: "नळ जवळ", en: "Tap nearby"}
-    ask: {hi: "मशीन की जगह के पास नल है?", mr: "मशीनच्या जागेजवळ नळ आहे का?", en: "Is there a tap near the machine spot?"}
+    ask: {hi: "Machine ki jagah ke paas nal hai?", mr: "मशीनच्या जागेजवळ नळ आहे का?", en: "Is there a tap near the machine spot?"}
     why: {hi: "Installer inlet pipe ki lambai jaane", mr: "इन्स्टॉलरला इनलेट पाइपची लांबी कळावी", en: "The installer must know the inlet pipe length"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -245,7 +245,7 @@ slots:
   - id: drain_near
     phase: site
     title: {hi: "Drain paas", mr: "ड्रेन जवळ", en: "Drain nearby"}
-    ask: {hi: "पानी निकलने की नाली पास में है?", mr: "पाणी जाण्याची मोरी जवळ आहे का?", en: "Is there a drain nearby for the outlet?"}
+    ask: {hi: "Paani nikalne ki naali paas mein hai?", mr: "पाणी जाण्याची मोरी जवळ आहे का?", en: "Is there a drain nearby for the outlet?"}
     why: {hi: "Drain door ho to extra pipe", mr: "ड्रेन लांब असेल तर जास्त पाइप", en: "A far drain needs extra pipe"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -264,7 +264,7 @@ slots:
   - id: floor_lift
     phase: site
     title: {hi: "Manzil/lift", mr: "मजला/लिफ्ट", en: "Floor/lift"}
-    ask: {hi: "घर कौन-सी मंज़िल पर है, लिफ़्ट है?", mr: "घर कितव्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
+    ask: {hi: "Ghar kaunsi manzil par hai, lift hai?", mr: "घर कितव्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
     why: {hi: "Delivery team ko pehle se pata ho", mr: "डिलिव्हरी टीमला आधी कळावं", en: "So the delivery team is ready"}
     quick:
       - {id: lift, title: {hi: "Lift hai", mr: "लिफ्ट आहे", en: "Has a lift"}}
@@ -306,50 +306,50 @@ benefits:
     when_spec: {capacity_kg: {gte: 8}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "{kg} kg मतलब एक बार में 2 जींस और 2 बेडशीट।", mr: "{kg} kg म्हणजे एका वेळी 2 जीन्स आणि 2 बेडशीट.", en: "{kg} kg: two pairs of jeans and two bedsheets in one wash."}
-    card: {hi: "एक बार में 2 जींस + 2 बेडशीट", mr: "एका वेळी 2 जीन्स + 2 बेडशीट", en: "2 jeans + 2 bedsheets per wash"}
+    say: {hi: "{kg} kg matlab ek baar mein 2 jeans aur 2 bedsheet.", mr: "{kg} kg म्हणजे एका वेळी 2 जीन्स आणि 2 बेडशीट.", en: "{kg} kg: two pairs of jeans and two bedsheets in one wash."}
+    card: {hi: "Ek baar mein 2 jeans + 2 bedsheet", mr: "एका वेळी 2 जीन्स + 2 बेडशीट", en: "2 jeans + 2 bedsheets per wash"}
   - id: b_kg_mid
     weight: 3
     when_spec: {capacity_kg: {in: [7, 7.5]}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "{kg} kg मतलब एक बार में 1 बेडशीट और 6 शर्ट।", mr: "{kg} kg म्हणजे एका वेळी 1 बेडशीट आणि 6 शर्ट.", en: "{kg} kg: one bedsheet and six shirts in one wash."}
-    card: {hi: "एक बार में 1 बेडशीट + 6 शर्ट", mr: "एका वेळी 1 बेडशीट + 6 शर्ट", en: "1 bedsheet + 6 shirts per wash"}
+    say: {hi: "{kg} kg matlab ek baar mein 1 bedsheet aur 6 shirt.", mr: "{kg} kg म्हणजे एका वेळी 1 बेडशीट आणि 6 शर्ट.", en: "{kg} kg: one bedsheet and six shirts in one wash."}
+    card: {hi: "Ek baar mein 1 bedsheet + 6 shirt", mr: "एका वेळी 1 बेडशीट + 6 शर्ट", en: "1 bedsheet + 6 shirts per wash"}
   - id: b_kg_small
     weight: 3
     when_spec: {capacity_kg: {lt: 7}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
-    say: {hi: "{kg} kg मतलब दो लोगों के रोज़ के कपड़े एक बार में।", mr: "{kg} kg म्हणजे दोघांचे रोजचे कपडे एका वेळी.", en: "{kg} kg: a day's clothes for two in one wash."}
-    card: {hi: "दो लोगों के कपड़े एक बार में", mr: "दोघांचे कपडे एका वेळी", en: "Clothes for two per wash"}
+    say: {hi: "{kg} kg matlab do logon ke roz ke kapde ek baar mein.", mr: "{kg} kg म्हणजे दोघांचे रोजचे कपडे एका वेळी.", en: "{kg} kg: a day's clothes for two in one wash."}
+    card: {hi: "Do logon ke kapde ek baar mein", mr: "दोघांचे कपडे एका वेळी", en: "Clothes for two per wash"}
   - id: b_bend
     weight: 1.5
     when_spec: {load: {eq: top}}
     when_slots: {elders_back: {in: ["yes"]}}
     cites: [elders_back]
-    say: {hi: "ऊपर से कपड़े डालिए — झुकना नहीं पड़ेगा।", mr: "वरून कपडे घाला — वाकावं लागणार नाही.", en: "Load from the top: no bending needed."}
-    card: {hi: "झुकना नहीं पड़ेगा", mr: "वाकावं लागणार नाही", en: "No bending"}
+    say: {hi: "Upar se kapde daaliye — jhukna nahi padega.", mr: "वरून कपडे घाला — वाकावं लागणार नाही.", en: "Load from the top: no bending needed."}
+    card: {hi: "Jhukna nahi padega", mr: "वाकावं लागणार नाही", en: "No bending"}
   - id: b_heater
     weight: 1
     when_spec: {heater: {eq: true}}
     when_slots: {water: {in: [hard]}}
     cites: [water]
-    say: {hi: "गर्म पानी की धुलाई — खारे पानी में भी कपड़े साफ़।", mr: "गरम पाण्याची धुलाई — खारट पाण्यातही कपडे स्वच्छ.", en: "Hot-water wash: clothes come clean even in hard water."}
-    card: {hi: "खारे पानी में भी साफ़", mr: "खारट पाण्यातही स्वच्छ", en: "Clean in hard water"}
+    say: {hi: "Garam paani ki dhulai — khare paani mein bhi kapde saaf.", mr: "गरम पाण्याची धुलाई — खारट पाण्यातही कपडे स्वच्छ.", en: "Hot-water wash: clothes come clean even in hard water."}
+    card: {hi: "Khare paani mein bhi saaf", mr: "खारट पाण्यातही स्वच्छ", en: "Clean in hard water"}
   - id: b_rpm
     weight: 1
     when_spec: {rpm: {gte: 1000}}
     when_slots: {drying: {in: ["yes"]}}
     cites: [drying]
-    say: {hi: "{rpm} RPM — बारिश में भी कपड़े जल्दी सूखेंगे।", mr: "{rpm} RPM — पावसातही कपडे लवकर वाळतील.", en: "{rpm} RPM: clothes dry faster even in the monsoon."}
-    card: {hi: "बारिश में जल्दी सूखें", mr: "पावसात लवकर वाळतात", en: "Faster drying in monsoon"}
+    say: {hi: "{rpm} RPM — baarish mein bhi kapde jaldi sukhenge.", mr: "{rpm} RPM — पावसातही कपडे लवकर वाळतील.", en: "{rpm} RPM: clothes dry faster even in the monsoon."}
+    card: {hi: "Baarish mein jaldi sukhein", mr: "पावसात लवकर वाळतात", en: "Faster drying in monsoon"}
   - id: b_quick
     weight: 0.5
     when_spec: {quick_wash: {eq: true}}
     when_slots: {wash_load: {has_any: [daily, uniforms]}}
     cites: [wash_load]
-    say: {hi: "रोज़ के कपड़े क्विक वॉश में जल्दी धुल जाएँगे।", mr: "रोजचे कपडे क्विक वॉशमध्ये लवकर धुतील.", en: "Daily clothes wash fast on the quick-wash programme."}
-    card: {hi: "क्विक वॉश रोज़ के लिए", mr: "रोजसाठी क्विक वॉश", en: "Quick wash for daily loads"}
+    say: {hi: "Roz ke kapde quick wash mein jaldi dhul jayenge.", mr: "रोजचे कपडे क्विक वॉशमध्ये लवकर धुतील.", en: "Daily clothes wash fast on the quick-wash programme."}
+    card: {hi: "Quick wash roz ke liye", mr: "रोजसाठी क्विक वॉश", en: "Quick wash for daily loads"}
 
 demos:
   - id: drum_bedsheet
@@ -357,19 +357,19 @@ demos:
     when_slots: {family_size: {known: true}}
     differs_on: capacity_kg
     steps: {hi: "Ek bedsheet tah karke {best} aur {other} ke drum mein rakh kar dikhaiye", mr: "एक बेडशीट घडी करून {best} आणि {other} च्या ड्रममध्ये ठेवून दाखवा", en: "Fold a bedsheet into the drums of {best} and {other}"}
-    say: {hi: "देखिए, {best} में बेडशीट आराम से घूमेगी।", mr: "बघा, {best} मध्ये बेडशीट आरामात फिरेल.", en: "See how the bedsheet has room to turn in {best}."}
+    say: {hi: "Dekhiye, {best} mein bedsheet aaram se ghoomegi.", mr: "बघा, {best} मध्ये बेडशीट आरामात फिरेल.", en: "See how the bedsheet has room to turn in {best}."}
   - id: bend_test
     title: {hi: "Jhukne ka test", mr: "वाकण्याची टेस्ट", en: "Bend test"}
     when_slots: {elders_back: {in: ["yes"]}}
     differs_on: load
     steps: {hi: "Customer se dono machine mein kapde daal kar dekhne kahiye", mr: "ग्राहकाला दोन्ही मशीनमध्ये कपडे घालून बघायला सांगा", en: "Ask the customer to load clothes into both machines"}
-    say: {hi: "खुद डालकर देखिए — {best} में झुकना कम पड़ता है।", mr: "स्वतः घालून बघा — {best} मध्ये कमी वाकावं लागतं.", en: "Try loading both: {best} needs less bending."}
+    say: {hi: "Khud daalkar dekhiye — {best} mein jhukna kam padta hai.", mr: "स्वतः घालून बघा — {best} मध्ये कमी वाकावं लागतं.", en: "Try loading both: {best} needs less bending."}
   - id: quick_wash
     title: {hi: "Quick wash", mr: "क्विक वॉश", en: "Quick wash"}
     when_slots: {wash_load: {known: true}}
     differs_on: null
     steps: {hi: "Control panel par quick wash programme aur time dikhaiye", mr: "कंट्रोल पॅनलवर क्विक वॉश प्रोग्राम आणि वेळ दाखवा", en: "Show the quick-wash programme and its time on the panel"}
-    say: {hi: "रोज़ के कपड़ों के लिए ये बटन — जल्दी धुलाई।", mr: "रोजच्या कपड्यांसाठी हे बटण — लवकर धुलाई.", en: "This button is for daily clothes: a fast wash."}
+    say: {hi: "Roz ke kapdon ke liye ye button — jaldi dhulai.", mr: "रोजच्या कपड्यांसाठी हे बटण — लवकर धुलाई.", en: "This button is for daily clothes: a fast wash."}
 
 myths:
   - id: wm_front_always_better
@@ -377,7 +377,7 @@ myths:
     belief: "A front-load machine is always better than a top-load"
     proof: bend_test
     keywords: ["front load hi achha", "front load best", "front load better", "फ्रंट लोड ही अच्छा", "फ्रंट लोडच चांगलं"]
-    line: {hi: "सही, फ्रंट लोड कपड़े अच्छे धोता है। पर झुकना और जगह भी मायने रखते हैं — आपके घर के हिसाब से देखते हैं।",
+    line: {hi: "Sahi, front load kapde achhe dhota hai. Par jhukna aur jagah bhi maayne rakhte hain — aapke ghar ke hisaab se dekhte hain.",
            mr: "बरोबर, फ्रंट लोड कपडे छान धुतो. पण वाकणं आणि जागाही महत्त्वाची — तुमच्या घरानुसार बघू.",
            en: "True, front loads wash well. Bending and space matter too, so let's match it to your home."}
   - id: wm_bigger_kg_better
@@ -385,7 +385,7 @@ myths:
     belief: "A bigger kg machine is always better"
     proof: drum_bedsheet
     keywords: ["sabse bada kilo", "zyada kilo achha", "bigger kg better", "ज़्यादा किलो", "जास्त किलो"]
-    line: {hi: "सही सोचा, बड़ी मशीन में ज़्यादा कपड़े आते हैं। पर परिवार के हिसाब से सही kg लें तो पानी-बिजली कम लगती है।",
+    line: {hi: "Sahi socha, badi machine mein zyada kapde aate hain. Par parivaar ke hisaab se sahi kg lein to paani-bijli kam lagti hai.",
            mr: "बरोबर विचार, मोठ्या मशीनमध्ये जास्त कपडे बसतात. पण कुटुंबानुसार योग्य kg घेतल्यास पाणी-वीज कमी लागते.",
            en: "Fair thought: bigger holds more. The right kg for your family uses less water and power."}
 site_needs: [tap_near, drain_near, floor_lift]
@@ -419,10 +419,10 @@ quiz:
     explain: {hi: "Pehle maaniye, phir poora kharcha card dikhaiye — installation, warranty sab.", mr: "आधी मान्य करा, मग पूर्ण खर्चाचं कार्ड दाखवा — इन्स्टॉलेशन, वॉरंटी सगळं.", en: "Agree first, then show the full-cost card: installation, warranty, all of it."}
 
 needs:
-  capacity_ok: {hi: "परिवार के कपड़ों के लिए क्षमता", mr: "कुटुंबाच्या कपड्यांसाठी क्षमता", en: "Load for your family"}
-  width_fit: {hi: "आपकी जगह में फ़िट", mr: "तुमच्या जागेत बसतं", en: "Fits your space"}
-  bend_ok: {hi: "झुकना नहीं पड़ेगा", mr: "वाकावं लागणार नाही", en: "No bending"}
-  top_pref: {hi: "Top load पसंद", mr: "Top load पसंत", en: "Top load preferred"}
-  front_pref: {hi: "Front load पसंद", mr: "Front load पसंत", en: "Front load preferred"}
-  hard_water_ok: {hi: "Hard water (खारा पानी)", mr: "Hard water (क्षारयुक्त पाणी)", en: "Hard water"}
-  dry_ok: {hi: "बारिश में जल्दी सूखे", mr: "पावसाळ्यात लवकर वाळतं", en: "Faster drying in monsoon"}
+  capacity_ok: {hi: "Parivaar ke kapdon ke liye capacity", mr: "कुटुंबाच्या कपड्यांसाठी क्षमता", en: "Load for your family"}
+  width_fit: {hi: "Aapki jagah mein fit", mr: "तुमच्या जागेत बसतं", en: "Fits your space"}
+  bend_ok: {hi: "Jhukna nahi padega", mr: "वाकावं लागणार नाही", en: "No bending"}
+  top_pref: {hi: "Top load pasand", mr: "Top load पसंत", en: "Top load preferred"}
+  front_pref: {hi: "Front load pasand", mr: "Front load पसंत", en: "Front load preferred"}
+  hard_water_ok: {hi: "Hard water (khara paani)", mr: "Hard water (क्षारयुक्त पाणी)", en: "Hard water"}
+  dry_ok: {hi: "Baarish mein jaldi sukhe", mr: "पावसाळ्यात लवकर वाळतं", en: "Faster drying in monsoon"}

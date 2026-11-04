@@ -67,7 +67,7 @@ def _options(ctx: SkillContext) -> str | None:
     meets = [o for o in others if o and any(c.rule_id == top and c.match >= 1 for c in fit(o, s.home, ctx.pack, g).contributions)]
     if meets:
         return None
-    need = ctx.pick(ctx.pack.needs[top], "en" if ctx.lang == "hi" else ctx.lang)
+    need = ctx.pick(ctx.pack.needs[top], ctx.lang)
     if "{" in need:
         return None
     return _once(ctx, "only_best", ctx.t("tip_only_best", label=lab, need=need))

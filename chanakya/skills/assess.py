@@ -382,11 +382,12 @@ async def doubt_list(ctx: SkillContext) -> Reply:
     from chanakya.core.contracts import ListRow, ListSection, OutMessage
 
     myths = ctx.packs.all_myths(ctx.session.home.category)
-    rows = [ListRow(id=ctx.sid("myth", m.id), title=truncate(ctx.pick(getattr(m, "short", None) or {"en": m.belief}), 24))
+    rows = [ListRow(id=ctx.sid("myth", m.id), title=truncate(ctx.pick(getattr(m, "short", None) or {"en": m.belief}), 24),
+                    description=truncate(ctx.pick(m.line, ctx.clang), 72))  # a preview of the line they'll say
             for m in myths if getattr(m, "short", None)][:9]
-    rows.append(ListRow(id=ctx.sid("doubt_voice"), title=ctx.t("row_other_doubt")))
+    rows.append(ListRow(id=ctx.sid("doubt_voice"), title=ctx.t("row_other_doubt"), description=ctx.t("row_other_doubt_d")))
     for r in rows:
-        ctx.reg.static(r.title)
+        ctx.reg.static(r.title + " " + (r.description or ""))
     return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("doubt_list_body"),
                                 list_button=truncate_title(ctx.t("list_doubt")), sections=[ListSection(rows=rows)],
                                 allowed_numbers=ctx.reg.allowed()))
@@ -449,7 +450,10 @@ async def status(ctx: SkillContext) -> Reply:
     btns.append(ctx.b("b_khatam", ctx.sid("khatam")))
     from chanakya.core.status import status_line
 
-    msg.body = status_line(ctx) or msg.body
+    st = [x for x in (status_line(ctx) or "").split(" · ") if x]
+    if st:  # 'Where C1 Shah stands', then each fact on its own line, then where the details are
+        msg.body = "\n".join([ctx.t("status_head", who=st[0]), ""] + [f"• {x}" for x in st[1:]]
+                             + (["", ctx.t("status_tail")] if msg.card else []))
     msg.buttons = btns
     msg.kind = "buttons"
     msg.allowed_numbers = ctx.reg.allowed()
@@ -486,7 +490,7 @@ async def data_explain(ctx: SkillContext, key: str) -> Reply:
             for i, v in enumerate(vals[:2])]
     btns.append(ctx.b("b_dq_any", ctx.sid("dq", key, "any")))
     ctx.ev("data_question_explained", key=key)
-    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns))
+    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns, do="do_explain"))
 
 
 async def data_answer(ctx: SkillContext, key: str, choice: str) -> Reply:

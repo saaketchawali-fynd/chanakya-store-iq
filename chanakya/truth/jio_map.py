@@ -259,6 +259,9 @@ def short_name(brand: str, specs: dict, mn: str | None, name: str) -> str:
     return " ".join(parts)
 
 
+ENERGY_LABEL = re.compile(r"(?i)bee[-_ ]|energy[-_ ]?label|star[-_ ]?label")  # BEE star-label pictures are not views
+
+
 def price(p: dict, kind: str) -> int | None:
     v = ((p.get("price") or {}).get(kind) or {}).get("min")
     if v is None:
@@ -278,7 +281,8 @@ def map_product(p: dict, category: str) -> dict | None:
     dims, dsrc = _dims(p)
     src.update(dsrc)
     mn = model_number(p)
-    feats = [f for f in [*(p.get("highlights") or []), *_strip_html(attr(p, "features") or attr(p, "key-features") or "")]
+    feats = [f for f in [*(p.get("highlights") or []),
+                         *_strip_html(attr(p, "features") or attr(p, "key-features") or attr(p, "key-feature") or "")]
              if str(f).strip()]  # the highlights first, then the features list (both the backend's own words)
     feats = list(dict.fromkeys(" ".join(str(f).split()) for f in feats))
     sku = str(p.get("item_code") or p.get("uid"))
@@ -291,6 +295,8 @@ def map_product(p: dict, category: str) -> dict | None:
         "categories": [c.get("name") for c in p.get("categories") or []], "sellable": bool(p.get("sellable")),
         "teaser_tag": p.get("teaser_tag") if isinstance(p.get("teaser_tag"), str) else None,
         "images": medias[:6],  # every photo of this product: the try-on uses the first that cuts out cleanly
+        "gallery": [u for u in medias if not ENERGY_LABEL.search(u)][:6],  # product shots only, for the product page
+        "brand_logo": ((p.get("brand") or {}).get("logo") or {}).get("url"),
     }
     return {
         "sku": sku, "category": category, "brand": brand, "model": short_name(brand, specs, mn, name),

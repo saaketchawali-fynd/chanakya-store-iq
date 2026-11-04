@@ -76,7 +76,9 @@ async def khatam(ctx: SkillContext) -> Reply:
         ctx.b("b_followup", ctx.sid("outcome", "followup")),
         ctx.b("b_lost", ctx.sid("outcome", "lost")),
     ]
-    return ctx.reply(info_reply(ctx, ctx.t("review_ask"), btns))
+    from chanakya.skills.follow import _cust_name
+
+    return ctx.reply(info_reply(ctx, ctx.t("review_ask", name=_cust_name(ctx)), btns))
 
 
 async def outcome(ctx: SkillContext, out: str) -> Reply:
@@ -142,12 +144,12 @@ async def finish(ctx: SkillContext) -> Reply:
         data={  # type: ignore[arg-type]
             "score_str": f"{score_str}/14",
             "steps": [{"name": ctx.t(f"step_{st}"), "points": steps[st]} for st in STEPS],
-            "level_text": level,
+            "level_text": level.strip("*"),  # the card draws its own weight
             "praise": praise,
             "tip": tip,
         },
     )
-    caption = "\n".join([level, ctx.t("review_best", text=praise), ctx.t("review_next", text=tip)])
+    caption = level + "\n\n" + "\n".join([ctx.t("review_best", text=praise), ctx.t("review_next", text=tip)])
     btns = [
         ctx.b("b_new_customer", encode("g", "new")),
         ctx.b("b_score", encode("g", "score")),

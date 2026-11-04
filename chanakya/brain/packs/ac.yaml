@@ -15,7 +15,7 @@ slots:
   - id: trigger
     phase: open
     title: {hi: "Kyun abhi", mr: "आत्ता का", en: "Why now"}
-    ask: {hi: "पुराना AC बदलना है, या नया लगवा रहे हैं?", mr: "जुना AC बदलायचा आहे, की नवीन बसवताय?", en: "Is this replacing an old AC, or a new one?"}
+    ask: {hi: "Purana AC badalna hai, ya naya lagwa rahe hain?", mr: "जुना AC बदलायचा आहे, की नवीन बसवताय?", en: "Is this replacing an old AC, or a new one?"}
     why: {hi: "Purana ho to wahi anchor hai: size, exchange aur jagah pehle se pata", mr: "जुनं असेल तर तेच माप: साइज, एक्सचेंज आणि जागा आधीच माहीत", en: "A replacement tells us the size, the exchange and the space already"}
     quick:
       - {id: replace, title: {hi: "Purana badalna", mr: "जुना बदलायचा", en: "Replacing old"}}
@@ -34,7 +34,7 @@ slots:
     phase: life
     number: room_size_sqft
     title: {hi: "Kamre ka size", mr: "खोलीचा आकार", en: "Room size"}
-    ask: {hi: "AC किस कमरे में लगेगा, और कमरा लगभग कितना बड़ा है — 10×10, 10×12 या बड़ा?", mr: "AC कोणत्या खोलीत लागेल, आणि खोली साधारण किती मोठी आहे — 10×10, 10×12 की मोठी?", en: "Which room is it for, and roughly how big: 10×10, 10×12 or bigger?"}
+    ask: {hi: "AC kis kamre mein lagega, aur kamra lagbhag kitna bada hai — 10×10, 10×12 ya bada?", mr: "AC कोणत्या खोलीत लागेल, आणि खोली साधारण किती मोठी आहे — 10×10, 10×12 की मोठी?", en: "Which room is it for, and roughly how big: 10×10, 10×12 or bigger?"}
     why: {hi: "Kamre se sahi ton tay hota hai", mr: "खोलीवरून योग्य ton ठरतो", en: "Room size decides the right tonnage"}
     quick:
       - {id: r_le120, number: 100, title: {hi: "10×10 tak", mr: "10×10 पर्यंत", en: "Up to 10×10"}}
@@ -56,7 +56,7 @@ slots:
   - id: sun_exposure
     phase: life
     title: {hi: "Top floor/dhoop", mr: "वरचा मजला/ऊन", en: "Top floor/sun"}
-    ask: {hi: "कमरा सबसे ऊपर की मंज़िल पर है, या दोपहर की धूप किसी दीवार पर आती है?", mr: "खोली वरच्या मजल्यावर आहे का, किंवा दुपारचं ऊन एखाद्या भिंतीवर येतं का?", en: "Is it on the top floor, or does afternoon sun hit a wall?"}
+    ask: {hi: "Kamra sabse upar ki manzil par hai, ya dopahar ki dhoop kisi deewar par aati hai?", mr: "खोली वरच्या मजल्यावर आहे का, किंवा दुपारचं ऊन एखाद्या भिंतीवर येतं का?", en: "Is it on the top floor, or does afternoon sun hit a wall?"}
     why: {hi: "Garam kamre ko aadha ton zyada chahiye", mr: "गरम खोलीला अर्धा ton जास्त लागतो", en: "A hot room needs half a ton more"}
     quick:
       - {id: "yes", title: {hi: "Haan, top/dhoop", mr: "हो, वरचा/ऊन", en: "Yes, top/sun"}}
@@ -73,7 +73,7 @@ slots:
     phase: life
     number: hours_per_day
     title: {hi: "Roz kitne hours", mr: "रोज किती hours", en: "Hours per day"}
-    ask: {hi: "AC रोज़ लगभग कितने hours चलेगा?", mr: "AC रोज साधारण किती hours चालेल?", en: "About how many hours a day will the AC run?"}
+    ask: {hi: "AC roz lagbhag kitne hours chalega?", mr: "AC रोज साधारण किती hours चालेल?", en: "About how many hours a day will the AC run?"}
     why: {hi: "Hours se star rating aur bill tay hota hai", mr: "hours वरून star rating आणि बिल ठरतं", en: "Hours decide the star rating and the bill"}
     quick:
       - {id: h_le4, number: 3, title: {hi: "4 h tak", mr: "4 h पर्यंत", en: "Up to 4 hours"}}
@@ -93,7 +93,7 @@ slots:
   - id: power_issues
     phase: life
     title: {hi: "Voltage issue", mr: "व्होल्टेज त्रास", en: "Voltage issues"}
-    ask: {hi: "आपके यहाँ वोल्टेज ऊपर-नीचे होता है या बिजली जाती है?", mr: "तुमच्याकडे व्होल्टेज कमी-जास्त होतो का किंवा वीज जाते का?", en: "Does the voltage fluctuate, or are there power cuts?"}
+    ask: {hi: "Aapke yahan voltage upar-neeche hota hai, ya bijli jaati hai?", mr: "तुमच्याकडे व्होल्टेज कमी-जास्त होतो का किंवा वीज जाते का?", en: "Does the voltage fluctuate, or are there power cuts?"}
     why: {hi: "Voltage issue ho to stabiliser sujhav", mr: "व्होल्टेजचा त्रास असेल तर स्टॅबिलायझर सुचवू", en: "Voltage trouble means we suggest a stabiliser"}
     quick:
       - {id: "yes", title: {hi: "Haan, hota hai", mr: "हो, होतो", en: "Yes"}}
@@ -109,7 +109,7 @@ slots:
   - id: people
     phase: life
     title: {hi: "Kitne log", mr: "किती लोक", en: "People in room"}
-    ask: {hi: "कमरे में आम तौर पर कितने लोग रहते हैं?", mr: "खोलीत साधारण किती लोक असतात?", en: "Usually how many people are in the room?"}
+    ask: {hi: "Kamre mein aam taur par kitne log rehte hain?", mr: "खोलीत साधारण किती लोक असतात?", en: "Usually how many people are in the room?"}
     why: {hi: "Zyada log = zyada garmi", mr: "जास्त लोक = जास्त उष्णता", en: "More people means more heat"}
     quick:
       - {id: p1_2, title: {hi: "1–2", mr: "1–2", en: "1–2"}}
@@ -128,7 +128,7 @@ slots:
   - id: decider
     phase: life
     title: {hi: "Faisla kaun", mr: "निर्णय कोण", en: "Decider"}
-    ask: {hi: "फ़ैसला आप ही लेंगे या घर पर किसी से पूछना है?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
+    ask: {hi: "Faisla aap hi lenge, ya ghar par kisi se poochna hai?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
     why: {hi: "Jo decide karega, use Parivaar Card bhejenge", mr: "जो निर्णय घेईल त्याला परिवार कार्ड पाठवू", en: "We'll send the family card to the decider"}
     quick:
       - {id: self, title: {hi: "Khud", mr: "स्वतः", en: "Myself"}}
@@ -147,7 +147,7 @@ slots:
   - id: app_control
     phase: tech
     title: {hi: "Phone se control", mr: "फोनवरून कंट्रोल", en: "App control"}
-    ask: {hi: "फ़ोन से बाहर से ही AC चालू करना काम का लगेगा?", mr: "फोनवरून बाहेरूनच AC चालू करणं उपयोगी वाटेल का?", en: "Would starting the AC from your phone be useful?"}
+    ask: {hi: "Phone se bahar se hi AC chalu karna kaam ka lagega?", mr: "फोनवरून बाहेरूनच AC चालू करणं उपयोगी वाटेल का?", en: "Would starting the AC from your phone be useful?"}
     why: {hi: "Zaroori ho tabhi WiFi model", mr: "गरज असेल तरच WiFi मॉडेल", en: "Only suggest WiFi if it matters"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -163,7 +163,7 @@ slots:
   - id: exchange_old
     phase: tech
     title: {hi: "Purana AC", mr: "जुना AC", en: "Old AC exchange"}
-    ask: {hi: "पुराना AC एक्सचेंज करना है?", mr: "जुना AC एक्सचेंज करायचा आहे का?", en: "Would you like to exchange your old AC?"}
+    ask: {hi: "Purana AC exchange karna hai?", mr: "जुना AC एक्सचेंज करायचा आहे का?", en: "Would you like to exchange your old AC?"}
     why: {hi: "Exchange se kharcha kam ho sakta hai", mr: "एक्सचेंजने खर्च कमी होऊ शकतो", en: "Exchange can lower the cost"}
     quick:
       - {id: yes_working, title: {hi: "Haan, chalta hai", mr: "हो, चालू आहे", en: "Yes, working"}}
@@ -182,7 +182,7 @@ slots:
   - id: outdoor_spot
     phase: site
     title: {hi: "Outdoor unit", mr: "आउटडोअर युनिट", en: "Outdoor unit"}
-    ask: {hi: "बाहर का यूनिट कहाँ लगेगा — दीवार पर, बालकनी में या छत पर?", mr: "बाहेरचं युनिट कुठे लागेल — भिंतीवर, बाल्कनीत की गच्चीवर?", en: "Where will the outdoor unit go: wall, balcony or terrace?"}
+    ask: {hi: "Bahar ka unit kahan lagega — deewar par, balcony mein ya chhat par?", mr: "बाहेरचं युनिट कुठे लागेल — भिंतीवर, बाल्कनीत की गच्चीवर?", en: "Where will the outdoor unit go: wall, balcony or terrace?"}
     why: {hi: "Deewar par ho to bracket lagega", mr: "भिंतीवर असेल तर ब्रॅकेट लागेल", en: "A wall spot needs a bracket"}
     quick:
       - {id: wall, title: {hi: "Deewar par", mr: "भिंतीवर", en: "On the wall"}}
@@ -202,7 +202,7 @@ slots:
     phase: site
     number: pipe_run_ft
     title: {hi: "Pipe ki lambai", mr: "पाइपची लांबी", en: "Pipe length"}
-    ask: {hi: "अंदर और बाहर के यूनिट के बीच कितनी दूरी होगी?", mr: "आतल्या आणि बाहेरच्या युनिटमध्ये किती अंतर असेल?", en: "How far apart will the indoor and outdoor units be?"}
+    ask: {hi: "Andar aur bahar ke unit ke beech kitni doori hogi?", mr: "आतल्या आणि बाहेरच्या युनिटमध्ये किती अंतर असेल?", en: "How far apart will the indoor and outdoor units be?"}
     why: {hi: "10 ft se zyada pipe ka alag kharcha", mr: "10 ft पेक्षा जास्त पाइपचा वेगळा खर्च", en: "Pipe beyond 10 ft costs extra"}
     quick:
       - {id: p_le10, number: 10, title: {hi: "10 ft tak", mr: "10 ft पर्यंत", en: "Up to 10 ft"}}
@@ -222,7 +222,7 @@ slots:
   - id: wall_hole
     phase: site
     title: {hi: "Deewar mein chhed", mr: "भिंतीला होल", en: "Wall hole"}
-    ask: {hi: "पाइप के लिए दीवार में छेद पहले से है?", mr: "पाइपसाठी भिंतीला आधीच होल आहे का?", en: "Is there already a hole in the wall for the pipe?"}
+    ask: {hi: "Pipe ke liye deewar mein chhed pehle se hai?", mr: "पाइपसाठी भिंतीला आधीच होल आहे का?", en: "Is there already a hole in the wall for the pipe?"}
     why: {hi: "Chhed nahi to drilling ka kharcha", mr: "होल नसेल तर ड्रिलिंगचा खर्च", en: "No hole means a drilling charge"}
     quick:
       - {id: existing, title: {hi: "Pehle se hai", mr: "आधीच आहे", en: "Already there"}}
@@ -241,7 +241,7 @@ slots:
   - id: socket_15a
     phase: site
     title: {hi: "15A socket", mr: "15A सॉकेट", en: "15A socket"}
-    ask: {hi: "AC की जगह के पास 15 एम्पियर का बड़ा सॉकेट है?", mr: "AC च्या जागेजवळ 15 अँपिअरचं मोठं सॉकेट आहे का?", en: "Is there a 15-amp power socket near the AC spot?"}
+    ask: {hi: "AC ki jagah ke paas 15 amp ka bada socket hai?", mr: "AC च्या जागेजवळ 15 अँपिअरचं मोठं सॉकेट आहे का?", en: "Is there a 15-amp power socket near the AC spot?"}
     why: {hi: "AC ko 15A socket chahiye, warna electrician", mr: "AC ला 15A सॉकेट हवं, नाहीतर इलेक्ट्रिशियन", en: "An AC needs a 15A socket, else an electrician"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -260,7 +260,7 @@ slots:
   - id: floor_lift
     phase: site
     title: {hi: "Manzil/lift", mr: "मजला/लिफ्ट", en: "Floor/lift"}
-    ask: {hi: "घर कौन-सी मंज़िल पर है, लिफ़्ट है?", mr: "घर कितव्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
+    ask: {hi: "Ghar kaunsi manzil par hai, lift hai?", mr: "घर कितव्या मजल्यावर आहे, लिफ्ट आहे का?", en: "Which floor is the home on, and is there a lift?"}
     why: {hi: "Delivery team ko pehle se pata ho", mr: "डिलिव्हरी टीमला आधी कळावं", en: "So the delivery team is ready"}
     quick:
       - {id: lift, title: {hi: "Lift hai", mr: "लिफ्ट आहे", en: "Has a lift"}}
@@ -294,43 +294,43 @@ benefits:
     when_spec: {ton: {in_band: true}}
     when_slots: {room_size: {known: true}}
     cites: [room_size]
-    say: {hi: "{ton} ton मतलब आपके {sqft} sq ft कमरे के लिए सही ठंडक।", mr: "{ton} ton म्हणजे तुमच्या {sqft} sq ft खोलीसाठी योग्य थंडावा.", en: "{ton} ton means the right cooling for your {sqft} sq ft room."}
-    card: {hi: "कमरे के लिए सही ठंडक", mr: "खोलीसाठी योग्य थंडावा", en: "Right cooling for the room"}
+    say: {hi: "{ton} ton matlab aapke {sqft} sq ft kamre ke liye sahi thandak.", mr: "{ton} ton म्हणजे तुमच्या {sqft} sq ft खोलीसाठी योग्य थंडावा.", en: "{ton} ton means the right cooling for your {sqft} sq ft room."}
+    card: {hi: "Kamre ke liye sahi thandak", mr: "खोलीसाठी योग्य थंडावा", en: "Right cooling for the room"}
   - id: b_star_bill
     weight: 2
     when_spec: {star: {gte: 5}}
     when_slots: {hours_per_day: {gte: 8}}
     cites: [hours_per_day]
-    say: {hi: "{star}-star: रोज़ {hours} h चलाकर भी बिल लगभग {monthly_bill} महीना।", mr: "{star}-star: रोज {hours} h चालवूनही बिल साधारण {monthly_bill} महिना.", en: "{star}-star: even {hours} hours a day, the bill is about {monthly_bill} a month."}
-    card: {hi: "रोज़ चलाओ, बिल कम", mr: "रोज चालवा, बिल कमी", en: "Daily use, lower bill"}
+    say: {hi: "{star}-star: roz {hours} h chalakar bhi bill lagbhag {monthly_bill} mahine ka.", mr: "{star}-star: रोज {hours} h चालवूनही बिल साधारण {monthly_bill} महिना.", en: "{star}-star: even {hours} hours a day, the bill is about {monthly_bill} a month."}
+    card: {hi: "Roz chalaiye, bill kam", mr: "रोज चालवा, बिल कमी", en: "Daily use, lower bill"}
   - id: b_saving
     weight: 2
     when_spec: {star: {gte: 5}}
     when_slots: {hours_per_day: {known: true}}
     cites: [hours_per_day]
-    say: {hi: "3-star से 5 साल में लगभग {five_year_saving} की बिजली बचत।", mr: "3-star पेक्षा 5 वर्षांत साधारण {five_year_saving} वीज बचत.", en: "About {five_year_saving} saved on electricity over 5 years versus 3-star."}
-    card: {hi: "5 साल में बिजली बचत", mr: "5 वर्षांत वीज बचत", en: "Electricity savings in 5 years"}
+    say: {hi: "3-star se 5 saal mein lagbhag {five_year_saving} ki bijli bachat.", mr: "3-star पेक्षा 5 वर्षांत साधारण {five_year_saving} वीज बचत.", en: "About {five_year_saving} saved on electricity over 5 years versus 3-star."}
+    card: {hi: "5 saal mein bijli bachat", mr: "5 वर्षांत वीज बचत", en: "Electricity savings in 5 years"}
   - id: b_sun
     weight: 1.5
     when_spec: {ton: {in_band: true}}
     when_slots: {sun_exposure: {in: ["yes"]}}
     cites: [sun_exposure]
-    say: {hi: "ऊपर की मंज़िल की गर्मी के लिए आधा ton ज़्यादा रखा है।", mr: "वरच्या मजल्याच्या उष्णतेसाठी अर्धा ton जास्त ठेवला आहे.", en: "We added half a ton for the top-floor heat."}
-    card: {hi: "गर्म कमरे में भी ठंडक", mr: "गरम खोलीतही थंडावा", en: "Cool even in a hot room"}
+    say: {hi: "Upar ki manzil ki garmi ke liye aadha ton zyada rakha hai.", mr: "वरच्या मजल्याच्या उष्णतेसाठी अर्धा ton जास्त ठेवला आहे.", en: "We added half a ton for the top-floor heat."}
+    card: {hi: "Garam kamre mein bhi thandak", mr: "गरम खोलीतही थंडावा", en: "Cool even in a hot room"}
   - id: b_quiet
     weight: 1
     when_spec: {noise_db: {lte: 38}}
     when_slots: {hours_per_day: {known: true}}
     cites: [hours_per_day]
-    say: {hi: "{noise_db} dB — रात को नींद में आवाज़ से खलल नहीं।", mr: "{noise_db} dB — रात्री झोपेत आवाजाचा त्रास नाही.", en: "{noise_db} dB: quiet enough not to disturb your sleep."}
-    card: {hi: "रात में शांत", mr: "रात्री शांत", en: "Quiet at night"}
+    say: {hi: "{noise_db} dB — raat ko awaaz se neend kharab nahi hogi.", mr: "{noise_db} dB — रात्री झोपेत आवाजाचा त्रास नाही.", en: "{noise_db} dB: quiet enough not to disturb your sleep."}
+    card: {hi: "Raat mein shaant", mr: "रात्री शांत", en: "Quiet at night"}
   - id: b_wifi
     weight: 0.5
     when_spec: {wifi: {eq: true}}
     when_slots: {app_control: {in: ["yes"]}}
     cites: [app_control]
-    say: {hi: "घर पहुँचने से पहले ही फ़ोन से AC चालू कर दीजिए।", mr: "घरी पोहोचण्याआधीच फोनवरून AC चालू करा.", en: "Switch the AC on from your phone before you reach home."}
-    card: {hi: "बाहर से ही AC चालू", mr: "बाहेरूनच AC चालू", en: "Start AC from outside"}
+    say: {hi: "Ghar pahunchne se pehle hi phone se AC chalu kar dijiye.", mr: "घरी पोहोचण्याआधीच फोनवरून AC चालू करा.", en: "Switch the AC on from your phone before you reach home."}
+    card: {hi: "Bahar se hi AC chalu", mr: "बाहेरूनच AC चालू", en: "Start AC from outside"}
 
 demos:
   - id: label_compare
@@ -338,25 +338,25 @@ demos:
     when_slots: {hours_per_day: {known: true}}
     differs_on: star
     steps: {hi: "{best} aur {other} ke energy label saath rakhiye; kWh/saal wali line dikhaiye", mr: "{best} आणि {other} चे एनर्जी लेबल शेजारी ठेवा; kWh/वर्ष ओळ दाखवा", en: "Put the energy labels of {best} and {other} side by side; point at kWh/year"}
-    say: {hi: "ये लाइन देखिए — {best} साल भर में कम बिजली लेता है।", mr: "ही ओळ बघा — {best} वर्षभरात कमी वीज घेतो.", en: "See this line: {best} uses less electricity in a year."}
+    say: {hi: "Ye line dekhiye — {best} saal bhar mein kam bijli leta hai.", mr: "ही ओळ बघा — {best} वर्षभरात कमी वीज घेतो.", en: "See this line: {best} uses less electricity in a year."}
   - id: noise_level
     title: {hi: "Awaaz demo", mr: "आवाज डेमो", en: "Noise demo"}
     when_slots: {hours_per_day: {known: true}}
     differs_on: noise_db
     steps: {hi: "Dono indoor unit low fan par chalaiye; customer ko paas khada kariye", mr: "दोन्ही इनडोअर युनिट लो फॅनवर चालवा; ग्राहकाला जवळ उभं करा", en: "Run both indoor units on low fan; stand the customer close"}
-    say: {hi: "पास से सुनिए — {best} कितना शांत है।", mr: "जवळून ऐका — {best} किती शांत आहे.", en: "Listen up close: hear how quiet {best} is."}
+    say: {hi: "Paas se suniye — {best} kitna shaant hai.", mr: "जवळून ऐका — {best} किती शांत आहे.", en: "Listen up close: hear how quiet {best} is."}
   - id: remote_features
     title: {hi: "Remote demo", mr: "रिमोट डेमो", en: "Remote demo"}
     when_slots: {hours_per_day: {known: true}}
     differs_on: null
     steps: {hi: "Remote par sleep mode aur timer chala kar dikhaiye", mr: "रिमोटवर स्लीप मोड आणि टायमर लावून दाखवा", en: "Show sleep mode and the timer on the remote"}
-    say: {hi: "रात को स्लीप मोड — ठंडक भी, बिल भी कम।", mr: "रात्री स्लीप मोड — थंडावाही, बिलही कमी.", en: "Sleep mode at night: stays cool, costs less."}
+    say: {hi: "Raat ko sleep mode — thandak bhi, bill bhi kam.", mr: "रात्री स्लीप मोड — थंडावाही, बिलही कमी.", en: "Sleep mode at night: stays cool, costs less."}
   - id: filter_clean
     title: {hi: "Filter demo", mr: "फिल्टर डेमो", en: "Filter demo"}
     when_slots: {}
     differs_on: null
     steps: {hi: "Front panel khol kar filter bahar nikaal kar dikhaiye", mr: "पुढचं पॅनल उघडून फिल्टर बाहेर काढून दाखवा", en: "Open the front panel and slide the filter out"}
-    say: {hi: "फ़िल्टर ऐसे निकलता है — घर पर खुद साफ़ कर सकते हैं।", mr: "फिल्टर असा निघतो — घरी स्वतः साफ करू शकता.", en: "The filter slides out like this: you can clean it at home."}
+    say: {hi: "Filter aise nikalta hai — ghar par khud saaf kar sakte hain.", mr: "फिल्टर असा निघतो — घरी स्वतः साफ करू शकता.", en: "The filter slides out like this: you can clean it at home."}
 
 myths:
   - id: ac_inverter_saves_half
@@ -364,7 +364,7 @@ myths:
     belief: "An inverter AC always saves 50% electricity"
     proof: label_compare
     keywords: ["aadha bill", "50% bachat", "50 percent bachat", "inverter half", "आधा बिल", "अर्धं बिल", "निम्मं बिल"]
-    line: {hi: "सही, इन्वर्टर बिजली बचाता है — कितना, ये लेबल से देखते हैं: इस मॉडल का महीने का बिल {monthly_bill}।",
+    line: {hi: "Sahi, inverter bijli bachata hai — kitna, ye label se dekhte hain: is model ka mahine ka bill {monthly_bill}.",
            mr: "बरोबर, इन्व्हर्टर वीज वाचवतो — किती, ते लेबलवरून पाहू: या मॉडेलचं महिन्याचं बिल {monthly_bill}.",
            en: "True, inverters save power. How much? The label says this model's monthly bill is {monthly_bill}."}
   - id: ac_bigger_ton_better
@@ -372,7 +372,7 @@ myths:
     belief: "A bigger tonnage AC is always better"
     proof: null
     keywords: ["bada ton", "zyada ton", "bigger ton", "2 ton lena", "ज़्यादा टन", "जास्त टन", "बड़ा टन"]
-    line: {hi: "ठंडक ज़रूरी है, सही। कमरे के हिसाब से सही ton लीजिए; ज़रूरत से बड़ा AC बिजली ज़्यादा खाता है।",
+    line: {hi: "Thandak zaroori hai, sahi. Kamre ke hisaab se sahi ton lijiye; zaroorat se bada AC bijli zyada khata hai.",
            mr: "थंडावा महत्त्वाचा, बरोबर. खोलीनुसार योग्य ton घ्या; गरजेपेक्षा मोठा AC जास्त वीज खातो.",
            en: "Cooling matters, yes. Pick the right tonnage for the room; an oversized AC eats more power."}
   - id: ac_5star_always
@@ -380,7 +380,7 @@ myths:
     belief: "A 5-star AC is always the right choice"
     proof: label_compare
     keywords: ["5 star hi", "5-star hi", "hamesha 5 star", "always 5 star", "5 स्टार ही", "फक्त 5 स्टार"]
-    line: {hi: "5-star चलाने में सस्ता, ख़रीदने में थोड़ा महंगा — आप रोज़ कितने hours चलाते हैं, उस हिसाब से।",
+    line: {hi: "5-star chalane mein sasta, khareedne mein thoda mehenga — aap roz kitne hours chalate hain, us hisaab se.",
            mr: "5-star चालवायला स्वस्त, घ्यायला थोडा महाग — तुम्ही रोज किती hours चालवता त्यानुसार.",
            en: "5-star costs less to run but a bit more to buy; it depends on your daily hours."}
 site_needs: [outdoor_spot, pipe_run_ft, wall_hole, socket_15a, floor_lift]
@@ -423,6 +423,6 @@ quiz:
     explain: {hi: "EMI ka poora kharcha ek line mein: mahina, fees, kul aur kitna zyada.", mr: "EMI चा पूर्ण खर्च एका ओळीत: महिना, फी, एकूण आणि किती जास्त.", en: "The full EMI cost in one line: monthly, fee, total and the extra."}
 
 needs:
-  ton_ok: {hi: "कमरे के लिए सही ton", mr: "खोलीसाठी योग्य ton", en: "Right tonnage for the room"}
-  star_ok: {hi: "रोज़ लंबा चलना, कम बिल", mr: "रोज जास्त वेळ, कमी बिल", en: "Long daily use, lower bill"}
-  wifi_ok: {hi: "फ़ोन से चालू करना", mr: "फोनवरून सुरू करणं", en: "Start from your phone"}
+  ton_ok: {hi: "Kamre ke liye sahi ton", mr: "खोलीसाठी योग्य ton", en: "Right tonnage for the room"}
+  star_ok: {hi: "Roz lamba chalna, kam bill", mr: "रोज जास्त वेळ, कमी बिल", en: "Long daily use, lower bill"}
+  wifi_ok: {hi: "Phone se chalu karna", mr: "फोनवरून सुरू करणं", en: "Start from your phone"}

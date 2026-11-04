@@ -50,4 +50,4 @@ async def show(ctx: SkillContext) -> Reply:
     why = ctx.t("view_kyun", lines=" · ".join(f'{r["label"]} {r["deg"]}°' for r in rows))
     ctx.ev("viewing_comfort_shown", options=[r["label"] for r in rows])
     btns = [ctx.b("b_they_chose", ctx.sid("prefer")), ctx.b("b_tryon", ctx.sid("tryon"))]
-    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx, ["seat_distance"]), btns, card=card))
+    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx, ["seat_distance"]), btns, card=card, do="do_view"))

@@ -29,19 +29,29 @@ def gate_options_reply(ctx: SkillContext) -> Reply:
     return ctx.reply(info_reply(ctx, body, btns))
 
 
+def _price_later(ctx: SkillContext, step: str) -> str:
+    """The price asked before the demo: a line to say to the customer (in their language), why it waits, and how to
+    keep them with you while it does."""
+    from chanakya.core.coach import bolo_block, do_block, kyun_block
+
+    return "\n\n".join([bolo_block(ctx, ctx.tc("bolo_price_later")),
+                        kyun_block(ctx, ctx.t("kyun_price_later") + " · " + step), do_block(ctx, "do_price_later")])
+
+
 def gate_price_reply(ctx: SkillContext) -> Reply:
     s = ctx.session
     best = ctx.facts.product_sync(state.best_sku(s)) if state.best_sku(s) else None
     if not state.options_gate_open(s, ctx.pack):
         n = state.missing_for_options(s, ctx.pack)
-        body = ctx.t("gate_price_assess", n=ctx.reg.num(n, "calc:gate_missing"))
+        body = _price_later(ctx, ctx.t("gate_price_assess", n=ctx.reg.num(n, "calc:gate_missing")))
         btns = [
             ctx.b("b_next_q", ctx.sid("go")),
             ctx.b("b_override_asked", ctx.sid("override", "price", "asked")),
             ctx.b("b_status", encode("g", "status")),
         ]
         return ctx.reply(info_reply(ctx, body, btns))
-    body = ctx.t("gate_price", best=C.product_name(ctx, best)) if best else ctx.t("gate_price_no_options")
+    body = _price_later(ctx, ctx.t("gate_price", best=C.product_name(ctx, best)) if best
+                        else ctx.t("gate_price_no_options"))
     first = ctx.b("b_shown", ctx.sid("shown")) if s.shortlist else ctx.b("b_options", ctx.sid("options"))
     btns = [
         first,
@@ -193,9 +203,10 @@ def option_block(ctx: SkillContext, o, opts, why: list[str] | None = None) -> st
     from chanakya.skills import fitview as FV
 
     p = o.product
-    head = f"*{o.label} · {C.product_name(ctx, p)}*" + (f" — _{ctx.t('best_pick')}_" if o.role == "best" else "")
+    tag = {"best": "best_pick", "new": "reason_new", "broader": "reason_broader"}.get(o.role)
+    head = f"*{o.label} · {C.product_name(ctx, p)}*" + (f" — _{ctx.t(tag)}_" if tag else "")
     bullets = list(why or []) or [option_reason(ctx, o, opts, ctx.lang)]
-    lang = "mr" if ctx.lang == "mr" else "en"  # Hinglish reads the card's English benefit words best
+    lang = ctx.lang  # the associate's own language (Hindi in Roman Hinglish)
     for pt in FV.points(ctx, p, lang, 4):
         if len(bullets) >= (3 if o.role == "best" else 2):
             break
@@ -203,7 +214,7 @@ def option_block(ctx: SkillContext, o, opts, why: list[str] | None = None) -> st
         proof = pt.get("proof") if isinstance(pt, dict) else None
         line = f"{text} ({proof})" if proof and proof not in text else text
         same_size = "size" in text.lower() and any("size" in b.lower() for b in bullets)
-        if text and not same_size and not any(text.lower() in b.lower() for b in bullets):
+        if text and not same_size and not any(text.lower() in b.lower() or b.lower() in text.lower() for b in bullets):
             bullets.append(line)
     if not (p.qty > 0):
         bullets.append(_stock_line(ctx, p))
@@ -260,9 +271,10 @@ async def more_menu(ctx: SkillContext) -> Reply:
     done = set(s.extra.get("dq_done") or [])
     q = DQ.next_data_question(pack, avail, done, s.extra.get("wants") or {})
     if q is not None:
-        rows.append(ListRow(id=ctx.sid("askdq"), title=truncate(ctx.t(f"dq_what_{q[0]}") if i18n_has(f"dq_what_{q[0]}")
-                                                                else DQ.label(q[0], True), 24),
-                            description=truncate(ctx.t("more_dq_d"), 72)))
+        short = f"want_label_{q[0]}"  # a row title is 24 characters: the short label ('Picture type'), never cut
+        title = ctx.t(short) if i18n_has(short) else (ctx.t(f"dq_what_{q[0]}") if i18n_has(f"dq_what_{q[0]}")
+                                                      else DQ.label(q[0], True))
+        rows.append(ListRow(id=ctx.sid("askdq"), title=truncate(title, 24), description=truncate(ctx.t("more_dq_d"), 72)))
     rows = rows[:7] + [ListRow(id=ctx.sid("ofs"), title=ctx.t("row_more_offers"), description=ctx.t("row_more_offers_d")),
                        ListRow(id=ctx.sid("nonefit"), title=ctx.t("row_more_other"), description=ctx.t("row_more_other_d"))]
     for r in rows:
@@ -383,7 +395,7 @@ def _hl_text(ctx: SkillContext, pt, p, lang: str) -> str:
     from chanakya.brain import highlights as HL
 
     proof = ctx.reg.raw(pt.proof, f"highlight:{p.sku}")
-    text = pt.say.get("mr") if lang == "mr" and pt.say.get("mr") else HL.card_text(pt)  # Hinglish reads English fine
+    text = HL.card_text(pt, lang)  # in this language: Hindi in Roman Hinglish, Marathi, English
     return ctx.reg.static(text) + f" ({proof})"
 
 
@@ -403,10 +415,9 @@ def option_reason(ctx: SkillContext, o, opts, lang: str) -> str:
         return _reason(ctx, o.reason_key, lang)
     if o.role in ("new", "broader") and best is not None:  # joined after the follow-ups: what it adds, from the data
         diff = HL.differences(p, best.product, ctx.session.home, ctx.session.extra.get("wants") or {}, ctx.pack)
-        tag = ctx.t(f"reason_{o.role}", lang)
-        if diff:
-            return f"{tag}: " + _hl_text(ctx, diff[0], p, lang)
-        return tag
+        if diff:  # the role itself ('New fit' / 'More option') is said in the option's head
+            return _hl_text(ctx, diff[0], p, lang)
+        return ctx.t(f"reason_{o.role}", lang)
     if o.role != "step" or best is None:
         return _reason(ctx, o.reason_key, lang)
     bp = best.product
@@ -569,10 +580,22 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
         why_b = []
         blocks.append(ctx.t("opts_head", n=ctx.reg.num(len(opts.options), "options:count"),
                             cat=ctx.t(f"brief_cat_{pack.category}")))
-    for o in opts.options:  # one block per product: what it is, then why it fits them, as bullets
-        blocks.append(option_block(ctx, o, opts, why_b if o.role == "best" else None))
-    blocks.append(ctx.t("opts_hint"))
-    card = C.english(ctx, lambda: options_card(ctx, opts))
+    # one product page per product (user, 5 Nov 2026: not cramped in one card), its own why-for-them as the caption;
+    # after the follow-ups only the products that joined get a page (the earlier ones were just shown)
+    from chanakya.skills.translate import product_card_en
+
+    pages = []
+    for o in [o for o in opts.options if not merged or o.role in ("new", "broader")] or opts.options:
+        cap = option_block(ctx, o, opts, why_b if o.role == "best" else None)
+        off = PV.offer_line(ctx, o.product, ctx.lang)["text"].replace(" · ", ", ")
+        cap += "\n• " + ctx.t("fact_offer", offer=off)  # the card is the reference design: its offer said here
+        if not pages:  # the first page also carries the heading (and what the note said)
+            cap = "\n\n".join(blocks + [cap])
+        with ctx.as_lang("en"):
+            chip = ctx.t(f"pdp_role_{o.role}") if i18n_has(f"pdp_role_{o.role}") else ctx.t("pdp_role_option")
+        card = await product_card_en(ctx, o.product, chip=chip, chip_label=o.label, chip_kind=o.role)
+        pages.append(info_reply(ctx, cap, card=card))
+    blocks = [ctx.t("opts_hint")]
     demo = pick_demo(opts, s.home, pack, ctx.facts.snap.guides)
     if demo:
         d, other, _ = demo
@@ -589,11 +612,10 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
                 ctx.b("b_demo_guide", ctx.sid("demo")) if many else (
                     ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer"))),
                 ctx.b("b_more_needs", ctx.sid("more"))]
-    lines = ["\n\n".join(blocks)]
-    m1 = info_reply(ctx, "\n".join(lines), btns, card=card)
+    last = info_reply(ctx, "\n\n".join(blocks), btns)  # the next steps, last, so the buttons sit at the bottom
     if ctx.x.pop("rerank_note", None):
-        m1.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
-    return ctx.reply(m1)
+        last.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
+    return ctx.reply(*pages, last)
 
 
 # the demo plan (user, 4 Nov 2026): what they asked for first, then their needs compared with the real options,
@@ -772,14 +794,14 @@ GUIDE_STEPS = {"best": 3, "other": 2}
 async def guide_steps(ctx: SkillContext, p, other, n: int = 3, lang: str = "en", say_lang: str = "en") -> list[dict]:
     """[{tag, title, proof, do, say}] for one product: their asks / needs first (pack benefits proven by a spec, the
     product's own highlights), the size from their sofa, then its other highlights and one real difference.
-    `lang`: the associate's words (what to show and do; Hinglish reads the English benefit words); `say_lang`: the
+    `lang`: the associate's words (what to show and do, the benefit titles); `say_lang`: the
     customer's language for the line to say."""
     from chanakya.brain import highlights as HL
     from chanakya.i18n.lang import fill as _fill
     from chanakya.skills import fitview as FV
     from chanakya.skills.translate import fill, matching
 
-    tl = "mr" if lang == "mr" else "en"  # titles: Marathi, else the English benefit words
+    tl = lang  # titles in the associate's language too (user, 5 Nov 2026)
     s, pack, home = ctx.session, ctx.pack, ctx.session.home
     wants = s.extra.get("wants") or {}
     name, oname = C.product_name(ctx, p), (C.product_name(ctx, other) if other is not None else "")
@@ -796,7 +818,7 @@ async def guide_steps(ctx: SkillContext, p, other, n: int = 3, lang: str = "en",
 
     def hl_step(pt) -> None:
         th = HL.theme(pack.category, pt.theme)
-        title = HL.card_text(pt) if tl == "en" else (pt.say.get("mr") or HL.card_text(pt))
+        title = HL.card_text(pt, tl)  # in the associate's language (Hindi in Roman Hinglish)
         add(title, ctx.reg.raw(pt.proof, f"highlight:{p.sku}"), HL.demo_text(th, lang, alone=other is None),
             HL.say(pt, say_lang) if pt.need else "", f"hl_{pt.theme}")
 
@@ -887,27 +909,28 @@ async def demo_guide_text(ctx: SkillContext) -> str:
 
 
 async def demo_guide_card(ctx: SkillContext) -> Card | None:
-    """One English card: for each product on the shortlist, the demo in order (wow first, then expand)."""
+    """The demo guide card, in the associate's own language (user, 5 Nov 2026: it is their script, not the
+    customer's): for each product on the shortlist, the demo in order (wow first, then expand). The line to say
+    stays in the customer's language."""
     from chanakya.skills import fitview as FV
 
     if not ctx.session.option_labels:
         return None
     best_lab, labs, prods = _guide_labs(ctx)
     cols = []
-    with ctx.as_lang("en"):
-        for lab in labs:
-            p = prods[lab]
-            if p is None:
-                continue
-            steps = await guide_steps(ctx, p, _other_for(best_lab, lab, labs, prods),
-                                      GUIDE_STEPS["best" if lab == best_lab else "other"])
-            if steps:
-                cols.append({"label": lab, "title": C.product_title(ctx, p, "en"), "image": p.image,
-                             "best": lab == best_lab, "steps": steps})
-        chips = FV.home_chips(ctx, "en") + meaning_labels(ctx, "en")
+    for lab in labs:
+        p = prods[lab]
+        if p is None:
+            continue
+        steps = await guide_steps(ctx, p, _other_for(best_lab, lab, labs, prods),
+                                  GUIDE_STEPS["best" if lab == best_lab else "other"], ctx.lang, ctx.clang)
+        if steps:
+            cols.append({"label": lab, "title": C.product_name(ctx, p), "image": p.image,
+                         "best": lab == best_lab, "steps": steps})
+    chips = FV.home_chips(ctx, ctx.lang) + meaning_labels(ctx, ctx.lang)
     if not cols:
         return None
-    return Card(template="demo", lang="en", data={"products": cols[:3], "chips": chips[:5]})  # type: ignore[arg-type]
+    return Card(template="demo", lang=ctx.lang, data={"products": cols[:3], "chips": chips[:5]})  # type: ignore[arg-type]
 
 
 def _demo_extra(ctx: SkillContext, st: dict, head: str, best_lab: str, bp, has_next: bool):
@@ -922,7 +945,7 @@ def _demo_extra(ctx: SkillContext, st: dict, head: str, best_lab: str, bp, has_n
         say = ctx.tc("demo_distance_one_say", best=C.product_name(ctx, bp))
         why = f"{head} · " + ctx.t("demo_distance_one_why", ft=ctx.reg.num(ft, "card:seat_distance", "ft"),
                                    size=ctx.reg.num(size, f"spec:{bp.sku}:size_in", "inch") if size else "")
-        return coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next))
+        return coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next), do="do_demo")
     on_p = ctx.facts.product_sync(s.option_labels.get(st["on"]) or bp.sku)
     other_p = ctx.facts.product_sync(s.option_labels[st["other"]]) if s.option_labels.get(st.get("other") or "") else None
     pts = [x for x in HL.points(on_p, s.home, s.extra.get("wants") or {}, ctx.pack, n=10) if x.theme == st["theme"]]
@@ -930,7 +953,7 @@ def _demo_extra(ctx: SkillContext, st: dict, head: str, best_lab: str, bp, has_n
     if not pts or th is None:
         return coach_reply(ctx, ctx.tc("demo_feature_say", what=_step_title(ctx, st, ctx.clang), best=C.product_name(ctx, on_p),
                                        other=C.product_name(ctx, other_p or on_p)), head, C.known_cites(ctx),
-                           _demo_buttons(ctx, has_next))
+                           _demo_buttons(ctx, has_next), do="do_demo")
     pt = pts[0]
     proof = ctx.reg.raw(pt.proof, f"highlight:{on_p.sku}")
     say = ctx.reg.static(HL.say(pt, ctx.clang))
@@ -938,7 +961,7 @@ def _demo_extra(ctx: SkillContext, st: dict, head: str, best_lab: str, bp, has_n
         say += " " + ctx.tc("demo_hl_cmp", on=C.product_name(ctx, on_p), other=C.product_name(ctx, other_p))
     how = HL.demo_text(th, ctx.lang, alone=other_p is None)
     why = f"{head} · " + (f"{how} · " if how else "") + ctx.t("demo_hl_why", on=st["on"], proof=proof)
-    return coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next))
+    return coach_reply(ctx, say, why, C.known_cites(ctx), _demo_buttons(ctx, has_next), do="do_demo")
 
 
 def _demo_buttons(ctx: SkillContext, has_next: bool) -> list:
@@ -982,7 +1005,7 @@ async def prefer(ctx: SkillContext) -> Reply:
     ctx.reg.static(" ".join((r.description or "") for r in rows))
     cites = C.known_cites(ctx)
     key = "bolo_prefer_personal" if ctx.pack.category == "laptop" else "bolo_prefer"  # a laptop is for a person
-    msg = coach_reply(ctx, ctx.tc(key), ctx.t("kyun_prefer"), cites, [])
+    msg = coach_reply(ctx, ctx.tc(key), ctx.t("kyun_prefer"), cites, [], do="do_prefer")
     msg.kind = "list"
     msg.list_button = truncate_title(ctx.t("list_prefer"))
     msg.sections = [ListSection(rows=rows)]
@@ -994,7 +1017,7 @@ async def none_fit(ctx: SkillContext) -> Reply:
     btns = [ctx.b("b_rr_lower", ctx.sid("rerank", "lower")), ctx.b("b_rr_higher", ctx.sid("rerank", "higher")),
             ctx.b("b_rr_brand", ctx.sid("rerank", "brand"))]
     ctx.ev("options_rejected", shown=list(ctx.session.option_labels.values()))
-    return ctx.reply(coach_reply(ctx, ctx.tc("bolo_missing"), ctx.t("kyun_missing"), C.known_cites(ctx), btns))
+    return ctx.reply(coach_reply(ctx, ctx.tc("bolo_missing"), ctx.t("kyun_missing"), C.known_cites(ctx), btns, do="do_missing"))
 
 
 async def rerank(ctx: SkillContext, how: str) -> Reply:
@@ -1052,7 +1075,7 @@ def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str 
         why = f"{why} · {why_suffix}"
     cites = [k for k in d.when_slots if P.known(s.home, k)] or C.known_cites(ctx)
     _ = pack
-    return coach_reply(ctx, say, why, cites, _demo_buttons(ctx, has_next))
+    return coach_reply(ctx, say, why, cites, _demo_buttons(ctx, has_next), do="do_demo")
 
 
 async def shown(ctx: SkillContext) -> Reply:
@@ -1183,7 +1206,7 @@ async def offer_detail(ctx: SkillContext, offer_id: str, label: str) -> Reply:
     if s.option_labels:
         btns.append(ctx.b("b_they_chose", ctx.sid("prefer")))
     ctx.ev("offer_explained", offer=o.id, sku=sku)
-    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns[:3]))
+    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns[:3], do="do_offer_line"))
 
 
 def _gains(ctx: SkillContext, lower, higher) -> list[str]:
@@ -1211,8 +1234,13 @@ def _gains(ctx: SkillContext, lower, higher) -> list[str]:
 
     for pt in HL.differences(higher, lower, home, ctx.session.extra.get("wants") or {}, pack):
         if pt.need and len(out) < 2:  # only what answers their need: 'adds ClearAudio+ for the elders'
-            out.append(ctx.t("reason_step_hl", what=_hl_text(ctx, pt, higher, ctx.lang)))
+            out.append(_hl_text(ctx, pt, higher, ctx.lang))  # the line already says "Adds:"
     return out[:2]
+
+
+def _lower1(s: str) -> str:
+    """'Smooth cricket' → 'smooth cricket' inside a list ('HDR10+', 'OLED' stay as they are)."""
+    return s[0].lower() + s[1:] if len(s) > 1 and s[0].isupper() and s[1].islower() else s
 
 
 async def upgrade_view(ctx: SkillContext) -> Reply:
@@ -1222,7 +1250,7 @@ async def upgrade_view(ctx: SkillContext) -> Reply:
     if not state.price_gate_open(s, ctx.pack) or len(s.option_labels) < 2:
         return await prefer(ctx)
     picks = sorted(((lab, ctx.facts.product_sync(sku)) for lab, sku in s.option_labels.items()), key=lambda x: x[1].price)
-    lines = [ctx.t("upg_head")]
+    blocks = [ctx.t("upg_head")]
     for (la, a), (lb, b) in zip(picks, picks[1:], strict=False):
         diff = b.price - a.price
         if diff <= 0:
@@ -1230,8 +1258,14 @@ async def upgrade_view(ctx: SkillContext) -> Reply:
         src = f"calc:upgrade:{a.sku}:{b.sku}"
         per_day = ctx.reg.inr(max(1, round(diff / (5 * 365))), src)
         gains = _gains(ctx, a, b)
-        what = " · ".join(gains) if gains else ctx.t("upg_nothing", lower=la)
-        lines.append(ctx.t("upg_line", a=la, b=lb, diff=ctx.reg.inr(diff, src), day=per_day, what=what))
+        blocks.append("\n".join([  # one block per step up: the two, the money (and per day), what it adds for them
+            ctx.t("upg_step", a=la, b=lb, pa=C.product_name(ctx, a), pb=C.product_name(ctx, b)),
+            ctx.t("upg_cost", diff=ctx.reg.inr(diff, src), day=per_day),
+            ctx.t("upg_adds", what=", ".join([gains[0]] + [_lower1(g) for g in gains[1:]])) if gains
+            else ctx.t("upg_nothing", lower=la)]))
     ctx.ev("upgrade_check", options=[lab for lab, _ in picks])
+    from chanakya.core.coach import do_block
+
+    blocks = blocks[:4] + [do_block(ctx, "do_upgrade")]
     btns = [ctx.b("b_they_chose", ctx.sid("prefer")), ctx.b("b_offers_on", ctx.sid("ofs"))]
-    return ctx.reply(info_reply(ctx, "\n".join(lines[:3]), btns))
+    return ctx.reply(info_reply(ctx, "\n\n".join(blocks), btns))

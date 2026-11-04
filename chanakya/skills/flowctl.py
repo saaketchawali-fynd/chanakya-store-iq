@@ -44,10 +44,10 @@ async def menu(ctx: SkillContext) -> Reply:
         rows.append(_row(ctx, encode("g", "switch"), "menu_switch", "menu_switch_d"))
     if s:
         lname = ctx.t(f"lang_name_{s.home.customer_lang}")
-        rows.append(_row(ctx, ctx.sid("clang"), "menu_clang", "menu_clang_d", lang=lname))
-    rows.append(_row(ctx, encode("g", "status"), "menu_status", None))
-    rows.append(_row(ctx, encode("g", "catalog", "", 0), "menu_catalog", None))
-    rows.append(_row(ctx, encode("g", "langpick"), "menu_lang", None))
+        rows.append(_row(ctx, ctx.sid("clang"), "menu_clang", "menu_clang_d", language=lname))  # not lang=: t()'s own
+    rows.append(_row(ctx, encode("g", "status"), "menu_status", "menu_status_d"))
+    rows.append(_row(ctx, encode("g", "catalog", "", 0), "menu_catalog", "menu_catalog_d"))
+    rows.append(_row(ctx, encode("g", "langpick"), "menu_lang", "menu_lang_d"))
     body = ctx.t("help_body")
     return ctx.reply(
         OutMessage(

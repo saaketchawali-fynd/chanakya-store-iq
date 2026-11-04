@@ -28,7 +28,7 @@ class CostLine(BaseModel):
     title: str
     amount_str: str
     amount: int
-    kind: Literal["product", "zaroori", "sujhav", "optional"]
+    kind: Literal["product", "zaroori", "sujhav", "optional", "addon"]  # addon: what they added in "Complete it"
     reason: str | None = None
     qty: float | None = None
 
@@ -111,7 +111,10 @@ async def compute(
     include_suggestions: bool = True,
     store_id: str | None = None,
     exclude_codes: list[str] | tuple[str, ...] = (),
+    addons: dict | None = None,
 ) -> CostSheet:
+    """`addons`: the "Complete it" step's outcome ({added: [{code, title, amount, source, reason}], declined: [codes]}).
+    Once it has happened, what they added is in the full cost and nothing they turned down is suggested again."""
     p = facts.product_sync(sku, store_id)
     assert p is not None, f"unknown sku {sku}"
     cat = p.category
@@ -120,7 +123,7 @@ async def compute(
     notes: list[str] = []
 
     def add(code, title, amount, kind, source, reason=None, qty=None):
-        if kind in ("sujhav", "optional") and code in exclude_codes:  # the customer removed it
+        if kind in ("sujhav", "optional", "addon") and code in exclude_codes:  # the customer removed it
             return
         lines.append(
             CostLine(
@@ -154,7 +157,7 @@ async def compute(
                 add(c.code, title, q * c.amount, "zaroori", f"charge:{c.code}", qty=q)
             else:
                 add(c.code, title, c.amount, "zaroori", f"charge:{c.code}")
-        elif c.kind == "suggest" and include_suggestions and cond_holds(c.condition, home, pack):
+        elif c.kind == "suggest" and include_suggestions and addons is None and cond_holds(c.condition, home, pack):
             add(c.code, title, c.amount, "sujhav", f"charge:{c.code}", reason=reason)
         elif c.kind == "optional":
             optional_count += 1
@@ -165,7 +168,10 @@ async def compute(
             optional_count += 1
             if include_optional:
                 add(pl.code, pick(pl.title, lang, reg), pl.price, "optional", f"protection:{pl.code}")
-    if include_suggestions:
+    decided = addons is not None
+    for x in (addons or {}).get("added") or []:  # added in "Complete it": part of the full cost now
+        add(x["code"], x["title"], x["amount"], "addon", x["source"], reason=x.get("reason"))
+    if include_suggestions and not decided:
         for pl in await facts.protection(cat):
             if filter_holds(pl.filter, p) and pl.suggest_if and cond_holds(pl.suggest_if, home, pack):
                 add(
@@ -176,21 +182,22 @@ async def compute(
                     f"protection:{pl.code}",
                     reason=pick(pl.reason, lang, reg),
                 )
-        codes = " ".join(ln.code.upper() for ln in lines)
-        for kind, why in accessory_needs(p, home, pack):
-            if any(w in codes for w in {"tv_mount": ("BRACKET", "MOUNT"), "stabiliser": ("STAB",),
-                                        "wm_stand": ("STAND", "TROLLEY")}.get(kind, ())):
-                continue  # the charges already carry it
-            a = pick_accessory(facts, kind, p, store_id)
-            if a is None:
-                if kind == "tv_mount":
-                    notes.append("mount_confirm")
-                continue
+    codes = " ".join(ln.code.upper() for ln in lines)
+    for kind, why in accessory_needs(p, home, pack):
+        if any(w in codes for w in {"tv_mount": ("BRACKET", "MOUNT"), "stabiliser": ("STAB",),
+                                    "wm_stand": ("STAND", "TROLLEY")}.get(kind, ())):
+            continue  # the charges (or what they added) already carry it
+        a = pick_accessory(facts, kind, p, store_id)
+        if a is None:
+            if kind == "tv_mount":
+                notes.append("mount_confirm")  # said honestly, whether or not "Complete it" has happened
+            continue
+        if include_suggestions and not decided:
             add(a.sku, pick(a.title, lang) or a.model, a.price, "sujhav", a.price_source,
                 reason=pick(ACC_REASON.get("soundbar_arc" if why == "arc" else kind) or SOUNDBAR_REASON, lang)
                 if kind != "soundbar" or why == "arc" else SOUNDBAR_REASON.get(lang))
 
-    zaroori = sum(line.amount for line in lines if line.kind in ("product", "zaroori"))
+    zaroori = sum(line.amount for line in lines if line.kind in ("product", "zaroori", "addon"))
     with_sug = zaroori + sum(line.amount for line in lines if line.kind == "sujhav")
     exch = None
     old = values(home, "exchange_old")
@@ -212,7 +219,8 @@ async def compute(
         lifetime=lifetime,
         sources=sources,
         optional_count=optional_count,
-        protection=_protection(p, await facts.protection(cat), reg, lang, {ln.code for ln in lines}),
+        protection=_protection(p, await facts.protection(cat), reg, lang,
+                               {ln.code for ln in lines} | set((addons or {}).get("declined") or [])),
         notes=notes,
     )
 
@@ -262,7 +270,7 @@ def accessory_needs(p: ProductWithStock, home: HomeCard, pack: Pack | None) -> l
         dist = number(home, "seat_distance", pack) if pack else None
         sbv = values(home, "soundbar")
         if "has" not in sbv and (any(v in ("no", "thinking") for v in sbv) or "yes" in values(home, "elders")
-                                 or (dist is not None and dist >= 12)):
+                                 or (dist is not None and dist >= 12) or "sound" in (home.asks or [])):
             out.append(("soundbar", "arc" if p.spec("hdmi_arc") is True else "need"))
         if "wall" in values(home, "mounting"):
             out.append(("tv_mount", "wall"))
@@ -294,10 +302,21 @@ def pick_accessory(facts: FactsService, kind: str, p: ProductWithStock, store_id
             return size is not None and float(rng[0]) <= float(size) <= float(rng[1])
 
         pool = [a for a in pool if fits(a)]
-    if not pool:
-        return None
-    same = [a for a in pool if (a.brand or "").lower() == (p.brand or "").lower()]
-    return min(same or pool, key=lambda a: (a.price, a.sku))
+    ranked = rank_accessories(pool, kind, p)
+    return ranked[0] if ranked else None
+
+
+def rank_accessories(pool: list, kind: str, p: ProductWithStock) -> list:
+    """Best first, for this product: the same brand; for a soundbar, HDMI ARC when the TV has it (one cable, one
+    remote); kept in proportion to the product (at most 40% of its price when such a choice exists); then the
+    lowest price."""
+    def key(a):
+        same = (a.brand or "").lower() == (p.brand or "").lower()
+        arc = kind == "soundbar" and p.spec("hdmi_arc") is True and a.spec("hdmi_arc") is True
+        fair = a.price <= 0.4 * p.price
+        return (not fair, not same, not arc, a.price, a.sku)
+
+    return sorted(pool, key=key)
 
 
 def _protection(p: ProductWithStock, plans: list, reg: NumberRegistry, lang: str, used: set[str]) -> dict | None:

@@ -292,11 +292,13 @@ async def ready(ctx: SkillContext, step: str) -> Reply:
     ctx.ev("shift_ready", focus=step)
     from chanakya.skills import wins
 
-    body = ctx.t("ready_body", step=ctx.t(f"step_{step}"), tip=ctx.t(f"tip_{step}"))
+    name = ctx.staff.name if ctx.staff and ctx.staff.name else ""
+    parts = [ctx.t("ready_title", name=name) if name else ctx.t("ready_title_plain")]
     won = await wins.line(ctx, yesterday=True)
     if won:  # yesterday's own wins (Family Cards, answers, sales, streak): no zeros
-        body = body.split("\n")[0] + "\n" + won + "\n" + body.split("\n")[-1]
-    m = info_reply(ctx, body, [ctx.b("b_new_customer", encode("g", "new"))])
+        parts.append(won)
+    parts.append(ctx.t("ready_body", tip=ctx.t(f"tip_{step}")))
+    m = info_reply(ctx, "\n\n".join(parts), [ctx.b("b_new_customer", encode("g", "new"))])
     m.footer = ctx.t("footer_voice_q")
     return ctx.reply(m)
 

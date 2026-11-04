@@ -4,7 +4,7 @@ myths:
     belief: "It is cheaper online"
     proof: kharcha
     keywords: ["online sasta", "online saste", "online cheaper", "amazon pe", "flipkart pe", "ऑनलाइन सस्ता", "ऑनलाइन स्वस्त"]
-    line: {hi: "सही, ऑनलाइन दाम कभी-कभी कम दिखता है। पूरा खर्च मिलाकर देखें — इंस्टॉलेशन, वारंटी, एक्सचेंज सब यहीं।",
+    line: {hi: "Sahi, online daam kabhi-kabhi kam dikhta hai. Poora kharcha milakar dekhte hain — installation, warranty, exchange sab yahin.",
            mr: "बरोबर, ऑनलाइन किंमत कधी कधी कमी दिसते. पूर्ण खर्च मिळून पाहू — इन्स्टॉलेशन, वॉरंटी, एक्सचेंज सगळं इथेच.",
            en: "True, online prices can look lower. Let's compare the full cost: installation, warranty and exchange are all here."}
   - id: gen_only_two_brands
@@ -12,13 +12,13 @@ myths:
     belief: "Only one or two brands are real or good"
     proof: null
     keywords: ["sirf do brand", "only two brands", "wahi brand achha", "baaki brand bekaar", "सिर्फ़ दो ब्रांड", "फक्त दोन ब्रँड"]
-    line: {hi: "ये ब्रांड भरोसेमंद हैं, सही। पर हर ब्रांड के अच्छे मॉडल हैं — आपके घर के हिसाब से फ़िट देखते हैं।",
+    line: {hi: "Yeh brand bharosemand hain, sahi. Par har brand ke achhe model hain — aapke ghar ke hisaab se fit dekhte hain.",
            mr: "हे ब्रँड विश्वासार्ह आहेत, बरोबर. पण प्रत्येक ब्रँडचे चांगले मॉडेल आहेत — तुमच्या घरानुसार योग्य बघू.",
            en: "Those brands are trusted, yes. Every brand has good models, so let's match one to your home."}
 objections:
   too_expensive:
     keywords: ["bahut mehenga", "bahut mehnga", "too expensive", "costly hai", "budget se bahar", "बहुत महंगा", "खूप महाग"]
-    line: {hi: "समझ सकता हूँ, बजट मायने रखता है। आपके घर के लिए कम खर्च वाला सही विकल्प भी है — दिखाऊँ?",
+    line: {hi: "Samajh sakta hoon, budget maayne rakhta hai. Aapke ghar ke liye kam kharche wala sahi option bhi hai — dikhaoon?",
            mr: "समजू शकतो, बजेट महत्त्वाचं आहे. तुमच्या घरासाठी कमी खर्चाचा योग्य पर्यायही आहे — दाखवू?",
            en: "I understand, budget matters. There's a lower-cost option that still fits your home. Shall I show it?"}
     buttons: [value_option, emi, exchange]
@@ -28,55 +28,55 @@ objections:
     buttons: [cost_show, offers, go]
   need_to_think:
     keywords: ["soch ke", "sochke", "sochna hai", "think about it", "baad mein aayenge", "सोचकर", "सोचना है", "विचार करून"]
-    line: {hi: "बिल्कुल, सोचकर लीजिए। सब कुछ आपके WhatsApp पर भेज दूँ, ताकि घर पर सब देख सकें?",
+    line: {hi: "Bilkul, sochkar lijiye. Sab kuch aapke WhatsApp par bhej doon, taaki ghar par sab dekh sakein?",
            mr: "नक्कीच, विचार करून घ्या. सगळं तुमच्या WhatsApp वर पाठवू, म्हणजे घरी सगळे पाहू शकतील?",
            en: "Of course, take your time. Shall I send everything to your WhatsApp so the family can see it?"}
     buttons: [parivaar, task, go]
   brand_doubt:
     keywords: ["brand pe bharosa nahi", "naya brand", "ye brand kaisa", "brand doubt", "ब्रांड पर भरोसा नहीं", "ब्रँडवर विश्वास नाही"]
-    line: {hi: "सवाल सही है। वारंटी और सर्विस की पूरी जानकारी कार्ड पर है — साथ में देखते हैं।",
+    line: {hi: "Sawaal sahi hai. Warranty aur service ki poori jaankari card par hai — saath mein dekhte hain.",
            mr: "प्रश्न योग्य आहे. वॉरंटी आणि सर्व्हिसची पूर्ण माहिती कार्डवर आहे — सोबत बघूया.",
            en: "Fair question. Warranty and service details are on the card; let's look together."}
     buttons: [cost_show, expert, go]
   ask_family:
     keywords: ["ghar pe pooch", "ghar par pooch", "wife se pooch", "biwi se pooch", "papa se pooch", "family se pooch", "ask my wife", "ask family", "घर पर पूछ", "घरी विचार"]
-    line: {hi: "बिल्कुल, घरवालों के साथ तय करना सही है। पूरी जानकारी — फ़ोटो, पूरा खर्च और ऑफ़र — उन्हें WhatsApp पर भेज दूँ?",
+    line: {hi: "Bilkul, gharwalon ke saath tay karna sahi hai. Poori jaankari — photo, poora kharcha aur offer — unhe WhatsApp par bhej doon?",
            mr: "नक्कीच, घरच्यांसोबत ठरवणं योग्य आहे. पूर्ण माहिती — फोटो, पूर्ण खर्च आणि ऑफर — त्यांना WhatsApp वर पाठवू?",
            en: "Of course, decide it together at home. Shall I send the family everything on WhatsApp: photo, full cost and offers?"}
     buttons: [parivaar_family, task, go]
   installation_worry:
     keywords: ["installation ki tension", "installer nahi aaya", "installation worry", "install ka dar", "इंस्टॉलेशन की चिंता", "इन्स्टॉलेशनची काळजी"]
-    line: {hi: "चिंता सही है। इंस्टॉलर को पहले से दीवार, सॉकेट और मंज़िल की जानकारी जाएगी, और चालू होने तक हम साथ हैं।",
+    line: {hi: "Chinta sahi hai. Installer ko pehle se deewar, socket aur floor ki jaankari jaayegi, aur chalu hone tak hum saath hain.",
            mr: "काळजी रास्त आहे. इन्स्टॉलरला आधीच भिंत, सॉकेट आणि मजल्याची माहिती जाईल, आणि चालू होईपर्यंत आम्ही सोबत आहोत.",
            en: "Fair worry. The installer gets your wall, socket and floor details in advance, and we stay with you until it works."}
     buttons: [cost_show, parivaar, go]
   waiting_for_sale:
     keywords: ["sale ka wait", "sale mein lenge", "diwali sale", "waiting for sale", "सेल का इंतज़ार", "सेलची वाट"]
-    line: {hi: "सही सोच है। आज के ऑफ़र {valid_to} तक हैं — तारीख़ कार्ड पर लिख दी है।",
+    line: {hi: "Sahi soch hai. Aaj ke offer {valid_to} tak hain — date card par likh di hai.",
            mr: "योग्य विचार आहे. आजच्या ऑफर {valid_to} पर्यंत आहेत — तारीख कार्डवर लिहिली आहे.",
            en: "Makes sense. Today's offers run until {valid_to}; the date is on the card."}
     buttons: [parivaar, task, go]
 price_rescue:
-  line: {hi: "₹{low} से ₹{high} तक है। आपके कमरे के हिसाब से सही वाला दिखाऊँ? बस 2 सवाल।",
+  line: {hi: "₹{low} se ₹{high} tak hai. Aapke kamre ke hisaab se sahi wala dikhaoon? Bas 2 sawaal.",
          mr: "₹{low} ते ₹{high} पर्यंत आहे. तुमच्या खोलीनुसार योग्य दाखवू का? फक्त 2 प्रश्न.",
          en: "It's between ₹{low} and ₹{high}. Shall I show the right one for your room? Just 2 questions."}
 price_rescue_known:
-  line: {hi: "₹{low} से ₹{high} तक है। आपके कमरे के हिसाब से सही वाले दिखाऊँ?",
+  line: {hi: "₹{low} se ₹{high} tak hai. Aapke kamre ke hisaab se sahi wale dikhaoon?",
          mr: "₹{low} ते ₹{high} पर्यंत आहे. तुमच्या खोलीनुसार योग्य ते दाखवू का?",
          en: "It's between ₹{low} and ₹{high}. Shall I show the right ones for your room?"}
 need_validation:
-  line: {hi: "बहुत सही सोचा है, एक बार घर से मिला लेते हैं।",
+  line: {hi: "Bahut sahi socha hai, ek baar ghar se mila lete hain.",
          mr: "छान विचार केलाय, एकदा घराशी जुळवून बघू.",
          en: "Good thinking; let's match it to your home."}
-complete_line: {hi: "ये पूरा खर्च है — बिल में यही आएगा।", mr: "हा पूर्ण खर्च आहे — बिलात हेच येईल.", en: "This is the full cost. The bill will match it."}
+complete_line: {hi: "Yeh poora kharcha hai — bill mein yahi aayega.", mr: "हा पूर्ण खर्च आहे — बिलात हेच येईल.", en: "This is the full cost. The bill will match it."}
 finance_line:
-  {hi: "₹{monthly} महीना, {months} महीने; फ़ीस ₹{fee}; कुल ₹{total} — अभी देने से ₹{extra} ज़्यादा।",
+  {hi: "₹{monthly} mahina, {months} mahine; fees ₹{fee}; kul ₹{total} — abhi dene se ₹{extra} zyada.",
    mr: "दरमहा ₹{monthly}, {months} महिने; फी ₹{fee}; एकूण ₹{total} — आत्ता भरल्यापेक्षा ₹{extra} जास्त.",
    en: "₹{monthly} a month for {months} months, ₹{fee} fee: ₹{total} in all, ₹{extra} more than paying now."}
-close_question: {hi: "डिलीवरी {day1} को चाहिए या {day2} को?", mr: "डिलिव्हरी {day1} ला हवी की {day2} ला?", en: "Delivery on {day1} or {day2}?"}
-consent_ask: {hi: "क्या मैं ये सब आपके WhatsApp पर भेज दूँ?", mr: "हे सगळं तुमच्या WhatsApp वर पाठवू का?", en: "May I send all this to your WhatsApp?"}
-trial_close: {hi: "{best} की तस्वीर कैसी लगी?", mr: "{best} चं चित्र कसं वाटलं?", en: "How did you like the picture on {best}?"}
-no_data_holding: {hi: "ये मैं पक्का करके बताता हूँ, एक मिनट।", mr: "हे मी खात्री करून सांगतो, एक मिनिट.", en: "Let me confirm that for you, one minute."}
+close_question: {hi: "Delivery {day1} ko chahiye ya {day2} ko?", mr: "डिलिव्हरी {day1} ला हवी की {day2} ला?", en: "Delivery on {day1} or {day2}?"}
+consent_ask: {hi: "Kya main yeh sab aapke WhatsApp par bhej doon?", mr: "हे सगळं तुमच्या WhatsApp वर पाठवू का?", en: "May I send all this to your WhatsApp?"}
+trial_close: {hi: "{best} ki picture kaisi lagi?", mr: "{best} चं चित्र कसं वाटलं?", en: "How did you like the picture on {best}?"}
+no_data_holding: {hi: "Yeh main pakka karke batata hoon, ek minute.", mr: "हे मी खात्री करून सांगतो, एक मिनिट.", en: "Let me confirm that for you, one minute."}
 banned_phrases: ["today only", "sirf aaj", "aaj hi", "आज ही", "सिर्फ़ आज", "फक्त आज", "last piece", "aakhri piece", "आखिरी पीस", "शेवटचा पीस",
                  "because of the war", "war ki wajah", "real brand", "asli brand", "just written", "bas likha hai", "likha hai bas"]
 
@@ -119,56 +119,56 @@ customer_lang_keywords:
   mr: ["marathi", "मराठी"]
   en: ["english", "angrezi", "अंग्रेज़ी", "इंग्रजी"]
 who_titles:
-  papa: {hi: "पापा", mr: "बाबा", en: "Dad"}
-  mummy: {hi: "मम्मी", mr: "आई", en: "Mum"}
-  dada: {hi: "दादा जी", mr: "आजोबा", en: "Grandpa"}
-  dadi: {hi: "दादी जी", mr: "आजी", en: "Grandma"}
-  beta: {hi: "बेटे", mr: "मुलगा", en: "your son"}
-  beti: {hi: "बेटी", mr: "मुलगी", en: "your daughter"}
+  papa: {hi: "papa", mr: "बाबा", en: "Dad"}
+  mummy: {hi: "mummy", mr: "आई", en: "Mum"}
+  dada: {hi: "dada ji", mr: "आजोबा", en: "Grandpa"}
+  dadi: {hi: "dadi ji", mr: "आजी", en: "Grandma"}
+  beta: {hi: "bete", mr: "मुलगा", en: "your son"}
+  beti: {hi: "beti", mr: "मुलगी", en: "your daughter"}
 
 # Fit pros / cons per fit rule (customer-facing; used on the product and compare cards). Placeholders are
 # filled from data / the Home Card only: {size} {distance} {ton} {sqft} {kg} {people}.
 fit_pros:
-  size_ok: {hi: "{size} inch — आपकी {distance} ft दूरी के लिए सही", mr: "{size} inch — तुमच्या {distance} ft अंतरासाठी योग्य", en: "{size} inch suits your {distance} ft distance"}
-  bright_ok: {hi: "धूप वाले कमरे में भी साफ़ तस्वीर", mr: "उन्हाच्या खोलीतही स्पष्ट चित्र", en: "Clear picture even in your sunny room"}
-  motion_ok: {hi: "तेज़ क्रिकेट में भी बॉल साफ़", mr: "वेगवान क्रिकेटमध्येही बॉल स्पष्ट", en: "Fast cricket stays sharp"}
-  dialogue_ok: {hi: "बुज़ुर्गों के लिए साफ़ डायलॉग", mr: "ज्येष्ठांसाठी स्पष्ट संवाद", en: "Clear dialogue for elders"}
-  angle_ok: {hi: "साइड से बैठकर भी सही रंग", mr: "बाजूने बसूनही योग्य रंग", en: "True colours from the side seats"}
-  dark_ok: {hi: "अंधेरे कमरे में असली काला", mr: "अंधाऱ्या खोलीत खरा काळा", en: "Deep blacks in your dark room"}
-  ton_ok: {hi: "{sqft} sq ft कमरे के लिए सही ton", mr: "{sqft} sq ft खोलीसाठी योग्य ton", en: "Right tonnage for a {sqft} sq ft room"}
-  star_ok: {hi: "रोज़ लंबे hours — कम बिजली बिल", mr: "रोज जास्त hours — कमी वीज बिल", en: "Long daily use, lower power bill"}
-  wifi_ok: {hi: "फ़ोन से चालू-बंद", mr: "फोनवरून चालू-बंद", en: "Control from the phone"}
-  capacity_ok: {hi: "{people} लोगों के परिवार के लिए सही क्षमता", mr: "{people} जणांच्या कुटुंबासाठी योग्य क्षमता", en: "Right capacity for a family of {people}"}
-  width_fit: {hi: "आपकी जगह में फ़िट होती है", mr: "तुमच्या जागेत बसते", en: "Fits your space"}
-  bend_ok: {hi: "झुकना कम — पीठ के लिए आराम", mr: "कमी वाकावं लागतं — पाठीला आराम", en: "Less bending, easy on the back"}
-  top_pref: {hi: "आपकी पसंद का टॉप-लोड", mr: "तुमच्या पसंतीचं टॉप-लोड", en: "Top-load, as you prefer"}
-  front_pref: {hi: "आपकी पसंद का फ़्रंट-लोड", mr: "तुमच्या पसंतीचं फ्रंट-लोड", en: "Front-load, as you prefer"}
-  hard_water_ok: {hi: "खारे पानी के लिए हीटर", mr: "क्षारयुक्त पाण्यासाठी हीटर", en: "Heater helps with hard water"}
-  dry_ok: {hi: "तेज़ स्पिन — कपड़े जल्दी सूखें", mr: "वेगवान स्पिन — कपडे लवकर वाळतात", en: "Fast spin, clothes dry quicker"}
-  perf_ok: {hi: "भारी सॉफ़्टवेयर आराम से चलेगा", mr: "जड सॉफ्टवेअर सहज चालेल", en: "Handles heavy software comfortably"}
-  coding_ok: {hi: "कोडिंग के लिए पर्याप्त ताक़त", mr: "कोडिंगसाठी पुरेशी ताकद", en: "Enough power for coding"}
-  carry_ok: {hi: "रोज़ ले जाने में हल्का", mr: "रोज नेण्यासाठी हलका", en: "Light to carry every day"}
-  battery_ok: {hi: "पूरे दिन की बैटरी", mr: "पूर्ण दिवसाची बॅटरी", en: "Battery lasts the whole day"}
-  gaming_ok: {hi: "गेमिंग के लिए अलग ग्राफ़िक्स", mr: "गेमिंगसाठी वेगळे ग्राफिक्स", en: "Dedicated graphics for gaming"}
+  size_ok: {hi: "{size} inch — aapki {distance} ft doori ke liye sahi", mr: "{size} inch — तुमच्या {distance} ft अंतरासाठी योग्य", en: "{size} inch suits your {distance} ft distance"}
+  bright_ok: {hi: "Dhoop wale kamre mein bhi saaf picture", mr: "उन्हाच्या खोलीतही स्पष्ट चित्र", en: "Clear picture even in your sunny room"}
+  motion_ok: {hi: "Tez cricket mein bhi ball saaf", mr: "वेगवान क्रिकेटमध्येही बॉल स्पष्ट", en: "Fast cricket stays sharp"}
+  dialogue_ok: {hi: "Buzurgon ke liye saaf dialogue", mr: "ज्येष्ठांसाठी स्पष्ट संवाद", en: "Clear dialogue for elders"}
+  angle_ok: {hi: "Side se baithkar bhi sahi rang", mr: "बाजूने बसूनही योग्य रंग", en: "True colours from the side seats"}
+  dark_ok: {hi: "Andhere kamre mein asli kaala", mr: "अंधाऱ्या खोलीत खरा काळा", en: "Deep blacks in your dark room"}
+  ton_ok: {hi: "{sqft} sq ft kamre ke liye sahi ton", mr: "{sqft} sq ft खोलीसाठी योग्य ton", en: "Right tonnage for a {sqft} sq ft room"}
+  star_ok: {hi: "Roz lambe hours — kam bijli bill", mr: "रोज जास्त hours — कमी वीज बिल", en: "Long daily use, lower power bill"}
+  wifi_ok: {hi: "Phone se chalu-band", mr: "फोनवरून चालू-बंद", en: "Control from the phone"}
+  capacity_ok: {hi: "{people} logon ke parivaar ke liye sahi capacity", mr: "{people} जणांच्या कुटुंबासाठी योग्य क्षमता", en: "Right capacity for a family of {people}"}
+  width_fit: {hi: "Aapki jagah mein fit hoti hai", mr: "तुमच्या जागेत बसते", en: "Fits your space"}
+  bend_ok: {hi: "Jhukna kam — peeth ke liye aaram", mr: "कमी वाकावं लागतं — पाठीला आराम", en: "Less bending, easy on the back"}
+  top_pref: {hi: "Aapki pasand ka top-load", mr: "तुमच्या पसंतीचं टॉप-लोड", en: "Top-load, as you prefer"}
+  front_pref: {hi: "Aapki pasand ka front-load", mr: "तुमच्या पसंतीचं फ्रंट-लोड", en: "Front-load, as you prefer"}
+  hard_water_ok: {hi: "Khaare paani ke liye heater", mr: "क्षारयुक्त पाण्यासाठी हीटर", en: "Heater helps with hard water"}
+  dry_ok: {hi: "Tez spin — kapde jaldi sookhein", mr: "वेगवान स्पिन — कपडे लवकर वाळतात", en: "Fast spin, clothes dry quicker"}
+  perf_ok: {hi: "Bhaari software aaram se chalega", mr: "जड सॉफ्टवेअर सहज चालेल", en: "Handles heavy software comfortably"}
+  coding_ok: {hi: "Coding ke liye kaafi power", mr: "कोडिंगसाठी पुरेशी ताकद", en: "Enough power for coding"}
+  carry_ok: {hi: "Roz le jaane mein halka", mr: "रोज नेण्यासाठी हलका", en: "Light to carry every day"}
+  battery_ok: {hi: "Poore din ki battery", mr: "पूर्ण दिवसाची बॅटरी", en: "Battery lasts the whole day"}
+  gaming_ok: {hi: "Gaming ke liye alag graphics", mr: "गेमिंगसाठी वेगळे ग्राफिक्स", en: "Dedicated graphics for gaming"}
 fit_cons:
-  size_ok: {hi: "{size} inch — आपकी {distance} ft दूरी के लिए सही साइज़ नहीं", mr: "{size} inch — तुमच्या {distance} ft अंतरासाठी योग्य साइज नाही", en: "{size} inch is not ideal for your {distance} ft distance"}
-  bright_ok: {hi: "धूप में तस्वीर थोड़ी फीकी लग सकती है", mr: "उन्हात चित्र थोडं फिकं वाटू शकतं", en: "May look washed out in your sunny room"}
-  motion_ok: {hi: "तेज़ क्रिकेट शॉट पर बॉल थोड़ी धुंधली", mr: "वेगवान शॉटवर बॉल थोडा धूसर", en: "Fast cricket shots may blur a little"}
-  dialogue_ok: {hi: "डायलॉग के लिए अलग साउंड मोड नहीं", mr: "संवादासाठी वेगळा साउंड मोड नाही", en: "No dialogue-enhance mode for elders"}
-  angle_ok: {hi: "साइड से रंग थोड़े फीके", mr: "बाजूने रंग थोडे फिके", en: "Colours fade a little from the side"}
-  dark_ok: {hi: "अंधेरे में काला पूरा गहरा नहीं", mr: "अंधारात काळा पूर्ण गडद नाही", en: "Blacks are not as deep in a dark room"}
-  ton_ok: {hi: "{sqft} sq ft के लिए ton सही नहीं", mr: "{sqft} sq ft साठी ton योग्य नाही", en: "Tonnage does not suit a {sqft} sq ft room"}
-  star_ok: {hi: "रोज़ लंबे hours — बिजली बिल ज़्यादा", mr: "रोज जास्त hours — वीज बिल जास्त", en: "Long daily use means a higher bill"}
-  wifi_ok: {hi: "फ़ोन से कंट्रोल नहीं", mr: "फोनवरून कंट्रोल नाही", en: "No phone control"}
-  capacity_ok: {hi: "{people} लोगों के लिए क्षमता कम/ज़्यादा", mr: "{people} जणांसाठी क्षमता कमी/जास्त", en: "Capacity does not suit a family of {people}"}
-  width_fit: {hi: "आपकी जगह में फ़िट नहीं होगी", mr: "तुमच्या जागेत बसणार नाही", en: "Will not fit your space"}
-  bend_ok: {hi: "कपड़े डालने के लिए झुकना पड़ेगा", mr: "कपडे टाकायला वाकावं लागेल", en: "Needs bending to load"}
-  top_pref: {hi: "आप टॉप-लोड चाहते थे", mr: "तुम्हाला टॉप-लोड हवं होतं", en: "You preferred top-load"}
-  front_pref: {hi: "आप फ़्रंट-लोड चाहते थे", mr: "तुम्हाला फ्रंट-लोड हवं होतं", en: "You preferred front-load"}
-  hard_water_ok: {hi: "खारे पानी के लिए हीटर नहीं", mr: "क्षारयुक्त पाण्यासाठी हीटर नाही", en: "No heater for hard water"}
-  dry_ok: {hi: "धीमा स्पिन — कपड़े देर से सूखें", mr: "हळू स्पिन — कपडे उशिरा वाळतात", en: "Slower spin, clothes dry slower"}
-  perf_ok: {hi: "भारी सॉफ़्टवेयर पर धीमा", mr: "जड सॉफ्टवेअरवर हळू", en: "Slow with heavy software"}
-  coding_ok: {hi: "कोडिंग के लिए कम ताक़त", mr: "कोडिंगसाठी कमी ताकद", en: "Underpowered for coding"}
-  carry_ok: {hi: "रोज़ ले जाने में भारी", mr: "रोज नेण्यासाठी जड", en: "Heavy to carry every day"}
-  battery_ok: {hi: "बैटरी पूरा दिन नहीं चलेगी", mr: "बॅटरी पूर्ण दिवस चालणार नाही", en: "Battery will not last the whole day"}
-  gaming_ok: {hi: "गेमिंग के लिए अलग ग्राफ़िक्स नहीं", mr: "गेमिंगसाठी वेगळे ग्राफिक्स नाही", en: "No dedicated graphics for gaming"}
+  size_ok: {hi: "{size} inch — aapki {distance} ft doori ke liye sahi size nahi", mr: "{size} inch — तुमच्या {distance} ft अंतरासाठी योग्य साइज नाही", en: "{size} inch is not ideal for your {distance} ft distance"}
+  bright_ok: {hi: "Dhoop mein picture thodi pheeki lag sakti hai", mr: "उन्हात चित्र थोडं फिकं वाटू शकतं", en: "May look washed out in your sunny room"}
+  motion_ok: {hi: "Tez cricket shot par ball thodi dhundhli", mr: "वेगवान शॉटवर बॉल थोडा धूसर", en: "Fast cricket shots may blur a little"}
+  dialogue_ok: {hi: "Dialogue ke liye alag sound mode nahi", mr: "संवादासाठी वेगळा साउंड मोड नाही", en: "No dialogue-enhance mode for elders"}
+  angle_ok: {hi: "Side se rang thode pheeke", mr: "बाजूने रंग थोडे फिके", en: "Colours fade a little from the side"}
+  dark_ok: {hi: "Andhere mein kaala poora gehra nahi", mr: "अंधारात काळा पूर्ण गडद नाही", en: "Blacks are not as deep in a dark room"}
+  ton_ok: {hi: "{sqft} sq ft ke liye ton sahi nahi", mr: "{sqft} sq ft साठी ton योग्य नाही", en: "Tonnage does not suit a {sqft} sq ft room"}
+  star_ok: {hi: "Roz lambe hours — bijli bill zyada", mr: "रोज जास्त hours — वीज बिल जास्त", en: "Long daily use means a higher bill"}
+  wifi_ok: {hi: "Phone se control nahi", mr: "फोनवरून कंट्रोल नाही", en: "No phone control"}
+  capacity_ok: {hi: "{people} logon ke liye capacity kam/zyada", mr: "{people} जणांसाठी क्षमता कमी/जास्त", en: "Capacity does not suit a family of {people}"}
+  width_fit: {hi: "Aapki jagah mein fit nahi hogi", mr: "तुमच्या जागेत बसणार नाही", en: "Will not fit your space"}
+  bend_ok: {hi: "Kapde daalne ke liye jhukna padega", mr: "कपडे टाकायला वाकावं लागेल", en: "Needs bending to load"}
+  top_pref: {hi: "Aap top-load chahte the", mr: "तुम्हाला टॉप-लोड हवं होतं", en: "You preferred top-load"}
+  front_pref: {hi: "Aap front-load chahte the", mr: "तुम्हाला फ्रंट-लोड हवं होतं", en: "You preferred front-load"}
+  hard_water_ok: {hi: "Khaare paani ke liye heater nahi", mr: "क्षारयुक्त पाण्यासाठी हीटर नाही", en: "No heater for hard water"}
+  dry_ok: {hi: "Dheema spin — kapde der se sookhein", mr: "हळू स्पिन — कपडे उशिरा वाळतात", en: "Slower spin, clothes dry slower"}
+  perf_ok: {hi: "Bhaari software par dheema", mr: "जड सॉफ्टवेअरवर हळू", en: "Slow with heavy software"}
+  coding_ok: {hi: "Coding ke liye kam power", mr: "कोडिंगसाठी कमी ताकद", en: "Underpowered for coding"}
+  carry_ok: {hi: "Roz le jaane mein bhaari", mr: "रोज नेण्यासाठी जड", en: "Heavy to carry every day"}
+  battery_ok: {hi: "Battery poora din nahi chalegi", mr: "बॅटरी पूर्ण दिवस चालणार नाही", en: "Battery will not last the whole day"}
+  gaming_ok: {hi: "Gaming ke liye alag graphics nahi", mr: "गेमिंगसाठी वेगळे ग्राफिक्स नाही", en: "No dedicated graphics for gaming"}

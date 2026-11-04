@@ -50,9 +50,9 @@ because: {hi: "kyunki", mr: "कारण", en: "because"}
 kyun_benefit: {hi: "Card mein '{value}' hai — isliye ye fayda pehle", mr: "कार्डमध्ये '{value}' आहे — म्हणून हा फायदा आधी", en: "The card says '{value}', so this benefit comes first"}
 kyun_hl: {hi: "Ghar ki zaroorat + product ki apni highlight: '{proof}'", mr: "घराची गरज + प्रॉडक्टची स्वतःची highlight: '{proof}'", en: "Their need + the product's own highlight: '{proof}'"}
 kyun_hl_general: {hi: "Product ki apni highlight: '{proof}' — ghar se poochh kar pakka kariye", mr: "प्रॉडक्टची स्वतःची highlight: '{proof}' — घराबद्दल विचारून पक्कं करा", en: "The product's own highlight: '{proof}'; check it against their home"}
-bolo_label_ready: {hi: "यह {product} है — खास बातें कार्ड पर हैं। आपके घर के हिसाब से इसे बाकी विकल्पों से मिलाकर दिखाऊँ?", mr: "हा {product} आहे — खास गोष्टी कार्डवर आहेत. तुमच्या घराप्रमाणे इतर पर्यायांशी तुलना करून दाखवू का?", en: "This is the {product}; the highlights are on the card. Shall I compare it with the other options for your home?"}
-bolo_ignore_data: {hi: "यहाँ लगभग हर {size} {cat} में {spec} है — तो सिर्फ़ इसके लिए ज़्यादा मत दीजिए, अपनी ज़रूरत पर तुलना कीजिए।", mr: "इथे जवळजवळ प्रत्येक {size} {cat} मध्ये {spec} आहे — म्हणून फक्त त्यासाठी जास्त देऊ नका, तुमच्या गरजेवर तुलना करा.", en: "Nearly every {size} {cat} here has {spec}, so don't pay more just for that; compare on what you need."}
-bolo_ignore_data_all: {hi: "यहाँ लगभग हर {cat} में {spec} है — तो सिर्फ़ इसके लिए ज़्यादा मत दीजिए, अपनी ज़रूरत पर तुलना कीजिए।", mr: "इथे जवळजवळ प्रत्येक {cat} मध्ये {spec} आहे — म्हणून फक्त त्यासाठी जास्त देऊ नका, तुमच्या गरजेवर तुलना करा.", en: "Nearly every {cat} here has {spec}, so don't pay more just for that; compare on what you need."}
+bolo_label_ready: {hi: "Ye {product} hai — khaas baatein card par hain. Aapke ghar ke hisaab se ise baaki options se milaakar dikhaun?", mr: "हा {product} आहे — खास गोष्टी कार्डवर आहेत. तुमच्या घराप्रमाणे इतर पर्यायांशी तुलना करून दाखवू का?", en: "This is the {product}; the highlights are on the card. Shall I compare it with the other options for your home?"}
+bolo_ignore_data: {hi: "Yahan lagbhag har {size} {cat} mein {spec} hai — toh sirf iske liye zyada mat dijiye, apni zaroorat par tulna kijiye.", mr: "इथे जवळजवळ प्रत्येक {size} {cat} मध्ये {spec} आहे — म्हणून फक्त त्यासाठी जास्त देऊ नका, तुमच्या गरजेवर तुलना करा.", en: "Nearly every {size} {cat} here has {spec}, so don't pay more just for that; compare on what you need."}
+bolo_ignore_data_all: {hi: "Yahan lagbhag har {cat} mein {spec} hai — toh sirf iske liye zyada mat dijiye, apni zaroorat par tulna kijiye.", mr: "इथे जवळजवळ प्रत्येक {cat} मध्ये {spec} आहे — म्हणून फक्त त्यासाठी जास्त देऊ नका, तुमच्या गरजेवर तुलना करा.", en: "Nearly every {cat} here has {spec}, so don't pay more just for that; compare on what you need."}
 kyun_ignore_data: {hi: "Stock: {total} mein se {n} mein {spec} — ye farak nahi daalta", mr: "स्टॉक: {total} पैकी {n} मध्ये {spec} — यात फरक नाही", en: "Stock: {n} of {total} have {spec}; it doesn't set them apart"}
 kyun_complete: {hi: "Koi surprise nahi = bharosa", mr: "कोणतंही सरप्राइज नाही = विश्वास", en: "No surprise = trust"}
 kyun_consent: {hi: "Bina consent kuch nahi bhejte", mr: "संमतीशिवाय काहीही पाठवत नाही", en: "Nothing is sent without consent"}
@@ -60,9 +60,7 @@ kyun_delivery: {hi: "Do din ka vikalp — faisla customer ka, din data se", mr: 
 kyun_expert_hold: {hi: "Expert se poochh raha hoon (90 sec)", mr: "एक्सपर्टला विचारतोय (90 सेकंद)", en: "Asking an expert (90 sec)"}
 kyun_myth: {hi: "Pehle maano, phir samjhao", mr: "आधी मान्य करा, मग समजवा", en: "Agree first, then explain"}
 kyun_need_validation: {hi: "Pehle maano, phir sawaal", mr: "आधी मान्य करा, मग प्रश्न", en: "Agree first, then ask"}
-kyun_no_offer: {hi: "Aaj is model par koi offer data mein nahi · payable {payable}", mr: "आज या मॉडेलवर डेटामध्ये ऑफर नाही · देय {payable}", en: "No offer on this model in today's data · payable {payable}"}
 kyun_objection: {hi: "Suno, mano, poochho, phir jawab", mr: "ऐका, मान्य करा, विचारा, मग उत्तर", en: "Listen, acknowledge, ask, then answer"}
-kyun_offers: {hi: "Aaj: {offer} −{amount} ({date} tak) · payable {payable}", mr: "आज: {offer} −{amount} ({date} पर्यंत) · देय {payable}", en: "Today: {offer} −{amount} (until {date}) · payable {payable}"}
 kyun_options_ready: {hi: "Ghar ki zaroori baatein pata hain — ab options", mr: "घराची महत्त्वाची माहिती मिळाली — आता पर्याय", en: "We know the key home facts: now the options"}
 kyun_price_rescue: {hi: "Imaandar range, phir 2 sawaal — daam aakhir mein", mr: "प्रामाणिक रेंज, मग 2 प्रश्न — किंमत शेवटी", en: "Honest range, then 2 questions: price comes last"}
 kyun_trial_close: {hi: "Demo ke baad pasand poochiye", mr: "डेमोनंतर पसंती विचारा", en: "After the demo, ask what they liked"}
@@ -70,17 +68,17 @@ kyun_tryon: {hi: "Size dekh kar faisla aasaan", mr: "साइज पाहू�
 proof_label: {hi: "Proof: {demo}", mr: "पुरावा: {demo}", en: "Proof: {demo}"}
 
 # ---------- customer-facing lines (Bolo) ----------
-bolo_options_ready: {hi: "आपके घर के हिसाब से 3 सही विकल्प दिखाता हूँ।", mr: "तुमच्या घरानुसार 3 योग्य पर्याय दाखवतो.", en: "Let me show you 3 options that fit your home."}
-this_product: {hi: "ये मॉडल", mr: "हे मॉडेल", en: "this model"}
+bolo_options_ready: {hi: "Aapke ghar ke hisaab se 3 sahi options dikhata hoon.", mr: "तुमच्या घरानुसार 3 योग्य पर्याय दाखवतो.", en: "Let me show you 3 options that fit your home."}
+this_product: {hi: "ye model", mr: "हे मॉडेल", en: "this model"}
 other_product: {hi: "dusra model", mr: "दुसरं मॉडेल", en: "the other model"}
-payable_now: {hi: "आज देय राशि {payable} है।", mr: "आज देय रक्कम {payable} आहे.", en: "Today's payable amount is {payable}."}
-honest_offer: {hi: "ये ऑफ़र {date} तक है — तारीख़ कार्ड पर है।", mr: "हा ऑफर {date} पर्यंत आहे — तारीख कार्डवर आहे.", en: "This offer runs until {date}; the date is on the card."}
-honest_stock: {hi: "{product} अभी स्टोर में {qty} हैं।", mr: "{product} सध्या स्टोअरमध्ये {qty} आहेत.", en: "{product}: {qty} in the store right now."}
-honest_generic: {hi: "आराम से सोचिए, सारी जानकारी आपके WhatsApp पर भेज दूँगा।", mr: "निवांत विचार करा, सगळी माहिती तुमच्या WhatsApp वर पाठवतो.", en: "Take your time; I'll send everything to your WhatsApp."}
+payable_now: {hi: "Aaj aapko {payable} dena hoga.", mr: "आज देय रक्कम {payable} आहे.", en: "Today's payable amount is {payable}."}
+honest_offer: {hi: "Ye offer {date} tak hai — taareekh card par hai.", mr: "हा ऑफर {date} पर्यंत आहे — तारीख कार्डवर आहे.", en: "This offer runs until {date}; the date is on the card."}
+honest_stock: {hi: "{product} abhi store mein {qty} hain.", mr: "{product} सध्या स्टोअरमध्ये {qty} आहेत.", en: "{product}: {qty} in the store right now."}
+honest_generic: {hi: "Aaram se sochiye, saari jaankari aapke WhatsApp par bhej dunga.", mr: "निवांत विचार करा, सगळी माहिती तुमच्या WhatsApp वर पाठवतो.", en: "Take your time; I'll send everything to your WhatsApp."}
 honest_body: {hi: "Ye line mat boliye — dabaav se bharosa tootta hai.\nSach boliye: \"{honest}\"", mr: "ही ओळ सांगू नका — दबावाने विश्वास तुटतो.\nखरं सांगा: \"{honest}\"", en: "Don't say that line: pressure breaks trust.\nSay the truth: \"{honest}\""}
-tryon_bolo: {hi: "ये आपकी दीवार पर {a} और {b} inch — सोफ़े से दोनों देखिए।", mr: "ही तुमच्या भिंतीवर {a} आणि {b} inch — सोफ्यावरून दोन्ही पाहा.", en: "Here are {a} and {b} inches on your wall: compare from the sofa."}
-tryon_bolo_one: {hi: "ये आपकी दीवार पर {a} inch — सोफ़े से देखिए।", mr: "ही तुमच्या भिंतीवर {a} inch — सोफ्यावरून पाहा.", en: "Here is {a} inches on your wall: look from the sofa."}
-tryon_distance: {hi: "सोफ़े से {ft} ft", mr: "सोफ्यापासून {ft} ft", en: "Sofa at {ft} ft"}
+tryon_bolo: {hi: "Ye aapki deewar par {a} aur {b} inch — sofa se dono dekhiye.", mr: "ही तुमच्या भिंतीवर {a} आणि {b} inch — सोफ्यावरून दोन्ही पाहा.", en: "Here are {a} and {b} inches on your wall: compare from the sofa."}
+tryon_bolo_one: {hi: "Ye aapki deewar par {a} inch — sofa se dekhiye.", mr: "ही तुमच्या भिंतीवर {a} inch — सोफ्यावरून पाहा.", en: "Here is {a} inches on your wall: look from the sofa."}
+tryon_distance: {hi: "Sofa se {ft} ft", mr: "सोफ्यापासून {ft} ft", en: "Sofa at {ft} ft"}
 tryon_like: {hi: "{size}\" pasand", mr: "{size}\" आवडला", en: "Like {size}\""}
 
 # ---------- cards ----------
@@ -89,28 +87,24 @@ home_row_sports: {hi: "Cricket kaun dekhta", mr: "क्रिकेट को�
 start_level_by_you: {hi: "aapne set kiya", mr: "तुम्ही ठरवलं", en: "set by you"}
 start_level_not_told: {hi: "Budget nahi bataya", mr: "बजेट सांगितलं नाही", en: "Budget not told"}
 benefit_card_caption: {hi: "Benefit Card — customer ko dikhaiye", mr: "फायदा कार्ड — ग्राहकाला दाखवा", en: "Benefit Card: show the customer"}
-ignore_prefix: {hi: "इस घर के लिए कम ज़रूरी:", mr: "या घरासाठी कमी महत्त्वाचं:", en: "Less important for this home:"}
-exchange_text: {hi: "पुराने टीवी/उपकरण का एक्सचेंज: {low} – {high} (बिल से अलग)", mr: "जुन्या उपकरणाचा एक्सचेंज: {low} – {high} (बिलापासून वेगळं)", en: "Exchange for the old one: {low} – {high} (separate from the bill)"}
-lifetime_text: {hi: "बिजली: लगभग {monthly}/महीना · 5 साल {five}", mr: "वीज: सुमारे {monthly}/महिना · 5 वर्षं {five}", en: "Power: about {monthly}/month · 5 years {five}"}
-lifetime_saving: {hi: "{alt} से 5 साल में {saving} बचत", mr: "{alt} पेक्षा 5 वर्षांत {saving} बचत", en: "saves {saving} over 5 years vs {alt}"}
+ignore_prefix: {hi: "Is ghar ke liye kam zaroori:", mr: "या घरासाठी कमी महत्त्वाचं:", en: "Less important for this home:"}
+exchange_text: {hi: "Purane TV/appliance ka exchange: {low} – {high} (bill se alag)", mr: "जुन्या उपकरणाचा एक्सचेंज: {low} – {high} (बिलापासून वेगळं)", en: "Exchange for the old one: {low} – {high} (separate from the bill)"}
+lifetime_text: {hi: "Bijli: lagbhag {monthly}/mahina · 5 saal {five}", mr: "वीज: सुमारे {monthly}/महिना · 5 वर्षं {five}", en: "Power: about {monthly}/month · 5 years {five}"}
+lifetime_saving: {hi: "{alt} se 5 saal mein {saving} bachat", mr: "{alt} पेक्षा 5 वर्षांत {saving} बचत", en: "saves {saving} over 5 years vs {alt}"}
 kharcha_stamp: {hi: "{date} {time}", mr: "{date} {time}", en: "{date} {time}"}
-parivaar_title: {hi: "{name} परिवार के लिए", mr: "{name} कुटुंबासाठी", en: "For the {name} family"}
+parivaar_title: {hi: "{name} parivaar ke liye", mr: "{name} कुटुंबासाठी", en: "For the {name} family"}
 parivaar_cost: {hi: "पूरा खर्च {total}", mr: "पूर्ण खर्च {total}", en: "Full cost {total}"}
-parivaar_cost_sug: {hi: "सुझाव सहित {total}", mr: "सूचनांसह {total}", en: "with suggestions {total}"}
+parivaar_cost_sug: {hi: "sujhaav ke saath {total}", mr: "सूचनांसह {total}", en: "with suggestions {total}"}
 parivaar_offer: {hi: "ऑफ़र: {offer} −{amount} ({date} तक) · देय {payable}", mr: "ऑफर: {offer} −{amount} ({date} पर्यंत) · देय {payable}", en: "Offer: {offer} −{amount} (until {date}) · payable {payable}"}
-parivaar_delivery: {hi: "डिलीवरी: {day}", mr: "डिलिव्हरी: {day}", en: "Delivery: {day}"}
-parivaar_caption: {hi: "{name} जी, आपके घर के लिए {product} — पूरा खर्च कार्ड पर।\nकोई सवाल हो तो यहीं लिखिए।", mr: "{name} जी, तुमच्या घरासाठी {product} — पूर्ण खर्च कार्डवर.\nकाही प्रश्न असल्यास इथेच लिहा.", en: "{name} ji, {product} for your home: the full cost is on the card.\nWrite here if you have any question."}
+parivaar_delivery: {hi: "Delivery: {day}", mr: "डिलिव्हरी: {day}", en: "Delivery: {day}"}
 parivaar_need_product: {hi: "Pehle option chuniye, phir Parivaar Card.", mr: "आधी पर्याय निवडा, मग परिवार कार्ड.", en: "Choose an option first, then the family card."}
 
 # ---------- associate messages ----------
 after_clip: {hi: "Clip ke baad ek sawaal?", mr: "क्लिपनंतर एक प्रश्न?", en: "One question after the clip?"}
 approval_closed: {hi: "Theek hai ✓ Associate ko bata diya.", mr: "ठीक आहे ✓ असोसिएटला कळवलं.", en: "Done ✓ The associate has been told."}
 approval_denied: {hi: "Manager: extra discount nahi. Data ke offers hi dikhaiye.", mr: "मॅनेजर: जास्त सूट नाही. डेटामधल्या ऑफरच दाखवा.", en: "Manager: no extra discount. Show the offers in the data."}
-approval_for_manager: {hi: "Approval: {name} ({code}) — customer discount maang rahe hain. Sirf data ke offers de sakte hain.", mr: "मंजुरी: {name} ({code}) — ग्राहक सूट मागत आहेत. फक्त डेटामधले ऑफर देता येतील.", en: "Approval: {name} ({code}): the customer wants a discount. Only offers in the data can be given."}
 approval_offers: {hi: "Manager: ye valid offers dikhaiye — {offers}", mr: "मॅनेजर: हे वैध ऑफर दाखवा — {offers}", en: "Manager: show these valid offers: {offers}"}
-approval_sent: {hi: "Manager ko bhej diya ✓ Tab tak data ke offers dikhaiye.", mr: "मॅनेजरला पाठवलं ✓ तोपर्यंत डेटामधले ऑफर दाखवा.", en: "Sent to the manager ✓ Meanwhile, show the offers in the data."}
 ask_bank: {hi: "Customer ka card kaunsa hai?", mr: "ग्राहकाचं कार्ड कोणतं आहे?", en: "Which card does the customer have?"}
-benefits_done: {hi: "Is ghar ke liye zaroori fayde ho gaye. Ab options?", mr: "या घरासाठी महत्त्वाचे फायदे सांगून झाले. आता पर्याय?", en: "That covers the benefits that matter here. Options now?"}
 brief_back: {hi: "{model} wapas stock mein", mr: "{model} पुन्हा स्टॉकमध्ये", en: "{model} back in stock since yesterday"}
 brief_out: {hi: "{model} stock khatam", mr: "{model} स्टॉक संपला", en: "{model} out of stock since yesterday"}
 brief_low: {hi: "{model} sirf {qty} bache", mr: "{model} फक्त {qty} उरले", en: "{model}: only {qty} left"}
@@ -123,37 +117,24 @@ brief_no_followups: {hi: "Aaj koi follow-up nahi", mr: "आज फॉलो-अ�
 brief_greeting: {hi: "Namaste {name} ji", mr: "नमस्कार {name}", en: "Namaste {name}"}
 brief_offer_ends: {hi: "{title} — {date} tak", mr: "{title} — {date} पर्यंत", en: "{title}: until {date}"}
 brief_offer_new: {hi: "Naya: {title}", mr: "नवीन: {title}", en: "New: {title}"}
-clip_caption: {hi: "45 sec: {step}\nDekhiye, phir ek sawaal.", mr: "45 सेकंद: {step}\nबघा, मग एक प्रश्न.", en: "45 sec: {step}\nWatch, then one question."}
 clock_set: {hi: "Demo clock: {date} {time}", mr: "डेमो घड्याळ: {date} {time}", en: "Demo clock: {date} {time}"}
 compare_body: {hi: "{a} aur {b} mein {n} farak; is ghar ke liye sirf {k} matter karte hain: {list}", mr: "{a} आणि {b} मध्ये {n} फरक; या घरासाठी फक्त {k} महत्त्वाचे: {list}", en: "{a} and {b} differ in {n} ways; only {k} matter for this home: {list}"}
-compare_send: {hi: "Dusre model ke label ki photo bhejiye.", mr: "दुसऱ्या मॉडेलच्या लेबलचा फोटो पाठवा.", en: "Send a photo of the other model's label."}
 consent_tap_needs_qr: {hi: "Customer ka 24-hour window band hai — QR scan karwaiye.", mr: "ग्राहकाचा 24-hour विंडो बंद आहे — QR स्कॅन करा.", en: "The customer's 24-hour window is closed: ask them to scan the QR."}
 customer_word: {hi: "Customer", mr: "ग्राहक", en: "Customer"}
 delivery_set: {hi: "Delivery: {day} ✓", mr: "डिलिव्हरी: {day} ✓", en: "Delivery: {day} ✓"}
-digest_gap: {hi: "{name}: {step} sabse kam. 45-sec clip bhejein?", mr: "{name}: {step} सर्वात कमी. 45 सेकंदांची क्लिप पाठवू?", en: "{name}: {step} is lowest. Send the 45-sec clip?"}
 digest_no_data: {hi: "Aaj abhi koi score nahi.", mr: "आज अजून स्कोअर नाही.", en: "No scores yet today."}
 expert_answer: {hi: "💬 {expert}: {text}", mr: "💬 {expert}: {text}", en: "💬 {expert}: {text}"}
-expert_answer_prompt: {hi: "Jawab text ya voice mein bhejiye.", mr: "उत्तर टेक्स्ट किंवा व्हॉइसमध्ये पाठवा.", en: "Send the answer as text or voice."}
 expert_busy: {hi: "Expert abhi busy; customer ko card bhej kar baad mein batayenge.", mr: "एक्सपर्ट सध्या व्यस्त; ग्राहकाला कार्ड पाठवून नंतर सांगू.", en: "The expert is busy; send the card and follow up later."}
 expert_home_line: {hi: "Ghar: {home}", mr: "घर: {home}", en: "Home: {home}"}
 expert_idle: {hi: "Abhi koi khula sawaal nahi. Shukriya!", mr: "सध्या कोणताही प्रश्न उघडा नाही. धन्यवाद!", en: "No open question right now. Thanks!"}
 expert_library_answer: {hi: "💬 {expert} (Guide): {text}", mr: "💬 {expert} (गाइड): {text}", en: "💬 {expert} (Guide): {text}"}
-expert_question: {hi: "❓ {associate} ({cat}, {code}): {question}", mr: "❓ {associate} ({cat}, {code}): {question}", en: "❓ {associate} ({cat}, {code}): {question}"}
 expert_reminder: {hi: "⏰ Ek sawaal jawab ka intezaar kar raha hai.", mr: "⏰ एक प्रश्न उत्तराची वाट पाहतोय.", en: "⏰ A question is waiting for your answer."}
 expert_save_ask: {hi: "Library mein daalein? Agli baar turant jawab milega.", mr: "लायब्ररीत ठेवू? पुढच्या वेळी लगेच उत्तर मिळेल.", en: "Save to the library? Next time the answer is instant."}
 expert_thanks: {hi: "Shukriya ✓", mr: "धन्यवाद ✓", en: "Thanks ✓"}
 expert_unknown: {hi: "Expert ko bhi pakka nahi. Customer ko card bhej kar baad mein batayenge.", mr: "एक्सपर्टलाही खात्री नाही. ग्राहकाला कार्ड पाठवून नंतर सांगू.", en: "The expert isn't sure either. Send the card and follow up later."}
 expert_voice_answer: {hi: "💬 {expert} ne voice mein jawab diya:", mr: "💬 {expert} यांनी व्हॉइसमध्ये उत्तर दिलं:", en: "💬 {expert} answered by voice:"}
-floor_now: {hi: "Abhi: {a} customer · {d} demo baaki · {e} expert sawaal", mr: "आत्ता: {a} ग्राहक · {d} डेमो बाकी · {e} एक्सपर्ट प्रश्न", en: "Now: {a} customers · {d} demos pending · {e} expert questions"}
-floor_today: {hi: "Aaj: {s} baat-cheet · Guide {g}/{n} · median {m}/14", mr: "आज: {s} संवाद · गाइड {g}/{n} · मीडियन {m}/14", en: "Today: {s} conversations · Guide {g}/{n} · median {m}/14"}
-floor_follow: {hi: "Follow-up aaj: {t} · Install risk: {r}", mr: "आजचे फॉलो-अप: {t} · इन्स्टॉल धोका: {r}", en: "Follow-ups today: {t} · Install risk: {r}"}
-gate_price_assess: {hi: "Daam se pehle ghar ke {n} aur sawaal, phir demo.", mr: "किंमतीआधी घराचे आणखी {n} प्रश्न, मग डेमो.", en: "{n} more home questions, then the demo, before price."}
-image_other: {hi: "Label ya kamre ki photo bhejiye. Ye kya hai?", mr: "लेबल किंवा खोलीचा फोटो पाठवा. हा कोणता आहे?", en: "Send a label or a room photo. Which is this?"}
-install_job_body: {hi: "Install job #{id}: {slot} · {site}", mr: "इन्स्टॉल जॉब #{id}: {slot} · {site}", en: "Install job #{id}: {slot} · {site}"}
-install_problem_assoc: {hi: "⚠️ {name} ka {product} — installation mein samasya. Manager ko bata diya.", mr: "⚠️ {name} यांचा {product} — इन्स्टॉलेशनमध्ये समस्या. मॅनेजरला कळवलं.", en: "⚠️ {name}'s {product}: installation problem. The manager has been told."}
 install_problem_manager: {hi: "⚠️ Install job #{id} ({name}): samasya. Site: {site}", mr: "⚠️ इन्स्टॉल जॉब #{id} ({name}): समस्या. साइट: {site}", en: "⚠️ Install job #{id} ({name}): problem. Site: {site}"}
 install_risk_manager: {hi: "⚠️ Install job #{id} risk: {risks} · {site}", mr: "⚠️ इन्स्टॉल जॉब #{id} धोका: {risks} · {site}", en: "⚠️ Install job #{id} risk: {risks} · {site}"}
-install_slot_ask: {hi: "Installation kab? (installer ko site ki jaankari jayegi)", mr: "इन्स्टॉलेशन कधी? (इन्स्टॉलरला साइटची माहिती जाईल)", en: "When should we install? (the installer gets the site details)"}
 kpi_conversations: {hi: "Baat-cheet", mr: "संवाद", en: "Conversations"}
 kpi_guide: {hi: "Guide level", mr: "गाइड लेव्हल", en: "Guide level"}
 kpi_median: {hi: "Median score", mr: "मीडियन स्कोअर", en: "Median score"}
@@ -163,13 +144,9 @@ kpi_minute: {hi: "Pehla daam (min)", mr: "पहिली किंमत (म�
 kpi_parivaar: {hi: "Parivaar Card", mr: "परिवार कार्ड", en: "Family cards"}
 kpi_install: {hi: "Installation", mr: "इन्स्टॉलेशन", en: "Installations"}
 kpi_expert_open: {hi: "Expert sawaal khule", mr: "उघडे एक्सपर्ट प्रश्न", en: "Open expert questions"}
-label_send: {hi: "Label ki photo bhejiye.", mr: "लेबलचा फोटो पाठवा.", en: "Send a photo of the label."}
-lang_set: {hi: "Bhasha set ✓", mr: "भाषा सेट ✓", en: "Language set ✓"}
 library_saved: {hi: "Library mein save ✓", mr: "लायब्ररीत सेव्ह ✓", en: "Saved to library ✓"}
 list_budget: {hi: "Budget", mr: "बजेट", en: "Budget"}
 list_choose: {hi: "Chuniye", mr: "निवडा", en: "Choose"}
-lost_reason_ask: {hi: "Kyun nahi liya? (voice ya text)", mr: "का घेतलं नाही? (व्हॉइस किंवा टेक्स्ट)", en: "Why didn't they buy? (voice or text)"}
-manager_help: {hi: "Floor = abhi ka haal · Digest = aaj ka score · Approvals", mr: "Floor = सध्याची स्थिती · Digest = आजचा स्कोअर · मंजुरी", en: "Floor = right now · Digest = today's scores · Approvals"}
 no_approvals: {hi: "Koi approval baaki nahi.", mr: "कोणतीही मंजुरी बाकी नाही.", en: "No approvals pending."}
 no_customer_linked: {hi: "Is customer ne abhi consent nahi diya (QR).", mr: "या ग्राहकाने अजून संमती दिलेली नाही (QR).", en: "This customer hasn't given consent yet (QR)."}
 no_options: {hi: "Is ghar ke liye data mein model nahi mila. Expert se poochhein?", mr: "या घरासाठी डेटामध्ये मॉडेल मिळालं नाही. एक्सपर्टला विचारू?", en: "No model in the data fits this home. Ask an expert?"}
@@ -177,7 +154,6 @@ no_scores: {hi: "Abhi koi score nahi.", mr: "अजून स्कोअर न
 noted: {hi: "Note kar liya ✓", mr: "नोंद केली ✓", en: "Noted ✓"}
 nudge_body: {hi: "Aaj ka focus: {step}. {tip}", mr: "आजचं लक्ष: {step}. {tip}", en: "Today's focus: {step}. {tip}"}
 nudge_sent: {hi: "{name} ko bhej diya ✓", mr: "{name} यांना पाठवलं ✓", en: "Sent to {name} ✓"}
-price_first_ask: {hi: "Daam pehle kisne bola?", mr: "किंमत आधी कोणी सांगितली?", en: "Who mentioned price first?"}
 praise_validate: {hi: "Customer ki baat pehle maani", mr: "ग्राहकाचं म्हणणं आधी मान्य केलं", en: "You agreed first"}
 praise_assess: {hi: "{n} ghar ki baatein pehle", mr: "आधी घराच्या {n} गोष्टी", en: "{n} home facts first"}
 praise_translate: {hi: "{n} fayde is ghar ke hisaab se", mr: "या घरानुसार {n} फायदे", en: "{n} benefits for this home"}
@@ -189,33 +165,21 @@ quiz_right: {hi: "Sahi ✓ {explain} (streak {streak})", mr: "बरोबर �
 quiz_wrong: {hi: "Sahi jawab: {answer}. {explain}", mr: "योग्य उत्तर: {answer}. {explain}", en: "Right answer: {answer}. {explain}"}
 relay_sent: {hi: "Customer ko bhej diya ✓", mr: "ग्राहकाला पाठवलं ✓", en: "Sent to the customer ✓"}
 reset_done: {hi: "Reset ✓ Naya customer shuru kariye.", mr: "रीसेट ✓ नवीन ग्राहक सुरू करा.", en: "Reset ✓ Start a new customer."}
-review_ask: {hi: "Customer ka kya hua?", mr: "ग्राहकाचं काय झालं?", en: "How did it end?"}
-review_best: {hi: "Best: {text}", mr: "सर्वोत्तम: {text}", en: "Best: {text}"}
-review_next: {hi: "Agli baar: {text}", mr: "पुढच्या वेळी: {text}", en: "Next time: {text}"}
 role_set: {hi: "Role: {role} ✓", mr: "भूमिका: {role} ✓", en: "Role: {role} ✓"}
-room_photo_send: {hi: "Customer ke phone se kamre ki photo yahan bhejiye (deewar saamne se).", mr: "ग्राहकाच्या फोनवरून खोलीचा फोटो इथे पाठवा (भिंत समोरून).", en: "Send the room photo here from the customer's phone (facing the wall)."}
-score_history: {hi: "Pichhle score: {totals} (har ek /14)", mr: "मागचे स्कोअर: {totals} (प्रत्येकी /14)", en: "Recent scores: {totals} (each /14)"}
 site_reason_pipe: {hi: "Pipe +{ft}: outdoor unit door hai", mr: "पाइप +{ft}: आउटडोअर युनिट लांब आहे", en: "Pipe +{ft}: the outdoor unit is far"}
-status_none: {hi: "Abhi koi customer nahi. Naya shuru kariye.", mr: "सध्या कोणताही ग्राहक नाही. नवीन सुरू करा.", en: "No customer right now. Start a new one."}
 stock_in_store: {hi: "Store mein {qty}", mr: "स्टोअरमध्ये {qty}", en: "{qty} in store"}
 stock_nearby: {hi: "{days} din mein delivery ({store} se)", mr: "{days} दिवसांत डिलिव्हरी ({store} मधून)", en: "Delivery in {days} days (from {store})"}
 stock_available: {hi: "Available hai", mr: "उपलब्ध आहे", en: "Available"}
 stock_unavailable: {hi: "Abhi available nahi", mr: "सध्या उपलब्ध नाही", en: "Not available right now"}
-honest_available: {hi: "{product} अभी उपलब्ध है।", mr: "{product} सध्या उपलब्ध आहे.", en: "{product} is available right now."}
+honest_available: {hi: "{product} abhi available hai.", mr: "{product} सध्या उपलब्ध आहे.", en: "{product} is available right now."}
 suggestions_off: {hi: "Sujhav hata diye — sirf zaroori.", mr: "सूचना काढल्या — फक्त आवश्यक.", en: "Suggestions removed: essentials only."}
 suggestions_on: {hi: "Sujhav wapas jode.", mr: "सूचना परत जोडल्या.", en: "Suggestions added back."}
 switch_body: {hi: "Kaunsa customer?", mr: "कोणता ग्राहक?", en: "Which customer?"}
 task_change_day: {hi: "Installation ka din badalna hai — customer ko call", mr: "इन्स्टॉलेशनचा दिवस बदलायचा — ग्राहकाला कॉल", en: "Installation day change: call the customer"}
-task_done: {hi: "Task: {when} call — owner aap ✓", mr: "टास्क: {when} कॉल — जबाबदारी तुमची ✓", en: "Task: call {when}; owner: you ✓"}
-task_reminder: {hi: "⏰ {title}", mr: "⏰ {title}", en: "⏰ {title}"}
 task_title: {hi: "{name} ko follow-up call", mr: "{name} यांना फॉलो-अप कॉल", en: "Follow-up call to {name}"}
 task_visit_title: {hi: "{name} visit book karna chahte hain", mr: "{name} भेट बुक करू इच्छितात", en: "{name} wants to book a visit"}
-task_when_ask: {hi: "Follow-up kab?", mr: "फॉलो-अप कधी?", en: "Follow up when?"}
-team_body: {hi: "Aaj ki team", mr: "आजची टीम", en: "Today's team"}
-team_row: {hi: "{s} baat-cheet · median {m}", mr: "{s} संवाद · मीडियन {m}", en: "{s} conversations · median {m}"}
 tip_card: {hi: "💡 {step}: {tip}", mr: "💡 {step}: {tip}", en: "💡 {step}: {tip}"}
 tryon_failed: {hi: "Is photo se size pakka nahi hua; deewar ke saamne se dobara photo lijiye.", mr: "या फोटोवरून साइज निश्चित झाली नाही; भिंतीसमोरून पुन्हा फोटो घ्या.", en: "Couldn't fix the size from this photo; retake it facing the wall."}
-unknown_number: {hi: "Namaste! Ye number Reliance Digital store team ke liye hai (test).", mr: "Namaste! Ye number Reliance Digital store team ke liye hai (test).", en: "Namaste! This number is for the Reliance Digital store team (test)."}
 visit_ask_price_first_by: {hi: "Daam pehle kisne bola?", mr: "किंमत आधी कोणी सांगितली?", en: "Who mentioned price first?"}
 visit_ask_demo_shown: {hi: "Demo dikhaya?", mr: "डेमो दाखवला?", en: "Was a demo shown?"}
 visit_ask_would_come_back: {hi: "Kya aap is associate ke paas wapas aayenge?", mr: "तुम्ही या असोसिएटकडे परत याल का?", en: "Would you come back to this associate?"}
@@ -232,25 +196,12 @@ window_closed: {hi: "Customer ka 24-hour window band hai; QR dobara scan karwaiy
 
 # ---------- customer side ----------
 cust_ask_prompt: {hi: "अपना सवाल यहीं लिखिए या voice note भेजिए।", mr: "तुमचा प्रश्न इथेच लिहा किंवा व्हॉइस नोट पाठवा.", en: "Write your question here or send a voice note."}
-cust_change_ack: {hi: "ठीक है, हम आपको कॉल करके नया दिन तय करेंगे।", mr: "ठीक आहे, आम्ही कॉल करून नवीन दिवस ठरवू.", en: "OK, we'll call you to fix a new day."}
-cust_change_assoc: {hi: "📅 {name} installation ka din badalna chahte hain — call kariye.", mr: "📅 {name} इन्स्टॉलेशनचा दिवस बदलू इच्छितात — कॉल करा.", en: "📅 {name} wants to change the installation day: please call."}
-cust_install_booked: {hi: "इंस्टॉलेशन {slot} पक्का ✓", mr: "इन्स्टॉलेशन {slot} निश्चित ✓", en: "Installation {slot} confirmed ✓"}
-cust_msg_assoc: {hi: "💬 {name}: {text}\n(Jawab: 'r ' likh kar bhejiye)", mr: "💬 {name}: {text}\n(उत्तर: 'r ' लिहून पाठवा)", en: "💬 {name}: {text}\n(Reply: type 'r ' then your message)"}
 cust_photo_assoc: {hi: "📷 Customer ne kamre ki photo bheji — try-on bana raha hoon.", mr: "📷 ग्राहकाने खोलीचा फोटो पाठवला — ट्राय-ऑन बनवतोय.", en: "📷 The customer sent a room photo: making the try-on."}
 cust_photo_thanks: {hi: "फ़ोटो मिल गई ✓ आपकी दीवार पर टीवी दिखाकर भेजेंगे।", mr: "फोटो मिळाला ✓ तुमच्या भिंतीवर टीव्ही दाखवून पाठवू.", en: "Got the photo ✓ We'll show the TV on your wall."}
-cust_problem_ack: {hi: "माफ़ कीजिए। हम तुरंत देख रहे हैं — {associate} जी आपसे बात करेंगे।", mr: "माफ करा. आम्ही लगेच पाहतोय — {associate} तुमच्याशी बोलतील.", en: "Sorry about that. We're on it: {associate} will call you."}
-cust_ready_ack: {hi: "धन्यवाद ✓ कल मिलते हैं।", mr: "धन्यवाद ✓ उद्या भेटू.", en: "Thank you ✓ See you tomorrow."}
 cust_stopped: {hi: "ठीक है, अब कोई संदेश नहीं भेजेंगे।", mr: "ठीक आहे, आता कोणताही संदेश पाठवणार नाही.", en: "OK, we won't message you again."}
 cust_stopped_assoc: {hi: "{name} ne STOP bola — ab unhe message nahi jayega.", mr: "{name} यांनी STOP सांगितलं — आता संदेश जाणार नाही.", en: "{name} said STOP: no more messages to them."}
-cust_talk_ack: {hi: "ठीक है, वे जल्द आपसे बात करेंगे।", mr: "ठीक आहे, ते लवकरच तुमच्याशी बोलतील.", en: "OK, they'll talk to you shortly."}
 cust_unknown_token: {hi: "Ye code nahi mila. Store mein QR dobara scan kariye.", mr: "हा कोड सापडला नाही. स्टोअरमध्ये QR पुन्हा स्कॅन करा.", en: "That code wasn't found. Please scan the QR again in the store."}
-cust_visit_ack: {hi: "ठीक है, कल सुबह आपको कॉल करके विज़िट तय करेंगे।", mr: "ठीक आहे, उद्या सकाळी कॉल करून भेट ठरवू.", en: "OK, we'll call you tomorrow morning to fix the visit."}
-cust_visit_assoc: {hi: "📅 {name} visit book karna chahte hain — task bana diya (kal 11:00).", mr: "📅 {name} भेट बुक करू इच्छितात — टास्क बनवला (उद्या 11:00).", en: "📅 {name} wants to book a visit: task created (tomorrow 11:00)."}
 cust_voice_assoc: {hi: "🎤 {name} ka voice note:", mr: "🎤 {name} यांची व्हॉइस नोट:", en: "🎤 Voice note from {name}:"}
-cust_wants_talk: {hi: "📞 {name} baat karna chahte hain. Bolo: \"Namaste, main store se bol raha hoon — kya madad karun?\"", mr: "📞 {name} बोलू इच्छितात. बोला: \"नमस्कार, मी स्टोअरमधून बोलतोय — काय मदत करू?\"", en: "📞 {name} wants to talk. Say: \"Namaste, calling from the store: how can I help?\""}
-cust_working_ack: {hi: "बहुत अच्छा ✓ कोई सवाल हो तो यहीं लिखिए।", mr: "छान ✓ काही प्रश्न असल्यास इथेच लिहा.", en: "Great ✓ Write here if you have any question."}
-gate_price_no_options: {hi: "Daam demo ke baad. Pehle options dikhaiye, phir farak.", mr: "किंमत डेमोनंतर. आधी पर्याय दाखवा, मग फरक.", en: "Price comes after the demo. Show the options first, then the difference."}
-ask_category: {hi: "Customer kaunsa product dekh rahe hain?", mr: "ग्राहक कोणतं उत्पादन बघत आहेत?", en: "Which product is the customer looking for?"}
 b_cat_tv: {hi: "TV", mr: "टीव्ही", en: "TV"}
 b_cat_ac: {hi: "AC", mr: "AC", en: "AC"}
 b_cat_wm: {hi: "Washing machine", mr: "वॉशिंग मशीन", en: "Washing machine"}
@@ -260,10 +211,9 @@ catalog_body: {hi: "{cat}: store mein {n} models. Specs aur offers sirf data se.
 catalog_sub_price: {hi: "Aaj ke daam · TEST DATA", mr: "आजच्या किंमती · TEST DATA", en: "Today's prices · TEST DATA"}
 catalog_sub_noprice: {hi: "Daam demo ke baad dikhenge", mr: "किंमत डेमोनंतर दिसेल", en: "Prices show after the demo"}
 b_more: {hi: "Aur dikhao", mr: "आणखी दाखवा", en: "Show more"}
-row_full_cost: {hi: "पूरा खर्च", mr: "पूर्ण खर्च", en: "Full cost"}
-row_with_sug: {hi: "सुझाव सहित", mr: "सूचनांसह", en: "With suggestions"}
-row_offer: {hi: "आज का ऑफ़र", mr: "आजची ऑफर", en: "Today's offer"}
-row_payable: {hi: "ऑफ़र के बाद देय", mr: "ऑफरनंतर देय", en: "Payable after offer"}
+row_full_cost: {hi: "Poora kharcha", mr: "पूर्ण खर्च", en: "Full cost"}
+row_with_sug: {hi: "Sujhaav ke saath", mr: "सूचनांसह", en: "With suggestions"}
+row_offer: {hi: "Aaj ka offer", mr: "आजची ऑफर", en: "Today's offer"}
 voice_retry: {hi: "Voice note saaf samajh nahi aaya — dobara boliye ya text likhiye.", mr: "व्हॉइस नोट नीट समजली नाही — पुन्हा बोला किंवा टेक्स्ट लिहा.", en: "I couldn't make out that voice note. Please say it again or type it."}
 oldtv_ask: {hi: "Photo mein jo TV laga hai, woh kitne inch ka hai? Isse naya TV ekdum sahi size mein dikhega.", mr: "फोटोतला टीव्ही किती inch चा आहे? त्यामुळे नवा टीव्ही अगदी योग्य आकारात दिसेल.", en: "How big is the TV already in the photo? It lets me show the new TV at exactly the right size."}
 oldtv_none: {hi: "Pata nahi", mr: "माहीत नाही", en: "Not sure"}
@@ -294,7 +244,6 @@ exit_done: {hi: "{who} band ✓ Ab kya karein?", mr: "{who} बंद ✓ आत
 exit_done_short: {hi: "{who} band ✓", mr: "{who} बंद ✓", en: "{who} ended ✓"}
 restart_confirm: {hi: "{n} chalu customer band karke bilkul shuru se karein? (bhasha → brief → naya customer)", mr: "{n} चालू ग्राहक बंद करून अगदी सुरुवातीपासून? (भाषा → ब्रीफ → नवीन ग्राहक)", en: "Close {n} open customer(s) and start over? (language → brief → new customer)"}
 footer_menu: {hi: "menu: naya customer · shuru se", mr: "menu: नवीन ग्राहक · पुन्हा सुरू", en: "menu: new customer · start over"}
-help_body: {hi: "Voice note: customer ke ghar ki baat · Photo: label ya kamra\nNaya = naya customer · Khatam = score · 'shuru se' = bilkul shuru se", mr: "व्हॉइस नोट: ग्राहकाच्या घराबद्दल · फोटो: लेबल किंवा खोली\nनवीन = नवीन ग्राहक · संपलं = स्कोअर · 'पुन्हा सुरू' = अगदी सुरुवातीपासून", en: "Voice note: the customer's home · Photo: a label or the room\nNew = new customer · Done = score · 'start over' = from the very beginning"}
 
 # ---------- clean, emoji-free coaching format ----------
 label_bolo: {hi: "*Bolo*", mr: "*बोला*", en: "*Say*"}
@@ -311,24 +260,21 @@ footer_photo_none: {hi: "Theek hai, customer ki baaton se aage", mr: "ठीक 
 footer_photo_got: {hi: "Photo mil gayi, deewar par TV aa raha hai", mr: "फोटो मिळाला, भिंतीवर टीव्ही येतोय", en: "Got the photo; drawing the TV on their wall"}
 b_photo_yes: {hi: "Photo hai", mr: "फोटो आहे", en: "Has a photo"}
 b_photo_no: {hi: "Photo nahi hai", mr: "फोटो नाही", en: "No photo"}
-bolo_photo_ask: {hi: "क्या आपके फ़ोन में उस कमरे की फ़ोटो है? मैं आपकी दीवार पर टीवी दिखा देता हूँ।", mr: "तुमच्या फोनमध्ये त्या खोलीचा फोटो आहे का? मी तुमच्या भिंतीवर टीव्ही दाखवतो.", en: "Do you have a photo of that room on your phone? I can show the TV on your own wall."}
-kyun_photo_ask: {hi: "Apni deewar par sahi size dekh kar faisla aasaan hota hai", mr: "स्वतःच्या भिंतीवर योग्य आकार पाहून निर्णय सोपा होतो", en: "Seeing the true size on their own wall makes the choice easy"}
-room_photo_send: {hi: "Customer ke phone se kamre ki photo yahan bhejiye — deewar saamne se.", mr: "ग्राहकाच्या फोनवरून खोलीचा फोटो इथे पाठवा — भिंत समोरून.", en: "Send the room photo here from the customer's phone, taken facing the wall."}
+bolo_photo_ask: {hi: "Kya aapke phone mein us kamre ki photo hai? Main aapki deewar par TV dikha deta hoon.", mr: "तुमच्या फोनमध्ये त्या खोलीचा फोटो आहे का? मी तुमच्या भिंतीवर टीव्ही दाखवतो.", en: "Do you have a photo of that room on your phone? I can show the TV on your own wall."}
 speak_it_back: {hi: "Customer ki baat unhe dohraate hue ek voice note bhejiye — ghar, kamra, kaun dekhega, budget.", mr: "ग्राहकाचं बोलणं त्यांना पुन्हा सांगत एक व्हॉइस नोट पाठवा — घर, खोली, कोण पाहणार, बजेट.", en: "Repeat the customer's needs back to them while recording one voice note: home, room, who watches, budget."}
 
 # ---------- label scan: product card, fit, compare ----------
-badge_good: {hi: "इस घर के लिए सही", mr: "या घरासाठी योग्य", en: "Fits this home"}
-badge_partial: {hi: "कुछ हद तक सही", mr: "काही प्रमाणात योग्य", en: "Partly fits"}
-badge_poor: {hi: "इस घर के लिए सही नहीं", mr: "या घरासाठी योग्य नाही", en: "Not a fit"}
-label_note: {hi: "लेबल से · मॉडल {model}", mr: "लेबलवरून · मॉडेल {model}", en: "Read from the label · model {model}"}
+badge_good: {hi: "Is ghar ke liye sahi", mr: "या घरासाठी योग्य", en: "Fits this home"}
+badge_partial: {hi: "Kuch had tak sahi", mr: "काही प्रमाणात योग्य", en: "Partly fits"}
+badge_poor: {hi: "Is ghar ke liye sahi nahi", mr: "या घरासाठी योग्य नाही", en: "Not a fit"}
+label_note: {hi: "Label se · model {model}", mr: "लेबलवरून · मॉडेल {model}", en: "Read from the label · model {model}"}
 kyun_label_gate: {hi: "Fit batane ke liye ghar ki {n} aur baatein chahiye — pehle sawaal", mr: "फिट सांगण्यासाठी घराच्या आणखी {n} गोष्टी हव्यात — आधी प्रश्न", en: "Need {n} more home facts before judging fit; ask first"}
-compare_title: {hi: "दोनों की तुलना", mr: "दोघांची तुलना", en: "Side by side"}
-compare_verdict: {hi: "इस घर के लिए {name} बेहतर", mr: "या घरासाठी {name} जास्त योग्य", en: "{name} suits this home better"}
+compare_title: {hi: "Dono ki tulna", mr: "दोघांची तुलना", en: "Side by side"}
+compare_verdict: {hi: "Is ghar ke liye {name} behtar", mr: "या घरासाठी {name} जास्त योग्य", en: "{name} suits this home better"}
 compare_body_fit: {hi: "{a} vs {b}: is ghar ke liye {winner} behtar. Card customer ko dikhaiye.", mr: "{a} vs {b}: या घरासाठी {winner} जास्त योग्य. कार्ड ग्राहकाला दाखवा.", en: "{a} vs {b}: {winner} suits this home better. Show the card to the customer."}
 compare_body_nofit: {hi: "{a} vs {b}: specs saath mein. Fit ke liye ghar ke aur sawaal poochhiye.", mr: "{a} vs {b}: स्पेक्स शेजारी. फिटसाठी घराचे आणखी प्रश्न विचारा.", en: "{a} vs {b}: specs side by side. Ask more home questions to judge fit."}
-compare_send: {hi: "Doosre model ke label ki photo bhejiye.", mr: "दुसऱ्या मॉडेलच्या लेबलचा फोटो पाठवा.", en: "Send a photo of the second model's label."}
 footer_compare: {hi: "Dono ki tulna is ghar ke hisaab se", mr: "दोघांची तुलना या घरानुसार", en: "Compared for this home"}
-bolo_label_intro: {hi: "यह {product} है — खास बातें कार्ड पर हैं। आपके घर के बारे में दो सवाल पूछूँ, ताकि सही फ़िट बता सकूँ?", mr: "हा {product} आहे — खास गोष्टी कार्डवर आहेत. तुमच्या घराबद्दल दोन प्रश्न विचारू का, म्हणजे योग्य फिट सांगता येईल?", en: "This is the {product}; the highlights are on the card. May I ask two questions about your home to judge the fit?"}
+bolo_label_intro: {hi: "Ye {product} hai — khaas baatein card par hain. Aapke ghar ke baare mein do sawaal poochhoon, taaki sahi fit bata sakoon?", mr: "हा {product} आहे — खास गोष्टी कार्डवर आहेत. तुमच्या घराबद्दल दोन प्रश्न विचारू का, म्हणजे योग्य फिट सांगता येईल?", en: "This is the {product}; the highlights are on the card. May I ask two questions about your home to judge the fit?"}
 footer_noted: {hi: "Samjha: {facts}", mr: "समजलं: {facts}", en: "Noted: {facts}"}
 
 # ---------- Ghar mein dekho: decision menu ----------
@@ -343,9 +289,9 @@ tm_one_d: {hi: "Sirf yeh, unki deewar par", mr: "फक्त हे, त्य�
 b_like_this: {hi: "Yeh pasand", mr: "हे आवडलं", en: "Like this one"}
 b_like_both: {hi: "Dono pasand", mr: "दोन्ही आवडले", en: "Like both"}
 b_show_more: {hi: "Aur dikhao", mr: "आणखी दाखवा", en: "Show more"}
-tryon_bolo_item: {hi: "ये आपकी जगह में {product} — असली नाप में।", mr: "ही तुमच्या जागेत {product} — खऱ्या मापात.", en: "Here is the {product} in your space, true to scale."}
-tryon_bolo_combo: {hi: "ये आपकी जगह में सब साथ में — असली नाप में।", mr: "हे सगळं तुमच्या जागेत एकत्र — खऱ्या मापात.", en: "Here they are together in your space, true to scale."}
+tryon_bolo_item: {hi: "Ye aapki jagah mein {product} — asli naap mein.", mr: "ही तुमच्या जागेत {product} — खऱ्या मापात.", en: "Here is the {product} in your space, true to scale."}
+tryon_bolo_combo: {hi: "Ye aapki jagah mein sab saath mein — asli naap mein.", mr: "हे सगळं तुमच्या जागेत एकत्र — खऱ्या मापात.", en: "Here they are together in your space, true to scale."}
 room_photo_ack: {hi: "Photo mil gayi. Kuch second mein deewar par dikhata hoon.", mr: "फोटो मिळाला. काही सेकंदात भिंतीवर दाखवतो.", en: "Got the photo. Showing it on their wall in a few seconds."}
 # ---- Saral Samjhao at the moment of choice (user, 4 Nov 2026)
-bolo_made_for: {hi: "बढ़िया चुनाव। {line}", mr: "छान निवड. {line}", en: "Great choice. {line}"}
+bolo_made_for: {hi: "Badhiya chunaav. {line}", mr: "छान निवड. {line}", en: "Great choice. {line}"}
 kyun_made_for: {hi: "Pasand pakki karwaiye: unki zaroorat + product ka apna saboot, phir poora kharcha", mr: "निवड पक्की करा: त्यांची गरज + प्रॉडक्टचा स्वतःचा पुरावा, मग पूर्ण खर्च", en: "Lock in the choice: their need + the product's own proof, then the full cost"}

@@ -8,7 +8,7 @@ import pytest
 
 from chanakya.truth import jio_sync
 from chanakya.truth.jio import JioClient
-from tests.helpers import button_ids, check_floor, pick, texts
+from tests.helpers import button_ids, check_floor, options_view, pick, texts
 from tests.unit.test_jio import ITEMS, PROMO, backend, item, live
 
 NAMES = {i["name"] for i in ITEMS}
@@ -36,11 +36,11 @@ async def to_options(h):
 async def test_options_are_backend_products_with_honest_roles(hj):
     out = await to_options(hj)
     check_floor(out)
-    card = next(m.card for m in out if m.card and m.card.template == "options")
+    card = options_view(out)
     opts = card.data["options"]
-    assert all(o["title"] in NAMES for o in opts)  # the backend's own product names
     s = await hj.rt.svc.sessions.by_code(hj.phone, "C1")
     by_label = {lab: hj.rt.facts.product_sync(sku) for lab, sku in s.option_labels.items()}
+    assert all(o["title"] in NAMES or o["title"] == by_label[o["label"]].model for o in opts)  # the backend's names
     best = next(by_label[o["label"]] for o in opts if o["is_best"])
     for o in opts:
         p = by_label[o["label"]]

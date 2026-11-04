@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{# The demo guide (English): for each product on the shortlist, the demo in order. The wow first (their own need,
+{# The demo guide, in the associate's language: for each product on the shortlist, the demo in order. The wow first (their own need,
    shown the way that proves it), then their next need, then what else is worth showing. Each step: what to show,
    its proof from the product's data, what to do, and the line to say. #}
 {% set ps = (products|aslist)[:3] %}
@@ -33,13 +33,25 @@
   .do { margin-top: 6px; font-size: 23px; color: var(--text); line-height: 1.36; display: flex; gap: 8px; }
   .do .ic { flex: none; color: var(--saffron); margin-top: 3px; }
   .say { margin-top: 6px; font-size: 22px; color: var(--muted); font-style: italic; line-height: 1.36; }
+  /* three products: tighter, so every step fits on the one card */
+  .tight .prod { padding: 14px 22px 6px; margin-top: 12px; }
+  .tight .ph { padding-bottom: 8px; }
+  .tight .ph h3 { font-size: 25px; }
+  .tight .ph .thumb { height: 58px; }
+  .tight .st { padding: 8px 0 7px; gap: 12px; }
+  .tight .num { width: 36px; height: 36px; font-size: 19px; }
+  .tight .tt { font-size: 23px; }
+  .tight .do { font-size: 20px; margin-top: 3px; }
+  .tight .say { font-size: 19px; margin-top: 3px; }
+  .tight .tag { font-size: 15px; margin-bottom: 2px; }
 {% endblock %}
 {% block header %}
-  <div class="kicker">Demo guide</div>
-  <h1>Show their need first</h1>
+  <div class="kicker">{{ L.kicker }}</div>
+  <h1>{{ L.title }}</h1>
   {% if chips %}<div class="homechips">{% for c in (chips|aslist)[:5] %}<span class="hc">{% if loop.first %}{{ icon('home', 22) }}{% endif %}{{ c }}</span>{% endfor %}</div>{% endif %}
 {% endblock %}
 {% block content %}
+  <div class="{% if ps|length >= 3 %}tight{% endif %}">
   {% for p in ps %}
   <section class="card prod{% if p.best %} best{% endif %}">
     <div class="ph">
@@ -51,7 +63,7 @@
     <div class="st {{ st.tag }}">
       <span class="num">{{ loop.index }}</span>
       <div class="sb">
-        <span class="tag">{{ {'wow': 'Wow first', 'then': 'Then', 'more': 'Also show'}.get(st.tag, '') }}</span>
+        <span class="tag">{{ L.get(st.tag, '') }}</span>
         <div class="tt">{{ st.title }}{% if st.proof %}<span class="pf">{{ st.proof }}</span>{% endif %}</div>
         {% if st.do %}<div class="do">{{ icon('play', 22) }}<span>{{ st.do }}</span></div>{% endif %}
         {% if st.say and st.tag == 'wow' %}<div class="say">“{{ st.say }}”</div>{% endif %}
@@ -60,4 +72,5 @@
     {% endfor %}
   </section>
   {% endfor %}
+  </div>
 {% endblock %}

@@ -9,7 +9,7 @@ from chanakya.brain import packs as P
 from chanakya.channel.limits import truncate
 from chanakya.core import repo
 from chanakya.core.buttons import encode
-from chanakya.core.coach import bolo_block, coach_reply, info_reply, kyun_block
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, kyun_block
 from chanakya.core.contracts import Button, OutMessage, Reply
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -85,9 +85,10 @@ async def ask(ctx: SkillContext, question: str, via_truth_check: bool = False, l
     ]
     cites = C.known_cites(ctx) if s else []
     if cites:
-        msgs.append(coach_reply(ctx, hold, ctx.t("kyun_expert_hold"), cites, btns))
+        msgs.append(coach_reply(ctx, hold, ctx.t("kyun_expert_hold"), cites, btns, do="do_expert_hold"))
     else:
-        msgs.append(info_reply(ctx, bolo_block(ctx, hold) + "\n\n" + kyun_block(ctx, ctx.t("kyun_expert_hold")), btns))
+        msgs.append(info_reply(ctx, bolo_block(ctx, hold) + "\n\n" + kyun_block(ctx, ctx.t("kyun_expert_hold")) + "\n\n"
+                               + do_block(ctx, "do_expert_hold"), btns))
     if expert:
         elang = expert.lang or "en"
         ctx.reg.raw(question, "associate:question")

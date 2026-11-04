@@ -89,7 +89,7 @@ async def test_later_steps_by_voice_in_three_languages(h):
     out = await h.say("घरच्यांना पाठवा")  # Marathi: send it to the family
     assert any(b.id in ("s:C1:qr", "s:C1:consent_tap") for b in out[0].buttons)
     out = await h.say("kal yaad dilana")  # a reminder
-    assert out and "Ek second" not in out[0].body
+    assert out and "samajh nahi aaya" not in out[0].body
     out = await h.say("what next")  # English
     assert out and out[0].buttons
 

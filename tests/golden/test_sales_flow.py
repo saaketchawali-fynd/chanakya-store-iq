@@ -8,7 +8,7 @@ from chanakya.config import ROOT
 from chanakya.core import repo
 from chanakya.i18n.lang import strings
 from chanakya.sim.harness import PHONES
-from tests.helpers import button_ids, check_floor, pick, texts, to_options
+from tests.helpers import answer_complete, button_ids, check_floor, pick, texts, to_options
 
 
 def rows(msg):
@@ -106,16 +106,17 @@ async def test_none_of_these_reranks(h):
 async def test_remove_an_item_from_the_cost(h):
     await to_options(h)
     await h.tap("s:C1:shown")
-    out = await pick(h)
+    out = await answer_complete(h, await h.tap("s:C1:opt:B"), addons="all")  # they added what goes with it
     k = next(m for m in out if m.card and m.card.template == "kharcha")
-    before = k.card.data["with_suggestions_total_str"]
+    before = k.card.data["zaroori_total_str"]
+    req = [ln for ln in k.card.data["lines"] if ln["tag"] == "zaroori"]
     out = await h.tap("s:C1:cost_rm")
     r = rows(out[0])
     drop = next(x for x in r if x.startswith("s:C1:cost_drop:") and not x.endswith(("_optional", "_restore")))
     out = await h.pick(drop)
     k2 = next(m for m in out if m.card and m.card.template == "kharcha")
-    assert k2.card.data["with_suggestions_total_str"] != before
-    assert k2.card.data["zaroori_total_str"] == k.card.data["zaroori_total_str"]  # required charges never change
+    assert k2.card.data["zaroori_total_str"] != before  # an added item comes off the full cost
+    assert [ln for ln in k2.card.data["lines"] if ln["tag"] == "zaroori"] == req  # required charges never change
 
 
 async def test_every_string_in_every_language():

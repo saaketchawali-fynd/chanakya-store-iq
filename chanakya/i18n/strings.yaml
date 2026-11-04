@@ -1,5 +1,3 @@
-label_bolo: {hi: "🗣 Bolo", mr: "🗣 बोला", en: "🗣 Say"}
-label_kyun: {hi: "💡 Kyun", mr: "💡 का", en: "💡 Why"}
 label_dikhao: {hi: "👁 Dikhao", mr: "👁 दाखवा", en: "👁 Show"}
 status_home: {hi: "Ghar", mr: "घर", en: "Home"}
 status_demo: {hi: "Demo", mr: "डेमो", en: "Demo"}
@@ -54,14 +52,10 @@ b_lang_mr: {hi: "मराठी", mr: "मराठी", en: "मराठी"}
 b_lang_en: {hi: "English", mr: "English", en: "English"}
 
 # messages (≤ 3 lines when combined)
-welcome_new_staff: {hi: "Namaste {name} ji! Main Chanakya hoon — aapka sales saathi.\nCustomer ke ghar ki baat voice note mein boliye, main agla sawaal dunga.", mr: "नमस्कार {name}! मी चाणक्य — तुमचा सेल्स साथी.\nग्राहकाच्या घराबद्दल व्हॉइस नोटमध्ये सांगा, मी पुढचा प्रश्न देईन.", en: "Namaste {name}! I'm Chanakya, your sales partner.\nTell me about the customer's home in a voice note; I'll give the next question."}
 new_customer_lang: {hi: "Naya customer {code}. Customer ki bhasha?", mr: "नवीन ग्राहक {code}. ग्राहकाची भाषा?", en: "New customer {code}. Customer's language?"}
-speak_it_back: {hi: "Customer ki baat unhe dohraate hue voice note bhejiye.", mr: "ग्राहकाचं बोलणं त्यांना पुन्हा सांगत व्हॉइस नोट पाठवा.", en: "Repeat the customer's needs back to them while recording a voice note."}
 gate_options: {hi: "Options se pehle {n} aur ghar ke sawaal.", mr: "पर्यायांआधी घराचे आणखी {n} प्रश्न.", en: "{n} more home questions before options."}
-gate_price: {hi: "Daam demo ke baad. Pehle {best} ka farak dikhaiye.", mr: "किंमत डेमोनंतर. आधी {best} चा फरक दाखवा.", en: "Price comes after the demo. Show {best}'s difference first."}
 budget_ask: {hi: "Customer ne budget bataya? (Aap set kariye, andaze se nahi)", mr: "ग्राहकाने बजेट सांगितलं? (तुम्ही ठरवा, अंदाजाने नाही)", en: "Did the customer state a budget? (You set it; never guess)"}
 room_photo_ask: {hi: "Customer ke phone mein ghar ki photo ho to maangiye — deewar par dikha dunga.", mr: "ग्राहकाच्या फोनमध्ये घराचा फोटो असेल तर मागा — भिंतीवर दाखवतो.", en: "Ask for a photo of their room; I'll show it on their wall."}
-room_photo_ack: {hi: "Photo mil gayi ✓ 15 sec mein unki deewar par dikhata hoon.", mr: "फोटो मिळाला ✓ 15 सेकंदात त्यांच्या भिंतीवर दाखवतो.", en: "Got the photo ✓ Showing it on their wall in 15 sec."}
 wall_width_ask: {hi: "Deewar lagbhag kitni chaudi hai?", mr: "भिंत साधारण किती रुंद आहे?", en: "Roughly how wide is the wall?"}
 label_unknown: {hi: "Label saaf nahi padha. 20 cm door se, bina flash, dobara photo bhejiye.", mr: "लेबल स्पष्ट वाचता आलं नाही. 20 cm अंतरावरून, फ्लॅशशिवाय पुन्हा फोटो पाठवा.", en: "Couldn't read the label. Retake from 20 cm, without flash."}
 not_in_data: {hi: "Ye data mein nahi hai — andaza mat boliye. Expert se poochh raha hoon.", mr: "हे डेटामध्ये नाही — अंदाज सांगू नका. एक्सपर्टला विचारतोय.", en: "That's not in the data, so don't guess. I'm asking an expert."}
@@ -69,21 +63,8 @@ truth_check_no: {hi: "Data mein nahi. Mat boliye.", mr: "डेटामध्�
 no_invented_discount: {hi: "Aisa koi offer aaj ke data mein nahi hai. Manager se poochhein?", mr: "असा कोणताही ऑफर आजच्या डेटामध्ये नाही. मॅनेजरला विचारू?", en: "No such offer in today's data. Ask the manager?"}
 no_looks: {hi: "Main dikhawat se andaza nahi lagata. Poochhiye: 'Aapne kitne tak ka socha hai?'", mr: "मी दिसण्यावरून अंदाज लावत नाही. विचारा: 'तुम्ही किती पर्यंत विचार केला आहे?'", en: "I never judge by looks. Ask: 'What range did you have in mind?'"}
 override_logged: {hi: "Theek hai, aapka faisla ✓ (note kar liya)", mr: "ठीक आहे, तुमचा निर्णय ✓ (नोंद केली)", en: "OK, your call ✓ (noted)"}
-fallback_body: {hi: "Ek second — dobara boliye ya neeche se chuniye.", mr: "एक सेकंद — पुन्हा सांगा किंवा खालून निवडा.", en: "One second: say it again or pick below."}
-help_body: {hi: "Voice note: customer ke ghar ki baat. Photo: label ya kamra.\nNaya = naya customer · Switch = customer badlo · Khatam = score", mr: "व्हॉइस नोट: ग्राहकाच्या घराबद्दल. फोटो: लेबल किंवा खोली.\nनवीन = नवीन ग्राहक · Switch = ग्राहक बदला · संपलं = स्कोअर", en: "Voice note: the customer's home. Photo: a label or the room.\nNew = new customer · Switch = change customer · Done = score"}
-consent_qr_caption: {hi: "Customer se ye QR scan karwaiye — WhatsApp khulega, 'Send' dabayein.", mr: "ग्राहकाकडून हा QR स्कॅन करा — WhatsApp उघडेल, 'Send' दाबा.", en: "Ask the customer to scan this QR; WhatsApp opens; they tap Send."}
-consent_done: {hi: "{name} jud gaye ✓ (consent {time})", mr: "{name} जोडले गेले ✓ (संमती {time})", en: "{name} is connected ✓ (consent {time})"}
-parivaar_sent: {hi: "{name} ko Parivaar Card bhej diya ✓", mr: "{name} यांना परिवार कार्ड पाठवलं ✓", en: "Family card sent to {name} ✓"}
-installed_ok: {hi: "{name} ka {product} chal raha hai ✓ Installation pakka.", mr: "{name} यांचा {product} चालू आहे ✓ इन्स्टॉलेशन पूर्ण.", en: "{name}'s {product} is working ✓ Installation confirmed."}
-score_guide: {hi: "{score}/14 — Guide level! 👏", mr: "{score}/14 — गाइड लेव्हल! 👏", en: "{score}/14: Guide level! 👏"}
-score_plain: {hi: "{score}/14. Achha kaam.", mr: "{score}/14. छान काम.", en: "{score}/14. Good work."}
 
 # customer-side strings (Devanagari for hi/mr)
-cust_welcome: {hi: "नमस्ते! मैं चाणक्य, Reliance Digital (टेस्ट)। {associate} जी आपका पूरा ब्योरा यहीं भेजेंगे।", mr: "नमस्कार! मी चाणक्य, Reliance Digital (टेस्ट). {associate} तुमचा पूर्ण तपशील इथेच पाठवतील.", en: "Namaste! I'm Chanakya, Reliance Digital (test). {associate} will send your full summary here."}
-cust_photo_hint: {hi: "घर की फ़ोटो भेजनी हो तो यहीं भेजिए।", mr: "घराचा फोटो पाठवायचा असेल तर इथेच पाठवा.", en: "You can send a photo of your room here."}
-cust_install_d1: {hi: "कल {slot} इंस्टॉलेशन है। टीवी की जगह खाली रखें, सॉकेट तैयार रखें।", mr: "उद्या {slot} इन्स्टॉलेशन आहे. टीव्हीची जागा मोकळी ठेवा, सॉकेट तयार ठेवा.", en: "Installation tomorrow, {slot}. Please keep the spot clear and the socket ready."}
-cust_install_check: {hi: "इंस्टॉलेशन हो गया? {product} ठीक चल रहा है?", mr: "इन्स्टॉलेशन झालं? {product} नीट चालू आहे?", en: "Is the installation done? Is your {product} working well?"}
-cust_d7: {hi: "सब ठीक चल रहा है? कोई सवाल हो तो यहीं लिखिए।", mr: "सगळं नीट चालू आहे? काही प्रश्न असल्यास इथे लिहा.", en: "Is everything working well? Write here if you have any question."}
 cb_talk: {hi: "{associate} से बात", mr: "{associate} शी बोला", en: "Talk to {associate}"}
 cb_visit: {hi: "विज़िट बुक करें", mr: "भेट बुक करा", en: "Book a visit"}
 cb_question: {hi: "सवाल पूछें", mr: "प्रश्न विचारा", en: "Ask a question"}

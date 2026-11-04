@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from functools import lru_cache
-
 from chanakya.brain import packs as P
 from chanakya.brain.next_question import next_slot, ordered_next
 from chanakya.channel.limits import truncate, truncate_title
@@ -115,7 +113,7 @@ def data_question(ctx: SkillContext, footer: str | None = None, force: bool = Fa
         btns.append(ctx.b("b_dq_any", ctx.sid("dq", key, "any")))
     ctx.x["questions_asked"] = questions_asked(ctx) + 1
     ctx.ev("data_question_asked", key=key, values=[str(v) for v in s.extra["dq_vals"][key]])
-    return coach_reply(ctx, say, why, known_cites(ctx), btns, footer=footer)
+    return coach_reply(ctx, say, why, known_cites(ctx), btns, footer=footer, do="do_data_question")
 
 
 def info_gain_slot(ctx: SkillContext, exclude: set[str] | None = None) -> str | None:
@@ -156,7 +154,8 @@ def question_reply(
     ctx.x["last_question"] = slot_id
     ctx.ev("question_asked", slot=slot_id)
     # voice first: every question says it can simply be answered by voice (any of the three languages)
-    return coach_reply(ctx, say, why, (extra_cites or []) + [slot_id], btns, footer=ctx.t("footer_voice_q"))
+    do = "do_setup" if slot_id in (pack.complete_slots + pack.site_needs) else "do_question"  # with the customer
+    return coach_reply(ctx, say, why, (extra_cites or []) + [slot_id], btns, footer=ctx.t("footer_voice_q"), do=do)
 
 
 BAND_SPEC = {"size_band": ("size_in", "inch"), "ton_band": ("ton", "ton")}
@@ -215,10 +214,10 @@ def question_tail(ctx: SkillContext, slot_id: str) -> str | None:
     vals = (r.when or {}).get("in") or (r.when or {}).get("has_any") or []
     sd = pack.slot(slot_id)
     if vals and sd is not None:  # the answer that switches the rule on, in the associate's words
-        need = value_title(sd, vals[0], ctx.lang) if ctx.lang != "hi" else sd.value_title(vals[0], "hi")
+        need = sd.value_title(vals[0], ctx.lang)
     else:
         nd = pack.needs.get(r.id)
-        need = ctx.pick(nd, "en" if ctx.lang == "hi" else ctx.lang) if nd else None
+        need = ctx.pick(nd, ctx.lang) if nd else None
     if not need or "{" in need or n == len(avail):
         return None  # every model meets it: the answer ranks, it does not narrow
     return ctx.t("kyun_tail_rule", need=need, n=ctx.reg.num(n, f"stock:{pack.category}:{r.id}"),
@@ -241,10 +240,10 @@ def category_message(ctx: SkillContext) -> OutMessage:
     for r in rows:
         ctx.reg.static(r.title + " " + (r.description or ""))
     code = ctx.reg.raw(ctx.session.code, "session:code")
-    from chanakya.core.coach import bolo_block, kyun_block, status_block
+    from chanakya.core.coach import bolo_block, do_block, kyun_block, status_block
 
     body = (bolo_block(ctx, ctx.tc("bolo_opener")) + "\n\n" + kyun_block(ctx, ctx.t("kyun_opener")) + "\n\n"
-            + status_block(ctx.t("st_new", code=code)))
+            + do_block(ctx, "do_opener") + "\n\n" + status_block(ctx.t("st_new", code=code)))
     return OutMessage(to=ctx.actor_wa_id, kind="list", body=body, list_button=truncate_title(ctx.t("list_product")),
                       sections=[ListSection(rows=rows)], footer=ctx.t("footer_voice_q"), allowed_numbers=ctx.reg.allowed())
 
@@ -257,8 +256,10 @@ def photo_question(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     key = f"bolo_photo_ask_{cat}" if i18n.has(f"bolo_photo_ask_{cat}") else "bolo_photo_ask"
     btns = [ctx.b("b_photo_yes", ctx.sid("photo_yes")), ctx.b("b_photo_no", ctx.sid("photo_no"))]
     if not cites:
-        return info_reply(ctx, ctx.tc(key), btns)
-    return coach_reply(ctx, ctx.tc(key), ctx.t("kyun_photo_ask"), cites, btns, footer=footer)
+        from chanakya.core.coach import bolo_block, do_block
+
+        return info_reply(ctx, bolo_block(ctx, ctx.tc(key)) + "\n\n" + do_block(ctx, "do_photo_ask"), btns)
+    return coach_reply(ctx, ctx.tc(key), ctx.t("kyun_photo_ask"), cites, btns, footer=footer, do="do_photo_ask")
 
 
 def _fits(ctx: SkillContext) -> list:
@@ -324,7 +325,7 @@ def comfort_range(ctx: SkillContext, footer: str | None = None) -> OutMessage:
                     description=truncate(ctx.t("range_d", n=ctx.reg.num(b["n"], "calc:range_count")), 72)) for b in bands]
     rows.append(ListRow(id=ctx.sid("budget", "none"), title=ctx.t("range_none"), description=ctx.t("range_none_d")))
     ctx.reg.static(" ".join(r.title + " " + (r.description or "") for r in rows[-1:]))
-    msg = coach_reply(ctx, ctx.tc("bolo_range"), ctx.t("kyun_range"), known_cites(ctx), [], footer=footer)
+    msg = coach_reply(ctx, ctx.tc("bolo_range"), ctx.t("kyun_range"), known_cites(ctx), [], footer=footer, do="do_range")
     msg.kind = "list"
     msg.list_button = truncate_title(ctx.t("list_range"))
     msg.sections = [ListSection(rows=rows)]
@@ -403,14 +404,14 @@ def readback(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     btns = [ctx.b("b_readback_ok", ctx.sid("readback_ok")), ctx.b("b_readback_edit", ctx.sid("readback_edit"))]
     cites = [s for s in ctx.pack.required_slots if P.known(ctx.session.home, s)] or known_cites(ctx)
     return coach_reply(ctx, say, ctx.t("kyun_readback"), cites, btns, card=english(ctx, lambda: home_card(ctx)),
-                       footer=footer)
+                       footer=footer, do="do_readback")
 
 
 def doubts(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     ctx.x["doubts_asked"] = True
     btns = [ctx.b("b_no_doubt", ctx.sid("options")), ctx.b("b_doubt", ctx.sid("doubt")),
             ctx.b("b_price_q", ctx.sid("pricefirst_q"))]
-    return coach_reply(ctx, ctx.tc("bolo_doubts"), ctx.t("kyun_doubts"), known_cites(ctx), btns, footer=footer)
+    return coach_reply(ctx, ctx.tc("bolo_doubts"), ctx.t("kyun_doubts"), known_cites(ctx), btns, footer=footer, do="do_doubts")
 
 
 def options_ready(ctx: SkillContext, footer: str | None = None) -> OutMessage:
@@ -418,7 +419,8 @@ def options_ready(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     btns = [ctx.b("b_options", ctx.sid("options")), ctx.b("b_status", encode("g", "status"))]
     if not cites:
         return info_reply(ctx, ctx.t("fallback_body"), btns)
-    return coach_reply(ctx, ctx.tc("bolo_options_ready"), ctx.t("kyun_options_ready"), cites, btns, footer=footer)
+    return coach_reply(ctx, ctx.tc("bolo_options_ready"), ctx.t("kyun_options_ready"), cites, btns, footer=footer,
+                       do="do_options_ready")
 
 
 def resume(ctx: SkillContext) -> OutMessage:
@@ -626,19 +628,7 @@ async def english_async(ctx: SkillContext, build):
         return await build()
 
 
-@lru_cache
-def _values_hi() -> dict[str, str]:
-    import yaml
-
-    from chanakya.config import ROOT
-
-    path = ROOT / "chanakya" / "i18n" / "values_hi.yaml"
-    if not path.exists():
-        return {}
-    return yaml.safe_load(path.read_text()) or {}
-
-
 def value_title(sd, value: str, lang: str) -> str:
-    """A slot value as the customer reads it: Hindi in Devanagari (packs keep Roman Hinglish for the associate)."""
-    t = sd.value_title(value, lang)
-    return _values_hi().get(t, t) if lang == "hi" else t
+    """A slot value in this language. Hindi is Roman Hinglish everywhere the associate reads it, the lines they say
+    to a Hindi-speaking customer included (user, 5 Nov 2026)."""
+    return sd.value_title(value, lang)

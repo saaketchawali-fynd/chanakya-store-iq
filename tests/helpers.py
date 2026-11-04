@@ -99,12 +99,16 @@ async def to_options(h, photo=None, clang: str | None = "mr"):
     return await h.tap("s:C1:options")
 
 
-async def answer_complete(h, out):
-    """Answer the cost questions Complete asks (mounting, wall, soundbar / AC site) until the cost card comes."""
-    for _ in range(6):
+async def answer_complete(h, out, addons: str = "none"):
+    """Answer the cost questions Complete asks (mounting, wall, soundbar / AC site) until the cost card comes.
+    "Complete it" (the add-ons, 5 Nov 2026) is answered with `addons`: 'none' (not now) or 'all'."""
+    for _ in range(7):
         if any(m.card and m.card.template == "kharcha" for m in out):
             return out
         ids = button_ids(out)
+        if "s:C1:addons:all" in ids or "s:C1:addons:none" in ids:
+            out = await h.tap(f"s:C1:addons:{addons}")
+            continue
         nxt = next((f"s:C1:slot:{a}" for a in COMPLETE_ANSWERS if f"s:C1:slot:{a}" in ids), None)
         if nxt is None:
             return out
@@ -124,3 +128,24 @@ async def pay(h, how: str = "card", bank: str | None = "HDFC"):
     if bank and how in ("card", "emi"):
         out = await h.tap(f"s:C1:bank:{bank}")
     return out
+
+
+# ---------- the options, one product page each (user, 5 Nov 2026) ----------
+def option_pages(msgs: list[OutMessage]) -> dict[str, dict]:
+    """{label: product page data} for the best-fit products shown in these messages, in order."""
+    return {m.card.data["chip_label"]: m.card.data for m in msgs
+            if m.card and m.card.template == "product" and m.card.data.get("chip_label")}
+
+
+def options_view(msgs: list[OutMessage]):
+    """The shortlist as the old options card's data ({options: [{label, title, role, points, offer, image}]}), built
+    from the product pages, so tests can keep checking what each option says; None when no options were shown."""
+    from types import SimpleNamespace
+
+    pages = option_pages(msgs)
+    if not pages:
+        return None
+    opts = [{"label": lab, "title": d["title"], "role": d.get("chip_kind"), "is_best": d.get("chip_kind") == "best",
+             "points": list(d.get("needs") or []) + list(d.get("also") or []), "image": d.get("image"),
+             "offer": {"text": d.get("offer_text"), "none": d.get("offer_none")}} for lab, d in pages.items()]
+    return SimpleNamespace(template="options", lang="en", data={"options": opts})

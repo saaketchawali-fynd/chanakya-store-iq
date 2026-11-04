@@ -337,9 +337,9 @@ def say(pt: Point, lang: str, prefix: str | None = None) -> str:
     return tpl.format(prefix=pre.get(lang) or pre.get("en"), line=line, proof=pt.proof)
 
 
-def card_text(pt: Point) -> str:
-    """The card line (cards are English): the daily-life words, sentence case."""
-    t = pt.say.get("en") or ""
+def card_text(pt: Point, lang: str = "en") -> str:
+    """The daily-life words in this language (cards: English; the associate's text: their own), sentence case."""
+    t = pt.say.get(lang) or pt.say.get("en") or ""
     return t[:1].upper() + t[1:]
 
 

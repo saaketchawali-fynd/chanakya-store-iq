@@ -6,7 +6,7 @@ from __future__ import annotations
 from chanakya.sim.harness import PHONES
 from chanakya.skills.view import angle, seat
 from tests.golden.test_after_sale import to_consent
-from tests.helpers import button_ids, check_floor, to_options
+from tests.helpers import button_ids, check_floor, options_view, to_options
 
 
 async def session(h, code="C1"):
@@ -32,7 +32,7 @@ async def test_returning_customer_carries_on_without_re_asking(h):
     check_floor(out)
     head = out[0].body
     assert "Shah" in head and "pasand" in head and "sasta" in head  # what happened, and what changed since
-    assert any(m.card and m.card.template == "options" for m in out)  # straight back to their picks
+    assert options_view(out) is not None  # straight back to their picks, one page each
     new = await session(h)
     assert new.home.slots and new.option_labels == old.option_labels
 

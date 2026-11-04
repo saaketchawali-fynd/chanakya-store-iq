@@ -70,7 +70,7 @@ async def test_upgrade_check_and_mrp_saving(h):
     out = await h.pick("s:C1:upgrade")
     check_floor(out)
     body = out[0].body
-    assert "A → B" in body and "/din" in body  # what each step up costs, per day over 5 years
+    assert "*A → B*" in body and "5 saal mein roz" in body  # each step up: its own block, the cost per day over 5 years
 
 
 async def test_price_watch_nudges_once_when_the_price_falls(h):

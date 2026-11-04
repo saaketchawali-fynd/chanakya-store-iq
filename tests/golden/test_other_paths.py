@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from chanakya.core import repo
 from chanakya.sim.harness import PHONES
-from tests.helpers import button_ids, check_floor
+from tests.helpers import answer_complete, button_ids, check_floor, options_view
 
 
 async def test_ac_path(h):
@@ -36,9 +36,12 @@ async def test_ac_path(h):
         out = await h.tap(f"s:C1:slot:{slot}:{pick}")
         check_floor(out)
     assert asked == ["outdoor_spot", "pipe_run_ft", "wall_hole"]
-    k = out[0]
+    ao = next(m for m in out if m.card)  # "Complete it": what goes with it for this home, before the full cost
+    assert ao.card.template == "addons" and ao.card.data["items"] and ao.card.data["total_str"] == "₹54,539"
+    out = await h.tap("s:C1:addons:all")
+    k = next(m for m in out if m.card)
     assert k.card.template == "kharcha"
-    assert k.card.data["zaroori_total_str"] == "₹48,240" and k.card.data["with_suggestions_total_str"] == "₹54,539"
+    assert k.card.data["zaroori_total_str"] == "₹54,539"  # the card said the same total as the bill
     assert k.card.data["lifetime_text"]
     assert "Pipe +5 ft" in k.body
     await h.tap("s:C1:slot:socket_15a:no")
@@ -58,10 +61,10 @@ async def test_wm_smoke_rules(h):
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     assert s.home.category == "wm"
     # the needs were told in one note (people, place, how often): the right machines now, from the note
-    assert any(m.card and m.card.template == "options" for m in out)
-    assert out[0].body.startswith("*Note se samjha:*\n• 5 log")  # what the note said, as bullets
+    assert options_view(out) is not None  # one product page per option
+    assert (out[0].body or out[0].caption).startswith("*Note se samjha:*\n• 5 log")  # what the note said, as bullets
     await h.tap("s:C1:shown")
-    out = await h.tap("s:C1:opt:B")
+    out = await answer_complete(h, await h.tap("s:C1:opt:B"))
     check_floor(out)
     assert any(m.card and m.card.template == "kharcha" for m in out)
 
@@ -84,7 +87,7 @@ async def test_laptop_smoke_rules(h):
         check_floor(await h.tap(bid))
     out = await h.tap("s:C1:options")
     check_floor(out)
-    assert any(m.card and m.card.template == "options" for m in out)
+    assert options_view(out) is not None  # one product page per option
 
 
 async def test_manager_expert_visitlog(h):
@@ -92,7 +95,7 @@ async def test_manager_expert_visitlog(h):
     h.as_("manager")
     out = await h.say("floor")
     check_floor(out)
-    assert out[0].body.startswith("Abhi:")
+    assert out[0].body.startswith("*Floor abhi*") and "\n\n*Aaj*" in out[0].body  # sections
     out = await h.say("digest")
     assert out[0].card.template == "digest"
     h.as_("visitor")

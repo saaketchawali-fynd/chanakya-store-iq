@@ -14,7 +14,7 @@ slots:
   - id: user
     phase: life
     title: {hi: "Kaun chalayega", mr: "कोण वापरणार", en: "Who uses it"}
-    ask: {hi: "लैपटॉप कौन चलाएगा — पढ़ाई के लिए या काम के लिए?", mr: "लॅपटॉप कोण वापरणार — अभ्यासासाठी की कामासाठी?", en: "Who will use the laptop: for study or for work?"}
+    ask: {hi: "Laptop kaun chalayega — padhai ke liye ya kaam ke liye?", mr: "लॅपटॉप कोण वापरणार — अभ्यासासाठी की कामासाठी?", en: "Who will use the laptop: for study or for work?"}
     why: {hi: "Padhai ya kaam: wazan, battery aur software badal jaata hai", mr: "अभ्यास की काम: वजन, बॅटरी आणि सॉफ्टवेअर बदलतं", en: "Study or work changes the weight, battery and software it needs"}
     quick:
       - {id: student, title: {hi: "Student", mr: "विद्यार्थी", en: "Student"}}
@@ -30,7 +30,7 @@ slots:
   - id: course
     phase: life
     title: {hi: "Course/kaam", mr: "कोर्स/काम", en: "Course/work"}
-    ask: {hi: "कौन-सा कोर्स या काम है — इंजीनियरिंग, कॉमर्स, डिज़ाइन?", mr: "कोणता कोर्स किंवा काम — इंजिनिअरिंग, कॉमर्स, डिझाइन?", en: "Which course or work: engineering, commerce, design?"}
+    ask: {hi: "Kaunsa course ya kaam hai — engineering, commerce, design?", mr: "कोणता कोर्स किंवा काम — इंजिनिअरिंग, कॉमर्स, डिझाइन?", en: "Which course or work: engineering, commerce, design?"}
     why: {hi: "Engineering/design ko zyada RAM aur graphics; commerce basic par chal jaata hai", mr: "इंजिनिअरिंग/डिझाइनला जास्त RAM आणि ग्राफिक्स; कॉमर्स साध्यावर चालतं", en: "Engineering and design need more RAM and graphics; commerce runs on a basic one"}
     quick:
       - {id: engineering, title: {hi: "Engineering", mr: "इंजिनिअरिंग", en: "Engineering"}}
@@ -54,7 +54,7 @@ slots:
     multi: true
     phase: life
     title: {hi: "Software", mr: "सॉफ्टवेअर", en: "Software"}
-    ask: {hi: "कौन-से सॉफ़्टवेयर चलेंगे — ऑफ़िस, कोडिंग, डिज़ाइन या वीडियो एडिटिंग?", mr: "कोणते सॉफ्टवेअर चालणार — ऑफिस, कोडिंग, डिझाइन की व्हिडिओ एडिटिंग?", en: "Which software: office, coding, design or video editing?"}
+    ask: {hi: "Kaunse software chalenge — office, coding, design ya video editing?", mr: "कोणते सॉफ्टवेअर चालणार — ऑफिस, कोडिंग, डिझाइन की व्हिडिओ एडिटिंग?", en: "Which software: office, coding, design or video editing?"}
     why: {hi: "Bhaari software ko zyada RAM chahiye", mr: "जड सॉफ्टवेअरला जास्त RAM हवी", en: "Heavy software needs more RAM"}
     quick:
       - {id: office, title: {hi: "Office/browser", mr: "ऑफिस/ब्राउझर", en: "Office/browser"}}
@@ -75,7 +75,7 @@ slots:
   - id: carry
     phase: life
     title: {hi: "Roz le jaana", mr: "रोज नेणं", en: "Carried daily"}
-    ask: {hi: "लैपटॉप रोज़ बैग में साथ ले जाएँगे?", mr: "लॅपटॉप रोज बॅगेत सोबत नेणार का?", en: "Will the laptop be carried in a bag every day?"}
+    ask: {hi: "Laptop roz bag mein saath le jaayenge?", mr: "लॅपटॉप रोज बॅगेत सोबत नेणार का?", en: "Will the laptop be carried in a bag every day?"}
     why: {hi: "Roz le jaana ho to halka laptop", mr: "रोज नेणार असाल तर हलका लॅपटॉप", en: "Daily carry needs a light laptop"}
     quick:
       - {id: daily, title: {hi: "Haan, roz", mr: "हो, रोज", en: "Yes, daily"}}
@@ -91,7 +91,7 @@ slots:
   - id: battery_need
     phase: life
     title: {hi: "Poore din battery", mr: "दिवसभर बॅटरी", en: "All-day battery"}
-    ask: {hi: "पूरे दिन बिना चार्जर के चलना चाहिए?", mr: "दिवसभर चार्जरशिवाय चालायला हवा का?", en: "Should it last the whole day without a charger?"}
+    ask: {hi: "Poore din bina charger ke chalna chahiye?", mr: "दिवसभर चार्जरशिवाय चालायला हवा का?", en: "Should it last the whole day without a charger?"}
     why: {hi: "Poore din ke liye zyada battery hours", mr: "दिवसभरासाठी जास्त बॅटरी hours", en: "All-day use needs more battery hours"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -107,7 +107,7 @@ slots:
   - id: gaming
     phase: life
     title: {hi: "Gaming", mr: "गेमिंग", en: "Gaming"}
-    ask: {hi: "गेम भी खेलेंगे?", mr: "गेम्सही खेळणार का?", en: "Will it be used for gaming too?"}
+    ask: {hi: "Game bhi khelenge?", mr: "गेम्सही खेळणार का?", en: "Will it be used for gaming too?"}
     why: {hi: "Gaming ke liye alag graphics card", mr: "गेमिंगसाठी वेगळं ग्राफिक्स कार्ड", en: "Gaming needs a dedicated graphics card"}
     quick:
       - {id: "yes", title: {hi: "Haan", mr: "हो", en: "Yes"}}
@@ -123,7 +123,7 @@ slots:
   - id: decider
     phase: life
     title: {hi: "Faisla kaun", mr: "निर्णय कोण", en: "Decider"}
-    ask: {hi: "फ़ैसला आप ही लेंगे या घर पर किसी से पूछना है?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
+    ask: {hi: "Faisla aap hi lenge ya ghar par kisi se poochna hai?", mr: "निर्णय तुम्हीच घेणार की घरी कोणाला विचारायचं आहे?", en: "Will you decide, or do you need to ask someone at home?"}
     why: {hi: "Jo decide karega, use Parivaar Card bhejenge", mr: "जो निर्णय घेईल त्याला परिवार कार्ड पाठवू", en: "We'll send the family card to the decider"}
     quick:
       - {id: self, title: {hi: "Khud", mr: "स्वतः", en: "Myself"}}
@@ -142,7 +142,7 @@ slots:
   - id: payer
     phase: tech
     title: {hi: "Kaun le raha", mr: "कोण घेतंय", en: "Who is buying"}
-    ask: {hi: "लैपटॉप आप खुद ले रहे हैं या घरवाले दिला रहे हैं?", mr: "लॅपटॉप तुम्ही स्वतः घेताय की घरचे घेऊन देतायत?", en: "Are you buying it yourself, or is the family buying it?"}
+    ask: {hi: "Laptop aap khud le rahe hain ya gharwale dila rahe hain?", mr: "लॅपटॉप तुम्ही स्वतः घेताय की घरचे घेऊन देतायत?", en: "Are you buying it yourself, or is the family buying it?"}
     why: {hi: "Jo pay karega, Parivaar Card usse bhi", mr: "जो पैसे भरेल त्यालाही परिवार कार्ड", en: "The payer should also get the family card"}
     quick:
       - {id: self, title: {hi: "Khud", mr: "स्वतः", en: "Myself"}}
@@ -190,43 +190,43 @@ benefits:
     when_spec: {ram_gb: {gte: 16}}
     when_slots: {software: {known: true}}
     cites: [software]
-    say: {hi: "{ram_gb} GB मतलब कॉलेज का सॉफ़्टवेयर और 20 टैब साथ में, अटकेगा नहीं।", mr: "{ram_gb} GB म्हणजे कॉलेजचं सॉफ्टवेअर आणि 20 टॅब एकत्र, अडकणार नाही.", en: "{ram_gb} GB: college software and 20 tabs together, no lag."}
-    card: {hi: "सॉफ़्टवेयर + 20 टैब, बिना अटके", mr: "सॉफ्टवेअर + 20 टॅब, न अडकता", en: "Software + 20 tabs, no lag"}
+    say: {hi: "{ram_gb} GB matlab college ka software aur 20 tab saath mein, atkega nahi.", mr: "{ram_gb} GB म्हणजे कॉलेजचं सॉफ्टवेअर आणि 20 टॅब एकत्र, अडकणार नाही.", en: "{ram_gb} GB: college software and 20 tabs together, no lag."}
+    card: {hi: "Software + 20 tab, bina atke", mr: "सॉफ्टवेअर + 20 टॅब, न अडकता", en: "Software + 20 tabs, no lag"}
   - id: b_weight
     weight: 2
     when_spec: {weight_kg: {lte: 1.6}}
     when_slots: {carry: {in: [daily]}}
     cites: [carry]
-    say: {hi: "{weight_kg} kg — रोज़ बैग में हल्का।", mr: "{weight_kg} kg — रोज बॅगेत हलका.", en: "{weight_kg} kg: light in the bag every day."}
-    card: {hi: "रोज़ बैग में हल्का", mr: "रोज बॅगेत हलका", en: "Light for daily carry"}
+    say: {hi: "{weight_kg} kg — roz bag mein halka.", mr: "{weight_kg} kg — रोज बॅगेत हलका.", en: "{weight_kg} kg: light in the bag every day."}
+    card: {hi: "Roz bag mein halka", mr: "रोज बॅगेत हलका", en: "Light for daily carry"}
   - id: b_battery
     weight: 2
     when_spec: {battery_h: {gte: 10}}
     when_slots: {battery_need: {in: ["yes"]}}
     cites: [battery_need]
-    say: {hi: "{battery_h} h — पूरा कॉलेज दिन बिना चार्जर।", mr: "{battery_h} h — पूर्ण कॉलेज दिवस चार्जरशिवाय.", en: "{battery_h} hours: a full college day without a charger."}
-    card: {hi: "पूरा दिन बिना चार्जर", mr: "दिवसभर चार्जरशिवाय", en: "All day, no charger"}
+    say: {hi: "{battery_h} h — college ka poora din bina charger.", mr: "{battery_h} h — पूर्ण कॉलेज दिवस चार्जरशिवाय.", en: "{battery_h} hours: a full college day without a charger."}
+    card: {hi: "Poora din bina charger", mr: "दिवसभर चार्जरशिवाय", en: "All day, no charger"}
   - id: b_gpu_design
     weight: 2
     when_spec: {gpu: {eq: dedicated}}
     when_slots: {software: {has_any: [cad, editing]}}
     cites: [software]
-    say: {hi: "अलग ग्राफ़िक्स कार्ड — डिज़ाइन और वीडियो जल्दी बनेंगे।", mr: "वेगळं ग्राफिक्स कार्ड — डिझाइन आणि व्हिडिओ लवकर होतील.", en: "Dedicated graphics: design and video work renders faster."}
-    card: {hi: "डिज़ाइन-वीडियो तेज़", mr: "डिझाइन-व्हिडिओ वेगवान", en: "Faster design and video"}
+    say: {hi: "Alag graphics card — design aur video jaldi banenge.", mr: "वेगळं ग्राफिक्स कार्ड — डिझाइन आणि व्हिडिओ लवकर होतील.", en: "Dedicated graphics: design and video work renders faster."}
+    card: {hi: "Design-video tez", mr: "डिझाइन-व्हिडिओ वेगवान", en: "Faster design and video"}
   - id: b_gpu_game
     weight: 2
     when_spec: {gpu: {eq: dedicated}}
     when_slots: {gaming: {in: ["yes"]}}
     cites: [gaming]
-    say: {hi: "अलग ग्राफ़िक्स कार्ड — गेम स्मूथ चलेंगे।", mr: "वेगळं ग्राफिक्स कार्ड — गेम्स स्मूथ चालतील.", en: "Dedicated graphics: games run smooth."}
-    card: {hi: "गेम स्मूथ", mr: "गेम्स स्मूथ", en: "Smooth gaming"}
+    say: {hi: "Alag graphics card — game smooth chalenge.", mr: "वेगळं ग्राफिक्स कार्ड — गेम्स स्मूथ चालतील.", en: "Dedicated graphics: games run smooth."}
+    card: {hi: "Game smooth", mr: "गेम्स स्मूथ", en: "Smooth gaming"}
   - id: b_storage
     weight: 1
     when_spec: {storage_gb: {gte: 1024}}
     when_slots: {software: {has_any: [editing, cad]}}
     cites: [software]
-    say: {hi: "{storage_gb} GB स्टोरेज — बड़े प्रोजेक्ट आराम से रखिए।", mr: "{storage_gb} GB स्टोरेज — मोठे प्रोजेक्ट आरामात ठेवा.", en: "{storage_gb} GB storage: room for big projects."}
-    card: {hi: "बड़े प्रोजेक्ट के लिए जगह", mr: "मोठ्या प्रोजेक्टसाठी जागा", en: "Room for big projects"}
+    say: {hi: "{storage_gb} GB storage — bade project aaram se rakhiye.", mr: "{storage_gb} GB स्टोरेज — मोठे प्रोजेक्ट आरामात ठेवा.", en: "{storage_gb} GB storage: room for big projects."}
+    card: {hi: "Bade project ke liye jagah", mr: "मोठ्या प्रोजेक्टसाठी जागा", en: "Room for big projects"}
 
 demos:
   - id: weight_hold
@@ -234,19 +234,19 @@ demos:
     when_slots: {carry: {in: [daily]}}
     differs_on: weight_kg
     steps: {hi: "Customer ke haath mein {best} aur {other} baari baari dijiye", mr: "ग्राहकाच्या हातात {best} आणि {other} आळीपाळीने द्या", en: "Hand {best} and {other} to the customer one by one"}
-    say: {hi: "हाथ में लेकर देखिए — {best} रोज़ ले जाने में हल्का है।", mr: "हातात घेऊन बघा — {best} रोज नेण्यासाठी हलका आहे.", en: "Hold them: {best} is lighter to carry every day."}
+    say: {hi: "Haath mein lekar dekhiye — {best} roz le jaane mein halka hai.", mr: "हातात घेऊन बघा — {best} रोज नेण्यासाठी हलका आहे.", en: "Hold them: {best} is lighter to carry every day."}
   - id: open_software
     title: {hi: "Software demo", mr: "सॉफ्टवेअर डेमो", en: "Software demo"}
     when_slots: {software: {known: true}}
     differs_on: ram_gb
     steps: {hi: "Dono par course ke software ki list aur 10 tab ek saath kholiye", mr: "दोन्हीवर कोर्सच्या सॉफ्टवेअरची यादी आणि 10 टॅब एकत्र उघडा", en: "Open the course software list and 10 tabs together on both"}
-    say: {hi: "एक साथ सब खोलकर देखिए — {best} नहीं अटकता।", mr: "सगळं एकत्र उघडून बघा — {best} अडकत नाही.", en: "Open everything at once: {best} doesn't lag."}
+    say: {hi: "Ek saath sab kholkar dekhiye — {best} nahi atakta.", mr: "सगळं एकत्र उघडून बघा — {best} अडकत नाही.", en: "Open everything at once: {best} doesn't lag."}
   - id: screen_outdoor
     title: {hi: "Screen demo", mr: "स्क्रीन डेमो", en: "Screen demo"}
     when_slots: {carry: {in: [daily]}}
     differs_on: null
     steps: {hi: "Laptop ko khidki ke paas le jaakar brightness poori kariye", mr: "लॅपटॉप खिडकीजवळ नेऊन brightness पूर्ण करा", en: "Take the laptop near the window and turn brightness up"}
-    say: {hi: "खिड़की की रोशनी में भी स्क्रीन देखिए।", mr: "खिडकीच्या प्रकाशातही स्क्रीन बघा.", en: "Check the screen even in window light."}
+    say: {hi: "Khidki ki roshni mein bhi screen dekhiye.", mr: "खिडकीच्या प्रकाशातही स्क्रीन बघा.", en: "Check the screen even in window light."}
 
 myths:
   - id: lp_bigger_processor_always
@@ -254,7 +254,7 @@ myths:
     belief: "A higher processor number is always better for everyone"
     proof: open_software
     keywords: ["i7 hi lena", "sabse bada processor", "i9 chahiye", "highest processor", "सबसे बड़ा प्रोसेसर", "मोठा प्रोसेसर"]
-    line: {hi: "सही, बड़ा प्रोसेसर तेज़ होता है। पर कोर्स के सॉफ़्टवेयर के लिए RAM ज़्यादा मायने रखती है — चलाकर देखिए।",
+    line: {hi: "Sahi, bada processor tez hota hai. Par course ke software ke liye RAM zyada maayne rakhti hai — chalakar dekhiye.",
            mr: "बरोबर, मोठा प्रोसेसर वेगवान असतो. पण कोर्सच्या सॉफ्टवेअरसाठी RAM जास्त महत्त्वाची — चालवून बघा.",
            en: "True, a bigger processor is faster. For course software, RAM matters more: try it."}
   - id: lp_storage_speed
@@ -262,7 +262,7 @@ myths:
     belief: "More storage makes a laptop faster"
     proof: open_software
     keywords: ["zyada storage tez", "1tb tez", "more storage faster", "ज़्यादा स्टोरेज", "जास्त स्टोरेज"]
-    line: {hi: "स्टोरेज ज़रूरी है, सही। पर स्पीड RAM से आती है, स्टोरेज से जगह मिलती है।",
+    line: {hi: "Storage zaroori hai, sahi. Par speed RAM se aati hai, storage se jagah milti hai.",
            mr: "स्टोरेज महत्त्वाचं, बरोबर. पण वेग RAM मुळे येतो, स्टोरेजमुळे जागा मिळते.",
            en: "Storage matters, yes. Speed comes from RAM; storage gives you space."}
 site_needs: []
@@ -298,6 +298,6 @@ quiz:
 needs:
   perf_ok: {hi: "Design software", mr: "Design software", en: "Design software"}
   coding_ok: {hi: "Coding", mr: "Coding", en: "Coding"}
-  carry_ok: {hi: "रोज़ बैग में", mr: "रोज बॅगेत", en: "Carried every day"}
-  battery_ok: {hi: "पूरे दिन की battery", mr: "दिवसभराची battery", en: "All-day battery"}
+  carry_ok: {hi: "Roz bag mein", mr: "रोज बॅगेत", en: "Carried every day"}
+  battery_ok: {hi: "Poore din ki battery", mr: "दिवसभराची battery", en: "All-day battery"}
   gaming_ok: {hi: "Gaming", mr: "Gaming", en: "Gaming"}

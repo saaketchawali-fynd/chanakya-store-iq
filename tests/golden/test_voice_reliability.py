@@ -46,7 +46,8 @@ async def test_voice_is_understood_even_when_the_text_model_is_down(h, monkeypat
     await start(h)
     live(h, monkeypatch, fail_times=0)
     out = await h.voice_bytes(b"OggS-1")
-    assert "Google" not in out[0].body and "samajh nahi" not in out[0].body  # answered at once, no error
+    first = out[0].body or out[0].caption
+    assert "Google" not in first and "samajh nahi" not in first  # answered at once, no error
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     assert s.home.slots.get("room_light")  # 'dhoop aati hai' understood by the offline rules
 

@@ -25,6 +25,7 @@ from chanakya.core.contracts import Card
 HERE = Path(__file__).resolve().parent
 TEMPLATES = HERE / "templates"
 STATIC_IMG = HERE / "static" / "img"
+FONTS = HERE / "static" / "fonts"  # bundled typefaces (Montserrat, SIL Open Font License: static/fonts/OFL.txt)
 TEMPLATE_NAMES = (
     "home",
     "benefit",
@@ -41,6 +42,7 @@ TEMPLATE_NAMES = (
     "view",
     "demo",
     "homecompare",
+    "addons",
 )
 WIDTH = 1080
 MAX_HEIGHT = 1350
@@ -142,6 +144,10 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "fit": "ghar se match",
             "made": "Aapke ghar ke liye",
             "picked": "Aapki pasand",
+            "for_home": "Aapke ghar ke liye",
+            "also": "Aur bhi",
+            "price_later": "Daam demo ke baad",
+            "warranty": "Warranty",
         },
         "mr": {
             "kicker": "उत्पादन",
@@ -152,16 +158,24 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "fit": "घराशी जुळणी",
             "made": "तुमच्या घरासाठी",
             "picked": "तुमची निवड",
+            "for_home": "तुमच्या घरासाठी",
+            "also": "आणखी",
+            "price_later": "किंमत डेमोनंतर",
+            "warranty": "वॉरंटी",
         },
         "en": {
             "kicker": "Product",
             "specs": "Key specs",
             "features": "Highlights",
             "pros": "Good for this home",
-            "cons": "Keep in mind",
+            "cons": "Worth knowing",
             "fit": "home match",
             "made": "Made for your home",
             "picked": "Your pick",
+            "for_home": "For your home",
+            "also": "Also",
+            "price_later": "Price after the demo",
+            "warranty": "Warranty",
         },
     },
     "compare": {
@@ -192,6 +206,7 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "total_note": "प्रोडक्ट + ज़रूरी इंस्टॉलेशन",
             "req_group": "इंस्टॉलेशन के लिए ज़रूरी",
             "sug_group": "आपके घर के लिए सुझाव",
+            "add_group": "Aapke ghar ke liye joda",
             "with_suggestions_total": "सुझाव सहित कुल",
             "exchange": "एक्सचेंज",
             "lifetime": "चलाने का खर्च",
@@ -209,6 +224,7 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "total_note": "उत्पादन + आवश्यक इन्स्टॉलेशन",
             "req_group": "इन्स्टॉलेशनसाठी आवश्यक",
             "sug_group": "तुमच्या घरासाठी सूचना",
+            "add_group": "तुमच्या घरासाठी जोडलं",
             "with_suggestions_total": "सूचनांसह एकूण",
             "exchange": "एक्सचेंज",
             "lifetime": "चालवण्याचा खर्च",
@@ -226,6 +242,7 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "total_note": "product + required installation",
             "req_group": "Needed for installation",
             "sug_group": "Suggested for your home",
+            "add_group": "Added for your home",
             "with_suggestions_total": "Total with suggestions",
             "exchange": "Exchange",
             "lifetime": "Running cost",
@@ -279,6 +296,24 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
             "delivery": "Delivery",
             "from": "Your partner",
         },
+    },
+    "addons": {  # "Complete it": the customer's card, English (hi/mr kept for completeness)
+        "hi": {"kicker": "Poora kijiye", "title": "Saath mein:", "goes": "Aapke ghar ke liye saath mein",
+               "total": "Sab milakar", "step_up": "Ek kadam upar", "about": "lagbhag", "a_day": "roz",
+               "foot": "Sab data se · har ek ki apni wajah"},
+        "mr": {"kicker": "पूर्ण करा", "title": "सोबत:", "goes": "तुमच्या घरासाठी सोबत", "total": "सगळं मिळून",
+               "step_up": "एक पाऊल वर", "about": "सुमारे", "a_day": "दररोज", "foot": "सगळं डेटामधून · प्रत्येकाचं कारण"},
+        "en": {"kicker": "Complete it", "title": "Goes well with your", "goes": "For your home, with it",
+               "total": "Full cost with all of these", "step_up": "Or step up", "about": "about", "a_day": "a day",
+               "foot": "All from the data · each one for a reason of theirs"},
+    },
+    "demo": {  # the associate's own script: in their language (user, 5 Nov 2026)
+        "hi": {"kicker": "Demo guide", "title": "Pehle unki zaroorat dikhaiye", "wow": "Pehle wow", "then": "Phir",
+               "more": "Aur dikhaiye"},
+        "mr": {"kicker": "डेमो गाइड", "title": "आधी त्यांची गरज दाखवा", "wow": "आधी wow", "then": "मग",
+               "more": "आणखी दाखवा"},
+        "en": {"kicker": "Demo guide", "title": "Show their need first", "wow": "Wow first", "then": "Then",
+               "more": "Also show"},
     },
     "score": {
         "hi": {
@@ -646,9 +681,11 @@ def _cache_path(url: str) -> Path:
 
 
 def _card_urls(data: dict) -> list[str]:
-    found = [data.get(k) for k in IMAGE_KEYS]
-    for key in ("options", "items"):
-        found += [(o or {}).get("image") for o in data.get(key) or [] if isinstance(o, dict)]
+    found = [data.get(k) for k in IMAGE_KEYS] + [data.get("brand_logo")] + list(data.get("gallery") or [])
+    found += [(data.get(k) or {}).get("image") for k in ("product", "step_up") if isinstance(data.get(k), dict)]
+    found += [(x or {}).get("image") for x in data.get("tiles") or [] if isinstance(x, dict)]
+    for key in ("options", "items", "products", "cols"):  # the demo guide's and the side-by-side's pictures too
+        found += [(o or {}).get(k) for o in data.get(key) or [] if isinstance(o, dict) for k in ("image", "photo")]
     found += [(data.get(side) or {}).get("image") for side in ("a", "b") if isinstance(data.get(side), dict)]
     return [u for u in found if isinstance(u, str) and u.startswith("https://")]
 
@@ -745,6 +782,16 @@ def _prepare(card: Card) -> dict[str, Any]:
         photo = bool(data.get("image_is_photo")) or _raw_is_photo(raw)
         data["image"] = to_data_uri(raw, None if photo else (700 if tpl == "product" else 900))
         data["image_is_photo"] = photo
+    for key in ("product", "step_up"):  # "Complete it": their product and the step up
+        if isinstance(data.get(key), dict) and data[key].get("image"):
+            data[key] = dict(data[key], image=to_data_uri(data[key]["image"], 420))
+    if data.get("brand_logo"):  # the product page: the brand's own logo, and more real photos of the product
+        data["brand_logo"] = to_data_uri(data["brand_logo"], 260)
+    if isinstance(data.get("gallery"), list):
+        data["gallery"] = [u for u in (to_data_uri(g, 360) for g in data["gallery"][:3]) if u]
+    if isinstance(data.get("tiles"), list):  # the product card's three photo tiles
+        data["tiles"] = [dict(x, image=to_data_uri(x.get("image"), 900 if x.get("crop") else 520))
+                         for x in data["tiles"][:3] if isinstance(x, dict)]
     if isinstance(data.get("options"), list):
         opts = []
         for o in data["options"]:
@@ -960,6 +1007,27 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
     if template == "product":
         return {
             "title": 'Meru 55" QLED Pro',
+            "brand": "Meru",
+            "subtitle": "55 inch · 4K · QLED · Google TV",
+            "chip": "Best fit for your home",
+            "chip_label": "B",
+            "chip_kind": "best",
+            "needs": [
+                {"text": "Clear picture even in afternoon sun", "proof": "600 nits", "icon": "sun"},
+                {"text": "The ball stays sharp in cricket", "proof": "120 Hz", "icon": "motion", "tag": "You asked"},
+                {"text": "Right size for your 10 ft sofa", "proof": "55 inch", "icon": "size"},
+            ],
+            "also": [{"text": "Netflix, Prime and YouTube built in", "proof": "Google TV", "icon": "apps"}],
+            "rows": [{"text": "Clear picture even in afternoon sun (600\u00a0nits)", "icon": "sun"},
+                     {"text": "The ball stays sharp in cricket (120\u00a0Hz)", "icon": "motion"},
+                     {"text": "Right size for your 10 ft sofa (55\u00a0inch)", "icon": "size"},
+                     {"text": "Netflix, Prime and YouTube built in (Google\u00a0TV)", "icon": "apps"}],
+            "tiles": [{"title": "Picture", "caption": "4K, QLED panel, 600 nits brightness, 120 Hz refresh rate.",
+                       "image": "products/TV-MER-55-QL120.png", "crop": "zoom-corner"},
+                      {"title": "Sound", "caption": "40 W speakers, Dolby Atmos.", "image": "products/TV-MER-55-QL120.png"},
+                      {"title": "Smart TV", "caption": "Google TV, Wi-Fi.", "image": "products/TV-MER-55-QL120.png",
+                       "crop": "zoom-base"}],
+            "warranty": "1 yr + panel 2 yrs",
             "image": "products/TV-MER-55-QL120.png",
             "badge": p("Is ghar ke liye sahi", "या घरासाठी योग्य", "Fits this home"),
             "badge_kind": "good",
@@ -1096,6 +1164,17 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
             ),
             "stamp": "1 Nov 18:40",
         }
+    if template == "addons":
+        return {"product": {"title": 'Meru 55" QLED Pro', "image": "products/TV-MER-55-QL120.png",
+                            "price_str": "₹58,990"},
+                "items": [{"title": "Meru Soundbar 2.1", "why": "clear dialogue · HDMI ARC: one cable",
+                           "price_str": "₹12,990", "mrp_str": "MRP saving ₹2,000", "image": "products/SB-MER-21.png",
+                           "combo": "₹3,000 off a soundbar with the TV · till 30 Nov"},
+                          {"title": "Extended warranty, 2 years", "why": "2 years of cover, about ₹5 a day",
+                           "price_str": "₹3,499", "icon": "shield"}],
+                "together": [], "total_str": "₹72,479",
+                "step_up": {"label": "C", "title": 'Meru 65" QLED Pro', "image": "products/TV-MER-65-QL120.png",
+                            "diff_str": "₹22,000", "day_str": "₹12", "adds": "bigger, 65 inch"}}
     if template == "demo":
         return {"chips": ["Living room", "10 ft", "Movies/OTT", "sound features"],
                 "products": [
@@ -1561,9 +1640,21 @@ _FIT_JS = """([MAX, MIN, W]) => {
 }"""
 
 
+@lru_cache(maxsize=1)
+def font_css() -> Markup:
+    """@font-face for the bundled Montserrat (the product card's typeface, user 5 Nov 2026), inlined so a card draws
+    the same on every machine without a system install. Empty when the file is missing (the next font is used)."""
+    f = FONTS / "Montserrat-wght.ttf"
+    if not f.is_file():
+        return Markup("")
+    b64 = base64.b64encode(f.read_bytes()).decode()
+    return Markup('@font-face { font-family: "Montserrat"; font-style: normal; font-weight: 100 900; '
+                  f'src: url(data:font/ttf;base64,{b64}) format("truetype"); }}')
+
+
 def make_env() -> Environment:
     env = Environment(loader=FileSystemLoader(str(TEMPLATES)), autoescape=select_autoescape(["html"]))
-    env.globals.update(icon=icon)
+    env.globals.update(icon=icon, font_css=font_css)
     env.filters.update(
         dv=dv_class, pct=pct, frac=frac, initial=initial, stock_icon=stock_icon, aslist=aslist, icon_name=icon_name
     )

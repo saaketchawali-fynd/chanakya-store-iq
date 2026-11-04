@@ -188,7 +188,8 @@ def test_product_and_compare_optional_keys():
     html = r.html(_card("product", "en", sample_data("product", "en") | {"price_str": None, "offer_text": None}))
     assert "₹62,990" not in html and 'class="price' not in html
     html = r.html(_card("product", "en", sample_data("product", "en")))
-    assert html.count('class="pc"') == 5 and "₹62,990" in html
+    # the reference design (user, 5 Nov 2026): four rows, three photo tiles; the price and offer go in the message
+    assert html.count('class="row"') == 4 and html.count('class="tile"') == 3 and "₹62,990" not in html
     html = r.html(_card("compare", "en", sample_data("compare", "en") | {"price_a": None, "price_b": None}))
     assert "tr price" not in html
     html = r.html(_card("compare", "en", sample_data("compare", "en")))
@@ -287,3 +288,15 @@ def test_screen_image_script(tmp_path):
     assert im.format == "JPEG" and im.size == (1600, 900)
     lo, hi = zip(*im.convert("RGB").getextrema(), strict=True)
     assert max(hi) - min(lo) > 120, "wallpaper should be vivid, not flat"
+
+
+def test_product_card_carries_its_bundled_typeface():
+    """The product card is the reference design, in its typeface: Montserrat (SIL OFL) inlined, so it draws the same
+    on every machine without a system install."""
+    from chanakya.render.renderer import FONTS, font_css
+
+    assert (FONTS / "Montserrat-wght.ttf").is_file() and (FONTS / "OFL.txt").is_file()
+    css = str(font_css())
+    assert css.startswith('@font-face { font-family: "Montserrat"') and "font-weight: 100 900" in css
+    html = Renderer().html(_card("product", "en", sample_data("product", "en")))
+    assert '@font-face { font-family: "Montserrat"' in html and 'font-family: "Montserrat"' in html

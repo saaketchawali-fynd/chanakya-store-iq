@@ -1,0 +1,55 @@
+# The product page, the add-ons ("Complete it") and other card-and-flow strings added on 5 Nov 2026. Loaded last.
+# Each key lives in this file only.
+fv_bigger: {hi: "Aapke abhi wale TV se bada", mr: "तुमच्या सध्याच्या टीव्हीपेक्षा मोठा", en: "Bigger than your current TV"}
+fv_new_vs: {hi: "Aapke model se naya: {what}", mr: "तुमच्या मॉडेलपेक्षा नवीन: {what}", en: "New vs yours: {what}"}
+# ---- the product page (cards are English; hi/mr kept for completeness)
+pdp_asked: {hi: "Aapne maanga", mr: "तुम्ही मागितलं", en: "You asked"}
+pdp_picked: {hi: "Aapke ghar ke liye chuna", mr: "तुमच्या घरासाठी निवडलं", en: "Picked for your home"}
+pdp_role_best: {hi: "Aapke ghar ke liye sabse sahi", mr: "तुमच्या घरासाठी सर्वात योग्य", en: "Best fit for your home"}
+pdp_role_value: {hi: "Kam kharche mein sahi", mr: "कमी खर्चात योग्य", en: "Fits, for less"}
+pdp_role_step: {hi: "Ek kadam upar", mr: "एक पाऊल वर", en: "A step up"}
+pdp_role_new: {hi: "Naya fit", mr: "नवा फिट", en: "New fit"}
+pdp_role_broader: {hi: "Aur ek option", mr: "आणखी एक पर्याय", en: "One more option"}
+pdp_role_option: {hi: "Aapke ghar ke liye", mr: "तुमच्या घरासाठी", en: "Fits your home"}
+# ---- "Complete it" (add-ons, a step up, combo offers)
+bolo_addons:
+  hi: "Aapke {product} ka poora maza lene ke liye, yeh saath mein achhe rahenge. Card par dekhiye."
+  mr: "तुमच्या {product} चा पूर्ण आनंद घेण्यासाठी, हे सोबत छान राहतील. कार्डवर बघा."
+  en: "To enjoy your {product} fully, these go well with it. Have a look at the card."
+kyun_addons:
+  hi: "Har ek unki kisi baat ke liye hai, aur sab data se"
+  mr: "प्रत्येक गोष्ट त्यांनी सांगितलेल्या कशासाठी तरी, आणि सगळं डेटामधून"
+  en: "Each one is for something they told you, and all from the data"
+kyun_addons_combo: {hi: "Saath lene par −{amount}: {offer}", mr: "सोबत घेतल्यास −{amount}: {offer}", en: "Together, −{amount}: {offer}"}
+kyun_addons_up:
+  hi: "Ya {label}: +{diff}, roz lagbhag {day}"
+  mr: "किंवा {label}: +{diff}, दररोज सुमारे {day}"
+  en: "Or {label}: +{diff}, about {day} a day"
+do_addons:
+  hi: "Card dikhaiye aur unhe chunne dijiye; 'nahi' bhi bilkul theek hai, zor kabhi nahi."
+  mr: "कार्ड दाखवा आणि त्यांना निवडू द्या; 'नाही' पण अगदी चालेल, आग्रह कधीच नाही."
+  en: "Show the card and let them choose; a 'no' is perfectly fine, never push."
+b_addons_all: {hi: "Sab jodiye", mr: "सगळं जोडा", en: "Add all"}
+b_addons_pick: {hi: "Ek-ek chuniye", mr: "एकेक निवडा", en: "Choose"}
+b_addons_none: {hi: "Abhi nahi", mr: "आत्ता नको", en: "Not now"}
+list_addons: {hi: "Chuniye", mr: "निवडा", en: "Choose"}
+addons_list_body:
+  hi: "*Kaunsa jodein?*\n\nEk tap se ek judega; phir aur bhi jod sakte hain."
+  mr: "*कोणतं जोडायचं?*\n\nएका टॅपने एक जोडलं जाईल; मग आणखीही जोडू शकता."
+  en: "*Which ones?*\n\nOne tap adds one; you can add another after."
+addons_more_body:
+  hi: "*Jod diya: {item}.*\n\nAur kuch?"
+  mr: "*जोडलं: {item}.*\n\nआणखी काही?"
+  en: "*Added: {item}.*\n\nAnything else?"
+row_addons_done: {hi: "Bas itna", mr: "एवढंच", en: "That's all"}
+row_addons_done_d: {hi: "Ab poora kharcha dikhaiye", mr: "आता पूर्ण खर्च दाखवा", en: "Now show the full cost"}
+ao_combo: {hi: "{offer} · {till} tak", mr: "{offer} · {till} पर्यंत", en: "{offer} · till {till}"}
+ao_bank: {hi: "{bank} card se: {offer} −{amount}", mr: "{bank} कार्डने: {offer} −{amount}", en: "With {bank} cards: {offer} −{amount}"}
+ao_mrp: {hi: "MRP se {save} kam", mr: "MRP पेक्षा {save} कमी", en: "MRP saving {save}"}
+ao_protect_why: {hi: "{years} saal ki suraksha, roz lagbhag {day}", mr: "{years} वर्षांचं संरक्षण, दररोज सुमारे {day}", en: "{years} years of cover, about {day} a day"}
+ao_bundle_in_line: {hi: "bundle offer −{amount} shaamil", mr: "बंडल ऑफर −{amount} समाविष्ट", en: "bundle offer −{amount} included"}
+kh_total_note_addons: {hi: "product, installation aur jo joda", mr: "प्रॉडक्ट, इन्स्टॉलेशन आणि जे जोडलं", en: "product, installation and what you added"}
+# ---- what the product card no longer shows (it is the reference design): said in the message text instead
+fact_price: {hi: "Shelf par daam {price}", mr: "शेल्फवरील किंमत {price}", en: "Shelf price {price}"}
+fact_offer: {hi: "Offer: {offer}", mr: "ऑफर: {offer}", en: "Offer: {offer}"}
+fact_fit: {hi: "Is ghar se match: {fit}", mr: "या घराशी जुळणी: {fit}", en: "Match for this home: {fit}"}

@@ -13,7 +13,7 @@ from chanakya.brain.fit import fit, tv_size_range
 from chanakya.brain.options import candidate_set
 from chanakya.channel.limits import truncate
 from chanakya.core import repo, state
-from chanakya.core.coach import bolo_block, coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, ListRow, ListSection, OutMessage, Reply
 from chanakya.log import get_log
 from chanakya.skills import common as C
@@ -513,9 +513,9 @@ def _tryon_message(ctx: SkillContext, pl: list[tuple], image: bytes) -> OutMessa
     btns = (btns + [ctx.b("b_show_more", ctx.sid("tmenu")), ctx.b("b_go", ctx.sid("go"))])[:3]
     cites = C.known_cites(ctx, ["seat_distance", "room_size", "niche_width_cm"])
     if not cites:
-        m = info_reply(ctx, bolo_block(ctx, say), btns)
+        m = info_reply(ctx, bolo_block(ctx, say) + "\n\n" + do_block(ctx, "do_tryon"), btns)
     else:
-        m = coach_reply(ctx, say, ctx.t("kyun_tryon"), cites, btns)
+        m = coach_reply(ctx, say, ctx.t("kyun_tryon"), cites, btns, do="do_tryon")
     m.image_bytes = image
     m.kind = "buttons"
     return m

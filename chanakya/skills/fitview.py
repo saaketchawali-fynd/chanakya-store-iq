@@ -52,17 +52,33 @@ def _proof(ctx: SkillContext, p, benefit, lang: str) -> str | None:
     return None
 
 
+# an icon per need theme and pack benefit, for the product page (renderer.ICONS names)
+THEME_ICON = {
+    "sound": "speaker", "picture": "sparkle", "smart": "apps", "remote": "voice", "gaming": "play", "motion": "motion",
+    "angle": "angle", "eyes": "sun", "slim": "size", "inverter": "bolt", "fast": "trend", "voltage": "shield",
+    "comfort": "snow", "air": "drop", "copper": "shield", "hygiene": "drop", "speed": "clock", "dry": "sun",
+    "clean": "sparkle", "body": "shield", "self_clean": "refresh", "power": "bolt", "fresh": "snow",
+    "convertible": "refresh", "family": "users", "freeze": "snow", "smell": "sparkle", "battery": "bolt",
+    "office": "list", "graphics": "film", "calls": "voice", "light": "size", "fold": "refresh", "secure": "lock",
+    "keyboard": "list", "screen": "tv",
+}
+
+
 def points(ctx: SkillContext, p, lang: str, n: int = 3) -> list[dict]:
-    """[{text, proof}] — benefits that hold for this product and this home, strongest first. With the product they
-    have now known: first, what this one adds over it (a bigger size; a highlight their model lacks)."""
+    """[{text, proof, kind, icon}] — benefits that hold for this product and this home, strongest first. kind: 'need'
+    (an answer of theirs switched it on), 'asked' (they named it), 'general' (the product's own best highlight). With
+    the product they have now known: first, what this one adds over it (a bigger size; a highlight their model
+    lacks)."""
+    from chanakya.skills.translate import ICONS as BENEFIT_ICONS
     from chanakya.skills.translate import matching
 
-    out = over_current(ctx, p)[:1]
+    out = [dict(x, kind="need", icon="up") for x in over_current(ctx, p, lang)[:1]]
     for b in matching(ctx, p):
         text = pick(b.card, lang) if b.card else None
         if not text or P.placeholders(text):
             continue
-        out.append({"text": ctx.reg.static(text), "proof": _proof(ctx, p, b, lang)})
+        out.append({"text": ctx.reg.static(text), "proof": _proof(ctx, p, b, lang), "kind": "need",
+                    "icon": BENEFIT_ICONS.get(b.id, "check")})
         if len(out) >= n:
             break
     from chanakya.brain import highlights as HL
@@ -79,17 +95,19 @@ def points(ctx: SkillContext, p, lang: str, n: int = 3) -> list[dict]:
                 break
             if pt.theme in done_themes and any(o.get("proof") for o in out if isinstance(o, dict)):
                 continue
-            text = ctx.reg.static(HL.card_text(pt))
+            text = ctx.reg.static(HL.card_text(pt, lang))
             if all((o.get("text") if isinstance(o, dict) else o) != text for o in out) and (general or pt.need):
-                out.append({"text": text, "proof": ctx.reg.raw(pt.proof, f"highlight:{p.sku}")})
+                kind = "asked" if pt.need == "as_asked" else ("need" if pt.need else "general")
+                out.append({"text": text, "proof": ctx.reg.raw(pt.proof, f"highlight:{p.sku}"), "kind": kind,
+                            "icon": THEME_ICON.get(pt.theme, "sparkle")})
 
     add_hl(False, n)  # the product's own highlights that answer their needs (live data has few spec benefits)
     from chanakya.skills.common import asked_for
 
-    for _, val in asked_for(ctx, lang):  # what they asked for about the product itself (picture type, brand …)
+    for lab, val in asked_for(ctx, lang):  # what they asked for about the product itself (picture type, brand …)
         if len(out) >= n + 2:
             break
-        out.append(val)
+        out.append({"text": f"{lab}: {val}", "proof": None, "kind": "asked", "icon": "target"})  # 'Brand: Arka'
     if len(out) < 2:
         add_hl(True, 2)  # nothing more for this home: the product's own best highlight, still its own words
     return out
@@ -198,7 +216,7 @@ def home_chips(ctx: SkillContext, lang: str, n: int = 4) -> list[str]:
     return out
 
 
-def over_current(ctx: SkillContext, p) -> list[dict]:
+def over_current(ctx: SkillContext, p, lang: str = "en") -> list[dict]:
     """What this product adds over the one they have now, from the data: a bigger size than theirs; and, when their
     model is in the catalogue, a highlight it lacks. Nothing when it adds nothing."""
     from chanakya.brain import highlights as HL
@@ -210,11 +228,11 @@ def over_current(ctx: SkillContext, p) -> list[dict]:
     if size and old and float(size) > float(old):
         a = ctx.reg.num(size, f"spec:{p.sku}:size_in")
         b = ctx.reg.num(old, "note:existing")
-        out.append({"text": ctx.reg.static("Bigger than your current TV"), "proof": f'{a}" vs {b}"'})
+        out.append({"text": ctx.t("fv_bigger", lang), "proof": f'{a}" vs {b}"'})
     oldp = ctx.facts.product_sync(ex["sku"]) if ex.get("sku") else None
     if oldp is not None:
         diff = HL.differences(p, oldp, home, ctx.session.extra.get("wants") or {}, ctx.pack)
         if diff:
-            out.append({"text": ctx.reg.static("New vs yours: " + HL.card_text(diff[0]).lower()),
+            out.append({"text": ctx.t("fv_new_vs", lang, what=HL.card_text(diff[0], lang).lower()),
                         "proof": ctx.reg.raw(diff[0].proof, f"highlight:{p.sku}")})
     return out

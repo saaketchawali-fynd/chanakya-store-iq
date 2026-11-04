@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{# Complete it (English): what goes well with their product for their home, from the data only. Each add-on with its
+   photo (a product) or an icon (a service or plan), why it is for them, its price and MRP saving, its own live offer
+   and any combo offer whose rule names this product; then what the bill crosses together, the total with all of
+   them, and a step up when the next option on their shortlist adds something for their needs. #}
+{% set its = (items|aslist)[:4] %}
+{% set product = product or {} %}
+{% set tog = (together|aslist)[:2] %}
+{% block style %}
+  .hd-row { align-items: center; }
+  .thumb { flex: none; width: 210px; height: 140px; border-radius: 22px; background: rgba(255,255,255,.95);
+           display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .thumb img { max-width: 90%; max-height: 88%; object-fit: contain; }
+  .pprice { margin-top: 10px; font-size: 30px; font-weight: 800; color: #fff; }
+  .it { display: flex; gap: 22px; align-items: center; padding: 18px 0; }
+  .it + .it { border-top: 1.5px solid var(--line); }
+  .ph { flex: none; width: 150px; height: 112px; border-radius: 20px; background: #F5F6F9; display: flex;
+        align-items: center; justify-content: center; overflow: hidden; color: var(--saffron-deep); }
+  .ph img { max-width: 92%; max-height: 90%; object-fit: contain; }
+  .mid { flex: 1; min-width: 0; }
+  .nm { font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.25; }
+  .why { margin-top: 4px; font-size: 23px; color: var(--green-deep); font-weight: 700; display: flex; gap: 8px; align-items: flex-start; }
+  .why .ic { margin-top: 3px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .chips .chip { font-size: 20px; padding: 6px 12px; }
+  .pr { flex: none; text-align: right; }
+  .pr .a { display: block; font-size: 30px; font-weight: 800; color: var(--ink); }
+  .pr .m { display: block; margin-top: 2px; font-size: 19px; font-weight: 700; color: var(--green-deep); }
+  .tog { margin-top: 18px; padding: 18px 26px; border: 2px solid #C7D2FE; background: linear-gradient(180deg, #F5F7FF, #fff); }
+  .tog .ln { display: flex; gap: 10px; align-items: flex-start; font-size: 24px; font-weight: 700; color: #3730A3; padding: 4px 0; }
+  .total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px; padding: 20px 28px; }
+  .total .k { font-size: 26px; font-weight: 700; color: var(--muted); }
+  .total .v { font-size: 40px; font-weight: 800; color: var(--ink); }
+  .up { margin-top: 18px; padding: 20px 26px; display: flex; gap: 20px; align-items: center; }
+  .up .ph { width: 130px; height: 96px; }
+  .up .t { font-size: 25px; font-weight: 800; color: var(--ink); }
+  .up .d { margin-top: 4px; font-size: 22px; color: var(--text); }
+  .up .lt { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px;
+            background: var(--saffron); color: #fff; font-size: 19px; font-weight: 800; margin-right: 8px; }
+{% endblock %}
+{% block header %}
+  <div class="hd-row">
+    <div class="grow">
+      <div class="kicker">{{ L.kicker }}</div>
+      <h1 class="{{ product.title|dv }}">{{ L.title }} {{ product.title }}</h1>
+      {% if product.price_str %}<div class="pprice num">{{ product.price_str }}</div>{% endif %}
+    </div>
+    {% if product.image %}<div class="thumb"><img src="{{ product.image }}" alt=""></div>{% endif %}
+  </div>
+{% endblock %}
+{% block content %}
+  {% if its %}
+  <section class="sec">
+    <div class="label">{{ icon('sparkle', 26) }}{{ L.goes }}</div>
+    <div class="card">
+      {% for x in its %}
+      <div class="it">
+        <div class="ph">{% if x.image %}<img src="{{ x.image }}" alt="">{% else %}{{ icon(x.icon or 'box', 46) }}{% endif %}</div>
+        <div class="mid">
+          <div class="nm">{{ x.title }}</div>
+          {% if x.why %}<div class="why">{{ icon('home', 22) }}<span>{{ x.why }}</span></div>{% endif %}
+          {% if x.offer or x.combo %}<div class="chips">{% if x.combo %}<span class="chip green">{{ icon('gift', 20) }}{{ x.combo }}</span>{% endif %}{% if x.offer %}<span class="chip saffron">{{ icon('tag', 20) }}{{ x.offer }}</span>{% endif %}</div>{% endif %}
+        </div>
+        <div class="pr num"><span class="a">{{ x.price_str }}</span>{% if x.mrp_str %}<span class="m">{{ x.mrp_str }}</span>{% endif %}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% if tog %}
+  <section class="card tog">{% for t in tog %}<div class="ln num">{{ icon('percent', 24) }}<span>{{ t }}</span></div>{% endfor %}</section>
+  {% endif %}
+  {% if total_str %}
+  <section class="card total num"><span class="k">{{ L.total }}</span><span class="v">{{ total_str }}</span></section>
+  {% endif %}
+  {% if step_up %}
+  <section class="card up">
+    <div class="ph">{% if step_up.image %}<img src="{{ step_up.image }}" alt="">{% else %}{{ icon('up', 40) }}{% endif %}</div>
+    <div class="mid">
+      <div class="t"><span class="lt">{{ step_up.label }}</span>{{ L.step_up }}: {{ step_up.title }}</div>
+      <div class="d num">+{{ step_up.diff_str }} · {{ L.about }} {{ step_up.day_str }} {{ L.a_day }} · {{ step_up.adds }}</div>
+    </div>
+  </section>
+  {% endif %}
+{% endblock %}
+{% block foot_left %}{{ L.foot }}{% endblock %}

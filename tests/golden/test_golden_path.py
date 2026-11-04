@@ -5,7 +5,7 @@ from __future__ import annotations
 from chanakya.core import repo
 from chanakya.sim.harness import PHONES
 from tests.conftest import make_harness
-from tests.helpers import button_ids, check_floor, texts
+from tests.helpers import button_ids, check_floor, options_view, texts
 
 
 async def ev_types(sid):
@@ -107,10 +107,10 @@ async def test_golden_path(tmp_path):
         out = await step(h.say, "offers")
         assert "Daam demo ke baad" in out[0].body and "₹" not in texts(out)
         assert "s:C1:override:price:asked" in button_ids(out)
-        # 10 options (one message) → the demo on tap
+        # 10 options: one product page per option, then the next steps → the demo on tap
         out = await step(h.tap, "s:C1:options")
-        assert len(out) == 1
-        card = out[0].card
+        assert len(out) == 4 and all(m.card and m.card.template == "product" for m in out[:3]) and out[3].buttons
+        card = options_view(out)
         assert [o["label"] + o["title"] for o in card.data["options"]] == [
             'AArka 55" 4K',
             'BMeru 55" QLED Pro',
@@ -118,8 +118,11 @@ async def test_golden_path(tmp_path):
         ]
         assert button_ids(out) == ["s:C1:cmpall", "s:C1:demo", "s:C1:more"]  # side by side, demo guide, tell me more
         assert all(o["offer"]["text"] for o in card.data["options"])  # every option shows its offer (or none)
-        assert "₹" not in texts(out) and "price" not in str(card.data)
-        assert card.data["grid"] and card.data["options"][1]["points"]  # built from this home's answers
+        s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+        prices = [f"₹{p.price:,}" for p in (h.rt.facts.product_sync(x) for x in s.option_labels.values())]
+        assert prices
+        assert not any(pr in texts(out) for pr in prices) and "price" not in str(card.data)  # offers yes, prices no
+        assert card.data["options"][1]["points"]  # built from this home's answers
         # 10a side by side: their room photo is here, so each option is drawn on their wall, then one detailed table
         out = await step(h.tap, "s:C1:cmpall")
         sbs = next(m.card for m in out if m.card and m.card.template == "homecompare")
@@ -141,7 +144,7 @@ async def test_golden_path(tmp_path):
         assert rows == ["s:C1:opt:A", "s:C1:opt:B", "s:C1:opt:C", "s:C1:abwall", "s:C1:view", "s:C1:upgrade",
                         "s:C1:nonefit"]  # + both on their wall, how big from the sofa, is the extra money worth it
         out2 = await step(h.pick, "s:C1:upgrade")  # is the extra money worth it? (the price is open after the demo)
-        assert out2[0].body.count("→") >= 1 and "/din" in out2[0].body
+        assert out2[0].body.count("→") >= 1 and "roz lagbhag" in out2[0].body
         assert "Daam khula" in out[0].body and "Demo ho gaya" in out[0].body
         # 12 B → the questions that change the cost (wall, wall type, soundbar) → Kharcha
         out = await step(h.pick, "s:C1:opt:B")
@@ -149,9 +152,13 @@ async def test_golden_path(tmp_path):
         await step(h.tap, "s:C1:slot:mounting:wall")
         await step(h.tap, "s:C1:slot:wall_type:concrete")
         out = await step(h.tap, "s:C1:slot:soundbar:has")
+        ao = out[-1]  # "Complete it": what goes with it for this home (the kids: protection), a step up, before the cost
+        assert ao.card.template == "addons" and ao.card.data["items"] and ao.card.data["step_up"]["label"] == "C"
+        assert button_ids(out) == ["s:C1:addons:all", "s:C1:addons:pick", "s:C1:addons:none"]
+        out = await step(h.tap, "s:C1:addons:none")  # not now: nothing more is suggested on the bill
         k = out[-1]
         assert k.card.template == "kharcha"
-        assert k.card.data["zaroori_total_str"] == "₹65,288" and k.card.data["with_suggestions_total_str"] == "₹68,787"
+        assert k.card.data["zaroori_total_str"] == "₹65,288" and not k.card.data["with_suggestions_total_str"]
         assert button_ids(out) == ["s:C1:offers", "s:C1:cost_rm", "s:C1:cost_show"]
         cost = (await repo.events_for(s.id, ["cost_shared"]))[-1]
         assert cost.payload["zaroori_total"] == 65288 and "charge:TV_WALLMOUNT_S" in cost.sources

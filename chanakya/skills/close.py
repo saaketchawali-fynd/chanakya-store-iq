@@ -9,7 +9,7 @@ from chanakya.brain import packs as P
 from chanakya.core import repo, state
 from chanakya.core.buttons import encode
 from chanakya.core.clock import today
-from chanakya.core.coach import bolo_block, coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, OutMessage, Reply, Step
 from chanakya.i18n.lang import fill
 from chanakya.skills import common as C
@@ -65,7 +65,7 @@ async def offers(ctx: SkillContext) -> Reply:
         if emi:
             btns.append(ctx.b("b_pay_emi", ctx.sid("pay", "emi")))
         say = ctx.tc("bolo_pay" if emi else "bolo_pay_no_emi")
-        return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_pay"), C.known_cites(ctx), btns))
+        return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_pay"), C.known_cites(ctx), btns, do="do_pay"))
     if pay in ("card", "emi") and not ctx.x.get("bank"):
         if not _bank_offers(ctx, pay):  # no bank has an offer on this product today: nothing to choose
             ctx.x["bank"] = "other"
@@ -118,7 +118,7 @@ def bank_list(ctx: SkillContext, pay: str) -> OutMessage:
         rows.append(ListRow(id=ctx.sid("bank", o.bank), title=truncate(o.bank, 24), description=truncate(desc, 72)))
     rows.append(ListRow(id=ctx.sid("bank", "other"), title=ctx.t("row_other_card"), description=ctx.t("row_bank_none_d")))
     if pay == "emi":
-        rows.append(ListRow(id=ctx.sid("bank", "none"), title=ctx.t("row_no_card_emi")))
+        rows.append(ListRow(id=ctx.sid("bank", "none"), title=ctx.t("row_no_card_emi"), description=ctx.t("row_no_card_emi_d")))
     ctx.reg.static(" ".join(r.title + " " + (r.description or "") for r in rows))
     return OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("bank_body_emi" if pay == "emi" else "bank_body"),
                       list_button=truncate_title(ctx.t("list_bank")), sections=[ListSection(rows=rows[:10])],
@@ -201,7 +201,7 @@ async def quote(ctx: SkillContext, alt: bool = False) -> Reply:
         ctx.b("b_not_today", ctx.sid("nottoday")),
         ctx.b("b_send_customer", ctx.sid("sendoffer")),
     ]
-    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card))
+    return ctx.reply(coach_reply(ctx, say, why, cites, btns, card=card, do="do_offer"))
 
 
 def _also(ctx: SkillContext, p, applied_ids: set[str], pay: str) -> list[dict]:
@@ -344,7 +344,7 @@ async def delivery(ctx: SkillContext) -> Reply:
         ctx.b("b_not_today", ctx.sid("nottoday")),
     ]
     cites = C.known_cites(ctx, ["decider", "floor_lift"])
-    return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_close_choice"), cites, btns))
+    return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_close_choice"), cites, btns, do="do_close_choice"))
 
 
 async def set_delivery(ctx: SkillContext, iso: str) -> Reply:
@@ -365,14 +365,24 @@ async def set_delivery(ctx: SkillContext, iso: str) -> Reply:
 
 async def not_today(ctx: SkillContext) -> Reply:
     """'Not today': ask what is holding them back, as one list of the real reasons."""
-    from chanakya.channel.limits import truncate_title
+    from chanakya.channel.limits import truncate, truncate_title
     from chanakya.core.contracts import ListRow, ListSection
 
     ids = ["too_expensive", "ask_family", "cheaper_online", "need_to_think", "waiting_for_sale", "brand_doubt",
            "installation_worry"]
-    rows = [ListRow(id=ctx.sid("obj", oid), title=ctx.t(f"obj_row_{oid}")) for oid in ids if ctx.packs.objection(oid)]
-    ctx.reg.static(" ".join(r.title for r in rows))
-    msg = coach_reply(ctx, ctx.tc("bolo_nottoday"), ctx.t("kyun_nottoday"), C.known_cites(ctx), [])
+    rows = []
+    for oid in ids:
+        ob = ctx.packs.objection(oid)
+        if ob:  # each row previews the honest line they'll say
+            line = ob.get("line") if isinstance(ob, dict) else getattr(ob, "line", None)
+            prev = ctx.pick(line, ctx.clang) if line else ""
+            if "{" in prev:  # filled in only when said (an offer date): preview the sentences before it
+                head = prev[: prev.index("{")]
+                prev = head[: head.rfind(". ") + 1] if ". " in head else ""
+            rows.append(ListRow(id=ctx.sid("obj", oid), title=ctx.t(f"obj_row_{oid}"),
+                                description=truncate(prev, 72) if prev else None))
+    ctx.reg.static(" ".join(r.title + " " + (r.description or "") for r in rows))
+    msg = coach_reply(ctx, ctx.tc("bolo_nottoday"), ctx.t("kyun_nottoday"), C.known_cites(ctx), [], do="do_nottoday")
     msg.kind = "list"
     msg.list_button = truncate_title(ctx.t("list_reason"))
     msg.sections = [ListSection(rows=rows)]
@@ -426,8 +436,8 @@ async def objection(ctx: SkillContext, oid: str) -> Reply:
             ctx.asking.add(slot)
             cites = [slot]
     if not cites:
-        return ctx.reply(info_reply(ctx, bolo_block(ctx, line), btns))
-    return ctx.reply(coach_reply(ctx, line, ctx.t("kyun_objection"), cites, btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, line) + "\n\n" + do_block(ctx, "do_objection"), btns))
+    return ctx.reply(coach_reply(ctx, line, ctx.t("kyun_objection"), cites, btns, do="do_objection"))
 
 
 def is_discount_ask(ctx: SkillContext, text: str) -> bool:
@@ -448,7 +458,8 @@ async def no_invented_discount(ctx: SkillContext) -> Reply:
     if not ctx.session:
         return ctx.reply(info_reply(ctx, ctx.t("no_invented_discount"), btns))
     # something honest to say to the customer, and the reason for the associate
-    return ctx.reply(coach_reply(ctx, ctx.tc("bolo_no_discount"), ctx.t("no_invented_discount"), C.known_cites(ctx), btns))
+    return ctx.reply(coach_reply(ctx, ctx.tc("bolo_no_discount"), ctx.t("no_invented_discount"), C.known_cites(ctx), btns,
+                                 do="do_no_discount"))
 
 
 async def ask_manager(ctx: SkillContext) -> Reply:

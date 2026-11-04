@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from chanakya.i18n.lang import pick
 
 __all__ = ["pick"]
@@ -121,7 +123,11 @@ def label(key: str, lang: str, customer: bool = True) -> str:
 
 
 def raw_value(p, key: str):
-    if key in ("warranty", "colours", "in_box", "model_number", "year", "series"):
+    if key == "warranty":  # the seed's {years…}, or the backend's own words ('1 Year'); a bare number says nothing
+        info = p.info or {}
+        txt = info.get("warranty_text")
+        return info.get("warranty") or (txt if isinstance(txt, str) and re.search(r"[A-Za-z]", txt) else None)
+    if key in ("colours", "in_box", "model_number", "year", "series"):
         return (p.info or {}).get(key)
     return p.spec(key)
 
@@ -147,7 +153,7 @@ def fmt_value(ctx: SkillContext, p, key: str, lang: str, customer: bool = True) 
             ("battery_years", {"hi": "battery", "mr": "battery", "en": "battery"}),
         ):
             if v.get(k) is not None:
-                parts.append(f"{name[word_lang]} {ctx.reg.num(v[k], src)}")
+                parts.append(f"{name[word_lang]} {ctx.reg.num(v[k], src)} yr")  # 'compressor 10 yr', not '10'
         return " · ".join(parts) or None
     if key == "in_box" and isinstance(v, list):
         return ctx.reg.raw(", ".join(pick(x, word_lang) if isinstance(x, dict) else str(x) for x in v), src)
@@ -163,15 +169,87 @@ def fmt_value(ctx: SkillContext, p, key: str, lang: str, customer: bool = True) 
     return ctx.reg.raw(str(v), src)
 
 
+SPEC_ICON = {  # the product page's feature tiles (renderer.ICONS names)
+    "size_in": "size", "panel": "sparkle", "resolution": "tv", "refresh_hz": "motion", "brightness_nits": "sun",
+    "hdr_formats": "film", "os": "apps", "speaker_w": "speaker", "wifi": "wifi", "warranty": "shield", "ton": "snow",
+    "star": "star", "star_rating": "star", "inverter": "bolt", "inverter_compressor": "bolt", "noise_db": "low",
+    "kwh_year": "bolt", "capacity_kg": "box", "load": "box", "rpm": "refresh", "heater": "sun", "capacity_l": "box",
+    "door": "box", "frost_free": "snow", "freezer_l": "snow", "convertible": "refresh", "stabiliser_free": "shield",
+    "cpu": "bolt", "ram_gb": "trend", "storage_gb": "box", "battery_h": "clock", "weight_kg": "size",
+    "channels": "speaker", "dialogue_enhance": "voice",
+}
+# the product page's subtitle: a few of the product's own specs in one line ('55 inch · 4K · QLED · Google TV')
+SUBTITLE_KEYS = {
+    "tv": ["size_in", "resolution", "panel", "os"], "ac": ["ton", "star", "inverter"],
+    "wm": ["capacity_kg", "load", "automatic"], "fridge": ["capacity_l", "door", "star_rating", "frost_free"],
+    "laptop": ["screen_in", "cpu", "ram_gb", "storage_gb"],
+}
+
+
 def key_specs(ctx: SkillContext, p, lang: str, n: int = 4) -> list[dict]:
     out = []
     for key in KEY_SPECS.get(p.category, []):
         val = fmt_value(ctx, p, key, lang)
         if val:
-            out.append({"label": ctx.reg.static(label(key, lang)), "value": val})
+            out.append({"label": ctx.reg.static(label(key, lang)), "value": val, "key": key,
+                        "icon": SPEC_ICON.get(key, "list")})
         if len(out) >= n:
             break
     return out
+
+
+# the product card's three tiles (like the reference's "Intuitive Controls / Premium Comfort / Foldable Design"): a
+# title and the product's own specs in one short line. (title, [spec keys], what a yes/no or a number reads as)
+TILE_GROUPS = {
+    "tv": [("Picture", ["resolution", "panel", "hdr_formats", "brightness_nits", "refresh_hz"]),
+           ("Sound", ["speaker_w", "dialogue_enhance", "hdmi_arc"]), ("Smart TV", ["os", "wifi"])],
+    "ac": [("Cooling", ["ton", "inverter"]), ("Savings", ["star", "kwh_year"]), ("Comfort", ["noise_db", "wifi"])],
+    "wm": [("Capacity", ["capacity_kg", "load", "automatic"]), ("Wash", ["rpm", "heater"]), ("Savings", ["kwh_year"])],
+    "fridge": [("Space", ["capacity_l", "door", "freezer_l"]), ("Cooling", ["frost_free", "convertible"]),
+               ("Savings", ["star_rating", "inverter_compressor", "stabiliser_free"])],
+    "laptop": [("Performance", ["cpu", "ram_gb"]), ("Storage", ["storage_gb"]), ("On the go", ["battery_h", "weight_kg"])],
+}
+TILE_WORD = {  # a number reads better with its name ('600 nits brightness'); a 'yes' is said by its name
+    "brightness_nits": "brightness", "refresh_hz": "refresh rate", "speaker_w": "speakers", "noise_db": "quiet",
+    "kwh_year": "a year", "rpm": "spin", "freezer_l": "freezer", "battery_h": "battery", "ram_gb": "RAM",
+    "storage_gb": "storage", "panel": "panel",
+}
+
+
+def tiles(ctx: SkillContext, p, lang: str) -> list[dict]:
+    """Three tiles for the product card: a title and the product's own specs as one short line ('4K, QLED panel,
+    HDR10+, 600 nits brightness.'). A group with nothing in the data is left out; the warranty fills in."""
+    out = []
+    for title, keys in TILE_GROUPS.get(p.category, []):
+        parts = []
+        for key in keys:
+            v = raw_value(p, key)
+            if v is True:
+                parts.append(ctx.reg.static(label(key, lang)))
+            elif v not in (None, False, "", []):
+                val = fmt_value(ctx, p, key, lang)
+                if val:
+                    parts.append(f"{val} {TILE_WORD[key]}" if key in TILE_WORD else val)
+        if parts:
+            out.append({"title": ctx.reg.static(title), "caption": ", ".join(parts[:4]) + "."})
+    w = fmt_value(ctx, p, "warranty", lang)
+    if len(out) < 3 and w:
+        out.append({"title": ctx.reg.static("Warranty"), "caption": w.replace(" · ", ", ") + "."})
+    return out[:3]
+
+
+def subtitle(ctx: SkillContext, p, lang: str) -> str | None:
+    """'55 inch · 4K · QLED · Google TV': the product's own specs, a yes/no spec by its name ('Inverter')."""
+    parts = []
+    for key in SUBTITLE_KEYS.get(p.category, []):
+        v = raw_value(p, key)
+        if v is True:
+            parts.append(ctx.reg.static(label(key, lang)))
+        elif v not in (None, False, "", []):
+            val = fmt_value(ctx, p, key, lang)
+            if val and val not in parts:
+                parts.append(val)
+    return " · ".join(x.replace(" ", "\u00a0") for x in parts) or None  # each spec whole on its line ('8 GB')
 
 
 def spec_strings(ctx: SkillContext, p, lang: str, n: int = 3) -> list[str]:

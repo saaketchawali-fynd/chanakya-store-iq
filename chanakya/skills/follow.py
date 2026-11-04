@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw
 from chanakya.brain import packs as P
 from chanakya.core import repo, state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import bolo_block, coach_reply, info_reply, kyun_block
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, kyun_block
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, Card, OutMessage, Reply, Step
 from chanakya.core.status import short_name
 from chanakya.skills import common as C
@@ -84,8 +84,9 @@ async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = F
         say = ctx.pick(ctx.packs.common_line("consent_ask"), ctx.clang)
         why = ctx.t("kyun_consent_note", note=note) if note else ctx.t("kyun_consent")
         if not cites:
-            return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + kyun_block(ctx, why), btns))
-        return ctx.reply(coach_reply(ctx, say, why, cites, btns))
+            return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + kyun_block(ctx, why) + "\n\n"
+                                        + do_block(ctx, "do_consent"), btns))
+        return ctx.reply(coach_reply(ctx, say, why, cites, btns, do="do_consent"))
     return await send_parivaar(ctx)
 
 
@@ -145,7 +146,7 @@ async def record_consent(ctx: SkillContext, customer_wa_id: str, method: str) ->
     name = s.home.customer_name or ctx.t("customer_word", alang)
     msgs = []
     # to the customer
-    cust_body = "\n".join(
+    cust_body = "\n\n".join(
         [
             ctx.t("cust_welcome", CUSTOMER_PHONE_LANG, associate=staff.name if staff else "Chanakya"),
             ctx.t("cust_photo_hint", CUSTOMER_PHONE_LANG),
@@ -319,7 +320,8 @@ async def send_parivaar(ctx: SkillContext, assoc_lang: str | None = None) -> Rep
         Button(id=encode("u", s8, "visit"), title=ctx.t("cb_visit", lang)),
         Button(id=encode("u", s8, "ask"), title=ctx.t("cb_question", lang)),
     ]
-    caption = ctx.t("parivaar_caption", lang, name=short_name(name) if name else "", product=C.product_name(ctx, p))
+    caption = (ctx.t("parivaar_caption", lang, name=short_name(name), product=C.product_name(ctx, p)) if name
+               else ctx.t("parivaar_caption_noname", lang, product=C.product_name(ctx, p)))
     to_customer = OutMessage(
         to=s.customer_wa_id, kind="buttons", body=caption, buttons=btns, card=card, allowed_numbers=ctx.reg.allowed()
     )
@@ -371,7 +373,14 @@ async def forward_voice(ctx: SkillContext) -> Reply:
 
 async def task_menu(ctx: SkillContext) -> Reply:
     btns = [ctx.b(key, ctx.sid("task_when", when)) for when, key in TASK_WHEN.items()]
-    return ctx.reply(info_reply(ctx, ctx.t("task_when_ask"), btns))
+    return ctx.reply(info_reply(ctx, ctx.t("task_when_ask", name=_cust_name(ctx)), btns))
+
+
+def _cust_name(ctx: SkillContext) -> str:
+    """'Shah ji' in a sentence: the customer's short name, or their code when no name was said."""
+    s = ctx.session
+    nm = short_name(s.home.customer_name) if s.home.customer_name else ""
+    return ctx.reg.raw(nm if nm and nm != "–" else s.code, "card:name")
 
 
 def _due(now: datetime, when: str) -> datetime:
@@ -392,9 +401,9 @@ async def create_task(ctx: SkillContext, when: str) -> Reply:
     t = await repo.task_create(ctx.actor_wa_id, "followup", title, due, s.id, {"code": s.code})
     ctx.ev("task_created", task_id=t.id, kind="followup", owner=ctx.actor_wa_id, due_at=due.isoformat())
     s.extra["task_created"] = True
-    label = ctx.t(TASK_WHEN.get(when, "b_task_tmr"))
+    label = ctx.t(f"task_when_{when}" if when in TASK_WHEN else "task_when_tomorrow")  # in a sentence: 'this evening'
     btns = [ctx.b("b_khatam", ctx.sid("khatam")), ctx.b("b_new_customer", encode("g", "new"))]
-    return ctx.reply(info_reply(ctx, ctx.t("task_done", when=label), btns))
+    return ctx.reply(info_reply(ctx, ctx.t("task_done", name=_cust_name(ctx), when=label), btns))
 
 
 async def sold(ctx: SkillContext) -> Reply:
@@ -432,7 +441,7 @@ def site_summary(ctx: SkillContext) -> tuple[dict, str, list[str]]:
         v = vals[-1] if vals else "unknown"
         needs[sid] = v
         if sd:
-            parts.append(f"{ctx.pick(sd.title)}: {sd.value_title(v, ctx.lang) if vals else '?'}")
+            parts.append(f"{ctx.pick(sd.title)}: {sd.value_title(v, ctx.lang) if vals else ctx.t('not_asked_yet')}")
     risks = []
     if (
         pack.category == "tv"
@@ -488,17 +497,12 @@ async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
     )
     s.extra["install_job_id"] = job.id
     ctx.ev("install_job_created", job_id=job.id, slot=label)
-    msgs = [
-        info_reply(
-            ctx,
-            ctx.t(
-                "install_job_body",
-                id=ctx.reg.raw(str(job.id), "job:id"),
-                slot=ctx.reg.static(label),
-                site=ctx.reg.static(summary or "-"),
-            ),
-        )
-    ]
+    lines = [ctx.t("install_job_head", id=ctx.reg.raw(str(job.id), "job:id")), "",
+             ctx.t("install_job_when", slot=ctx.reg.static(label))]
+    lines += [f"• {ctx.reg.static(x)}" for x in summary.split(" · ") if x]  # each site fact on its own line
+    if ctx.t("not_asked_yet") in summary:
+        lines += ["", ctx.t("install_job_missing")]
+    msgs = [info_reply(ctx, "\n".join(lines))]
     if s.customer_wa_id:
         msgs.append(
             OutMessage(

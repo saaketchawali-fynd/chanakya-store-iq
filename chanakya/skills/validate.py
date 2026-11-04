@@ -9,7 +9,7 @@ from chanakya.brain.fit import fit
 from chanakya.brain.options import candidate_set
 from chanakya.core import state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import bolo_block, coach_reply, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
 from chanakya.core.contracts import Reply
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -79,8 +79,8 @@ async def myth(ctx: SkillContext, claim_id: str) -> Reply:
             ctx.asking.add(slot)
             cites = [slot]
     if not cites:
-        return ctx.reply(info_reply(ctx, bolo_block(ctx, line), btns))
-    return ctx.reply(coach_reply(ctx, line, why, cites, btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, line) + "\n\n" + do_block(ctx, "do_myth"), btns))
+    return ctx.reply(coach_reply(ctx, line, why, cites, btns, do="do_myth"))
 
 
 async def proof(ctx: SkillContext, claim_id: str | None) -> Reply:
@@ -127,7 +127,8 @@ async def price_rescue(ctx: SkillContext) -> Reply:
     if slot:
         return ctx.reply(C.question_reply(ctx, slot, say_override=say, why_override=ctx.t("kyun_price_rescue")))
     cites = C.known_cites(ctx)
-    return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_price_rescue"), cites, [ctx.b("b_options", ctx.sid("options"))]))
+    return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_price_rescue"), cites, [ctx.b("b_options", ctx.sid("options"))],
+                                 do="do_price_rescue"))
 
 
 async def unknown_claim(ctx: SkillContext, question: str | None) -> Reply:

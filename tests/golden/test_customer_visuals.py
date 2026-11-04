@@ -2,7 +2,7 @@
 - every visual is ONE card in English for the customer and the associate (no copy in another language);
 - the options card built from this home (needs grid, benefits with proof), never a generic feature list;
 - the bill: 'Show customer' always leaves the associate a next step;
-- units and technical terms in English in every language; Devanagari for Hindi customer wording;
+- units and technical terms in English in every language; Hindi in Roman Hinglish everywhere (5 Nov 2026);
 - photo labels drawn per script (no empty boxes), the live-sports question, the voice safety net."""
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from chanakya.brain.packs import load_packs
 from chanakya.config import ROOT
 from chanakya.sim.harness import PHONES
 from chanakya.tryon import fonts
-from tests.helpers import button_ids, check_floor, pick, to_options
+from tests.helpers import button_ids, check_floor, options_view, pick, to_options
 
 PACKS = load_packs()
 NOW = datetime(2026, 11, 1, tzinfo=UTC)
@@ -28,23 +28,20 @@ async def session(h):
     return await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
 
 
-async def test_options_card_is_one_english_card_built_from_this_home(h):
+async def test_each_option_is_one_english_page_built_from_this_home(h):
     out = await to_options(h)
-    m = out[0]
     check_floor(out)
-    assert m.card.template == "options" and m.card.lang == "en"
-    assert sum(1 for x in out if x.card or x.image_bytes) == 1  # one card, no copy in the associate's language
-    d = m.card.data
+    pages = [x for x in out if x.card]
+    assert pages and all(x.card.template == "product" and x.card.lang == "en" for x in pages)  # one page per option
+    s = await session(h)
+    assert len(pages) == len(s.option_labels)  # no copy in the associate's language
+    d = options_view(out).data
     best = next(o for o in d["options"] if o["is_best"])
     assert best["points"] and all(p["text"] for p in best["points"])
-    assert any(p["proof"] for p in best["points"])  # each benefit backed by the product's own spec
-    needs = [r["need"] for r in d["grid"]]
-    assert needs and needs[0].startswith("Size for")  # the customer's own distance, the heaviest need first
-    assert all(len(r["cells"]) == len(d["options"]) for r in d["grid"])
-    assert d["home"]  # their answers, as chips
+    assert any(p.get("proof") for p in best["points"])  # each benefit backed by the product's own spec
     others = [o for o in d["options"] if not o["is_best"]]
     assert all(o["role"] in ("value", "step") for o in others)
-    assert "price" not in str(d).lower()
+    assert not any(x.card.data.get("price_str") for x in pages)  # the price stays after the demo
 
 
 async def test_show_customer_keeps_a_next_step_and_bill_is_english(h):
@@ -64,7 +61,9 @@ async def test_show_customer_keeps_a_next_step_and_bill_is_english(h):
 async def test_english_associate_gets_the_same_one_card(h):
     await h.say("lang en")
     out = await to_options(h, clang="en")
-    assert out[0].card.lang == "en" and sum(1 for x in out if x.card) == 1
+    pages = [x for x in out if x.card]
+    assert pages and all(x.card.lang == "en" for x in pages)  # one English page per option, no copy
+    assert len(pages) == len(options_view(out).data["options"])
 
 
 async def test_product_card_is_one_english_card_for_both(h):
@@ -111,11 +110,31 @@ def test_units_and_terms_stay_english_in_display_text():
     assert not bad, bad[:5]
 
 
-def test_every_hindi_answer_has_a_devanagari_customer_version():
-    vh = yaml.safe_load((ROOT / "chanakya/i18n/values_hi.yaml").read_text())
-    missing = [t["hi"] for p in PACKS.packs.values() for sd in p.slots for t in sd.value_titles.values()
-               if t.get("hi") and t["hi"] not in vh]
-    assert not missing, missing[:5]
+def test_hindi_display_text_is_roman_never_devanagari():
+    """User, 5 Nov 2026: 'keep Hinglish and not Devanagari script' — every Hindi line the associate reads (the lines
+    to say to a Hindi-speaking customer included) is Roman. Speech keywords keep their Devanagari (understanding)."""
+    dev = re.compile(r"[\u0900-\u097F]")
+    keep = {"keywords", "intent_keywords", "category_keywords", "who_words", "customer_lang_keywords",
+            "banned_phrases", "looks_bait"}
+
+    def walk(o, path, out):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k in keep:
+                    continue
+                if k == "hi" and isinstance(v, str) and dev.search(v):
+                    out.append(f"{path}: {v[:40]}")
+                else:
+                    walk(v, f"{path}.{k}", out)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v, path, out)
+
+    bad: list[str] = []
+    for f in [*(ROOT / "chanakya/brain/packs").glob("*.yaml"), ROOT / "chanakya/brain/highlights.yaml"]:
+        walk(yaml.safe_load(f.read_text()), f.name, bad)
+    assert not bad, bad[:5]
+    assert not (ROOT / "chanakya/i18n/values_hi.yaml").exists()  # no Devanagari copy of the answers any more
 
 
 def test_every_fit_rule_has_a_need_in_every_language():

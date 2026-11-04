@@ -614,6 +614,14 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     if action == "lang":
         ctx.session.extra["lang_tapped"] = True
         return await assess.set_customer_lang(ctx, a0 or "hi")
+    if action == "addons":  # "Complete it": add all, none, or pick one at a time
+        from chanakya.skills import addons
+
+        return await addons.choose(ctx, a0 or "pick")
+    if action == "addon" and a0:
+        from chanakya.skills import addons
+
+        return await addons.choose(ctx, ":".join(args))
     if action == "retpick" and a0:
         return await returning.resume(ctx, ":".join(args))
     if action == "swap" and a0:

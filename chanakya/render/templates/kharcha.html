@@ -7,6 +7,7 @@
 {% set req = ls|selectattr('tag', 'equalto', 'zaroori')|list %}
 {% set sug = ls|selectattr('tag', 'equalto', 'sujhav')|list %}
 {% set opt = ls|selectattr('tag', 'equalto', 'optional')|list %}
+{% set added = ls|selectattr('tag', 'equalto', 'addon')|list %}
 {% block style %}
   .thumb { width: 230px; height: 158px; flex: none; border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
   .thumb img { max-width: 88%; max-height: 86%; }
@@ -84,6 +85,10 @@
     {% if req %}
     <div class="grp{{ L.req_group|dv }}">{{ icon('check-circle', 24, '', 2.4) }}{{ L.req_group }}</div>
     {% for ln in req %}<div class="r num"><span class="t{{ ln.title|dv }}">{{ ln.title }}</span><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
+    {% endif %}
+    {% if added %}
+    <div class="grp{{ L.add_group|dv }}">{{ icon('sparkle', 24) }}{{ L.add_group }}</div>
+    {% for ln in added %}<div class="r num"><span class="t{{ ln.title|dv }}">{{ ln.title }}{% if ln.reason %}<small class="why"> · {{ ln.reason }}</small>{% endif %}</span><span class="a">{{ ln.amount_str }}</span></div>{% endfor %}
     {% endif %}
     <div class="total num"><span class="k{{ L.zaroori_total|dv }}">{{ L.zaroori_total }}{% if req %}<small>{{ L.total_note }}</small>{% endif %}</span><span class="v">{{ zaroori_total_str or '—' }}</span></div>
   </section>

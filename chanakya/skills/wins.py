@@ -60,17 +60,22 @@ async def counts(ctx: SkillContext, wa: str | None = None, day: date | None = No
     return c
 
 
+def _one(key: str, n: int) -> str:
+    """The singular wording for one ("1 Family Card"), else the plural key."""
+    return f"{key}_one" if n == 1 else key
+
+
 async def line(ctx: SkillContext, yesterday: bool = False) -> str | None:
     """One short line, or None when there is nothing yet (no zeros shown as a 'win')."""
     day = ctx.now.astimezone(IST).date() - timedelta(days=1) if yesterday else None
     c = await counts(ctx, day=day)
     parts = []
     if c["cards"]:
-        parts.append(ctx.t("wins_cards", n=ctx.reg.num(c["cards"], "wins:cards")))
+        parts.append(ctx.t(_one("wins_cards", c["cards"]), n=ctx.reg.num(c["cards"], "wins:cards")))
     if c["answered"]:
-        parts.append(ctx.t("wins_answered", n=ctx.reg.num(c["answered"], "wins:answered")))
+        parts.append(ctx.t(_one("wins_answered", c["answered"]), n=ctx.reg.num(c["answered"], "wins:answered")))
     if c["sales"]:
-        parts.append(ctx.t("wins_sales", n=ctx.reg.num(c["sales"], "wins:sales")))
+        parts.append(ctx.t(_one("wins_sales", c["sales"]), n=ctx.reg.num(c["sales"], "wins:sales")))
     if c["streak"] >= 2:
         parts.append(ctx.t("wins_streak", n=ctx.reg.num(c["streak"], "wins:streak")))
     return ctx.t("wins_yesterday" if yesterday else "wins_today", what=" · ".join(parts)) if parts else None

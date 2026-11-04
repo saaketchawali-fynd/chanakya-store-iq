@@ -1,120 +1,114 @@
-{% extends "base.html" %}
-{# Product detail after a label scan: image, fit badge, key specs, highlights, pros/cons, price/offer/stock. #}
-{% set specs = (key_specs|aslist)[:6] %}
-{% set feats = (features|aslist)[:4] %}
-{% set mine = (made|aslist)[:3] %}
-{% set ups = [] if mine else (pros|aslist)[:4] %}
-{% set downs = (cons|aslist)[:3] %}
-{% set kind = badge_kind if badge_kind in ('good', 'partial', 'poor') else 'neutral' %}
-{% block style %}
-  .buy .mrp { font-size: 22px; font-weight: 600; color: var(--green-deep); }
-  .hd-row { align-items: flex-end; }
-  .verdict { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; margin-bottom: 6px; }
-  .badge2 { display: inline-flex; align-items: center; gap: 10px; font-size: 25px; font-weight: 800; padding: 10px 18px;
-            border-radius: 999px; background: rgba(255,255,255,.12); color: #fff; border: 1.5px solid rgba(255,255,255,.18); }
-  .badge2.good { background: #059669; border-color: #059669; }
-  .badge2.partial { background: #4F46E5; border-color: #4F46E5; }
-  .badge2.poor { background: #DC2626; border-color: #DC2626; }
-  .fitline { display: inline-flex; align-items: center; gap: 10px; font-size: 22px; color: #C7CBD6; font-weight: 600; }
-  .fitline b { color: #fff; font-size: 26px; }
-  .meter { width: 80px; height: 10px; border-radius: 99px; background: rgba(255,255,255,.18); overflow: hidden; }
-  .meter i { display: block; height: 100%; border-radius: 99px; background: #34D399; }
-  .hero { padding: 0; overflow: hidden; }
-  .hero .stage { height: 250px; border-radius: 30px 30px 0 0; }
-  .hero .stage img { max-width: 60%; max-height: 88%; }
-  .hero .feats { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 24px 20px; }
-  .hero.noimg .feats { padding-top: 24px; }
-  .specs { display: grid; grid-template-columns: repeat(3, 1fr); padding: 6px 10px; }
-  .specs.n2, .specs.n4 { grid-template-columns: repeat(2, 1fr); }
-  .specs.n1 { grid-template-columns: 1fr; }
-  .sp { padding: 12px 22px; border-left: 2px solid var(--line); }
-  .specs.n3 .sp:nth-child(3n+1), .specs.n5 .sp:nth-child(3n+1), .specs.n6 .sp:nth-child(3n+1),
-  .specs.n2 .sp:nth-child(2n+1), .specs.n4 .sp:nth-child(2n+1), .specs.n1 .sp { border-left: none; }
-  .sp .k { display: block; font-size: 21px; font-weight: 700; color: var(--muted); }
-  .sp .v { display: block; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.28; margin-top: 2px; }
-  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
-  .duo.one { grid-template-columns: 1fr; }
-  .duo .card { padding: 22px 26px; }
-  .pc { display: flex; align-items: flex-start; gap: 12px; padding: 5px 0; font-size: 26px; line-height: 1.34; }
-  .pc .bubble { width: 34px; height: 34px; margin-top: 2px; }
-  .pros .bubble { background: var(--green); color: #fff; }
-  .pros .label .ic { color: var(--green); }
-  .cons .bubble { background: var(--saffron-pale); color: var(--saffron-deep); }
-  .cons .label .ic { color: var(--saffron); }
-  .buy { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; margin-top: 18px; padding: 18px 28px; }
-  .buy .price { font-size: 42px; font-weight: 800; color: var(--ink); letter-spacing: -.5px; }
-  .buy .stock { display: inline-flex; align-items: center; gap: 10px; font-size: 25px; color: var(--muted); }
-  .buy .stock .ic { color: var(--green); }
-  .buy .stock .ic.i-truck { color: var(--saffron); }
-  .buy .stock .ic.i-alert { color: var(--red); }
-  .note { font-size: 21px; color: var(--faint); }
-  .made { margin-top: 18px; padding: 22px 28px; border: 2px solid #C7D2FE; background: linear-gradient(180deg, #F5F7FF, #fff); }
-  .made .label .ic { color: var(--saffron); }
-  .made .pc { padding: 9px 0; font-size: 27px; font-weight: 600; color: var(--ink); }
-  .made .pc + .pc { border-top: 1.5px solid var(--line); }
-  .made .bubble { background: var(--green); color: #fff; }
-  .made .proof { display: inline-block; margin-left: 10px; padding: 3px 12px; border-radius: 999px; font-size: 20px;
-                 font-weight: 700; color: #3730A3; background: #EEF2FF; vertical-align: 2px; }
-{% endblock %}
-{% block hd_class %}{% if image or feats %} lift{% endif %}{% endblock %}
-{% block header %}
-  <div class="hd-row">
-    <div class="grow">
-      <div class="kicker{{ L.kicker|dv }}">{% if picked %}{{ L.picked }}{% else %}{{ L.kicker }}{% endif %}</div>
-      <h1 class="{{ title|dv }}">{{ title or L.kicker }}</h1>
+<!doctype html>
+{# The product card (user, 5 Nov 2026: "exactly the same as the attached design, just with our product and data" —
+   the Sennheiser Momentum 4 page). A warm cream scene with soft window light; top left the brand, the product name
+   large in bronze capitals and its line below, a short rule, four feature rows (an outlined rounded-square icon and
+   a short line each); the product large on the right, standing on a lighter table; along the bottom one panel of
+   three tiles, each a photo with a title and a caption. Every word and photo comes from the product's own data:
+   the rows are its benefits for THIS home first, then its highlights; the tiles are its own photos (or close views
+   of its one photo) with its own specs. #}
+{% set rows_l = (rows|aslist)[:4] %}
+{% set tiles_l = (tiles|aslist)[:3] %}
+{% set long = (title|default('')|length) > 18 %}
+{% set longer = (title|default('')|length) > 24 %}
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  {{ font_css() }}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; background: #EFE6DC; }
+  body { font-family: "Montserrat", "Poppins", "Avenir Next", "Inter", "Noto Sans", "Noto Sans Devanagari", Arial, sans-serif;
+         -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; color: #3B3631; }
+  #card { position: relative; width: 1080px; height: 1340px; overflow: hidden;
+          background: radial-gradient(1150px 900px at 78% 14%, #F8F1E9 0%, #EFE4D8 40%, #E5D7C8 74%, #DCCBBA 100%); }
+  #fit { position: relative; width: 1080px; height: 1340px; transform-origin: 0 0; }
+  .ic { display: inline-block; flex: none; vertical-align: middle; }
+
+  /* the scene: soft window light falling from the top right, a lighter table the product stands on */
+  .light { position: absolute; top: -160px; width: 120px; height: 1080px; transform: rotate(24deg);
+           background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.55) 40%, rgba(255,255,255,0));
+           filter: blur(22px); }
+  .shade { position: absolute; top: -140px; width: 70px; height: 980px; transform: rotate(24deg);
+           background: rgba(120,90,62,.14); filter: blur(16px); }
+  .table { position: absolute; left: 0; right: 0; top: 842px; height: 120px;
+           background: linear-gradient(180deg, rgba(246,239,231,.96) 0%, rgba(234,224,212,.92) 100%); }
+  .table::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: rgba(190,172,154,.35); }
+
+  /* left: brand, name, line, rule, the four rows */
+  .brand { position: absolute; left: 70px; top: 104px; height: 48px; display: flex; align-items: center; }
+  .brand img { height: 46px; max-width: 300px; object-fit: contain; object-position: left center; mix-blend-mode: multiply; }
+  .brand .bn { font-size: 31px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: #1D1916; }
+  .head { position: absolute; left: 70px; top: 196px; width: 360px; }  /* like the reference: the name beside the product */
+  .ttl { font-size: 50px; line-height: 1.08; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: #7C5A41; }
+  .ttl.long { font-size: 44px; }
+  .ttl.longer { font-size: 38px; }
+  .sub { margin-top: 10px; font-size: 30px; line-height: 1.25; font-weight: 400; color: #3A3530; }
+  .sub.one { white-space: nowrap; }  /* a short line stays one line, like the reference */
+  .sub.long { font-size: 26px; width: 400px; }
+  .rule { width: 130px; height: 2px; background: #BDAF9F; margin: 36px 0 40px; }
+  .rows { width: 290px; }
+  .row { display: flex; align-items: center; gap: 18px; margin-bottom: 34px; }
+  .row .fi { flex: none; width: 56px; height: 56px; border: 2px solid #43362D; border-radius: 16px; color: #43362D;
+             display: flex; align-items: center; justify-content: center; }
+  .row .ft { width: 214px; font-size: 19.5px; line-height: 1.33; color: #5A5049; font-weight: 400; }
+
+  /* right: the product, large, standing on the table */
+  .hero { position: absolute; left: 392px; right: 22px; top: 140px; height: 752px; display: flex; align-items: flex-end;
+          justify-content: center; }
+  .hero img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .hero img.cut { filter: drop-shadow(0 26px 26px rgba(84,58,36,.24)); }  /* a cut-out: its own soft shadow */
+  .hero.photo::after { content: ""; position: absolute; left: 18%; right: 18%; bottom: 46px; height: 34px;
+                       border-radius: 50%; background: rgba(84,58,36,.16); filter: blur(16px); z-index: -1; }
+
+  /* bottom: one panel, three tiles (a photo, a title, a caption) */
+  .tiles { position: absolute; left: 52px; right: 52px; top: 940px; height: 364px; display: grid;
+           grid-template-columns: repeat(3, 1fr); background: rgba(248,242,235,.95); border: 1.5px solid #DFD2C4;
+           border-radius: 10px; overflow: hidden; }
+  .tile { display: flex; flex-direction: column; min-width: 0; }
+  .tile + .tile { border-left: 1.5px solid #E2D7CB; }
+  .tile .ph { height: 236px; overflow: hidden; display: flex; align-items: center; justify-content: center;
+              background: radial-gradient(120% 110% at 50% 40%, #F6EFE7 0%, #ECE2D7 100%); }
+  .tile .ph img { max-width: 88%; max-height: 88%; object-fit: contain; mix-blend-mode: multiply; }
+  /* one photo only: close views of it, like the reference's detail shots (a corner; its base) */
+  .tile .ph img.zoom-corner { max-width: none; max-height: none; width: 230%; height: auto; transform: translate(31%, 27%); }
+  .tile .ph img.zoom-base { max-width: none; max-height: none; width: 210%; height: auto; transform: translate(0, -31%); }
+  .tile .ph img.zoom-top { max-width: none; max-height: none; width: 150%; height: auto; transform: translate(0, 35%); }
+  .tile .ph img.zoom-bottom { max-width: none; max-height: none; width: 150%; height: auto; transform: translate(0, -30%); }
+  .tile .tt { margin-top: 22px; padding: 0 18px; text-align: center; font-size: 19.5px; font-weight: 700; color: #2B2622; }
+  .tile .tc { margin-top: 10px; padding: 0 24px; text-align: center; font-size: 17.5px; line-height: 1.4; color: #6A615A; }
+</style>
+</head>
+<body>
+<div id="card"><div id="fit">
+  <div class="light" style="left: 640px"></div>
+  <div class="shade" style="left: 760px"></div>
+  <div class="light" style="left: 860px"></div>
+  <div class="shade" style="left: 960px"></div>
+  <div class="table"></div>
+
+  <div class="brand">{% if brand_logo %}<img src="{{ brand_logo }}" alt="">{% else %}<span class="bn">{{ brand }}</span>{% endif %}</div>
+  <div class="head">
+    <div class="ttl{% if longer %} longer{% elif long %} long{% endif %}">{{ title|replace('-', '‑') }}</div>
+    {% if subtitle %}<div class="sub {{ 'one' if subtitle|length <= 32 else 'long' }}">{{ subtitle }}</div>{% endif %}
+    <div class="rule"></div>
+    <div class="rows">
+      {% for r in rows_l %}<div class="row"><span class="fi">{{ icon(r.icon or 'sparkle', 28, '', 1.8) }}</span><span class="ft">{{ r.text }}</span></div>{% endfor %}
     </div>
-    {% if badge or fit_str %}
-    <div class="verdict">
-      {% if badge %}<span class="badge2 {{ kind }}{{ badge|dv }}">{{ icon({'good': 'check-circle', 'partial': 'alert', 'poor': 'x'}.get(kind, 'info'), 26, '', 2.4) }}{{ badge }}</span>{% endif %}
-      {% if fit_str %}{% set v = fit_str|pct %}<span class="fitline{{ L.fit|dv }}">{% if v is not none %}<span class="meter"><i style="width: {{ v|round|int }}%"></i></span>{% endif %}<b class="num">{{ fit_str }}</b>{{ L.fit }}</span>{% endif %}
-    </div>
-    {% endif %}
   </div>
-{% endblock %}
-{% block content %}
-  {% if image or feats %}
-  <section class="card hero{% if not image %} noimg{% endif %}">
-    {% if image %}<div class="stage"><img src="{{ image }}" alt=""></div>{% endif %}
-    {% if feats %}<div class="feats">{% for f in feats %}<span class="chip indigo">{{ icon('sparkle', 20) }}{{ f }}</span>{% endfor %}</div>{% endif %}
-  </section>
-  {% endif %}
-  {% if specs %}
-  <section class="sec">
-    <div class="label{{ L.specs|dv }}">{{ icon('list', 26) }}{{ L.specs }}</div>
-    <div class="card specs n{{ specs|length }}">
-      {% for s in specs %}<div class="sp"><span class="k">{{ s.label }}</span><span class="v num">{{ s.value }}</span></div>{% endfor %}
+
+  <div class="hero{% if image_is_photo %} photo{% endif %}">{% if image %}<img src="{{ image }}" alt="" class="{{ 'photo' if image_is_photo else 'cut' }}">{% endif %}</div>
+
+  {% if tiles_l %}
+  <div class="tiles">
+    {% for t in tiles_l %}
+    <div class="tile">
+      <div class="ph">{% if t.image %}<img src="{{ t.image }}" alt=""{% if t.crop %} class="{{ t.crop }}"{% endif %}>{% endif %}</div>
+      <div class="tt">{{ t.title }}</div>
+      <div class="tc">{{ t.caption }}</div>
     </div>
-  </section>
+    {% endfor %}
+  </div>
   {% endif %}
-  {% if mine %}
-  <section class="card made">
-    <div class="label{{ L.made|dv }}">{{ icon('home', 26) }}{{ L.made }}</div>
-    {% for x in mine %}<div class="pc"><span class="bubble">{{ icon('check', 20, '', 3) }}</span><span>{{ x.text }}{% if x.proof %}<span class="proof num">{{ x.proof }}</span>{% endif %}</span></div>{% endfor %}
-  </section>
-  {% endif %}
-  {% if ups or downs %}
-  <section class="duo{% if not (ups and downs) %} one{% endif %}">
-    {% if ups %}
-    <div class="card pros">
-      <div class="label{{ L.pros|dv }}">{{ icon('check-circle', 26) }}{{ L.pros }}</div>
-      {% for x in ups %}<div class="pc"><span class="bubble">{{ icon('check', 20, '', 3) }}</span><span>{{ x }}</span></div>{% endfor %}
-    </div>
-    {% endif %}
-    {% if downs %}
-    <div class="card cons">
-      <div class="label{{ L.cons|dv }}">{{ icon('alert', 26) }}{{ L.cons }}</div>
-      {% for x in downs %}<div class="pc"><span class="bubble">{{ icon('alert', 20, '', 2.4) }}</span><span>{{ x }}</span></div>{% endfor %}
-    </div>
-    {% endif %}
-  </section>
-  {% endif %}
-  {% if price_str or offer_text or stock_line %}
-  <section class="card buy">
-    {% if price_str %}<span class="price num">{{ price_str }}</span>{% endif %}
-    {% if mrp_str %}<span class="mrp num">{{ mrp_str }}</span>{% endif %}
-    {% if offer_text %}<span class="chip saffron">{{ icon('tag', 22) }}{{ offer_text }}</span>{% endif %}
-    {% if stock_line %}<span class="stock">{{ icon(stock_line|stock_icon, 24) }}{{ stock_line }}</span>{% endif %}
-  </section>
-  {% endif %}
-{% endblock %}
-{% block foot_left %}{% if note %}<span class="note">{{ note }}</span>{% else %}{{ super() }}{% endif %}{% endblock %}
+</div></div>
+</body>
+</html>
