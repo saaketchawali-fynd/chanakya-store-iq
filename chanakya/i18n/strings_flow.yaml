@@ -212,11 +212,14 @@ brief_hello_morning: {hi: "Good morning, {name}", mr: "Good morning, {name}", en
 brief_hello_afternoon: {hi: "Good afternoon, {name}", mr: "Good afternoon, {name}", en: "Good afternoon, {name}"}
 brief_hello_evening: {hi: "Good evening, {name}", mr: "Good evening, {name}", en: "Good evening, {name}"}
 brief_step_of: {hi: "Step {n} of 3 · Pre-read", mr: "Step {n} of 3 · Pre-read", en: "Step {n} of 3 · Pre-read"}
-brief_pre_caption: {hi: "Aaj: {n} {cat} stock mein · {n_off} offer chalu\nPadh liya? Ab 20 second ka clip.", mr: "आज: {n} {cat} स्टॉकमध्ये · {n_off} ऑफर चालू\nवाचलं? आता 20 सेकंदांची क्लिप.", en: "Today: {n} {cat} in stock · {n_off} offers live\nRead it? Next, a 20-second clip."}
-b_clip_next: {hi: "Aage: aaj ka clip", mr: "पुढे: आजची क्लिप", en: "Next: today's clip"}
-clip_why_last: {hi: "Aaj ka focus: {step} (pichhli baar {n}/2)", mr: "आजचा फोकस: {step} (मागच्या वेळी {n}/2)", en: "Today's focus: {step} (last time {n}/2)"}
-clip_why_first: {hi: "Aaj ka focus: {step}", mr: "आजचा फोकस: {step}", en: "Today's focus: {step}"}
-clip_then_ready: {hi: "Clip dekh liya? Taiyaar hon to bataiye.", mr: "क्लिप पाहिली? तयार असाल तर सांगा.", en: "Watched it? Tap when you're ready."}
+brief_pre_caption: {hi: "Aaj: {n} {cat} stock mein · {n_off} offer chalu
+Padh liya? Ab 45 second ki training.", mr: "आज: {n} {cat} स्टॉकमध्ये · {n_off} ऑफर चालू
+वाचलं? आता 45 सेकंदांचं प्रशिक्षण.", en: "Today: {n} {cat} in stock · {n_off} offers live
+Read it? Next, a 45-second training."}
+b_clip_next: {hi: "Aaj ki training", mr: "आजचं प्रशिक्षण", en: "Today's training"}
+clip_why_last: {hi: "Aaj ki training: {step} (pichhli baar {n}/2) · 45 sec", mr: "आजचं प्रशिक्षण: {step} (मागच्या वेळी {n}/2) · 45 sec", en: "Today's training: {step} (last time {n}/2) · 45 sec"}
+clip_why_first: {hi: "Aaj ki training: {step} · 45 sec", mr: "आजचं प्रशिक्षण: {step} · 45 sec", en: "Today's training: {step} · 45 sec"}
+clip_then_ready: {hi: "Training dekh li? Aaj ka ek kaam yaad rakhiye, phir taiyaar.", mr: "प्रशिक्षण पाहिलं? आजचं एक काम लक्षात ठेवा, मग तयार.", en: "Watched it? Keep today's one thing in mind, then you're ready."}
 b_ready: {hi: "Taiyaar hoon ✓", mr: "मी तयार ✓", en: "I'm ready ✓"}
 ready_body: {hi: "Shabash, aap taiyaar hain ✓\nAaj yaad rakhiye: {tip}\nCustomer aaye to 'Naya customer' dabaiye, ya seedha voice note bhejiye.", mr: "छान, तुम्ही तयार आहात ✓\nआज लक्षात ठेवा: {tip}\nग्राहक आला की 'नवीन ग्राहक' दाबा, किंवा थेट व्हॉइस नोट पाठवा.", en: "You're ready ✓\nToday, remember: {tip}\nWhen a customer comes, tap New customer, or just send a voice note."}
 footer_voice_q: {hi: "Bolkar bhi: voice note — Hindi, English, मराठी · menu", mr: "बोलूनही: व्हॉइस नोट पाठवा — हिंदी, English, मराठी · menu", en: "Or send a voice note: Hindi, English or Marathi · menu"}
@@ -416,3 +419,5 @@ demo_feature_why: {hi: "Data mein ek aur asli farak: {what}", mr: "डेटा�
 pc_mrp: {hi: "MRP {mrp} · {pct}% off", mr: "MRP {mrp} · {pct}% off", en: "MRP {mrp} · {pct}% off"}
 demo_val_one: {hi: "{a}: {va}", mr: "{a}: {va}", en: "{a}: {va}"}
 demo_want_one_say: {hi: "आपने {what} कहा था — {best} में वही है, ख़ुद देखिए।", mr: "तुम्ही {what} म्हणाला होतात — {best} मध्ये तेच आहे, स्वतः पाहा.", en: "You asked for {what}: {best} has it, see for yourself."}
+b_dq_explain: {hi: "Farak samjhaiye", mr: "फरक समजावा", en: "Explain difference"}
+dqx_why: {hi: "Pehle farak samjhaiye, phir customer khud chunega · stock: {counts}", mr: "आधी फरक समजावा, मग ग्राहक स्वतः निवडेल · स्टॉक: {counts}", en: "Explain first, then let them choose · in stock: {counts}"}

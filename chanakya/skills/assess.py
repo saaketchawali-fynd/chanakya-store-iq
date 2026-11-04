@@ -359,6 +359,38 @@ async def status(ctx: SkillContext) -> Reply:
     return ctx.reply(msg)
 
 
+async def data_explain(ctx: SkillContext, key: str) -> Reply:
+    """'Explain the difference': a simple analogy for each choice in the customer's language, a hint from this home,
+    and the stock behind each (for the associate). Then the customer answers knowing what they choose."""
+    from chanakya.brain import data_questions as DQ
+    from chanakya.brain import explain
+    from chanakya.core.coach import coach_reply
+
+    s = ctx.session
+    vals = (s.extra.get("dq_vals") or {}).get(key) or []
+    if len(vals) < 2:
+        return ctx.reply(C.next_question_or_options(ctx))
+    cl = ctx.clang
+    parts = [explain.analogy(key, v, cl) for v in vals[:2]]
+    hint = explain.need_hint(key, s.home, ctx.pack, cl)
+    say = " ".join(x for x in [*parts, hint] if x)
+    ctx.reg.static(say)
+    avail = [p for p in ctx.facts.products_sync(ctx.pack.category) if p.qty > 0 or p.nearby_qty > 0]
+    stock = []
+    for v in vals[:2]:
+        ps = [p for p in avail if DQ._value(p, key) is not None and str(DQ._value(p, key)) == str(v)]
+        lo = min(ps, key=lambda p: p.price, default=None)
+        lab = ctx.reg.raw(DQ.label(key, v), f"stock:{ctx.pack.category}:{key}")
+        stock.append(f"{ctx.reg.num(len(ps), f'stock:{ctx.pack.category}:{key}')} {lab}"
+                     + (f" {ctx.t('dq_from', price=ctx.reg.inr(lo.price, lo.price_source))}" if lo else ""))
+    why = ctx.t("dqx_why", counts=" · ".join(stock))
+    btns = [Button(id=ctx.sid("dq", key, i), title=C.truncate_title(ctx.reg.raw(DQ.label(key, v), "stock")))
+            for i, v in enumerate(vals[:2])]
+    btns.append(ctx.b("b_dq_any", ctx.sid("dq", key, "any")))
+    ctx.ev("data_question_explained", key=key)
+    return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns))
+
+
 async def data_answer(ctx: SkillContext, key: str, choice: str) -> Reply:
     """A data question answered: the chosen value becomes a want (it filters the shortlist); 'any' is fine too."""
     s = ctx.session

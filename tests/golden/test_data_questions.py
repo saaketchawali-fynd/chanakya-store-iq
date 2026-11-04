@@ -123,3 +123,45 @@ async def test_the_card_shows_everything_the_customer_told(tmp_path, monkeypatch
         assert "Sunlight" not in " ".join(card.data["missing"])  # never 'still to ask' for a question we skip
     finally:
         await h.close()
+
+
+def test_every_data_choice_can_be_explained_simply():
+    """4 Nov 2026: customers don't know LED vs QLED or Google TV vs webOS. Each choice has a plain analogy in the
+    three languages, and a hint from the home."""
+    from chanakya.brain import explain
+    from chanakya.core.contracts import HomeCard
+
+    for attr, vals in (("panel", ["LED", "QLED", "OLED", "NanoCell", "Mini LED"]),
+                       ("os", ["Google TV", "Android TV", "webOS", "Tizen", "VIDAA", "Linux"]),
+                       ("resolution", ["4K Ultra HD", "Full HD", "HD Ready"]), ("inverter", [True, False]),
+                       ("frost_free", [True, False]), ("load", ["front", "top"]), ("automatic", [True, False])):
+        for v in vals:
+            for lang in ("hi", "mr", "en"):
+                assert explain.analogy(attr, v, lang), (attr, v, lang)
+    home = HomeCard()
+    from datetime import UTC, datetime
+
+    from chanakya.brain.packs import set_slot
+
+    set_slot(home, PACKS.get("tv"), "room_light", "sunny", None, "tap", datetime.now(UTC))
+    assert "QLED" in explain.need_hint("panel", home, PACKS.get("tv"), "en")  # from THIS home: sun → brighter panels
+
+
+async def test_the_data_question_offers_to_explain_then_the_customer_chooses(tmp_path, monkeypatch):
+    monkeypatch.setattr(JioClient, "transport", backend())
+    h = await live(tmp_path)
+    try:
+        await jio_sync.sync(h.rt.settings, h.rt.facts)
+        s_ctx = None
+        await h.tap("g:new")
+        await h.tap("s:C1:lang:en")
+        await h.pick("s:C1:cat:tv")
+        s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+        s.extra.update(skip_key="x")  # recompute on the next step
+        await h.rt.svc.sessions.save(s)
+        from chanakya.brain import explain
+
+        assert explain.can_explain("panel", ["LED", "QLED"]) and not explain.can_explain("brand", ["Sony", "LG"])
+        _ = s_ctx
+    finally:
+        await h.close()

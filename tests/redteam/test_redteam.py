@@ -295,7 +295,7 @@ async def test_language_picker_then_single_language(tmp_path):
         assert "नाव" in out[0].body  # the name, in Marathi, right after the language
         out = await hh.say("माझं नाव सुनीता")
         b = next(m for m in out if m.card and m.card.template == "brief")
-        assert b.card.lang == "en" and "क्लिप" in b.buttons[0].title  # English card, Marathi messages
+        assert b.card.lang == "en" and "प्रशिक्षण" in b.buttons[0].title  # English card, Marathi messages
         out = await hh.tap("g:new")
         assert "नवीन ग्राहक" in out[0].body  # Marathi from now on
         out = await hh.tap("s:C1:lang:hi")  # customer speaks Hindi: only the Bolo line follows the customer

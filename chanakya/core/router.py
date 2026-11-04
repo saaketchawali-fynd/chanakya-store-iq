@@ -618,6 +618,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         return await assess.voice_answer(ctx, a0)
     if action == "dq" and a0 and a1:
         return await assess.data_answer(ctx, a0, a1)
+    if action == "dqx" and a0:
+        return await assess.data_explain(ctx, a0)
     if action == "ofd" and a0:
         if a0 == "none":
             return await recommend.offers_view(ctx)

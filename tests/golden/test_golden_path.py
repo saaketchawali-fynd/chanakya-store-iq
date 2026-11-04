@@ -40,7 +40,7 @@ async def test_golden_path(tmp_path):
         offs = brief.card.data["offers"]
         assert offs and all(o["badge"] and o["title"] and o["till"] for o in offs)
         assert offs[0]["kind"] == "ends"  # the offers ending soonest come first
-        assert [b.title for b in brief.buttons] == ["Aage: aaj ka clip"]  # one step, not every option at once
+        assert [b.title for b in brief.buttons] == ["Aaj ki training"]  # one step, not every option at once
         out = await step(h.tap, brief.buttons[0].id)
         assert any(m.kind == "video" for m in out) and button_ids(out) == ["g:ready:translate"]
         out = await step(h.tap, "g:ready:translate")

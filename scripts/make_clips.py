@@ -1,9 +1,11 @@
-"""Make the 'Aaj ka clip' videos: one ~22-second vertical clip per step and language (data/clips/<step>_<lang>.mp4).
+"""Make the before-the-shift training videos: one 40-45 second vertical lesson per sales step and language
+(data/clips/<step>_<lang>.mp4), the way an expert floor associate would teach a new one (user, 4 Nov 2026).
 
-Focused on what to keep in mind, in five clean slides: the step and its rule; three points to keep in mind (revealed
-one by one); the line to say; what to avoid; one thing to try today. Rendered with Playwright, joined with
-crossfades by ffmpeg (H.264, silent AAC track, faststart) so WhatsApp plays them inline.
-Run: python scripts/make_clips.py  (needs Chromium from Playwright and ffmpeg)."""
+Nine clean slides: the step and its goal; four expert moves, revealed one by one; a real exchange on the floor; the
+mistake to avoid and what to do instead; which Chanakya button helps; one thing to try today. The lessons are in
+scripts/clip_training.py. Rendered with Playwright, joined with crossfades by ffmpeg (H.264, silent AAC track,
+faststart) so WhatsApp plays them inline.
+Run: python scripts/make_clips.py [step …]  (needs Chromium from Playwright and ffmpeg)."""
 
 from __future__ import annotations
 
@@ -19,174 +21,82 @@ sys.path.insert(0, str(ROOT))
 OUT = ROOT / "data" / "clips"
 
 from chanakya.i18n.lang import t  # noqa: E402
+from scripts.clip_training import HEAD, LESSONS  # noqa: E402
 
 STEPS = ["validate", "assess", "translate", "demonstrate", "complete", "close", "follow_through"]
-NITI = {"validate": "niti_validate", "assess": "niti_assess", "translate": "niti_translate",
-        "demonstrate": "niti_recommend", "complete": "niti_complete", "close": "niti_close",
-        "follow_through": "niti_follow"}
-INTRO = {"hi": "20 second mein: 3 baatein jo aaj dhyan rakhni hain", "mr": "20 सेकंदात: आज लक्षात ठेवायच्या 3 गोष्टी",
-         "en": "In 20 seconds: 3 things to keep in mind today"}
-HEAD = {"hi": ("Aaj ka step", "Dhyan rahe", "Aise boliye", "Ye mat kariye", "Aaj try kariye"),
-        "mr": ("आजचा टप्पा", "लक्षात ठेवा", "असं बोला", "हे टाळा", "आज करून बघा"),
-        "en": ("Today's step", "Keep in mind", "Say it like this", "Avoid", "Try it today")}
-
-# step → lang → (three points to keep in mind, the line to say, what to avoid, one thing to try today)
-CLIP = {
-    "assess": {
-        "en": (["One question at a time: why now, then the home", "Ask about life, not specs: 'how far is the sofa?'",
-                "Say the home back before you recommend"],
-               "How many steps from the sofa to the TV?", "Don't start with brands or price",
-               "Read the home back to one customer: 'So, for your home…'"),
-        "hi": (["Ek baar mein ek sawaal: pehle kyun abhi, phir ghar", "Spec nahi, zindagi poochiye: 'sofa kitni door hai?'",
-                "Suggest karne se pehle ghar dohraaiye"],
-               "सोफ़े से टीवी कितने कदम दूर होगा?", "Brand ya daam se shuru mat kariye",
-               "Ek customer ko ghar dohraaiye: 'To aapke ghar ke liye…'"),
-        "mr": (["एका वेळी एक प्रश्न: आधी आत्ता का, मग घर", "स्पेक्स नाही, जगणं विचारा: 'सोफा किती लांब?'",
-                "सुचवण्याआधी घर पुन्हा सांगा"],
-               "सोफ्यापासून टीव्ही किती पावलं लांब असेल?", "ब्रँड किंवा किमतीपासून सुरुवात करू नका",
-               "एका ग्राहकाला घर पुन्हा सांगा: 'तर तुमच्या घरासाठी…'"),
-    },
-    "validate": {
-        "en": (["Agree with the true part first", "Then correct with one fact about their home",
-                "Still unsure? Show it: a demo beats an argument"],
-               "Good thinking. Let's match it to your room.", "Never say 'that's wrong'",
-               "Answer one doubt with 'True, and…'"),
-        "hi": (["Pehle sahi hissa maaniye", "Phir unke ghar ki ek baat se sudhaariye",
-                "Shak bacha ho to dikhaiye: demo bahas se behtar"],
-               "बहुत सही सोचा है। एक बार कमरे से मिला लेते हैं।", "Kabhi mat kahiye 'ye galat hai'",
-               "Ek shak ka jawab 'sahi, aur…' se dijiye"),
-        "mr": (["आधी खरा भाग मान्य करा", "मग त्यांच्या घराच्या एका गोष्टीने दुरुस्त करा",
-                "शंका उरली तर दाखवा: डेमो वादापेक्षा चांगला"],
-               "छान विचार केलाय. एकदा खोलीशी जुळवून बघू.", "कधीही म्हणू नका 'हे चूक आहे'",
-               "एका शंकेचं उत्तर 'बरोबर, आणि…' ने द्या"),
-    },
-    "translate": {
-        "en": (["Turn every spec into daily life", "Tie it to their home: 'because in your home…'",
-                "Ask 'Does that matter to you?', then listen"],
-               "120 Hz means the ball stays sharp in cricket.", "Don't read the label aloud",
-               "Add 'because in your home…' to every feature"),
-        "hi": (["Har spec ko roz ki zindagi mein badaliye", "Ghar se jodiye: 'kyunki aapke ghar mein…'",
-                "Poochiye 'ye aapke kaam ka hai?', phir suniye"],
-               "120 Hz मतलब क्रिकेट में बॉल धुंधली नहीं होगी।", "Label padh kar mat sunaiye",
-               "Har feature ke saath 'kyunki aapke ghar mein…' jodiye"),
-        "mr": (["प्रत्येक स्पेक रोजच्या जगण्यात बदला", "घराशी जोडा: 'कारण तुमच्या घरात…'",
-                "विचारा 'हे तुमच्या कामाचं आहे का?', मग ऐका"],
-               "120 Hz म्हणजे क्रिकेटमध्ये बॉल धूसर दिसणार नाही.", "लेबल वाचून दाखवू नका",
-               "प्रत्येक फीचरसोबत 'कारण तुमच्या घरात…' जोडा"),
-    },
-    "demonstrate": {
-        "en": (["Three options: lead with the best fit", "Show one difference they can see, in 20 seconds",
-                "Then ask: 'Which one felt right?'"],
-               "Look at both from your sofa distance.", "Don't talk over the demo",
-               "Run one side-by-side demo, then stay quiet"),
-        "hi": (["Teen options: sabse sahi fit se shuru", "Ek farak dikhaiye jo aankh se dikhe, 20 second mein",
-                "Phir poochiye: 'kaunsa sahi laga?'"],
-               "अपने सोफ़े जितनी दूरी से दोनों देखिए।", "Demo ke beech bolte mat rahiye",
-               "Ek side-by-side demo kariye, phir chup rahiye"),
-        "mr": (["तीन पर्याय: सर्वात योग्य पर्यायाने सुरुवात", "डोळ्यांना दिसणारा एक फरक, 20 सेकंदात",
-                "मग विचारा: 'कोणता योग्य वाटला?'"],
-               "तुमच्या सोफ्याइतक्या अंतरावरून दोन्ही पाहा.", "डेमोच्या मध्ये बोलत राहू नका",
-               "एक शेजारी-शेजारी डेमो करा, मग शांत राहा"),
-    },
-    "complete": {
-        "en": (["Ask the site questions that change the cost first", "Full cost, line by line, before any offer",
-                "They can remove extras; required charges stay"],
-               "This is the full cost; the bill will match it.", "No surprise charges at billing",
-               "Show the full-cost card before any offer"),
-        "hi": (["Kharcha badalne wale sawaal pehle", "Offer se pehle poora kharcha, line by line",
-                "Customer extra hata sakte hain; zaroori kharcha rahega"],
-               "ये पूरा खर्च है — बिल में यही आएगा।", "Billing par koi surprise kharcha nahi",
-               "Offer se pehle poora kharcha card dikhaiye"),
-        "mr": (["खर्च बदलणारे प्रश्न आधी", "ऑफरआधी पूर्ण खर्च, ओळीनुसार",
-                "ग्राहक जादा वस्तू काढू शकतात; आवश्यक खर्च राहतो"],
-               "हा पूर्ण खर्च आहे — बिलात हेच येईल.", "बिलिंगला कोणताही सरप्राइज खर्च नाही",
-               "ऑफरआधी पूर्ण खर्चाचं कार्ड दाखवा"),
-    },
-    "close": {
-        "en": (["Price after the demo; offers only from the data", "Ask how they'll pay: only those offers apply",
-                "Close with a choice: 'Saturday or Sunday?'"],
-               "Delivery on Saturday or Sunday?", "Never 'today only' or 'last piece'",
-               "On 'not today', ask: 'What's holding you back?'"),
-        "hi": (["Daam demo ke baad; offer sirf data se", "Payment poochiye: wahi offer lagte hain",
-                "Vikalp se close: 'Shanivaar ya Ravivaar?'"],
-               "डिलीवरी शनिवार को चाहिए या रविवार को?", "Kabhi 'sirf aaj' ya 'aakhri piece' nahi",
-               "'Aaj nahi' par poochiye: 'kis baat par ruk rahe hain?'"),
-        "mr": (["किंमत डेमोनंतर; ऑफर फक्त डेटातून", "पेमेंट विचारा: त्याच ऑफर लागू",
-                "पर्यायाने क्लोज: 'शनिवार की रविवार?'"],
-               "डिलिव्हरी शनिवारी हवी की रविवारी?", "कधीही 'फक्त आज' किंवा 'शेवटचा पीस' नाही",
-               "'आज नाही' म्हटल्यावर विचारा: 'कशामुळे थांबताय?'"),
-    },
-    "follow_through": {
-        "en": (["Consent first: the QR, then WhatsApp", "The Family card goes to whoever decides",
-                "Every customer leaves with a task and an owner"],
-               "May I send all this to your WhatsApp?", "Never message without consent",
-               "Send one Family card, even if they don't buy"),
-        "hi": (["Pehle consent: QR, phir WhatsApp", "Parivaar Card faisla lene wale tak",
-                "Har customer ke saath ek task aur uska owner"],
-               "क्या मैं ये सब आपके WhatsApp पर भेज दूँ?", "Bina consent message kabhi nahi",
-               "Ek Parivaar Card bhejiye, chahe kharida na ho"),
-        "mr": (["आधी संमती: QR, मग WhatsApp", "परिवार कार्ड निर्णय घेणाऱ्यापर्यंत",
-                "प्रत्येक ग्राहकासोबत एक टास्क आणि त्याचा मालक"],
-               "हे सगळं तुमच्या WhatsApp वर पाठवू का?", "संमतीशिवाय कधीही मेसेज नाही",
-               "एक परिवार कार्ड पाठवा, खरेदी झाली नाही तरी"),
-    },
-}
+# seconds per slide: goal, 4 moves (one by one), floor, avoid/instead, Chanakya, try today  → ~45 s
+TIMES = [5.5, 3.8, 3.8, 3.8, 6.0, 7.0, 6.0, 4.5, 5.0]
 
 CSS = """*{margin:0;box-sizing:border-box}
 body{width:720px;height:1280px;font-family:"Inter","Avenir Next","Helvetica Neue","Kohinoor Devanagari","Noto Sans",
 "Noto Sans Devanagari",sans-serif;background:#F4F5F7;color:#0B1220;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
-.top{padding:64px 56px 0}.row{display:flex;justify-content:space-between;align-items:center}
-.brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:600;color:#6B7280}
-.mk{width:28px;height:28px;border-radius:8px;background:#4338CA;display:inline-block}
-.pill{font-size:19px;font-weight:600;padding:6px 14px;border-radius:999px;background:#EEF0FF;color:#4338CA}
-.step{margin-top:44px;font-size:22px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#4338CA}
-.step.dv{letter-spacing:0;text-transform:none}
-.title{margin-top:6px;font-size:66px;font-weight:700;line-height:1.1;letter-spacing:-1px}
-.rule{margin-top:16px;font-size:31px;color:#4B5563;line-height:1.4}
-.body{flex:1;padding:24px 56px 90px;display:flex;flex-direction:column;justify-content:center}
-.k{font-size:21px;font-weight:700;color:#6B7280;letter-spacing:1.6px;text-transform:uppercase}.k.dv{text-transform:none;letter-spacing:0}
-.pt{display:flex;gap:20px;align-items:flex-start;margin-top:26px;background:#fff;border:1.5px solid #E8EAEE;border-radius:26px;
-padding:26px 28px;font-size:35px;line-height:1.36;font-weight:600}
-.pt .n{flex:none;width:50px;height:50px;border-radius:50%;background:#EEF0FF;color:#4338CA;font-size:25px;font-weight:700;
+.top{padding:56px 52px 0}.row{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:600;color:#6B7280}
+.mk{width:26px;height:26px;border-radius:8px;background:#4338CA;display:inline-block}
+.pill{font-size:18px;font-weight:600;padding:6px 14px;border-radius:999px;background:#EEF0FF;color:#4338CA}
+.kick{margin-top:36px;font-size:21px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#4338CA}
+.kick.dv{letter-spacing:0;text-transform:none}
+.title{margin-top:6px;font-size:60px;font-weight:700;line-height:1.08;letter-spacing:-1px}
+.body{flex:1;padding:24px 52px 70px;display:flex;flex-direction:column;justify-content:center}
+.k{font-size:21px;font-weight:700;color:#6B7280;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:18px}
+.k.dv{text-transform:none;letter-spacing:0}
+.goal{background:#0B1020;color:#fff;border-radius:28px;padding:40px 38px;font-size:40px;line-height:1.36;font-weight:600}
+.goal small{display:block;font-size:20px;font-weight:600;color:#A5B4FC;margin-bottom:12px;letter-spacing:1px}
+.mv{display:flex;gap:18px;align-items:flex-start;margin-top:16px;background:#fff;border:1.5px solid #E8EAEE;border-radius:24px;
+padding:22px 24px;font-size:31px;line-height:1.34;font-weight:600}
+.mv .n{flex:none;width:46px;height:46px;border-radius:50%;background:#4338CA;color:#fff;font-size:23px;font-weight:700;
 display:flex;align-items:center;justify-content:center;margin-top:1px}
-.pt.dim{opacity:.22}
-.quote{margin-top:26px;background:#fff;border:1.5px solid #E8EAEE;border-left:10px solid #4338CA;border-radius:26px;
-padding:38px 36px;font-size:42px;line-height:1.38;font-weight:600}
-.avoid{margin-top:26px;background:#FEF2F2;color:#991B1B;border-radius:26px;padding:38px 36px;font-size:40px;line-height:1.38;font-weight:600}
-.try{margin-top:26px;background:#ECFDF5;color:#065F46;border-radius:26px;padding:38px 36px;font-size:40px;line-height:1.38;font-weight:600}
-.intro{margin-top:26px;font-size:40px;line-height:1.38;font-weight:600;color:#1F2937}
-.bar{height:8px;background:#E5E7EB;margin:0 56px 64px;border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:#4338CA}"""
-CLIP_PILL = {"hi": "Step 2 of 3 · Clip", "mr": "Step 2 of 3 · Clip", "en": "Step 2 of 3 · Clip"}
+.mv.dim{opacity:.18}.mv.new{border-color:#4338CA;box-shadow:0 8px 24px rgba(67,56,202,.12)}
+.chat{display:flex;flex-direction:column;gap:20px}
+.bub{max-width:88%;border-radius:26px;padding:26px 28px;font-size:33px;line-height:1.38;font-weight:600}
+.bub small{display:block;font-size:19px;font-weight:700;letter-spacing:1px;margin-bottom:8px;opacity:.75}
+.bub.c{align-self:flex-start;background:#fff;border:1.5px solid #E8EAEE;border-top-left-radius:8px}
+.bub.y{align-self:flex-end;background:#4338CA;color:#fff;border-top-right-radius:8px}
+.av{border-radius:26px;padding:30px 30px;font-size:34px;line-height:1.36;font-weight:600;margin-top:4px}
+.av small{display:block;font-size:20px;font-weight:700;letter-spacing:1px;margin-bottom:10px}
+.av.bad{background:#FEF2F2;color:#991B1B}.av.good{background:#ECFDF5;color:#065F46;margin-top:18px}
+.help{background:#fff;border:1.5px solid #E8EAEE;border-left:10px solid #4338CA;border-radius:26px;padding:34px 32px;
+font-size:36px;line-height:1.38;font-weight:600}
+.try{background:#ECFDF5;color:#065F46;border-radius:28px;padding:40px 36px;font-size:40px;line-height:1.36;font-weight:700}
+.bar{height:8px;background:#E5E7EB;margin:0 52px 56px;border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:#4338CA}"""
 
 
-def page(lang: str, step: str, frac: float, inner: str, big_head: bool) -> str:
+def page(lang: str, step: str, frac: float, inner: str) -> str:
     e = html.escape
     h = HEAD[lang]
     dv = " dv" if lang != "en" else ""
-    top = (f'<div class="top"><div class="row"><div class="brand"><span class="mk"></span>Chanakya · Today\'s clip</div>'
-           f'<span class="pill">{e(CLIP_PILL[lang])}</span></div>'
-           f'<div class="step{dv}">{e(h[0])}</div><div class="title">{e(t(f"step_{step}", lang))}</div>'
-           + (f'<div class="rule">{e(t(NITI[step], lang))}</div>' if big_head else "") + "</div>")
+    top = (f'<div class="top"><div class="row"><div class="brand"><span class="mk"></span>Chanakya · {e(h["secs"])}</div>'
+           f'<span class="pill">{e(h["pill"])}</span></div>'
+           f'<div class="kick{dv}">{e(h["step"])}</div><div class="title">{e(t(f"step_{step}", lang))}</div></div>')
     return (f'<html><head><meta charset="utf-8"><style>{CSS}</style></head><body>{top}<div class="body">{inner}</div>'
             f'<div class="bar"><i style="width:{frac * 100:.0f}%"></i></div></body></html>')
 
 
 def slides(step: str, lang: str) -> list[tuple[str, float]]:
-    """(html, seconds) in order."""
+    """(html, seconds) in order: about 45 seconds in all."""
     e = html.escape
-    keep, say, avoid, try_ = CLIP[step][lang]
+    L = LESSONS[step][lang]
     h = HEAD[lang]
     dv = " dv" if lang != "en" else ""
-    intro = f'<div class="intro">{e(INTRO[lang])}</div>'
-    out = [(page(lang, step, 0.12, intro, True), 3.2)]
-    for shown in (1, 2, 3):  # the three points appear one by one
-        pts = "".join(f'<div class="pt{"" if i < shown else " dim"}"><span class="n">{i + 1}</span><span>{e(p)}</span></div>'
-                      for i, p in enumerate(keep))
-        out.append((page(lang, step, 0.12 + 0.14 * shown, f'<div class="k{dv}">{e(h[1])}</div>{pts}', False),
-                    2.6 if shown < 3 else 3.4))
-    out.append((page(lang, step, 0.72, f'<div class="k{dv}">{e(h[2])}</div><div class="quote">“{e(say)}”</div>', False), 4.0))
-    out.append((page(lang, step, 0.86, f'<div class="k{dv}">{e(h[3])}</div><div class="avoid">{e(avoid)}</div>', False), 3.0))
-    out.append((page(lang, step, 1.0, f'<div class="k{dv}">{e(h[4])}</div><div class="try">{e(try_)}</div>', False), 3.6))
+    n = len(TIMES)
+    frac = [sum(TIMES[: i + 1]) / sum(TIMES) for i in range(n)]
+    out = [(page(lang, step, frac[0], f'<div class="goal"><small>{e(h["goal"]).upper() if lang == "en" else e(h["goal"])}</small>'
+                                      f'{e(L["goal"])}</div>'), TIMES[0])]
+    for shown in (1, 2, 3, 4):  # the four expert moves appear one by one (the newest highlighted)
+        mv = "".join(f'<div class="mv{"" if i < shown else " dim"}{" new" if i == shown - 1 else ""}"><span class="n">{i + 1}</span>'
+                     f'<span>{e(m)}</span></div>' for i, m in enumerate(L["moves"]))
+        out.append((page(lang, step, frac[shown], f'<div class="k{dv}">{e(h["moves"])}</div>{mv}'), TIMES[shown]))
+    cust, you = L["floor"]
+    chat = (f'<div class="k{dv}">{e(h["floor"])}</div><div class="chat">'
+            f'<div class="bub c"><small>{e(h["customer"])}</small>“{e(cust)}”</div>'
+            f'<div class="bub y"><small>{e(h["you"])}</small>“{e(you)}”</div></div>')
+    out.append((page(lang, step, frac[5], chat), TIMES[5]))
+    av = (f'<div class="av bad"><small>{e(h["avoid"])}</small>{e(L["avoid"])}</div>'
+          f'<div class="av good"><small>{e(h["instead"])}</small>{e(L["instead"])}</div>')
+    out.append((page(lang, step, frac[6], av), TIMES[6]))
+    out.append((page(lang, step, frac[7], f'<div class="k{dv}">{e(h["chanakya"])}</div><div class="help">{e(L["chanakya"])}</div>'),
+                TIMES[7]))
+    out.append((page(lang, step, frac[8], f'<div class="k{dv}">{e(h["try"])}</div><div class="try">{e(L["try"])}</div>'), TIMES[8]))
     return out
 
 

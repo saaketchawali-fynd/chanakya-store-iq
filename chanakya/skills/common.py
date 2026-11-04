@@ -106,8 +106,13 @@ def data_question(ctx: SkillContext, footer: str | None = None) -> OutMessage | 
     what_c, what_a = ctx.t(f"dq_whatc_{key}", ctx.clang), ctx.t(f"dq_what_{key}")
     say = ctx.tc("dq_ask", what=what_c, a=labels[0], b=labels[1])
     why = ctx.t("dq_why", what=what_a, counts=counts, cat=ctx.t(f"brief_cat_{ctx.pack.category}"))
+    from chanakya.brain import explain
+
     btns = [Button(id=ctx.sid("dq", key, i), title=truncate_title(lab)) for i, lab in enumerate(labels[:2])]
-    btns.append(ctx.b("b_dq_any", ctx.sid("dq", key, "any")))
+    if explain.can_explain(key, [v for v, _ in vals]):  # most customers don't know LED vs QLED, Google TV vs webOS
+        btns.insert(0, ctx.b("b_dq_explain", ctx.sid("dqx", key)))  # 'any is fine' is one tap later, after the why
+    else:
+        btns.append(ctx.b("b_dq_any", ctx.sid("dq", key, "any")))
     ctx.x["questions_asked"] = questions_asked(ctx) + 1
     ctx.ev("data_question_asked", key=key, values=[str(v) for v in s.extra["dq_vals"][key]])
     return coach_reply(ctx, say, why, known_cites(ctx), btns, footer=footer)
