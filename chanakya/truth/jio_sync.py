@@ -212,8 +212,11 @@ async def sync(s: Settings, facts) -> dict:
         report = catalog_report(products)
         acc: dict[str, dict] = {}
         for r in extras:
-            a = acc.setdefault(r["category"], {"n": 0, "for": {}, "with_size_range": 0})
+            a = acc.setdefault(r["category"], {"n": 0, "for": {}, "with_size_range": 0, "samples": []})
             a["n"] += 1
+            if len(a["samples"]) < 4:  # to check the matching: the item's own name and the sizes read from it
+                a["samples"].append({"name": r["info"].get("name", "")[:90], "fits_in": r["info"].get("fits_in"),
+                                     "price": r["price"]})
             for c in r["info"].get("for") or []:
                 a["for"][c] = a["for"].get(c, 0) + 1
             a["with_size_range"] += 1 if r["info"].get("fits_in") else 0

@@ -259,3 +259,14 @@ def test_every_theme_speaks_all_three_languages(lang):
             assert th.demo.get(lang), (cat, th.id)
             for n in th.needs:
                 assert HL.need_label(n.id, lang), (cat, th.id, n.id)
+
+
+def test_mount_and_bag_sizes_in_cm_and_attributes():
+    from chanakya.truth.jio_map import _fits_inches, _size_text
+
+    assert _fits_inches("Wall Mount (81.28 cm - 139.7 cm) Tilt") == [32.0, 55.0]  # Jio names sizes in cm
+    assert _fits_inches("Universal TV Wall Mount up to 165.1 cm") == [0.0, 65.0]
+    assert _fits_inches("Fixed Wall Mount") is None  # no size stated: never suggested as a fit
+    assert _fits_inches(_size_text({"name": "Wall Mount", "attributes": {"suitable-screen-size": "32 - 55 Inches"}})) \
+        == [32.0, 55.0]  # its own size attribute
+    assert _fits_inches("Laptop Backpack 39.62 cm", single=True) == [0.0, 15.6]

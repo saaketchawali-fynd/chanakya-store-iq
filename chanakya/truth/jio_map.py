@@ -301,16 +301,44 @@ def map_product(p: dict, category: str) -> dict | None:
 
 
 # ---------------------------------------------------------------- accessories → products of their own kind
-def _fits_inches(name: str) -> list[float] | None:
-    """The TV sizes a mount or bag states it fits: "32-55 inch" / "up to 65 inch" / "for 15.6 inch laptops"."""
-    m = re.search(rf"{NUM}\s*(?:\"|inch(?:es)?|in\b)?\s*(?:-|–|to)\s*{NUM}\s*(?:\"|inch|in\b)", name, re.I)
+SIZE_UNIT = r"(?:\"|”|inch(?:es)?|in\b|cm\b)"
+
+
+def _inch(v: str, unit: str) -> float:
+    x = float(v)
+    return round(x / 2.54, 1) if unit.lower().startswith("cm") else x
+
+
+def _fits_inches(text: str, single: bool = False) -> list[float] | None:
+    """The screen sizes an accessory states it fits, in inches: "32-55 inch", "81.28 cm - 139.7 cm" (→ 32–55),
+    "up to 65 inch"; with `single`, one stated size fits it and anything smaller ("15.6 inch laptop bag")."""
+    t = text or ""
+    m = re.search(rf"{NUM}\s*({SIZE_UNIT})?\s*(?:-|–|to)\s*{NUM}\s*({SIZE_UNIT})", t, re.I)
     if m:
-        lo, hi = float(m.group(1)), float(m.group(2))
-        return [lo, hi] if lo < hi else None
-    m = re.search(rf"(?:up ?to|upto|max(?:imum)?)\s*{NUM}\s*(?:\"|inch|in\b)", name, re.I)
+        unit2 = m.group(4)
+        lo, hi = _inch(m.group(1), m.group(2) or unit2), _inch(m.group(3), unit2)
+        if 10 <= lo < hi <= 120:
+            return [lo, hi]
+    m = re.search(rf"(?:up ?to|upto|max(?:imum)?)\s*{NUM}\s*({SIZE_UNIT})", t, re.I)
     if m:
-        return [0.0, float(m.group(1))]
+        hi = _inch(m.group(1), m.group(2))
+        return [0.0, hi] if 10 <= hi <= 120 else None
+    if single:
+        m = re.search(rf"{NUM}\s*({SIZE_UNIT})", t, re.I)
+        if m:
+            hi = _inch(m.group(1), m.group(2))
+            return [0.0, hi] if 10 <= hi <= 120 else None
     return None
+
+
+def _size_text(p: dict) -> str:
+    """The item's own words about what it fits: its name, then its size / compatibility attributes."""
+    a = p.get("attributes") or {}
+    bits = [p.get("name") or ""]
+    for k, v in a.items():
+        if re.search(r"size|screen|compat|suitab|fit|tv|display", str(k), re.I) and isinstance(v, (str, int, float)):
+            bits.append(str(v))
+    return " | ".join(bits)
 
 
 def map_accessory(p: dict, kind: str) -> dict | None:
@@ -338,7 +366,8 @@ def map_accessory(p: dict, kind: str) -> dict | None:
               and PLACEHOLDER not in m.get("url")]
     mn = model_number(p)
     info = {"source": "jio", "slug": p.get("slug"), "uid": p.get("uid"), "name": name, "model_number": mn,
-            "accessory": kind, "for": fors, "fits_in": _fits_inches(name), "warranty_text": attr(p, "warranty"),
+            "accessory": kind, "for": fors, "fits_in": _fits_inches(_size_text(p), single=kind == "laptop_bag"),
+            "warranty_text": attr(p, "warranty"),
             "categories": [c.get("name") for c in p.get("categories") or []], "spec_source": src,
             "sellable": bool(p.get("sellable")), "images": medias[:2], "features": []}
     return {"sku": str(p.get("item_code") or p.get("uid")), "category": kind, "brand": brand,
