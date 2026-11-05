@@ -38,6 +38,49 @@ def no_remote_images(monkeypatch):
     monkeypatch.setattr(renderer, "fetch_images", offline)
 
 
+
+
+
+@pytest.fixture(autouse=True)
+def floor_rules(monkeypatch, request):
+    """The contest's floor rules on every message of every test (user, 5 Nov 2026: strictly, for the associate and
+    the manager): at most 3 lines and no blank line, at most 3 buttons (a list is one button, ≤ 10 rows), a footer
+    within 60 characters, and voice first: every associate or manager message says, in its footer, that it can be
+    answered by voice (or what a voice note was understood as). Checked as the skills wrote it, before the
+    validator's safety net."""
+    from chanakya.channel import limits
+    from chanakya.core import validator
+    from chanakya.sim.harness import PHONES
+
+    staff = {PHONES.get("associate"), PHONES.get("manager")}
+    bad: list[str] = []
+    orig = validator.enforce
+
+    def enforce(m, *a, **k):
+        for attr in ("body", "caption"):
+            v = getattr(m, attr) or ""
+            if not v:
+                continue
+            lines = v.split("\n")
+            if len(lines) > limits.FLOOR_MAX_LINES or any(not ln.strip() for ln in lines):
+                bad.append(f"{len(lines)} lines: {v[:160]!r}")
+        if len(m.buttons) > limits.MAX_BUTTONS:
+            bad.append(f"{len(m.buttons)} buttons: {(m.body or '')[:60]!r}")
+        if sum(len(s.rows) for s in m.sections) > limits.LIST_ROWS_MAX:
+            bad.append(f"list rows: {(m.body or '')[:60]!r}")
+        if m.footer and len(m.footer) > limits.FOOTER_MAX:
+            bad.append(f"footer {len(m.footer)}: {m.footer!r}")
+        if m.to in staff and m.kind in ("text", "buttons", "list", "image") and not m.footer \
+                and not (m.body or "").startswith("Choose your language"):
+            bad.append(f"no voice footer: {(m.body or m.caption or '')[:80]!r}")
+        return orig(m, *a, **k)
+
+    monkeypatch.setattr(validator, "enforce", enforce)
+    yield
+    if request.node.get_closest_marker("floor_exempt") is None:
+        assert not bad, "floor rules broken:\n" + "\n".join(dict.fromkeys(bad))
+
+
 @pytest.fixture
 async def h(tmp_path):
     hh = await make_harness(tmp_path)

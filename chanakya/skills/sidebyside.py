@@ -101,18 +101,19 @@ def build(ctx: SkillContext, labs: list[str], photos: dict[str, bytes] | None = 
 
 
 def summary(ctx: SkillContext, labs: list[str]) -> str:
-    """The message with the card: each product's top reason for them, as bullets (the associate's language)."""
+    """The message with the card, in 3 lines: each product's top reason for them (the associate's language), and
+    what comes next when there is room."""
     from chanakya.skills import recommend as R
 
     s = ctx.session
     opts = R.current_options(ctx)
-    blocks = [ctx.t("sbs_head")]
-    for lab in labs[:MAX_COLS]:
+    lines = []
+    for lab in labs[:MAX_COLS]:  # one line per product: its name and its top reason for them (the card has the rest)
         o = opts.by_label(lab) if opts else None
         if o is not None:
-            blocks.append(R.option_block(ctx, o, opts))
-    if not state.price_gate_open(s, ctx.pack):
-        blocks.append(ctx.t("sbs_tail_locked"))
-    else:
-        blocks.append(ctx.t("sbs_tail"))
-    return "\n\n".join(blocks)
+            head, _, why = R.option_block(ctx, o, opts).partition("\n")
+            lines.append(f"{head}: {why.split(': ', 1)[-1].split(' · ')[0]}" if why else head)
+    tail = ctx.t("sbs_tail_locked" if not state.price_gate_open(s, ctx.pack) else "sbs_tail")
+    if len(lines) >= 3:
+        return "\n".join(lines[:3])
+    return "\n".join(lines + [tail] if len(lines) == 2 else [ctx.t("sbs_head")] + lines + [tail])

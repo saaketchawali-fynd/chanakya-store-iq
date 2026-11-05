@@ -20,15 +20,27 @@ AFTER_SALE_AWAIT = ("lost_reason", "voice_for_parivaar")  # answers still expect
 VOICE_KINDS = ("text", "buttons", "list", "image")
 
 
-def voice_footer(ctx: SkillContext, m) -> None:
-    """Voice first, at every step: every message to the associate (and the manager) says it can simply be
-    answered by voice, in Hindi, English or Marathi, unless it already carries its own footer (such as what a
-    voice note was understood as). Not on the customer's, expert's or visitor's phone."""
-    if m.footer or m.kind not in VOICE_KINDS or m.to != ctx.actor_wa_id or ctx.role not in ("associate", "manager"):
+async def voice_footer(ctx: SkillContext, m) -> None:
+    """Voice first, at every step: every message to an associate or the manager says, in its grey footer, that it
+    can simply be answered by voice, and for the associate in front of a customer where that customer stands
+    ('Bolkar bhi · C1 Shah · TV · Ghar 4/4'), unless it already carries its own footer (such as what a voice note
+    was understood as). A message to another staff phone (the manager's tip, an approval) gets it in that
+    person's language. Not on the customer's, expert's or visitor's phone."""
+    if m.footer or m.kind not in VOICE_KINDS:
         return
-    if ctx.staff is None or not ctx.staff.lang_set:
+    if m.to != ctx.actor_wa_id:
+        other = await repo.staff_by_wa(m.to)
+        if other is not None and other.role in ("associate", "manager") and other.lang_set:
+            m.footer = ctx.t("footer_voice_mgr" if other.role == "manager" else "footer_voice_q", other.lang or "en")
+        return
+    if ctx.role not in ("associate", "manager") or ctx.staff is None or not ctx.staff.lang_set:
         return  # the language picker comes first
-    m.footer = ctx.t("footer_voice_mgr" if ctx.role == "manager" else "footer_voice_q")
+    if ctx.role == "associate" and ctx.session is not None:
+        from chanakya.core.coach import status_footer
+
+        m.footer = status_footer(ctx)
+        m.allowed_numbers = sorted(set(m.allowed_numbers or []) | set(ctx.reg.allowed()))
+    m.footer = m.footer or ctx.t("footer_voice_mgr" if ctx.role == "manager" else "footer_voice_q")
 
 
 class Orchestrator:
@@ -37,6 +49,7 @@ class Orchestrator:
         self.scheduler = scheduler
         self._tasks: set[asyncio.Task] = set()
         svc.orchestrator = self
+        self._first: dict[str, dict] = {}  # inbound message id → {ctx, done, hold_ms}: the first-reply watchdog
 
     def spawn(self, coro) -> asyncio.Task:
         t = asyncio.create_task(coro)
@@ -58,10 +71,48 @@ class Orchestrator:
             log.info("duplicate", wamid=msg.wa_message_id)
             return
         self.spawn(self.svc.channel.mark_read_typing(msg.wa_message_id))
+        holder: dict = {"ctx": None, "done": asyncio.Event(), "hold_ms": None}
+        self._first[msg.wa_message_id] = holder
+        self.spawn(self._first_reply_watchdog(msg, holder, t0))
+        try:
+            await self._handle(msg, holder, t0)
+        finally:
+            holder["done"].set()
+            self._first.pop(msg.wa_message_id, None)
+
+    async def _first_reply_watchdog(self, msg: InboundMessage, holder: dict, t0: datetime | None) -> None:
+        """The contest's floor rule: the first reply in under 5 seconds. When nothing has gone back by
+        `first_reply_hold_s` (3.5 s: a voice note being heard, a label being read, a card being drawn), one short line
+        goes first ('Sun liya — ek second…'); the full reply follows. Staff phones only."""
+        wait = float(getattr(self.svc.settings, "first_reply_hold_s", 3.5))
+        try:
+            await asyncio.wait_for(holder["done"].wait(), timeout=wait)
+            return
+        except TimeoutError:
+            pass
+        ctx = holder["ctx"]
+        if ctx is None or ctx.role not in ("associate", "manager", "expert", "visitor") or ctx.staff is None \
+                or not ctx.staff.lang_set or holder["done"].is_set():
+            return
+        key = {"audio": "hold_voice", "image": "hold_photo"}.get(msg.type, "hold_wait")
+        try:
+            await self.svc.deliver(OutMessage(to=msg.from_wa_id, kind="text", body=ctx.t(key)))
+        except Exception:
+            log.warning("hold_failed")
+            return
+        ms = int((datetime.now(UTC) - t0.astimezone(UTC)).total_seconds() * 1000) if t0 else None
+        holder["hold_ms"] = ms
+        diag.mark(f"reply_ms_{msg.type}", {"ms": ms, "hold": True})
+        ctx.events.append(Event(type="latency", session_id=ctx.session.id if ctx.session else None,
+                                actor_wa_id=ctx.actor_wa_id, payload={"phase": "first_reply", "ms": ms, "hold": True},
+                                latency_ms=ms))
+
+    async def _handle(self, msg: InboundMessage, holder: dict, t0: datetime | None) -> None:
         async with locks.for_(msg.from_wa_id):
             ctx = None
             try:
                 ctx = await router.build_context(msg, self.svc)
+                holder["ctx"] = ctx
                 w = msg.from_wa_id
                 diag.mark(
                     "last_inbound",
@@ -86,6 +137,7 @@ class Orchestrator:
 
     async def finish(self, ctx: SkillContext, reply: Reply, t0: datetime | None) -> None:
         first = True
+        holder = self._first.get(ctx.inbound.wa_message_id) if ctx.inbound else None
         home = ctx.session.home if ctx.session else None
         for m in reply.messages:
             if m is None:
@@ -96,19 +148,25 @@ class Orchestrator:
                     m.session_id = ctx.session.id
                 if ctx.session and ctx.role == "associate":
                     ctx.session.extra["last_touch"] = ctx.now.isoformat()
-                voice_footer(ctx, m)
+                await voice_footer(ctx, m)
                 out = self.svc.validate(m, ctx.reg, home, lang, ctx.asking, ctx.session)
+                if holder and first and m.to == ctx.actor_wa_id and out.card is None:
+                    holder["done"].set()  # a plain message is on its way now: no holding line
                 await self.svc.deliver(out)
+                if holder and m.to == ctx.actor_wa_id:
+                    holder["done"].set()
                 if first and t0 is not None and m.to == ctx.actor_wa_id:
                     ms = int((datetime.now(UTC) - t0.astimezone(UTC)).total_seconds() * 1000)
                     kind = ctx.inbound.type if ctx.inbound else "?"
-                    diag.mark(f"reply_ms_{kind}", {"ms": ms, "step": ctx.session.step.value if ctx.session else None})
+                    held = holder["hold_ms"] if holder else None
+                    diag.mark(f"full_reply_ms_{kind}" if held else f"reply_ms_{kind}",
+                              {"ms": ms, "step": ctx.session.step.value if ctx.session else None})
                     ctx.events.append(
                         Event(
-                            type="latency",
+                            type="first_reply_hold" if held else "latency",
                             session_id=ctx.session.id if ctx.session else None,
                             actor_wa_id=ctx.actor_wa_id,
-                            payload={"phase": "first_reply", "ms": ms},
+                            payload={"phase": "full_reply" if held else "first_reply", "ms": ms},
                             latency_ms=ms,
                         )
                     )

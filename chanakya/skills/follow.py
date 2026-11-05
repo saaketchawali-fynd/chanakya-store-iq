@@ -84,7 +84,7 @@ async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = F
         say = ctx.pick(ctx.packs.common_line("consent_ask"), ctx.clang)
         why = ctx.t("kyun_consent_note", note=note) if note else ctx.t("kyun_consent")
         if not cites:
-            return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + kyun_block(ctx, why) + "\n\n"
+            return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n" + kyun_block(ctx, why) + "\n"
                                         + do_block(ctx, "do_consent"), btns))
         return ctx.reply(coach_reply(ctx, say, why, cites, btns, do="do_consent"))
     return await send_parivaar(ctx)
@@ -146,7 +146,7 @@ async def record_consent(ctx: SkillContext, customer_wa_id: str, method: str) ->
     name = s.home.customer_name or ctx.t("customer_word", alang)
     msgs = []
     # to the customer
-    cust_body = "\n\n".join(
+    cust_body = "\n".join(
         [
             ctx.t("cust_welcome", CUSTOMER_PHONE_LANG, associate=staff.name if staff else "Chanakya"),
             ctx.t("cust_photo_hint", CUSTOMER_PHONE_LANG),
@@ -497,11 +497,11 @@ async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
     )
     s.extra["install_job_id"] = job.id
     ctx.ev("install_job_created", job_id=job.id, slot=label)
-    lines = [ctx.t("install_job_head", id=ctx.reg.raw(str(job.id), "job:id")), "",
-             ctx.t("install_job_when", slot=ctx.reg.static(label))]
-    lines += [f"• {ctx.reg.static(x)}" for x in summary.split(" · ") if x]  # each site fact on its own line
+    lines = [ctx.t("install_job_head", id=ctx.reg.raw(str(job.id), "job:id")) + " · "  # 3 lines: the job and when;
+             + ctx.t("install_job_when", slot=ctx.reg.static(label)),                    # the site facts in one line;
+             ctx.reg.static(summary)]                                                     # what is still to ask
     if ctx.t("not_asked_yet") in summary:
-        lines += ["", ctx.t("install_job_missing")]
+        lines.append(ctx.t("install_job_missing"))
     msgs = [info_reply(ctx, "\n".join(lines))]
     if s.customer_wa_id:
         msgs.append(

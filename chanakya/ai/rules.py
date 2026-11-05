@@ -92,6 +92,28 @@ NUM = r"(\d+(?:\.\d+)?)"
 FT = r"(?:ft|feet|foot|fut|feet ka|फ़ुट|फुट|फीट|फूट)"
 STEPS = r"(?:kadam|qadam|steps|step|कदम|पावलं|पावले|पाऊल)"
 BUDGET_WORDS = ("budget", "बजट", "बजेट", "range", "tak ka", "tak ki", "पर्यंत", "तक का", "socha hai", "soch rahe")
+# store rule 3 (contest brief): never guess wealth from appearance; the associate sets the start level. A budget is
+# taken from a note only when it was said as a budget, never from what the customer drives, wears or looks like.
+WEALTH_CUES = ("car", "gaadi", "gadi", "bmw", "mercedes", "audi", "kapde", "kapda", "clothes", "branded", "jewel",
+               "gehne", "gehna", "watch", "ghadi", "ameer", "amir", "rich", "paise wale", "paisewale", "paisa wala",
+               "salary", "income", "kamate", "bungalow", "villa", "dikhte", "lagte", "dikh rahe", "lag rahe",
+               "गाडी", "कपडे", "श्रीमंत", "अमीर", "दिखते", "लगते", "दिसतात", "वाटतात")
+
+
+def explicit_budget(transcript: str | None) -> bool:
+    """True when the note says a budget as a budget ('budget 50 hazaar', '50 hazaar tak ka'), and that clause is not
+    about the customer's car, clothes, jewellery or looks. With no transcript to check (a test fixture), True."""
+    if not transcript:
+        return True
+    t = _norm(transcript)
+    if not any(w in t for w in BUDGET_WORDS):
+        return False
+    for clause in re.split(r"[.,;!?|।]| aur | but | lekin | पण ", t):
+        if any(w in clause for w in BUDGET_WORDS) and any(re.search(rf"(?<!\w){re.escape(c)}(?!\w)", clause) for c in WEALTH_CUES):
+            return False
+    return True
+
+
 QUESTION_HINTS = ("kya ", "kya?", "?", "does ", "is it", "support", "का?", "क्या", "आहे का", "kaisa")
 
 

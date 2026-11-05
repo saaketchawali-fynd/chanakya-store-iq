@@ -20,8 +20,9 @@ async def test_the_demo_is_a_plan_built_from_this_customer(h):
     m = out[0]
     assert m.card.template == "demo" and m.card.data["products"][0]["steps"][0]["tag"] == "wow"
     body = m.body
-    assert body.startswith("*Demo guide*") and "\n1. *Wow:*" in body and "\n2. " in body  # numbered, step by step
-    assert "▸ " in body  # how to show each step
+    assert body.startswith("*Demo guide*") and len(body.split("\n")) == 3  # where to start, the wow line, how to go on
+    steps = m.card.data["products"][0]["steps"]
+    assert len(steps) >= 2 and all(st.get("title") for st in steps)  # numbered steps on the card, how to show each
     assert "s:C1:shown" in button_ids(out)
     s = await session(h)
     plan = s.extra["demo_plan"]

@@ -75,7 +75,7 @@ async def test_option_features_by_voice(h):
     assert out[0].coach and "120 Hz" in out[0].body
     ev = (await repo.events_for(None, ["label_read"]))[-1]
     assert ev.payload["sku"] == "TV-MER-55-QL120"
-    assert "₹" not in texts(out)
+    assert "₹" not in texts(out, footer=False)
 
 
 async def test_old_tv_on_wall_asks_its_size_then_draws(h):

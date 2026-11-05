@@ -23,9 +23,10 @@ def test_lines_buttons_titles():
     assert len(c.msg.buttons) == 3 and all(len(b.title) <= 20 for b in c.msg.buttons)
     long = OutMessage(to="1", kind="text", body="\n".join(str(i) for i in range(30)))
     reg.static(" ".join(str(i) for i in range(30)))
-    assert validator.check(long, reg, None, "hi", BANNED).fatal  # past the line limit
+    c = validator.check(long, reg, None, "hi", BANNED)  # past the 3-line floor rule: never sent long
+    assert not c.fatal and len(c.msg.body.split("\n")) == 3 and any(v.kind == "too_many_lines" for v in c.violations)
     spaced = OutMessage(to="1", kind="text", body="a\n\n\nb")
-    assert validator.check(spaced, reg, None, "hi", BANNED).msg.body == "a\n\nb"  # one gap kept, never two
+    assert validator.check(spaced, reg, None, "hi", BANNED).msg.body == "a\nb"  # no blank lines
 
 
 def test_coach_needs_kyun_and_known_cite():

@@ -71,6 +71,7 @@ class Settings(BaseSettings):
     demo_role_switch_allowed: str = ""
     harmonise_tryon: bool = False  # off: the blend adds ~10 s; the composite is realistic and true to scale
     render_cards: bool = True  # False → skip Playwright (falls back to Pillow cards)
+    first_reply_hold_s: float = 3.5  # floor rule: first reply < 5 s; a short holding line goes out if nothing has by then
     scheduler_enabled: bool = True
     log_level: str = "INFO"
     privacy_contact: str = ""  # shown on /privacy (optional)

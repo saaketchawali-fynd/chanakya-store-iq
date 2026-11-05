@@ -66,7 +66,7 @@ async def test_golden_path(tmp_path):
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.slots["seat_distance"][-1].value == "d8_10" and s.home.slots["room"][-1].value == "living"
         assert s.home.start_level_inr == 50000 and s.home.start_level_source == "associate_voice"
-        assert "₹" not in texts(out)
+        assert "₹" not in texts(out, footer=False)
         # 5 replacing → the old TV's size → the 4 home facts are known: room photo? (2 buttons only)
         out = await step(h.tap, "s:C1:slot:trigger:replace")
         assert button_ids(out)[0] == "s:C1:slot:old_size:o32"
@@ -105,11 +105,12 @@ async def test_golden_path(tmp_path):
         assert next(e for e in evs if e.type == "label_read").payload["sku"] == "TV-MER-55-QL120"
         # 9 offers too early → gate, no numbers
         out = await step(h.say, "offers")
-        assert "Daam demo ke baad" in out[0].body and "₹" not in texts(out)
+        assert "Daam demo ke baad" in out[0].body and "₹" not in texts(out, footer=False)
         assert "s:C1:override:price:asked" in button_ids(out)
         # 10 options: one product page per option, then the next steps → the demo on tap
         out = await step(h.tap, "s:C1:options")
-        assert len(out) == 4 and all(m.card and m.card.template == "product" for m in out[:3]) and out[3].buttons
+        assert len(out) == 5 and not out[0].card and len(out[0].body.split("\n")) <= 2  # how many, for this home
+        assert all(m.card and m.card.template == "product" for m in out[1:4]) and out[4].buttons  # a page each, then next
         card = options_view(out)
         assert [o["label"] + o["title"] for o in card.data["options"]] == [
             'AArka 55" 4K',
@@ -145,7 +146,7 @@ async def test_golden_path(tmp_path):
                         "s:C1:nonefit"]  # + both on their wall, how big from the sofa, is the extra money worth it
         out2 = await step(h.pick, "s:C1:upgrade")  # is the extra money worth it? (the price is open after the demo)
         assert out2[0].body.count("→") >= 1 and "roz lagbhag" in out2[0].body
-        assert "Daam khula" in out[0].body and "Demo ho gaya" in out[0].body
+        assert "Daam khula" in out[0].footer and "Demo ho gaya" in out[0].footer  # where they stand, in the footer
         # 12 B → the questions that change the cost (wall, wall type, soundbar) → Kharcha
         out = await step(h.pick, "s:C1:opt:B")
         assert button_ids(out)[0] == "s:C1:slot:mounting:wall"

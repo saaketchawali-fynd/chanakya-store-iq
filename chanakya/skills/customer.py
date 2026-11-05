@@ -189,7 +189,8 @@ async def relay(ctx: SkillContext) -> Reply:
         if (ctx.now - seen).total_seconds() >= 6 * 3600:  # coming back after a while: what happened last time
             with ctx.as_lang(alang):
                 line, _ = returning.summary(ctx, seen, s)
-            body = ctx.t("ret_msg_prefix", alang, line=line) + "\n" + body
+            head, _, rest = body.partition("\n")  # 3 lines: who wrote, with what happened last time; the message; the reply hint
+            body = head + " — " + ctx.t("ret_msg_prefix", alang, line=line) + ("\n" + rest if rest else "")
     return ctx.reply(OutMessage(to=a, kind="text", body=body, allowed_numbers=ctx.reg.allowed()))
 
 

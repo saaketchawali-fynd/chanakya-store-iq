@@ -293,12 +293,11 @@ async def ready(ctx: SkillContext, step: str) -> Reply:
     from chanakya.skills import wins
 
     name = ctx.staff.name if ctx.staff and ctx.staff.name else ""
-    parts = [ctx.t("ready_title", name=name) if name else ctx.t("ready_title_plain")]
+    first = ctx.t("ready_title", name=name) if name else ctx.t("ready_title_plain")
     won = await wins.line(ctx, yesterday=True)
-    if won:  # yesterday's own wins (Family Cards, answers, sales, streak): no zeros
-        parts.append(won)
-    parts.append(ctx.t("ready_body", tip=ctx.t(f"tip_{step}")))
-    m = info_reply(ctx, "\n\n".join(parts), [ctx.b("b_new_customer", encode("g", "new"))])
+    if won:  # yesterday's own wins (Family Cards, answers, sales, streak), in the same line: no zeros
+        first += " " + won
+    m = info_reply(ctx, first + "\n" + ctx.t("ready_body", tip=ctx.t(f"tip_{step}")), [ctx.b("b_new_customer", encode("g", "new"))])
     m.footer = ctx.t("footer_voice_q")
     return ctx.reply(m)
 

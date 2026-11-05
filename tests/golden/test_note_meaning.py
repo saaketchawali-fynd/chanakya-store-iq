@@ -124,7 +124,7 @@ async def test_more_options_keeps_the_best_and_adds(h):
     for _ in range(3):
         if options_view(out) is not None:
             break
-        assert out[-1].body.startswith("*Follow-up")
+        assert out[-1].footer.startswith("Follow-up")  # which follow-up, in the footer; the question stays 3 lines
         nxt = next(b.id for b in out[-1].buttons if ":slot:" in b.id or ":dq:" in b.id)
         rows = [r.id for m in out for sec in (m.sections or []) for r in sec.rows]
         out = await (h.pick(nxt) if nxt in rows else h.tap(nxt))
@@ -149,4 +149,4 @@ async def test_side_by_side_without_a_room_photo(h):
     titles = [sec["title"] for sec in d["sections"]]
     assert titles[0] == "For your needs" and "Benefits for you" in titles and "Features" in titles
     assert titles[-1] == "Cost and offers"
-    assert out[0].body.startswith("*Side-by-side*") and "s:C1:demo" in button_ids(out)
+    assert out[0].body.startswith("*B · ") and len(out[0].body.split("\n")) <= 3 and "s:C1:demo" in button_ids(out)

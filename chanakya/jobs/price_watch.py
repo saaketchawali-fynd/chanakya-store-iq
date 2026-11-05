@@ -66,6 +66,7 @@ async def run(svc, now: datetime) -> int:
                          offer=reg.raw((o.title or {}).get("en") or o.id, f"offer:{o.id}"),
                          till=reg.raw(fmt.date_short(o.valid_to, lang), f"offer:{o.id}:valid_to"))
             msg = OutMessage(to=s.associate_wa_id, kind="buttons", body=body, session_id=s.id,
+                             footer=t("footer_voice_q", lang) if staff and staff.lang_set else None,
                              buttons=[Button(id=f"s:{s.code}:called", title=t("b_called", lang)[:20]),
                                       Button(id=f"s:{s.code}:task", title=t("b_task", lang)[:20])],
                              allowed_numbers=reg.allowed())

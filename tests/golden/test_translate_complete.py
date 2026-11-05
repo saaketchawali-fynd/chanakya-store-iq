@@ -144,7 +144,7 @@ async def test_live_options_demo_and_choice(tmp_path, monkeypatch):
         plan = s.extra["demo_plan"]
         assert any(st["kind"] == "highlight" for st in plan) and len(plan) >= 2
         assert len(out) == 1 and out[0].card.template == "demo"  # the demo guide: one message, per product
-        assert "1. *Wow:*" in out[0].body and "(HDR10+)" in out[0].body  # their need first, its proof from the data
+        assert out[0].body.startswith("*Demo guide*") and "HDR10+" in str(out[0].card.data)  # their need first, its proof
         await h.tap("s:C1:shown")
         lab = next(k for k, v in by.items() if v["is_best"])
         out = await h.pick(f"s:C1:opt:{lab}")

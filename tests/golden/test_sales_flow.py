@@ -34,7 +34,7 @@ async def test_fridge_end_to_end(h):
         check_floor(out)
         assert len(out) == 1 and button_ids(out)[0] == nxt  # one question at a time, in order
     out = await h.tap("s:C1:slot:power_cuts:yes")
-    assert button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"] and "Ghar 4/4" in out[0].body
+    assert button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"] and "Ghar 4/4" in (out[0].footer or "")
     out = await h.tap("s:C1:photo_no")
     r = rows(out[0])
     assert out[0].kind == "list" and r[-1] == "s:C1:budget:none" and "₹" in texts(out) + str(out[0].sections)

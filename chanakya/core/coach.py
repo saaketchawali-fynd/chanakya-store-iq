@@ -15,25 +15,35 @@ def _one_line(s: str) -> str:
     return " ".join((s or "").split())
 
 
-# Message layout (user, 4 Nov 2026): fast to read on the floor, well spaced, never a robotic one-liner.
-#   *Bolo*:
-#   > the words to say (a WhatsApp quote)
-#
-#   *Kyun*: the reason, in a full sentence
-#   • each further fact on its own bullet
-#
-#   *Karo*: what to do with the customer right now (user, 5 Nov 2026: engaged customer presence)
-#
-#   _C1 · TV · Ghar 2/4 · …_   (the status, quiet) — or the copilot tip, which replaces it
+# Message layout (user, 5 Nov 2026: the contest's floor rules, strictly): at most 3 lines, no blank lines, 3 buttons.
+#   *Bolo*: "the words to say"
+#   *Kyun*: the reason · one more fact
+#   *Karo*: what to do with the customer right now — or the copilot tip, when a fact calls for it
+#   ─ footer (grey): Bolkar bhi · C1 Shah · TV · Ghar 2/4   (voice first, and where the customer stands)
+# Everything longer is on the card above the text (Home Card, product page, demo guide, kharcha, score).
+def fit_line(parts: list[str], first: str, limit: int | None = None) -> str:
+    """One line: the first part, then more facts joined with ' · ' while the line still fits."""
+    from chanakya.channel.limits import LINE_MAX
+
+    limit = limit or LINE_MAX
+    line = first
+    for p in parts:
+        if len(line) + 3 + len(p) > limit:
+            break
+        line = f"{line} · {p}"
+    return line
+
+
 def bolo_block(ctx: SkillContext, say: str, lang: str | None = None) -> str:
-    return f'{ctx.t("label_bolo", lang or ctx.lang)}:\n> {_one_line(say).strip(chr(34))}'
+    return f'{ctx.t("label_bolo", lang or ctx.lang)}: "{_one_line(say).strip(chr(34))}"'
 
 
 def kyun_block(ctx: SkillContext, why: str, lang: str | None = None) -> str:
     parts = [p.strip() for p in _one_line(why).split(" · ") if p.strip()]
+    label = ctx.t("label_kyun", lang or ctx.lang)
     if not parts:
-        return f'{ctx.t("label_kyun", lang or ctx.lang)}:'
-    return "\n".join([f'{ctx.t("label_kyun", lang or ctx.lang)}: {parts[0]}'] + [f"• {p}" for p in parts[1:]])
+        return f"{label}:"
+    return fit_line(parts[1:], f"{label}: {parts[0]}")
 
 
 def do_block(ctx: SkillContext, key: str | None, lang: str | None = None) -> str:
@@ -60,6 +70,21 @@ def status_block(text: str, tip: bool = False) -> str:
     return text if tip or not text else f"_{text}_"
 
 
+def status_footer(ctx: SkillContext) -> str | None:
+    """The grey footer of an associate's message: voice first, then where the customer stands, as much as fits in
+    WhatsApp's 60 characters ('Bolkar bhi · C1 Shah · TV · Ghar 4/4 · Demo baaki')."""
+    from chanakya.channel.limits import FOOTER_MAX
+
+    st = status_line(ctx)
+    if not st:
+        return None
+    parts = [p for p in st.split(" · ") if p]  # who · category · home · demo · price
+    full = " · ".join([ctx.t("footer_voice_short")] + parts)
+    if len(full) > FOOTER_MAX and len(parts) == 5:  # short of room: the category goes first (the associate knows it)
+        parts = parts[:1] + parts[2:]
+    return fit_line(parts, ctx.t("footer_voice_short"), FOOTER_MAX)
+
+
 def coach_reply(
     ctx: SkillContext,
     say: str,
@@ -71,24 +96,28 @@ def coach_reply(
     footer: str | None = None,
     do: str | None = None,
 ) -> OutMessage:
-    """`do`: the key of this moment's Karo line (see do_block)."""
-    body = bolo_block(ctx, say) + "\n\n" + kyun_block(ctx, why)
-    karo = do_block(ctx, do)
-    if karo:
-        body += "\n\n" + karo
-    st, is_tip = (status_line(ctx) if status else ""), False
-    if status:  # the copilot: one quiet line, only when a fact calls for it (the status is one tap away)
+    """Three lines: Bolo, Kyun, Karo. The copilot tip joins the Kyun line when it fits (else it takes the third line
+    of a message with no Karo, or waits for a later message). `do`: the key of this moment's Karo line."""
+    from chanakya.channel.limits import LINE_MAX
+
+    kyun, karo = kyun_block(ctx, why), do_block(ctx, do)
+    if status:  # the copilot: one quiet fact, only when a fact calls for it
         from chanakya.skills.copilot import tip
 
+        before = list(ctx.session.extra.get("tips_shown", [])) if ctx.session else []
         t = tip(ctx)
-        st, is_tip = (t, True) if t else (st, False)
-    if st:
-        body += "\n\n" + status_block(st, is_tip)
-    # no footer given: the voice line is added for every associate message when it is sent (orchestrator)
+        if t and len(kyun) + 3 + len(t) <= LINE_MAX:
+            kyun = f"{kyun} · {t}"
+        elif t and not karo:
+            karo = status_block(t, True)
+        elif t and ctx.session:
+            ctx.session.extra["tips_shown"] = before  # not shown: it can come with a later message
+    lines = [bolo_block(ctx, say), kyun] + ([karo] if karo else [])
+    # no footer given: voice first and the status go in the footer when it is sent (orchestrator.voice_footer)
     return OutMessage(
         to=ctx.actor_wa_id,
         kind="buttons" if buttons else "text",
-        body=body,
+        body="\n".join(lines),
         footer=footer,
         buttons=buttons[:3],
         card=card,
@@ -113,16 +142,6 @@ def info_reply(
 
 
 def tidy(body: str | None) -> str:
-    """Spacing kept (one blank line between blocks), never two in a row, none at the ends; within the line limit."""
-    from chanakya.channel.limits import FLOOR_MAX_LINES
-
-    out: list[str] = []
-    for ln in (body or "").split("\n"):
-        if not ln.strip():
-            if out and out[-1] != "":
-                out.append("")
-            continue
-        out.append(ln.rstrip())
-    while out and out[-1] == "":
-        out.pop()
-    return "\n".join(out[:FLOOR_MAX_LINES])
+    """No blank lines (the floor rule: 3 lines, nothing wasted), none at the ends. The line count is checked by the
+    validator, never cut silently here."""
+    return "\n".join(ln.rstrip() for ln in (body or "").split("\n") if ln.strip())

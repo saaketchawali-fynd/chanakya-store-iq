@@ -79,7 +79,7 @@ async def test_manager_huddle_floor_tip_profile(h, lang):
     clean(out)
     ids = button_ids(out)
     assert any(i.startswith("m:nudge:") for i in ids) and any(i.startswith("m:whov:") for i in ids)
-    assert out[0].body.count("\n• ") >= 2
+    assert len(out[0].body.split("\n")) == 3  # today, the steps, the wins: 3 lines
 
     out = await h.pick("m:vlog")
     out = await h.pick(first(out, "m:vnote:"))  # plain words: no raw ids
@@ -112,7 +112,7 @@ async def test_expert_queue_answer_library_reminder(h, lang):
     await h.tap("s:C1:demo")
     out = await h.voice("curve_unknown_spec")
     q_msg = next(m for m in out if m.to == PHONES["expert"])
-    assert "*Product:*" in q_msg.body and "• HDR" in q_msg.body  # the product's facts from the data, the asked one first
+    assert "*Product:*" in q_msg.body and "· HDR: " in q_msg.body  # the product's facts from the data, the asked one first
 
     h.as_("expert")
     out = await h.tap(f"g:alang:{lang}")  # the queue, not "no open question"
@@ -124,7 +124,7 @@ async def test_expert_queue_answer_library_reminder(h, lang):
     out = await h.say("Nahi, Dolby Vision nahi hai, HDR10 aur HLG hai. Say: Isme HDR10 aur HLG hai, Dolby Vision nahi.")
     clean(out)
     to_assoc = next(m for m in out if m.to == PHONES["associate"])
-    assert to_assoc.body.startswith("*Expert") and "\n> " in to_assoc.body and "Dolby Vision nahi." in to_assoc.body
+    assert to_assoc.body.startswith("*Expert") and "\n_" in to_assoc.body and "Dolby Vision nahi." in to_assoc.body  # answer, Bolo, the question
     assert {"s:C1:go", "s:C1:expfollow"} <= set(button_ids([to_assoc]))
     out = await h.tap(f"x:{qid}:save")
     clean(out)

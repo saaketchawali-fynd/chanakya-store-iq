@@ -436,7 +436,7 @@ async def objection(ctx: SkillContext, oid: str) -> Reply:
             ctx.asking.add(slot)
             cites = [slot]
     if not cites:
-        return ctx.reply(info_reply(ctx, bolo_block(ctx, line) + "\n\n" + do_block(ctx, "do_objection"), btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, line) + "\n" + do_block(ctx, "do_objection"), btns))
     return ctx.reply(coach_reply(ctx, line, ctx.t("kyun_objection"), cites, btns, do="do_objection"))
 
 
@@ -484,6 +484,11 @@ async def ask_manager(ctx: SkillContext) -> Reply:
             name=ctx.reg.raw(ctx.staff.name, "staff:name"),
             code=ctx.reg.raw(s.code, "session:code"),
         )
+        from chanakya.skills.manager import approval_context
+
+        extra = approval_context(ctx, s, _sku(ctx), mlang)  # the product, its price and live offers, from the data
+        if extra:
+            body += "\n" + "\n".join(extra)
         msgs.append(
             info_reply(
                 ctx,

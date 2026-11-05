@@ -27,6 +27,7 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 asyncio_default_test_loop_scope = "session"
 testpaths = ["tests"]
+markers = ["floor_exempt: a test that deliberately sends a message outside the floor rules"]
 
 [tool.ruff]
 line-length = 120

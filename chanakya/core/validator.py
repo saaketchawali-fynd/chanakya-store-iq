@@ -92,16 +92,14 @@ def check(
         v = getattr(msg, attr)
         if not v:
             continue
-        lines = v.split("\n")
-        if len(lines) > limits.FLOOR_MAX_LINES:
-            c.violations.append(Violation("too_many_lines", f"{attr}:{len(lines)}"))
-            c.fatal = True
-        if any(not a.strip() and not b.strip() for a, b in zip(lines, lines[1:], strict=False)) or \
-                (lines and (not lines[0].strip() or not lines[-1].strip())):
-            from chanakya.core.coach import tidy  # spacing is fine: one blank line between blocks, never two
-
-            setattr(msg, attr, tidy(v))
+        lines = [ln for ln in v.split("\n") if ln.strip()]
+        if len(lines) != len(v.split("\n")):  # no blank lines: 3 lines, nothing wasted
             c.violations.append(Violation("empty_line", attr))
+        if len(lines) > limits.FLOOR_MAX_LINES:  # never sent long: the rest joins the last line (and is logged)
+            c.violations.append(Violation("too_many_lines", f"{attr}:{len(lines)}"))
+            lines = lines[: limits.FLOOR_MAX_LINES - 1] + [" · ".join(x.strip() for x in lines[limits.FLOOR_MAX_LINES - 1:])]
+        v = "\n".join(lines)
+        setattr(msg, attr, v)
         if len(v) > mx:
             setattr(msg, attr, limits.truncate(v, mx))
             c.violations.append(Violation("too_long", attr))

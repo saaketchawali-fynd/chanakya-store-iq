@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from chanakya.core import repo
 from chanakya.sim.harness import PHONES
-from tests.helpers import button_ids, check_floor
+from tests.helpers import button_ids, check_floor, texts
 
 
 def rows(msg):
@@ -66,4 +66,4 @@ async def test_start_over_from_the_very_beginning(h):
     out = await h.tap("g:alang:en")  # then the brief, in English
     assert any(m.card and m.card.template == "brief" and m.card.lang == "en" for m in out)
     out = await h.tap("g:new")
-    assert "C3" in out[0].body or "C1" in out[0].body
+    assert "C3" in texts(out) or "C1" in texts(out)

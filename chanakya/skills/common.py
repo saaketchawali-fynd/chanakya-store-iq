@@ -143,7 +143,7 @@ def question_reply(
     if not why_override:
         tail = question_tail(ctx, slot_id)
         if tail:
-            why = f"{why.rstrip('.')} · {tail}"
+            why = f"{tail} · {why.rstrip('.')}"  # the reason from today's stock first: the line is cut to fit
     if buttons is None and alt and alt.get("quick"):
         buttons = [Button(id=ctx.sid("slot", slot_id, v), title=truncate_title(sd.value_title(v, ctx.lang)))
                    for v in alt["quick"][:2]]
@@ -240,12 +240,12 @@ def category_message(ctx: SkillContext) -> OutMessage:
     for r in rows:
         ctx.reg.static(r.title + " " + (r.description or ""))
     code = ctx.reg.raw(ctx.session.code, "session:code")
-    from chanakya.core.coach import bolo_block, do_block, kyun_block, status_block
+    from chanakya.core.coach import bolo_block, do_block, fit_line, kyun_block
 
-    body = (bolo_block(ctx, ctx.tc("bolo_opener")) + "\n\n" + kyun_block(ctx, ctx.t("kyun_opener")) + "\n\n"
-            + do_block(ctx, "do_opener") + "\n\n" + status_block(ctx.t("st_new", code=code)))
+    body = "\n".join([bolo_block(ctx, ctx.tc("bolo_opener")), kyun_block(ctx, ctx.t("kyun_opener")), do_block(ctx, "do_opener")])
+    footer = fit_line([ctx.t("st_new", code=code)], ctx.t("footer_voice_short"), 60)  # 'Bolkar bhi · C1 · Naya customer'
     return OutMessage(to=ctx.actor_wa_id, kind="list", body=body, list_button=truncate_title(ctx.t("list_product")),
-                      sections=[ListSection(rows=rows)], footer=ctx.t("footer_voice_q"), allowed_numbers=ctx.reg.allowed())
+                      sections=[ListSection(rows=rows)], footer=footer, allowed_numbers=ctx.reg.allowed())
 
 
 def photo_question(ctx: SkillContext, footer: str | None = None) -> OutMessage:
@@ -258,7 +258,7 @@ def photo_question(ctx: SkillContext, footer: str | None = None) -> OutMessage:
     if not cites:
         from chanakya.core.coach import bolo_block, do_block
 
-        return info_reply(ctx, bolo_block(ctx, ctx.tc(key)) + "\n\n" + do_block(ctx, "do_photo_ask"), btns)
+        return info_reply(ctx, bolo_block(ctx, ctx.tc(key)) + "\n" + do_block(ctx, "do_photo_ask"), btns)
     return coach_reply(ctx, ctx.tc(key), ctx.t("kyun_photo_ask"), cites, btns, footer=footer, do="do_photo_ask")
 
 

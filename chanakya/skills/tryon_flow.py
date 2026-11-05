@@ -514,7 +514,7 @@ def _tryon_message(ctx: SkillContext, pl: list[tuple], image: bytes) -> OutMessa
     btns = (btns + [ctx.b("b_show_more", ctx.sid("tmenu")), ctx.b("b_go", ctx.sid("go"))])[:3]
     cites = C.known_cites(ctx, ["seat_distance", "room_size", "niche_width_cm"])
     if not cites:
-        m = info_reply(ctx, bolo_block(ctx, say) + "\n\n" + do_block(ctx, "do_tryon"), btns)
+        m = info_reply(ctx, bolo_block(ctx, say) + "\n" + do_block(ctx, "do_tryon"), btns)
     else:
         m = coach_reply(ctx, say, ctx.t("kyun_tryon"), cites, btns, do="do_tryon")
     m.image_bytes = image

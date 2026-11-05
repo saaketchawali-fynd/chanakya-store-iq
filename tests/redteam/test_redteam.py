@@ -168,6 +168,7 @@ async def test_13_banned_phrase_honest_version(h):
     assert "Ye line mat boliye" in out[0].body and "नोव्हें." in out[0].body  # real end date from data (mr)
 
 
+@pytest.mark.floor_exempt  # sends 4 buttons and long titles on purpose: the validator must trim them
 async def test_14_and_16_overflow_titles_and_buttons(h):
     reg = NumberRegistry()
     m = OutMessage(
@@ -205,7 +206,7 @@ async def test_17_expert_answer_with_number(h):
     await h.tap(f"x:{ev.payload['qid']}:save")
     h.as_("associate")
     out = await h.say("expert Does Meru 55 QLED Pro support Dolby Vision?")
-    assert out[0].body.startswith("*Library se* · Sunil")  # a saved answer, said plainly, by whom
+    assert out[0].body.startswith("*Library se · Sunil")  # a saved answer, said plainly, by whom
 
 
 async def test_18_window_closed(h):
@@ -297,7 +298,7 @@ async def test_language_picker_then_single_language(tmp_path):
         b = next(m for m in out if m.card and m.card.template == "brief")
         assert b.card.lang == "en" and "प्रशिक्षण" in b.buttons[0].title  # English card, Marathi messages
         out = await hh.tap("g:new")
-        assert "नवीन ग्राहक" in out[0].body  # Marathi from now on
+        assert "नवीन ग्राहक" in out[0].body + (out[0].footer or "")  # Marathi from now on
         out = await hh.tap("s:C1:lang:hi")  # customer speaks Hindi: only the Bolo line follows the customer
         out = await hh.voice("assess_short")
         body = out[0].body

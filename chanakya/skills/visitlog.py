@@ -114,7 +114,7 @@ async def home(ctx: SkillContext) -> Reply:
     totals = [_total(r.entry or {})[0] for r in rows]
     body = ctx.t("visit_home")
     if rows:
-        body += "\n\n" + ctx.t("visit_home_count", n=ctx.reg.num(len(rows), "visit:count"),
+        body += "\n" + ctx.t("visit_home_count", n=ctx.reg.num(len(rows), "visit:count"),
                                m=ctx.reg.num(statistics.median(totals), "visit:median"))
     first = (Button(id=encode("v", draft.id, "more", "1"), title=ctx.t("b_visit_continue")) if draft and draft.entry
              else Button(id=encode("v", 0, "new", "1"), title=ctx.t("b_new_visit")))
@@ -175,7 +175,7 @@ def _next_missing(ctx: SkillContext, log_id: int, entry: dict) -> OutMessage:
     total, n = _total(entry)
     body = ctx.t("visit_ready", total=ctx.reg.num(total, "visit:total"), n=ctx.reg.num(n, "visit:steps"))
     if n < len(STEPS):
-        body += "\n\n" + ctx.t("visit_ready_missing", k=ctx.reg.num(len(STEPS) - n, "visit:steps"))
+        body += "\n" + ctx.t("visit_ready_missing", k=ctx.reg.num(len(STEPS) - n, "visit:steps"))
     ctx.reg.static("14 7")
     return info_reply(ctx, body, [Button(id=encode("v", log_id, "save", "1"), title=ctx.t("b_save")),
                                   Button(id=encode("v", log_id, "more", "1"), title=ctx.t("b_add_more"))])
@@ -308,7 +308,7 @@ async def summary(ctx: SkillContext, to: str | None = None) -> Reply:
     weakest = min((s for s in steps if s["avg"] is not None), key=lambda s: s["avg"], default=None)
     body = ctx.t("visits_caption", n=num(n, "visit:sum"), m=num(statistics.median(totals), "visit:sum"))
     if weakest:
-        body += "\n\n" + ctx.t("visits_weakest", step=weakest["name"])
+        body += "\n" + ctx.t("visits_weakest", step=weakest["name"])
     btns = [Button(id=encode("v", 0, "export", "1"), title=ctx.t("b_export"))]
     if not to and ctx.role == "visitor":
         btns.insert(0, Button(id=encode("v", 0, "new", "1"), title=ctx.t("b_new_visit")))

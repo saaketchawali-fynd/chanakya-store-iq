@@ -106,6 +106,12 @@ class Services:
             for s in (m.body, m.caption):
                 if s:
                     reg.static(s)
+        if not m.footer and m.kind in ("text", "buttons", "list", "image"):  # voice first on every staff phone
+            from chanakya.core import repo
+
+            st = await repo.staff_by_wa(m.to)
+            if st is not None and st.role in ("associate", "manager") and st.lang_set:
+                m.footer = t("footer_voice_mgr" if st.role == "manager" else "footer_voice_q", st.lang or "en")
         return await self.deliver(self.validate(m, reg, None, lang, None))
 
 

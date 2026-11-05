@@ -62,7 +62,7 @@ async def test_wm_smoke_rules(h):
     assert s.home.category == "wm"
     # the needs were told in one note (people, place, how often): the right machines now, from the note
     assert options_view(out) is not None  # one product page per option
-    assert (out[0].body or out[0].caption).startswith("*Note se samjha:*\n• 5 log")  # what the note said, as bullets
+    assert (out[0].body or out[0].caption).startswith("*Note se samjha:* 5 log")  # what the note said, in one line
     await h.tap("s:C1:shown")
     out = await answer_complete(h, await h.tap("s:C1:opt:B"))
     check_floor(out)
@@ -95,7 +95,7 @@ async def test_manager_expert_visitlog(h):
     h.as_("manager")
     out = await h.say("floor")
     check_floor(out)
-    assert out[0].body.startswith("*Floor abhi*") and "\n\n*Aaj*" in out[0].body  # sections
+    assert out[0].body.startswith("*Floor abhi:*") and "\n*Aaj:*" in out[0].body  # right now, then today
     out = await h.say("digest")
     assert out[0].card.template == "digest"
     h.as_("visitor")

@@ -204,6 +204,7 @@ brief_step_of: {hi: "Step {n} of 3 · Pre-read", mr: "Step {n} of 3 · Pre-read"
 b_clip_next: {hi: "Aaj ki training", mr: "आजचं प्रशिक्षण", en: "Today's training"}
 b_ready: {hi: "Taiyaar hoon ✓", mr: "मी तयार ✓", en: "I'm ready ✓"}
 footer_voice_q: {hi: "Bolkar bhi: voice note — Hindi, English, Marathi · menu", mr: "बोलूनही: व्हॉइस नोट पाठवा — हिंदी, English, मराठी · menu", en: "Or send a voice note: Hindi, English or Marathi · menu"}
+footer_voice_short: {hi: "Bolkar bhi", mr: "बोलूनही", en: "Or say it"}
 brief_keep_cover: {hi: "Offer {n} of {total} {cat} par lagta hai", mr: "ऑफर {total} पैकी {n} {cat} वर लागू", en: "Offers apply to {n} of the {total} {cat} on sale"}
 brief_keep_days_left: {hi: "{title}: sirf {n} din baaki", mr: "{title}: फक्त {n} दिवस उरले", en: "{title}: only {n} days left"}
 brief_keep_last_day: {hi: "{title}: aaj aakhri din", mr: "{title}: आज शेवटचा दिवस", en: "{title}: today is the last day"}
@@ -417,8 +418,8 @@ note_upgrade: {hi: "Naye features chahiye", mr: "नवीन फीचर्स
 b_demo_guide: {hi: "Demo guide", mr: "डेमो गाइड", en: "Demo guide"}
 b_more_needs: {hi: "Aur bataiye", mr: "अजून सांगा", en: "Tell me more"}
 list_more: {hi: "Kya poochhein", mr: "काय विचारायचं", en: "What to ask"}
-more_body: {hi: "*Aur kya poochein*\n\nYe baatein abhi tak nahi aayin; har ek se sahi product aur pakka hoga.", mr: "*आणखी काय विचारायचं*\n\nया गोष्टी अजून आल्या नाहीत; प्रत्येकीमुळे योग्य प्रॉडक्ट अधिक पक्का होईल.", en: "*What else to ask*\n\nThese aren't covered yet; each one makes the pick surer."}
-more_body_none: {hi: "*Zaroori sab aa gaya.*\n\nAur kuch chahiye? Offers, ya doosra budget ya brand neeche hai.", mr: "*महत्त्वाचं सगळं आलं.*\n\nआणखी काही हवं? ऑफर्स, किंवा दुसरं बजेट किंवा ब्रँड खाली आहे.", en: "*That covers what matters.*\n\nAnything else they'd like? Offers, or another budget or brand, are below."}
+more_body: {hi: "*Aur kya poochein*\nYe baatein abhi tak nahi aayin; har ek se sahi product aur pakka hoga.", mr: "*आणखी काय विचारायचं*\nया गोष्टी अजून आल्या नाहीत; प्रत्येकीमुळे योग्य प्रॉडक्ट अधिक पक्का होईल.", en: "*What else to ask*\nThese aren't covered yet; each one makes the pick surer."}
+more_body_none: {hi: "*Zaroori sab aa gaya.*\nAur kuch chahiye? Offers, ya doosra budget ya brand neeche hai.", mr: "*महत्त्वाचं सगळं आलं.*\nआणखी काही हवं? ऑफर्स, किंवा दुसरं बजेट किंवा ब्रँड खाली आहे.", en: "*That covers what matters.*\nAnything else they'd like? Offers, or another budget or brand, are below."}
 more_footer: {hi: "Ya ek aur voice note bhejiye", mr: "किंवा आणखी एक व्हॉइस नोट पाठवा", en: "Or send another voice note"}
 more_dq_d: {hi: "Stock mein jis par models alag hain", mr: "स्टॉकमध्ये ज्यावर मॉडेल वेगळे आहेत", en: "What the models in stock differ on"}
 row_more_offers: {hi: "In par offers", mr: "यांवरच्या ऑफर्स", en: "Offers on these"}
@@ -432,7 +433,7 @@ note_head: {hi: "*Note se samjha:*", mr: "*नोटमधून समजलं
 note_line_wants: {hi: "Maanga: {what}", mr: "मागितलं: {what}", en: "Asked for: {what}"}
 note_line_needs: {hi: "Zaroorat: {what}", mr: "गरज: {what}", en: "Needs: {what}"}
 note_fits_head: {hi: "*Isse sabse sahi {n} {cat}*, har ek ka apna page — phone unki taraf kijiye:", mr: "*यावरून सर्वात योग्य {n} {cat}*, प्रत्येकाचं स्वतःचं पान — फोन त्यांच्याकडे वळवा:", en: "*The {n} {cat} that fit best*, one page each — turn your phone to them:"}
-opts_hint: {hi: "*Aage kya?* Side-by-side mein dono-teeno ki tulna, Demo guide se dikhaiye, ya aur sawaal.\n\n_Daam demo ke baad · offers aur baaki sawaal 'Aur bataiye' mein_", mr: "*पुढे काय?* साइड-बाय-साइडमध्ये तुलना, डेमो गाइडने दाखवा, किंवा आणखी प्रश्न.\n\n_किंमत डेमोनंतर · ऑफर्स आणि बाकी प्रश्न 'अजून सांगा' मध्ये_", en: "*Next with them:* compare them side by side, show them with the Demo guide, or ask more.\n\n_Price after the demo · offers and other questions under 'Tell me more'_"}
+opts_hint: {hi: "*Aage kya?* Side-by-side mein dono-teeno ki tulna, Demo guide se dikhaiye, ya aur sawaal.\n_Daam demo ke baad · offers aur baaki sawaal 'Aur bataiye' mein_", mr: "*पुढे काय?* साइड-बाय-साइडमध्ये तुलना, डेमो गाइडने दाखवा, किंवा आणखी प्रश्न.\n_किंमत डेमोनंतर · ऑफर्स आणि बाकी प्रश्न 'अजून सांगा' मध्ये_", en: "*Next with them:* compare them side by side, show them with the Demo guide, or ask more.\n_Price after the demo · offers and other questions under 'Tell me more'_"}
 # ---- the demo guide in one message (user, 4 Nov 2026)
 guide_head: {hi: "*Demo guide* — har product par pehle unki zaroorat dikhaiye (wow), phir baaki. Ek-ek step:", mr: "*डेमो गाइड* — प्रत्येक प्रॉडक्टवर आधी त्यांची गरज दाखवा (wow), मग बाकी. एक-एक स्टेप:", en: "*Demo guide* — on each product show their need first (the wow), then the rest. Step by step:"}
 guide_tag_wow: {hi: "Wow", mr: "Wow", en: "Wow"}
@@ -597,3 +598,8 @@ do_expert_hold:
   hi: "Imaandari se bataiye ki expert se pooch rahe hain; tab tak agli cheez dikhaiye, taaki woh khaali na baithein."
   mr: "प्रामाणिकपणे सांगा की एक्सपर्टला विचारताय; तोपर्यंत पुढचं काही दाखवा, म्हणजे ते रिकामे थांबणार नाहीत."
   en: "Tell them honestly you're checking with an expert; show them the next thing meanwhile, so they don't wait idle."
+guide_head_one: {hi: "*Demo guide* upar card par · pehle *{lab} · {name}*, unki sabse badi zaroorat se.", mr: "*डेमो गाइड* वरच्या कार्डवर · आधी *{lab} · {name}*, त्यांच्या सर्वात मोठ्या गरजेपासून.", en: "*Demo guide* on the card · start with *{lab} · {name}*, from their biggest need."}
+upg_line: {hi: "*{a} → {b}:* +{diff} (5 saal mein roz lagbhag {day}) · {adds}", mr: "*{a} → {b}:* +{diff} (5 वर्षांत रोज सुमारे {day}) · {adds}", en: "*{a} → {b}:* +{diff} (about {day} a day over 5 years) · {adds}"}
+hold_voice: {hi: "Sun liya — ek second…", mr: "ऐकलं — एक सेकंद…", en: "Got it — one second…"}
+hold_photo: {hi: "Photo mil gayi — padh raha hoon…", mr: "फोटो मिळाला — वाचतोय…", en: "Got the photo — reading it…"}
+hold_wait: {hi: "Ek second…", mr: "एक सेकंद…", en: "One second…"}

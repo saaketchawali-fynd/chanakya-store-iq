@@ -89,6 +89,11 @@ def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voic
             ctx.ev("slot_filled", slot=sp.slot, value=sp.value, source=source)
     for npair in u.numbers:
         if npair.name == "budget_inr":
+            from chanakya.ai.rules import explicit_budget
+
+            if not explicit_budget(u.transcript or (ctx.inbound.text if ctx.inbound else None)):
+                ctx.ev("budget_ignored", reason="not_said_as_budget")  # store rule 3: never from appearance
+                continue
             home.start_level_inr = int(npair.value)
             home.start_level_source = "associate_voice"
             continue
@@ -451,9 +456,9 @@ async def status(ctx: SkillContext) -> Reply:
     from chanakya.core.status import status_line
 
     st = [x for x in (status_line(ctx) or "").split(" · ") if x]
-    if st:  # 'Where C1 Shah stands', then each fact on its own line, then where the details are
-        msg.body = "\n".join([ctx.t("status_head", who=st[0]), ""] + [f"• {x}" for x in st[1:]]
-                             + (["", ctx.t("status_tail")] if msg.card else []))
+    if st:  # 3 lines: 'Where C1 Shah stands', the facts in one line, then where the details are
+        msg.body = "\n".join([ctx.t("status_head", who=st[0]), " · ".join(st[1:])]
+                             + ([ctx.t("status_tail")] if msg.card else []))
     msg.buttons = btns
     msg.kind = "buttons"
     msg.allowed_numbers = ctx.reg.allowed()

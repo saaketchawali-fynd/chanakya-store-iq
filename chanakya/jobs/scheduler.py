@@ -85,7 +85,7 @@ class Scheduler:
                 btns = btns[1:]
             body = t("task_reminder", lang, title=title)
             if task.kind == "followup" and st and st.name:  # the call itself: how to open it, warmly
-                body += "\n\n" + t("task_reminder_say", lang, associate=st.name)
+                body += "\n" + t("task_reminder_say", lang, associate=st.name)
             await self.send(
                 OutMessage(to=task.owner_wa_id, kind="buttons", body=body, buttons=btns, session_id=task.session_id)
             )

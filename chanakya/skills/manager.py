@@ -88,7 +88,7 @@ async def floor(ctx: SkillContext) -> Reply:
         if (j.site_needs or {}).get("_risks") or j.status == "problem"
     ]
     n = ctx.reg.num
-    body = "\n\n".join(  # sections: right now, then today (with the follow-ups and install risks)
+    body = "\n".join(  # 3 lines: right now; today with the follow-ups and install risks; (the tap hint)
         [
             ctx.t(
                 "floor_now",
@@ -103,7 +103,7 @@ async def floor(ctx: SkillContext) -> Reply:
                 n=n(len(totals), "calc:floor"),
                 m=n(med, "calc:floor"),
             )
-            + "\n"
+            + " · "
             + ctx.t("floor_follow", t=n(len(tasks), "calc:floor"), r=n(len(risk), "calc:floor")),
         ]
     )
@@ -131,7 +131,7 @@ async def floor(ctx: SkillContext) -> Reply:
     rows.append(ListRow(id=encode("m", "digest"), title=truncate(ctx.t("mgr_row_digest"), 24),
                         description=truncate(ctx.t("mgr_row_digest_d"), 72)))
     ctx.reg.static(" ".join(r.title + " " + (r.description or "") for r in rows[-1:]))
-    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=body + "\n\n" + ctx.t("floor_tap"),
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=body + "\n" + ctx.t("floor_tap"),
                                 list_button=truncate_title(ctx.t("list_floor")), sections=[ListSection(rows=rows)],
                                 allowed_numbers=ctx.reg.allowed()))
 
@@ -156,11 +156,11 @@ async def floor_customer(ctx: SkillContext, session_id: str | None) -> Reply:
         ctx.session = mine
     step = COACH_STEP.get(getattr(s.step, "value", str(s.step)), "assess")
     pack = ctx.packs.get(s.home.category)
+    now = ctx.t("floor_c_step", step=ctx.t(f"step_{step}"), m=ctx.reg.num(_mins(ctx, row[0].created_at), "calc:floor"))
     lines = [ctx.t("floor_c_head", assoc=who.name if who else "?", who=parts[0] if parts else s.code,
-                   cat=ctx.pick(pack.label) if pack and s.home.category else ctx.t("floor_no_cat")), ""]
-    lines += [f"• {x}" for x in parts[2:]]
-    lines.append(ctx.t("floor_c_step", step=ctx.t(f"step_{step}"), m=ctx.reg.num(_mins(ctx, row[0].created_at), "calc:floor")))
-    lines += ["", ctx.t("tip_line", tip=ctx.t(f"tip_{step}"))]
+                   cat=ctx.pick(pack.label) if pack and s.home.category else ctx.t("floor_no_cat")),
+             " · ".join([now] + parts[2:]),
+             ctx.t("tip_line", tip=ctx.t(f"tip_{step}"))]
     btns = [Button(id=encode("m", "tip", s.associate_wa_id, step), title=ctx.t("b_send_tip")),
             Button(id=encode("m", "floor"), title=ctx.t("b_floor")),
             Button(id=encode("m", "digest"), title=ctx.t("b_huddle"))]
@@ -244,16 +244,19 @@ async def digest(ctx: SkillContext, to: str | None = None) -> Reply:
     if worst:
         caption = ctx.t("digest_gap", name=worst[1], step=ctx.t(f"step_{worst[3]}"))
         gaps = ctx.t("digest_gap_card", name=worst[1], step=ctx.t(f"step_{worst[3]}"))
+        extra = []
         if best is not None:
             bst = d["staff"].get(best.associate_wa_id)
-            caption += "\n\n" + ctx.t("digest_best_line", name=bst.name if bst else "", total=n(best.total, "calc:digest"))
+            extra.append(ctx.t("digest_best_line", name=bst.name if bst else "", total=n(best.total, "calc:digest")))
     else:
         caption = gaps = ctx.t("digest_no_data")
+        extra = []
     vn = [e for e in ev if e.type == "voice_note"]
     if vn:  # the associates' voice notes today, and how many were understood (the voice log is one tap away)
         ok = sum(1 for e in vn if (e.payload or {}).get("understood") or (e.payload or {}).get("intents"))
-        caption += "\n\n_" + ctx.t("kpi_voice") + ": " + ctx.t("kpi_voice_val", n=n(len(vn), "calc:digest"),
-                                                                ok=n(ok, "calc:digest")) + "_"
+        extra.append(ctx.t("kpi_voice") + ": " + ctx.t("kpi_voice_val", n=n(len(vn), "calc:digest"), ok=n(ok, "calc:digest")))
+    if extra:  # one quiet line: the best today and the voice notes
+        caption += "\n_" + " · ".join(x.strip("_ ").rstrip(".") for x in extra) + "_"
     card = Card(
         template="digest",
         lang=ctx.lang,
@@ -338,7 +341,7 @@ async def approvals(ctx: SkillContext) -> Reply:
     s = await ctx.svc.sessions.get(t.session_id) if t.session_id else None
     extra = approval_context(ctx, s, p.get("sku"), ctx.lang)
     if extra:
-        body += "\n\n" + "\n".join(extra)
+        body += "\n" + "\n".join(extra)
     btns = [
         Button(id=encode("m", "appr", t.id, "offers"), title=ctx.t("b_offer_dikhao")),
         Button(id=encode("m", "appr", t.id, "no"), title=ctx.t("b_mana_karo")),
@@ -536,12 +539,12 @@ async def profile(ctx: SkillContext, wa: str | None) -> Reply:
     n = ctx.reg.num
     sess = sum(1 for r, _ in d["sessions"] if r.associate_wa_id == st.wa_id)
     today = [sc.total for sc in d["scores"] if sc.associate_wa_id == st.wa_id]
-    lines = [ctx.t("profile_head", name=st.name), ""]
     if today:
-        lines.append(ctx.t("profile_today", s=n(sess, "calc:profile"), m=n(statistics.median(today), "calc:profile"),
-                           g=n(sum(1 for x in today if x >= 11), "calc:profile"), n=n(len(today), "calc:profile")))
+        first = ctx.t("profile_today", s=n(sess, "calc:profile"), m=n(statistics.median(today), "calc:profile"),
+                      g=n(sum(1 for x in today if x >= 11), "calc:profile"), n=n(len(today), "calc:profile"))
     else:
-        lines.append(ctx.t("profile_today_none", s=n(sess, "calc:profile")))
+        first = ctx.t("profile_today_none", s=n(sess, "calc:profile"))
+    lines = [ctx.t("profile_head", name=st.name) + " · " + first]
     week = [sc for sc in await repo.scores_for(st.wa_id, limit=100)
             if (repo.aware(sc.at) or ctx.now) >= ctx.now - timedelta(days=7)]
     weakest = None
@@ -550,7 +553,8 @@ async def profile(ctx: SkillContext, wa: str | None) -> Reply:
         hi_s, lo_s = max(STEPS, key=lambda s: avg[s]), min(STEPS, key=lambda s: avg[s])
         weakest = lo_s
         lines.append(ctx.t("profile_steps", best=ctx.t(f"step_{hi_s}"), b=n(_cell(avg[hi_s]), "calc:profile"),
-                           worst=ctx.t(f"step_{lo_s}"), w=n(_cell(avg[lo_s]), "calc:profile")))
+                           worst=ctx.t(f"step_{lo_s}"), w=n(_cell(avg[lo_s]), "calc:profile"))
+                     + " · " + ctx.t("profile_steps_note", n=n(len(week), "calc:profile")))
     c = await wins.counts(ctx, wa=st.wa_id)
     parts = []
     for key, k in (("wins_cards", "cards"), ("wins_sales", "sales")):
@@ -558,13 +562,12 @@ async def profile(ctx: SkillContext, wa: str | None) -> Reply:
             parts.append(ctx.t(wins._one(key, c[k]), n=n(c[k], f"wins:{k}")))
     if c["streak"] >= 2:
         parts.append(ctx.t("wins_streak", n=n(c["streak"], "wins:streak")))
-    if parts:
-        lines.append(ctx.t("profile_wins", what=" · ".join(parts)))
     vn = [e for e in d["events"] if e.type == "voice_note" and e.actor_wa_id == st.wa_id]
+    third = [ctx.t("profile_wins", what=" · ".join(parts))] if parts else []
     if vn:
-        lines.append(ctx.t("profile_voice", n=n(len(vn), "calc:profile")))
-    if week:
-        lines += ["", ctx.t("profile_steps_note", n=n(len(week), "calc:profile"))]
+        third.append(ctx.t("profile_voice", n=n(len(vn), "calc:profile")))
+    if third:
+        lines.append(" · ".join(third))
     ctx.reg.static("14 11 7 2")
     btns = []
     if weakest:
@@ -586,15 +589,15 @@ async def voice_detail(ctx: SkillContext, event_id: int) -> Reply:
     s = await ctx.svc.sessions.get(e.session_id) if e.session_id else None
     pack = ctx.packs.get(s.home.category) if s else None
     head = " · ".join(x for x in ((st.name if st else "?"), pl.get("code") or "", _when(e), (pl.get("lang") or "").upper()) if x)
-    lines = [f"*{head}*", "", ctx.t("vlog_heard", text=pl.get("transcript") or ctx.t("vlog_empty"))]
-    got = _understood_lines(ctx, pl, pack)
+    lines = [f"*{head}*", "> " + " ".join((pl.get("transcript") or ctx.t("vlog_empty")).split())]
+    got = [x.lstrip("• ") for x in _understood_lines(ctx, pl, pack)]
     asked = [ctx.t(f"intent_{i}") for i in pl.get("intents") or [] if i != "other"]
+    third = []
     if got:
-        lines += ["", ctx.t("vlog_got", lines="\n".join(got[:6]))]
+        third.append(ctx.t("vlog_got", lines=", ".join(got[:4])))
     if asked:
-        lines += ["", ctx.t("vlog_asked", what=", ".join(asked[:4]))]
-    if not got and not asked:
-        lines += ["", ctx.t("vlog_nothing")]
+        third.append(ctx.t("vlog_asked", what=", ".join(asked[:3])))
+    lines.append(" · ".join(third) if third else ctx.t("vlog_nothing"))
     ctx.reg.raw("\n".join(lines), "voice:log")
     btns = [Button(id=encode("m", "vlog"), title=ctx.t("b_vlog")), Button(id=encode("m", "digest"), title=ctx.t("b_huddle"))]
     if st:

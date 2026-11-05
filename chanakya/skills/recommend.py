@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import re
-
 from chanakya.brain import packs as P
 from chanakya.brain.demos import pick_demo
 from chanakya.brain.fit import fit
@@ -34,7 +32,7 @@ def _price_later(ctx: SkillContext, step: str) -> str:
     keep them with you while it does."""
     from chanakya.core.coach import bolo_block, do_block, kyun_block
 
-    return "\n\n".join([bolo_block(ctx, ctx.tc("bolo_price_later")),
+    return "\n".join([bolo_block(ctx, ctx.tc("bolo_price_later")),
                         kyun_block(ctx, ctx.t("kyun_price_later") + " · " + step), do_block(ctx, "do_price_later")])
 
 
@@ -186,20 +184,20 @@ def note_block(ctx: SkillContext, note: dict) -> str:
     meaning = meaning_labels(ctx)
     asks = meaning[: len(home.asks)]
     rest = meaning[len(home.asks):]
-    out = [ctx.t("note_head")]
-    if facts:
-        out.append("• " + " · ".join(facts[:5]))
+    parts = list(facts[:5])
     if wants:
-        out.append("• " + ctx.t("note_line_wants", what=", ".join(wants)))
-    if rest:
-        out.append("• " + " · ".join(rest))
+        parts.append(ctx.t("note_line_wants", what=", ".join(wants)))
+    parts += rest
     if asks:
-        out.append("• " + ctx.t("note_line_needs", what=", ".join(asks)))
-    return "\n".join(out)
+        parts.append(ctx.t("note_line_needs", what=", ".join(asks)))
+    from chanakya.core.coach import fit_line
+
+    return fit_line(parts[1:], f"{ctx.t('note_head')} {parts[0]}") if parts else ""
 
 
 def option_block(ctx: SkillContext, o, opts, why: list[str] | None = None) -> str:
-    """'*A · Name* — best fit' and, as bullets, why it fits them: its reason, then its own points with proof."""
+    """Two lines: '*A · Name* — best fit', then why it fits them in one line: its reason, then its own points with
+    proof (the product page card shows the rest)."""
     from chanakya.skills import fitview as FV
 
     p = o.product
@@ -217,8 +215,11 @@ def option_block(ctx: SkillContext, o, opts, why: list[str] | None = None) -> st
         if text and not same_size and not any(text.lower() in b.lower() or b.lower() in text.lower() for b in bullets):
             bullets.append(line)
     if not (p.qty > 0):
-        bullets.append(_stock_line(ctx, p))
-    return "\n".join([head] + [f"• {b}" for b in bullets if b])
+        bullets.insert(1, _stock_line(ctx, p))
+    from chanakya.core.coach import fit_line
+
+    bullets = [b for b in bullets if b]
+    return head + ("\n" + fit_line(bullets[1:], f"{ctx.t('label_kyun')}: {bullets[0]}") if bullets else "")
 
 
 def meaning_labels(ctx: SkillContext, lang: str | None = None) -> list[str]:
@@ -345,7 +346,7 @@ async def _next_followup(ctx: SkillContext) -> Reply:
             return await _next_followup(ctx)
     else:
         m = C.question_reply(ctx, q)
-    m.body = f"{lead}\n\n{m.body}"
+    m.footer = lead.replace("*", "")[:60]  # the question stays 3 lines; which follow-up it is, in the footer
     return ctx.reply(m)
 
 
@@ -584,13 +585,11 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
     # after the follow-ups only the products that joined get a page (the earlier ones were just shown)
     from chanakya.skills.translate import product_card_en
 
-    pages = []
+    pages = [info_reply(ctx, "\n".join(x for x in blocks if x))]  # what was understood, and how many: ≤ 2 lines
     for o in [o for o in opts.options if not merged or o.role in ("new", "broader")] or opts.options:
         cap = option_block(ctx, o, opts, why_b if o.role == "best" else None)
         off = PV.offer_line(ctx, o.product, ctx.lang)["text"].replace(" · ", ", ")
-        cap += "\n• " + ctx.t("fact_offer", offer=off)  # the card is the reference design: its offer said here
-        if not pages:  # the first page also carries the heading (and what the note said)
-            cap = "\n\n".join(blocks + [cap])
+        cap += "\n" + ctx.t("fact_offer", offer=off)  # the card is the reference design: its offer said here
         with ctx.as_lang("en"):
             chip = ctx.t(f"pdp_role_{o.role}") if i18n_has(f"pdp_role_{o.role}") else ctx.t("pdp_role_option")
         card = await product_card_en(ctx, o.product, chip=chip, chip_label=o.label, chip_kind=o.role)
@@ -604,7 +603,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
         ctx.x["demos_sent"] = [d.id]
     many = len(opts.options) >= 2
     if note is not None:  # after a note: are these right for them? yes → see them side by side; no → more options
-        blocks.append(ctx.t("note_ask_happy"))
+        blocks = [ctx.t("note_ask_happy")]
         btns = [ctx.b("b_happy", ctx.sid("cmpall") if many else ctx.sid("demo")),
                 ctx.b("b_more_options", ctx.sid("moreopts")), ctx.b("b_demo_guide", ctx.sid("demo"))]
     else:  # the next steps with the products (user, 4 Nov 2026): compare in their home, the demo, or more
@@ -612,7 +611,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
                 ctx.b("b_demo_guide", ctx.sid("demo")) if many else (
                     ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer"))),
                 ctx.b("b_more_needs", ctx.sid("more"))]
-    last = info_reply(ctx, "\n\n".join(blocks), btns)  # the next steps, last, so the buttons sit at the bottom
+    last = info_reply(ctx, "\n".join(blocks), btns)  # the next steps, last, so the buttons sit at the bottom
     if ctx.x.pop("rerank_note", None):
         last.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
     return ctx.reply(*pages, last)
@@ -870,42 +869,21 @@ def _other_for(best_lab: str, lab: str, labs: list[str], prods: dict):
 
 
 async def demo_guide_text(ctx: SkillContext) -> str:
-    """The whole demo in one message (user, 4 Nov 2026): for each product, numbered steps the associate runs one by
-    one: what to show (their need first, the wow), its proof, how to show it, and the line to say."""
+    """Three lines under the demo guide card (which holds every product's numbered steps): which product to start
+    with and why, the wow line to say, and how to go on."""
     best_lab, labs, prods = _guide_labs(ctx)
-    words = {"wow": ctx.t("guide_tag_wow"), "then": ctx.t("guide_tag_then"), "more": ctx.t("guide_tag_more")}
-    blocks = [ctx.t("guide_head")]
-    for lab in labs[:3]:
-        p = prods.get(lab)
-        if p is None:
-            continue
-        steps = await guide_steps(ctx, p, _other_for(best_lab, lab, labs, prods),
-                                  GUIDE_STEPS["best" if lab == best_lab else "other"], ctx.lang, ctx.clang)
-        if not steps:
-            continue
-        head = f"*{lab} · {C.product_name(ctx, p)}*" + (f" — _{ctx.t('best_pick')}_" if lab == best_lab else "")
-        lines = [head]
-        for i, st in enumerate(steps, 1):
-            proof = f" ({st['proof']})" if st.get("proof") else ""
-            lines.append(f"{ctx.reg.num(i, 'guide:step_no')}. *{words.get(st['tag'], '')}:* {st['title']}{proof}")
-            if st.get("do"):
-                lines.append(f"   ▸ {st['do']}")
-            if st.get("say") and st["tag"] == "wow":
-                lines.append(f'   _"{st["say"]}"_')
-        blocks.append("\n".join(lines))
-    blocks.append(ctx.t("guide_tail"))
-    text = "\n\n".join(blocks)
-    if len(text) > 1000:  # WhatsApp's limit with buttons: the lines to say go first, then the other products' how-to
-        text = "\n".join(ln for ln in text.split("\n") if not ln.strip().startswith('_"'))
-    if len(text) > 1000:
-        keep, out = True, []
-        for ln in text.split("\n"):
-            if re.match(r"^\*[A-E] · ", ln):  # a product's block: keep the how-to only for the best pick
-                keep = ln.startswith(f"*{best_lab} ")
-            if keep or not ln.strip().startswith("▸"):
-                out.append(ln)
-        text = "\n".join(out)
-    return text[:1020]
+    p = prods.get(best_lab)
+    lines = [ctx.t("guide_head_one", lab=best_lab, name=C.product_name(ctx, p) if p else best_lab)]
+    if p is not None:
+        steps = await guide_steps(ctx, p, _other_for(best_lab, best_lab, labs, prods), 1, ctx.lang, ctx.clang)
+        if steps and steps[0].get("say"):
+            from chanakya.core.coach import bolo_block
+
+            lines.append(bolo_block(ctx, steps[0]["say"]))
+        elif steps:
+            lines.append(f"*{ctx.t('guide_tag_wow')}:* {steps[0]['title']}")
+    lines.append(ctx.t("guide_tail"))
+    return "\n".join(lines)
 
 
 async def demo_guide_card(ctx: SkillContext) -> Card | None:
@@ -1258,14 +1236,13 @@ async def upgrade_view(ctx: SkillContext) -> Reply:
         src = f"calc:upgrade:{a.sku}:{b.sku}"
         per_day = ctx.reg.inr(max(1, round(diff / (5 * 365))), src)
         gains = _gains(ctx, a, b)
-        blocks.append("\n".join([  # one block per step up: the two, the money (and per day), what it adds for them
-            ctx.t("upg_step", a=la, b=lb, pa=C.product_name(ctx, a), pb=C.product_name(ctx, b)),
-            ctx.t("upg_cost", diff=ctx.reg.inr(diff, src), day=per_day),
-            ctx.t("upg_adds", what=", ".join([gains[0]] + [_lower1(g) for g in gains[1:]])) if gains
-            else ctx.t("upg_nothing", lower=la)]))
+        adds = (ctx.t("upg_adds", what=", ".join([gains[0]] + [_lower1(g) for g in gains[1:]])) if gains
+                else ctx.t("upg_nothing", lower=la)).lstrip("• ")
+        blocks.append(ctx.t("upg_line", a=la, b=lb, diff=ctx.reg.inr(diff, src), day=per_day, adds=adds))  # one line each
     ctx.ev("upgrade_check", options=[lab for lab, _ in picks])
     from chanakya.core.coach import do_block
 
-    blocks = blocks[:4] + [do_block(ctx, "do_upgrade")]
+    steps_ = blocks[1:]
+    blocks = (steps_[:2] if len(steps_) >= 2 else blocks[:2]) + [do_block(ctx, "do_upgrade")]
     btns = [ctx.b("b_they_chose", ctx.sid("prefer")), ctx.b("b_offers_on", ctx.sid("ofs"))]
-    return ctx.reply(info_reply(ctx, "\n\n".join(blocks), btns))
+    return ctx.reply(info_reply(ctx, "\n".join(x for x in blocks if x), btns))

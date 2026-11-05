@@ -79,7 +79,7 @@ async def myth(ctx: SkillContext, claim_id: str) -> Reply:
             ctx.asking.add(slot)
             cites = [slot]
     if not cites:
-        return ctx.reply(info_reply(ctx, bolo_block(ctx, line) + "\n\n" + do_block(ctx, "do_myth"), btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, line) + "\n" + do_block(ctx, "do_myth"), btns))
     return ctx.reply(coach_reply(ctx, line, why, cites, btns, do="do_myth"))
 
 

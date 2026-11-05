@@ -30,8 +30,8 @@ def check_floor(msgs: list[OutMessage]) -> None:
         for text in (m.body, m.caption):
             if text:
                 lines = text.split("\n")
-                assert len(lines) <= 24, f"> 24 lines: {text!r}"  # well spaced, detailed, still scannable
-                assert not any(not a.strip() and not b.strip() for a, b in zip(lines, lines[1:], strict=False)), f"double gap: {text!r}"
+                assert len(lines) <= 3, f"> 3 lines: {text!r}"  # the contest's floor rule
+                assert all(ln.strip() for ln in lines), f"blank line: {text!r}"
                 assert not re.search(r"[०-९]", text)
                 low = text.lower()
                 assert not any(b in low for b in BANNED), text
@@ -43,10 +43,10 @@ def check_floor(msgs: list[OutMessage]) -> None:
             assert any(raw("label_kyun", lg) in (m.body or m.caption or "") for lg in ("hi", "mr", "en"))  # image: caption
 
 
-def texts(msgs: list[OutMessage]) -> str:
+def texts(msgs: list[OutMessage], footer: bool = True) -> str:
     out = []
     for m in msgs:
-        out += [m.body or "", m.caption or ""] + [b.title for b in m.buttons]
+        out += [m.body or "", m.caption or "", (m.footer or "") if footer else ""] + [b.title for b in m.buttons]
     return "\n".join(out)
 
 

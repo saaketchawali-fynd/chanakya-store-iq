@@ -251,8 +251,7 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
             ctx.asking.add(slot)
         facts = card_facts(ctx, p, card)
         if not cites:
-            return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + "\n".join(f"• {f}" for f in facts)
-                                        + "\n\n" + do_block(ctx, "do_benefit"), btns, card=card))
+            return ctx.reply(info_reply(ctx, _facts_body(ctx, say, facts), btns, card=card))
         return ctx.reply(coach_reply(ctx, say, " · ".join([why, *facts]), cites, btns, card=card, do="do_benefit"))
     if nxt is None or len(said) >= 2:
         return await ignore_line(ctx, p)
@@ -288,9 +287,18 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     cites = [c for c in cites_all if P.known(ctx.session.home, c)] or cites_all or C.known_cites(ctx)
     facts = card_facts(ctx, p, card) if card is not None else []
     if not cites:
-        body = bolo_block(ctx, say) + ("\n\n" + "\n".join(f"• {f}" for f in facts) if facts else "")
-        return ctx.reply(info_reply(ctx, body + "\n\n" + do_block(ctx, "do_benefit"), btns, card=card))
+        return ctx.reply(info_reply(ctx, _facts_body(ctx, say, facts), btns, card=card))
     return ctx.reply(coach_reply(ctx, say, " · ".join([why, *facts]), cites, btns, card=card, do="do_benefit"))
+
+
+def _facts_body(ctx: SkillContext, say: str, facts: list[str]) -> str:
+    """Three lines with no Home Card fact to cite yet: the line to say, the card's facts in one line, what to do."""
+    from chanakya.core.coach import fit_line
+
+    lines = [bolo_block(ctx, say)]
+    if facts:
+        lines.append(fit_line(facts[1:], facts[0]))
+    return "\n".join(lines + [do_block(ctx, "do_benefit")])
 
 
 def card_facts(ctx: SkillContext, p, card: Card) -> list[str]:
@@ -409,7 +417,7 @@ async def ignore_line(ctx: SkillContext, p, ms: list | None = None) -> Reply:
                 total=ctx.reg.num(total, f"stock:{p.category}:bucket_count"), spec=spec)
     cites = C.known_cites(ctx)
     if not cites:
-        return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n\n" + do_block(ctx, "do_ignore"), btns))
+        return ctx.reply(info_reply(ctx, bolo_block(ctx, say) + "\n" + do_block(ctx, "do_ignore"), btns))
     return ctx.reply(coach_reply(ctx, say, why, cites, btns, do="do_ignore"))
 
 

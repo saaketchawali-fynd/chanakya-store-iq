@@ -51,7 +51,7 @@ async def test_explicit_asks_pick_the_products(h):
     s = await session(h)
     best = h.rt.facts.product_sync(s.option_labels[next(k for k, r in s.extra["option_roles"].items() if r == "best")])
     assert meets_all(best, s.extra["wants"]) and "jaisa kaha" in texts(out)  # '55", QLED, Meru as asked'
-    assert "₹" not in texts(out)
+    assert "₹" not in texts(out, footer=False)
 
 
 async def test_a_short_note_still_goes_one_question_at_a_time(h):

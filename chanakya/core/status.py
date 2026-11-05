@@ -29,6 +29,8 @@ def status_line(ctx: SkillContext) -> str:
         return ""
     pack = ctx.pack
     L = ctx.lang
+    if not s.home.category:  # no product picked yet: 'C1 · New customer'
+        return ctx.t("st_new", L, code=ctx.reg.raw(s.code, "session:code"))
     cat = ctx.pick(pack.label) if pack else "–"
     known, total = state.required_progress(s, pack) if pack else (0, 0)
     code = ctx.reg.raw(s.code, "session:code")

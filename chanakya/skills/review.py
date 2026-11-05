@@ -149,7 +149,7 @@ async def finish(ctx: SkillContext) -> Reply:
             "tip": tip,
         },
     )
-    caption = level + "\n\n" + "\n".join([ctx.t("review_best", text=praise), ctx.t("review_next", text=tip)])
+    caption = level + "\n" + "\n".join([ctx.t("review_best", text=praise), ctx.t("review_next", text=tip)])
     btns = [
         ctx.b("b_new_customer", encode("g", "new")),
         ctx.b("b_score", encode("g", "score")),

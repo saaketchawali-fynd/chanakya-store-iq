@@ -112,7 +112,7 @@ async def home(ctx: SkillContext) -> Reply:
     lib = len(await repo.library_all(None))
     lib_line = ctx.t("expert_home_lib", n=ctx.reg.num(lib, "calc:library"))
     if not open_q:
-        return ctx.reply(info_reply(ctx, ctx.t("expert_home_none") + "\n\n" + lib_line))
+        return ctx.reply(info_reply(ctx, ctx.t("expert_home_none") + "\n" + lib_line))
     rows = []
     for q in open_q[:10]:
         a = await repo.staff_by_wa(q.associate_wa_id)
@@ -122,7 +122,7 @@ async def home(ctx: SkillContext) -> Reply:
         rows.append(ListRow(id=encode("x", q.id, "answer"), title=truncate(title, 24), description=truncate(q.question, 72)))
     for r in rows:
         ctx.reg.raw(r.title + " " + (r.description or ""), "expert:queue")
-    body = ctx.t("expert_home_some", n=ctx.reg.num(len(open_q), "calc:expert_open")) + "\n\n" + lib_line
+    body = ctx.t("expert_home_some", n=ctx.reg.num(len(open_q), "calc:expert_open")) + "\n" + lib_line
     return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=body, list_button=truncate(ctx.t("list_expert_q"), 20),
                                 sections=[ListSection(rows=rows)], allowed_numbers=ctx.reg.allowed()))
 
@@ -141,10 +141,11 @@ async def answer_from_library(ctx: SkillContext, entry) -> Reply:
     ctx.reg.raw(ans.get("for_associate", "") + " " + (ans.get("bolo") or "") + " " + entry.question, src)
     ctx.ev("expert_answered", sources=[src], qid=f"L{entry.id}", from_library=True)
     when = ctx.reg.raw(fmt.date_short(repo.aware(entry.created_at), ctx.lang), src) if entry.created_at else ""
-    body = ctx.t("expert_library_answer", expert=entry.expert_name, date=when, question=truncate(entry.question, 120),
-                 text=ans.get("for_associate", ""))
+    lines = [ctx.t("expert_library_answer", expert=entry.expert_name, date=when, text=ans.get("for_associate", ""))]
     if ans.get("bolo"):
-        body += "\n\n" + bolo_block(ctx, ans["bolo"])
+        lines.append(bolo_block(ctx, ans["bolo"]))
+    lines.append(ctx.t("expert_q_ctx", question=truncate(entry.question, 120)))
+    body = "\n".join(lines)
     if ctx.session:
         ctx.session.extra["last_expert_q"] = entry.question
     btns = [ctx.b("b_go", ctx.sid("go") if ctx.session else encode("g", "status"))]
@@ -192,7 +193,7 @@ async def ask(ctx: SkillContext, question: str, via_truth_check: bool = False, l
     if cites:
         msgs.append(coach_reply(ctx, hold, ctx.t("kyun_expert_hold"), cites, btns, do="do_expert_hold"))
     else:
-        msgs.append(info_reply(ctx, bolo_block(ctx, hold) + "\n\n" + kyun_block(ctx, ctx.t("kyun_expert_hold")) + "\n\n"
+        msgs.append(info_reply(ctx, bolo_block(ctx, hold) + "\n" + kyun_block(ctx, ctx.t("kyun_expert_hold")) + "\n"
                                + do_block(ctx, "do_expert_hold"), btns))
     if expert:
         elang = expert.lang or "en"
@@ -207,11 +208,13 @@ async def ask(ctx: SkillContext, question: str, via_truth_check: bool = False, l
         )
         prod = _product_for(ctx, question)
         if prod is not None:
-            facts = _product_facts(ctx, prod, question, elang)
-            body += "\n\n" + ctx.t("expert_q_product", elang, name=C.product_title(ctx, prod, elang)) + ("\n" + "\n".join(facts) if facts else "")
-        if s and s.home.slots:
-            body += "\n\n" + ctx.t("expert_home_line", elang, home=ctx.reg.static(_home_summary(ctx, elang)))
-        body += "\n\n" + ctx.t("expert_q_how", elang)
+            from chanakya.core.coach import fit_line
+
+            facts = [f.lstrip("• ") for f in _product_facts(ctx, prod, question, elang)]
+            body += "\n" + fit_line(facts, ctx.t("expert_q_product", elang, name=C.product_title(ctx, prod, elang)))
+        home_footer = None
+        if s and s.home.slots:  # the customer's home, in the grey footer (60 characters)
+            home_footer = truncate(ctx.t("expert_home_line", elang, home=ctx.reg.static(_home_summary(ctx, elang))).replace("*", ""), 60)
         msgs.append(
             info_reply(
                 ctx,
@@ -223,6 +226,7 @@ async def ask(ctx: SkillContext, question: str, via_truth_check: bool = False, l
                 to=expert.wa_id,
             )
         )
+        msgs[-1].footer = home_footer
         ctx.reg.raw(str(q.id), "expert:qid")
     return ctx.reply(*msgs)
 
@@ -267,9 +271,11 @@ async def expert_message(ctx: SkillContext) -> Reply:
     ctx.reg.static(q.question)
     pack = ctx.packs.get(q.category)
     who = f"{ctx.staff.name} ({ctx.pick(pack.label, alang)})" if pack else ctx.staff.name
-    body = ctx.t("expert_answer", alang, expert=who, question=truncate(q.question, 120), text=ans.for_associate)
+    lines = [ctx.t("expert_answer", alang, expert=who, text=ans.for_associate)]
     if ans.bolo:
-        body += "\n\n" + bolo_block(ctx, ans.bolo, alang)
+        lines.append(bolo_block(ctx, ans.bolo, alang))
+    lines.append(ctx.t("expert_q_ctx", alang, question=truncate(q.question, 120)))
+    body = "\n".join(lines)
     nxt = [Button(id=encode("s", s.code, "go"), title=ctx.t("b_go", alang)),
            Button(id=encode("s", s.code, "expfollow"), title=ctx.t("b_expert_follow", alang))] if s else []
     to_assoc = info_reply(ctx, body, nxt, to=q.associate_wa_id)
@@ -277,7 +283,7 @@ async def expert_message(ctx: SkillContext) -> Reply:
     name = assoc.name if assoc else ""
     to_expert = info_reply(
         ctx,
-        ctx.t("expert_sent", name=name) + "\n\n" + ctx.t("expert_save_ask"),
+        ctx.t("expert_sent", name=name) + "\n" + ctx.t("expert_save_ask"),
         [
             Button(id=encode("x", q.id, "save"), title=ctx.t("b_library_save")),
             Button(id=encode("x", q.id, "nosave"), title=ctx.t("b_no")),
@@ -301,7 +307,7 @@ async def expert_button(ctx: SkillContext, qid: str, action: str) -> Reply:
         a = await repo.staff_by_wa(q.associate_wa_id)
         ctx.reg.static(q.question)
         return ctx.reply(info_reply(ctx, ctx.t("expert_answering", name=a.name if a else "", question=truncate(q.question, 200))
-                                    + "\n\n" + ctx.t("expert_answer_prompt")))
+                                    + "\n" + ctx.t("expert_answer_prompt")))
     if action == "dunno":
         await repo.expert_q_update(q.id, status="expired")
         assoc = await repo.staff_by_wa(q.associate_wa_id)
