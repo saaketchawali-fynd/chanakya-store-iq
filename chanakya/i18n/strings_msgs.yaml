@@ -303,9 +303,9 @@ image_other:
 
 # ---------------------------------------------------------------- the manager and the expert
 manager_help:
-  hi: "*Aapka store, abhi*\n\n• *Floor*: kaun kis customer ke saath, kis step par\n• *Digest*: aaj ke score aur coaching kahan\n• *Approvals*: discount ki maang baaki\n\nNeeche chuniye, ya voice note mein poochiye."
-  mr: "*तुमचं स्टोअर, आत्ता*\n\n• *Floor*: कोण कोणत्या ग्राहकासोबत, कोणत्या पायरीवर\n• *Digest*: आजचे स्कोअर आणि कोचिंग कुठे\n• *मंजुरी*: सवलतीच्या मागण्या बाकी\n\nखाली निवडा, किंवा व्हॉइस नोटमध्ये विचारा."
-  en: "*Your store, right now*\n\n• *Floor*: who is with which customer, at which step\n• *Digest*: today's scores and where to coach\n• *Approvals*: discount requests waiting\n\nPick below, or ask by voice note."
+  hi: "*Aapka store, abhi*\n\n• *Floor*: kaun kis customer ke saath, kis step par\n• *Sabha*: aaj ke score, daam pehle, aur coaching kahan\n• *Approvals*: discount ki maang\n• *Store visits*: visits ka score, 14 mein se\n\nNeeche chuniye, ya voice note mein poochiye."
+  mr: "*तुमचं स्टोअर, आत्ता*\n\n• *फ्लोअर*: कोण कोणत्या ग्राहकासोबत, कोणत्या पायरीवर\n• *सभा*: आजचे स्कोअर, आधी किंमत, आणि कोचिंग कुठे\n• *मंजुरी*: सवलतीच्या मागण्या\n• *स्टोअर भेटी*: भेटींचा स्कोअर, 14 पैकी\n\nखाली निवडा, किंवा व्हॉइस नोटमध्ये विचारा."
+  en: "*Your store, right now*\n\n• *Floor*: who is with which customer, at which step\n• *Huddle*: today's scores, price first, and where to coach\n• *Approvals*: discount requests\n• *Store visits*: visits scored out of 14\n\nPick below, or ask by voice note."
 floor_now:
   hi: "*Floor abhi*\n• Customer: {a}\n• Demo baaki: {d}\n• Expert sawaal khule: {e}"
   mr: "*फ्लोअर आत्ता*\n• ग्राहक: {a}\n• डेमो बाकी: {d}\n• एक्सपर्ट प्रश्न उघडे: {e}"
@@ -320,9 +320,9 @@ digest_gap:
   mr: "*{name}: आज {step} सर्वात कमी.*\n\nत्यांना याची 45 सेकंदांची क्लिप पाठवू?"
   en: "*{name}: {step} is the lowest step today.*\n\nSend them the 45-second clip for it?"
 team_body:
-  hi: "*Aaj ki team*\n\nHar associate ki baat-cheet aur median score. Kisi par tap karke unki voice notes dekhiye."
-  mr: "*आजची टीम*\n\nप्रत्येकाचे संवाद आणि मीडियन स्कोअर. कोणावरही टॅप करून त्यांच्या व्हॉइस नोट्स बघा."
-  en: "*Today's team*\n\nEach associate's conversations and median score. Tap one to see their voice notes."
+  hi: "*Aaj ki team*\n\nHar associate ki baat-cheet aur median score. Kisi par tap kijiye: unke steps, jeet aur voice notes."
+  mr: "*आजची टीम*\n\nप्रत्येकाचे संवाद आणि मीडियन स्कोअर. कोणावरही टॅप करा: त्यांच्या पायऱ्या, जीत आणि व्हॉइस नोट्स."
+  en: "*Today's team*\n\nEach associate's conversations and median score. Tap one for their steps, wins and voice notes."
 team_row: {hi: "Baat-cheet: {s} · median score {m}", mr: "संवाद: {s} · मीडियन स्कोअर {m}", en: "Conversations: {s} · median score {m}"}
 approval_for_manager:
   hi: "*Approval chahiye:* {name} ({code})\n\nCustomer discount maang rahe hain. Sirf data ke offers de sakte hain."
@@ -332,7 +332,7 @@ approval_sent:
   hi: "*Manager ko bhej diya.*\n\nTab tak customer ko data ke offers dikhaiye."
   mr: "*मॅनेजरला पाठवलं.*\n\nतोपर्यंत ग्राहकाला डेटामधले ऑफर दाखवा."
   en: "*Sent to the manager.*\n\nMeanwhile, show the customer the offers in the data."
-expert_question: {hi: "*{associate} ka sawaal* ({cat}, {code}):\n> {question}", mr: "*{associate} यांचा प्रश्न* ({cat}, {code}):\n> {question}", en: "*Question from {associate}* ({cat}, {code}):\n> {question}"}
+expert_question: {hi: "*{associate} ka sawaal* · {cat} · {code}\n> {question}", mr: "*{associate} यांचा प्रश्न* · {cat} · {code}\n> {question}", en: "*Question from {associate}* · {cat} · {code}\n> {question}"}
 expert_answer_prompt:
   hi: "_Jawab text ya voice note mein bhejiye; seedha associate tak jayega._"
   mr: "_उत्तर टेक्स्ट किंवा व्हॉइस नोटमध्ये पाठवा; थेट असोसिएटकडे जाईल._"

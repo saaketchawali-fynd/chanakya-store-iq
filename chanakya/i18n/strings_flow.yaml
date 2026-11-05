@@ -242,8 +242,8 @@ fc_reply: {hi: "Reply here to talk to {associate}", mr: "Reply here to talk to {
 footer_voice_mgr: {hi: "Bolkar bhi: 'digest', 'team', 'voice log' — voice note", mr: "बोलूनही: 'digest', 'team', 'voice log' — व्हॉइस नोट", en: "Or say it: 'digest', 'team', 'voice log' by voice note"}
 # ---- manager: voice first, and the voice log
 list_mgr: {hi: "Menu", mr: "मेनू", en: "Menu"}
-mgr_row_digest: {hi: "Aaj ka Digest", mr: "आजचा डायजेस्ट", en: "Today's Digest"}
-mgr_row_digest_d: {hi: "Score, price-first, Parivaar, install", mr: "स्कोअर, price-first, परिवार, इन्स्टॉल", en: "Scores, price-first, Family Cards, installs"}
+mgr_row_digest: {hi: "Aaj ki sabha", mr: "आजची सभा", en: "Today's huddle"}
+mgr_row_digest_d: {hi: "Score, daam pehle, sawaal, coaching kahan", mr: "स्कोअर, आधी किंमत, प्रश्न, कोचिंग कुठे", en: "Scores, price first, questions, where to coach"}
 mgr_row_floor: {hi: "Floor abhi", mr: "आत्ता फ्लोर", en: "Floor now"}
 mgr_row_floor_d: {hi: "Kaun kis customer ke saath, kis step par", mr: "कोण कोणत्या ग्राहकासोबत, कोणत्या टप्प्यावर", en: "Who is with which customer, at which step"}
 mgr_row_team: {hi: "Team", mr: "टीम", en: "Team"}

@@ -72,10 +72,26 @@ READ_IMAGE_SYSTEM = """You read photos sent by a store associate. Decide the kin
 - "other": anything else.
 Return JSON only."""
 
-VISIT_SYSTEM = (
-    "Extract a store-visit log entry from the visitor's voice note. Never record any person's name; "
-    "refer to 'the associate'. Only what was said."
-)
+VISIT_SYSTEM = """Extract a store-visit log entry from a visitor's voice note about how a store associate served them
+(they visited as a customer). Never record any person's name; say 'the associate'. Use only what was said; leave a
+field null and leave a step out when the note does not say. The note may mix Hindi, Marathi and English.
+
+Score each step 0-2 ONLY when the note gives evidence (put a short quote or paraphrase in evidence, no names):
+- validate: the customer said something partly right. 2 = agreed first, then corrected politely; 1 = corrected
+  bluntly or only partly; 0 = argued, ignored it, or agreed with something wrong.
+- assess: questions about the home before the first product. 2 = 4 or more (room, distance, light, who uses it);
+  1 = 2-3; 0 = 0-1 ("these are all the TVs, tell me which one").
+- translate: features said in daily-life words for this home. 2 = most features tied to their home; 1 = some;
+  0 = only spec words ("it is just written, it does not mean much").
+- demonstrate: 2 = showed the difference side by side; 1 = showed one product or one feature; 0 = no demo.
+- complete: 2 = the full solution and the full cost, charge by charge (installation, accessories, warranty);
+  1 = part of it; 0 = only the product price.
+- close: 2 = price only after the demo, the customer asked first, honest offer and finance cost; 1 = price after the
+  demo but with some pressure; 0 = the associate led with the price, or pressure ("today only", "last piece").
+- follow_through: 2 = took consent, sent a summary and set a follow-up; 1 = some of it; 0 = none.
+Also extract: store, scenario (A_tv, B_wm_ac, C_laptop), questions_before_first_product, price_first_by
+(associate / customer / none), minute_first_price, demo_shown, full_cost_given, would_come_back, best_sentence,
+worst_sentence (what the associate said, no names)."""
 
 READ_IMAGE_GEOMETRY = """
 For a "room" photo also return:

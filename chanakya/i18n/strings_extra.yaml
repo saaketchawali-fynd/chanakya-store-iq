@@ -101,7 +101,7 @@ parivaar_need_product: {hi: "Pehle option chuniye, phir Parivaar Card.", mr: "�
 
 # ---------- associate messages ----------
 after_clip: {hi: "Clip ke baad ek sawaal?", mr: "क्लिपनंतर एक प्रश्न?", en: "One question after the clip?"}
-approval_closed: {hi: "Theek hai ✓ Associate ko bata diya.", mr: "ठीक आहे ✓ असोसिएटला कळवलं.", en: "Done ✓ The associate has been told."}
+approval_closed: {hi: "*Ho gaya.* Associate ko bata diya.", mr: "*झालं.* असोसिएटला कळवलं.", en: "*Done.* The associate has been told."}
 approval_denied: {hi: "Manager: extra discount nahi. Data ke offers hi dikhaiye.", mr: "मॅनेजर: जास्त सूट नाही. डेटामधल्या ऑफरच दाखवा.", en: "Manager: no extra discount. Show the offers in the data."}
 approval_offers: {hi: "Manager: ye valid offers dikhaiye — {offers}", mr: "मॅनेजर: हे वैध ऑफर दाखवा — {offers}", en: "Manager: show these valid offers: {offers}"}
 ask_bank: {hi: "Customer ka card kaunsa hai?", mr: "ग्राहकाचं कार्ड कोणतं आहे?", en: "Which card does the customer have?"}
@@ -123,16 +123,16 @@ consent_tap_needs_qr: {hi: "Customer ka 24-hour window band hai — QR scan karw
 customer_word: {hi: "Customer", mr: "ग्राहक", en: "Customer"}
 delivery_set: {hi: "Delivery: {day} ✓", mr: "डिलिव्हरी: {day} ✓", en: "Delivery: {day} ✓"}
 digest_no_data: {hi: "Aaj abhi koi score nahi.", mr: "आज अजून स्कोअर नाही.", en: "No scores yet today."}
-expert_answer: {hi: "💬 {expert}: {text}", mr: "💬 {expert}: {text}", en: "💬 {expert}: {text}"}
+expert_answer: {hi: "*Expert ka jawab* · {expert}\n> {question}\n\n{text}", mr: "*एक्सपर्टचं उत्तर* · {expert}\n> {question}\n\n{text}", en: "*Expert answer* · {expert}\n> {question}\n\n{text}"}
 expert_busy: {hi: "Expert abhi busy; customer ko card bhej kar baad mein batayenge.", mr: "एक्सपर्ट सध्या व्यस्त; ग्राहकाला कार्ड पाठवून नंतर सांगू.", en: "The expert is busy; send the card and follow up later."}
-expert_home_line: {hi: "Ghar: {home}", mr: "घर: {home}", en: "Home: {home}"}
-expert_idle: {hi: "Abhi koi khula sawaal nahi. Shukriya!", mr: "सध्या कोणताही प्रश्न उघडा नाही. धन्यवाद!", en: "No open question right now. Thanks!"}
-expert_library_answer: {hi: "💬 {expert} (Guide): {text}", mr: "💬 {expert} (गाइड): {text}", en: "💬 {expert} (Guide): {text}"}
-expert_reminder: {hi: "⏰ Ek sawaal jawab ka intezaar kar raha hai.", mr: "⏰ एक प्रश्न उत्तराची वाट पाहतोय.", en: "⏰ A question is waiting for your answer."}
+expert_home_line: {hi: "*Customer ka ghar:* {home}", mr: "*ग्राहकाचं घर:* {home}", en: "*Customer's home:* {home}"}
+expert_idle: {hi: "*Abhi koi sawaal intezaar mein nahi.*", mr: "*सध्या कोणताही प्रश्न वाट पाहत नाही.*", en: "*No question waiting right now.*"}
+expert_library_answer: {hi: "*Library se* · {expert} ka jawab, {date}\n> {question}\n\n{text}", mr: "*लायब्ररीतून* · {expert} यांचं उत्तर, {date}\n> {question}\n\n{text}", en: "*From the library* · answered by {expert}, {date}\n> {question}\n\n{text}"}
+expert_reminder: {hi: "*Ek sawaal intezaar mein* · {name}, {m} min\n> {question}\n\nText ya voice mein jawab dijiye; associate customer ke saath hain.", mr: "*एक प्रश्न वाट पाहतोय* · {name}, {m} मिनिट\n> {question}\n\nटेक्स्ट किंवा व्हॉइसमध्ये उत्तर द्या; असोसिएट ग्राहकासोबत आहेत.", en: "*A question is waiting* · {name}, {m} min\n> {question}\n\nAnswer by text or voice; the associate is with the customer."}
 expert_save_ask: {hi: "Library mein daalein? Agli baar turant jawab milega.", mr: "लायब्ररीत ठेवू? पुढच्या वेळी लगेच उत्तर मिळेल.", en: "Save to the library? Next time the answer is instant."}
-expert_thanks: {hi: "Shukriya ✓", mr: "धन्यवाद ✓", en: "Thanks ✓"}
+expert_thanks: {hi: "*Shukriya.*", mr: "*धन्यवाद.*", en: "*Thank you.*"}
 expert_unknown: {hi: "Expert ko bhi pakka nahi. Customer ko card bhej kar baad mein batayenge.", mr: "एक्सपर्टलाही खात्री नाही. ग्राहकाला कार्ड पाठवून नंतर सांगू.", en: "The expert isn't sure either. Send the card and follow up later."}
-expert_voice_answer: {hi: "💬 {expert} ne voice mein jawab diya:", mr: "💬 {expert} यांनी व्हॉइसमध्ये उत्तर दिलं:", en: "💬 {expert} answered by voice:"}
+expert_voice_answer: {hi: "*Expert ka jawab* · {expert}, voice mein:", mr: "*एक्सपर्टचं उत्तर* · {expert}, व्हॉइसमध्ये:", en: "*Expert answer* · {expert}, by voice:"}
 install_problem_manager: {hi: "⚠️ Install job #{id} ({name}): samasya. Site: {site}", mr: "⚠️ इन्स्टॉल जॉब #{id} ({name}): समस्या. साइट: {site}", en: "⚠️ Install job #{id} ({name}): problem. Site: {site}"}
 install_risk_manager: {hi: "⚠️ Install job #{id} risk: {risks} · {site}", mr: "⚠️ इन्स्टॉल जॉब #{id} धोका: {risks} · {site}", en: "⚠️ Install job #{id} risk: {risks} · {site}"}
 kpi_conversations: {hi: "Baat-cheet", mr: "संवाद", en: "Conversations"}
@@ -144,7 +144,7 @@ kpi_minute: {hi: "Pehla daam (min)", mr: "पहिली किंमत (म�
 kpi_parivaar: {hi: "Parivaar Card", mr: "परिवार कार्ड", en: "Family cards"}
 kpi_install: {hi: "Installation", mr: "इन्स्टॉलेशन", en: "Installations"}
 kpi_expert_open: {hi: "Expert sawaal khule", mr: "उघडे एक्सपर्ट प्रश्न", en: "Open expert questions"}
-library_saved: {hi: "Library mein save ✓", mr: "लायब्ररीत सेव्ह ✓", en: "Saved to library ✓"}
+library_saved: {hi: "*Library mein save ho gaya.*\n\nAgli baar koi yahi poochega to jawab turant milega. Library mein jawab: {n}.", mr: "*लायब्ररीत सेव्ह झालं.*\n\nपुढच्या वेळी कोणी हेच विचारलं तर उत्तर लगेच मिळेल. लायब्ररीतील उत्तरं: {n}.", en: "*Saved to the library.*\n\nNext time anyone asks this, the answer is instant. Answers in the library: {n}."}
 list_budget: {hi: "Budget", mr: "बजेट", en: "Budget"}
 list_choose: {hi: "Chuniye", mr: "निवडा", en: "Choose"}
 no_approvals: {hi: "Koi approval baaki nahi.", mr: "कोणतीही मंजुरी बाकी नाही.", en: "No approvals pending."}
@@ -152,8 +152,8 @@ no_customer_linked: {hi: "Is customer ne abhi consent nahi diya (QR).", mr: "य
 no_options: {hi: "Is ghar ke liye data mein model nahi mila. Expert se poochhein?", mr: "या घरासाठी डेटामध्ये मॉडेल मिळालं नाही. एक्सपर्टला विचारू?", en: "No model in the data fits this home. Ask an expert?"}
 no_scores: {hi: "Abhi koi score nahi.", mr: "अजून स्कोअर नाही.", en: "No scores yet."}
 noted: {hi: "Note kar liya ✓", mr: "नोंद केली ✓", en: "Noted ✓"}
-nudge_body: {hi: "Aaj ka focus: {step}. {tip}", mr: "आजचं लक्ष: {step}. {tip}", en: "Today's focus: {step}. {tip}"}
-nudge_sent: {hi: "{name} ko bhej diya ✓", mr: "{name} यांना पाठवलं ✓", en: "Sent to {name} ✓"}
+nudge_body: {hi: "*Aaj ka focus* · {step}\n\n{tip}", mr: "*आजचं लक्ष* · {step}\n\n{tip}", en: "*Today's focus* · {step}\n\n{tip}"}
+nudge_sent: {hi: "*{name} ko bhej diya.*", mr: "*{name} यांना पाठवलं.*", en: "*Sent to {name}.*"}
 praise_validate: {hi: "Customer ki baat pehle maani", mr: "ग्राहकाचं म्हणणं आधी मान्य केलं", en: "You agreed first"}
 praise_assess: {hi: "{n} ghar ki baatein pehle", mr: "आधी घराच्या {n} गोष्टी", en: "{n} home facts first"}
 praise_translate: {hi: "{n} fayde is ghar ke hisaab se", mr: "या घरानुसार {n} फायदे", en: "{n} benefits for this home"}
@@ -180,14 +180,14 @@ task_title: {hi: "{name} ko follow-up call", mr: "{name} यांना फॉ�
 task_visit_title: {hi: "{name} visit book karna chahte hain", mr: "{name} भेट बुक करू इच्छितात", en: "{name} wants to book a visit"}
 tip_card: {hi: "💡 {step}: {tip}", mr: "💡 {step}: {tip}", en: "💡 {step}: {tip}"}
 tryon_failed: {hi: "Is photo se size pakka nahi hua; deewar ke saamne se dobara photo lijiye.", mr: "या फोटोवरून साइज निश्चित झाली नाही; भिंतीसमोरून पुन्हा फोटो घ्या.", en: "Couldn't fix the size from this photo; retake it facing the wall."}
-visit_ask_price_first_by: {hi: "Daam pehle kisne bola?", mr: "किंमत आधी कोणी सांगितली?", en: "Who mentioned price first?"}
-visit_ask_demo_shown: {hi: "Demo dikhaya?", mr: "डेमो दाखवला?", en: "Was a demo shown?"}
-visit_ask_would_come_back: {hi: "Kya aap is associate ke paas wapas aayenge?", mr: "तुम्ही या असोसिएटकडे परत याल का?", en: "Would you come back to this associate?"}
-visit_export: {hi: "Visit log: {n} entries (CSV)", mr: "भेट लॉग: {n} नोंदी (CSV)", en: "Visit log: {n} entries (CSV)"}
-visit_none: {hi: "Koi draft visit nahi. 'visit' likhiye.", mr: "ड्राफ्ट भेट नाही. 'visit' लिहा.", en: "No draft visit. Type 'visit'."}
-visit_ready: {hi: "Visit taiyar ({n} step score). Save karein?", mr: "भेट तयार ({n} स्टेप स्कोअर). सेव्ह करू?", en: "Visit ready ({n} step scores). Save?"}
-visit_saved: {hi: "Visit #{id} save ✓", mr: "भेट #{id} सेव्ह ✓", en: "Visit #{id} saved ✓"}
-visit_start: {hi: "Store, scenario aur baat-cheet voice note ya text mein boliye. Naam mat boliye.", mr: "स्टोअर, परिस्थिती आणि संवाद व्हॉइस नोट किंवा टेक्स्टमध्ये सांगा. नाव सांगू नका.", en: "Describe the store, scenario and conversation by voice or text. No names."}
+visit_ask_price_first_by: {hi: "*Daam ki baat pehle kisne ki?*\n\nAssociate ne, aapne (customer), ya kisi ne nahi?", mr: "*किंमतीबद्दल आधी कोण बोललं?*\n\nअसोसिएट, तुम्ही (ग्राहक), की कोणीच नाही?", en: "*Who spoke about the price first?*\n\nThe associate, you (the customer), or nobody?"}
+visit_ask_demo_shown: {hi: "*Demo dikhaya?*\n\nKya associate ne product chala kar, ya do products ka farak dikhaya?", mr: "*डेमो दाखवला?*\n\nअसोसिएटने प्रॉडक्ट चालवून, किंवा दोन प्रॉडक्ट्समधला फरक दाखवला का?", en: "*Was a demo shown?*\n\nDid the associate show you the product working, or the difference between two?"}
+visit_ask_would_come_back: {hi: "*Kya aap is associate ke paas wapas aayenge?*\n\nHar visit ka yeh ek zaroori sawaal hai.", mr: "*तुम्ही या असोसिएटकडे परत याल का?*\n\nप्रत्येक भेटीचा हा एक महत्त्वाचा प्रश्न.", en: "*Would you come back to this associate?*\n\nThe one question every visit answers."}
+visit_export: {hi: "*Visit log:* {n} visits (CSV)", mr: "*भेट लॉग:* {n} भेटी (CSV)", en: "*Visit log:* {n} visits (CSV)"}
+visit_none: {hi: "*Abhi koi visit chalu nahi.*\n\nNayi visit dabaiye, ya visit ke baare mein voice note bhejiye.", mr: "*सध्या कोणतीही भेट सुरू नाही.*\n\nनवीन भेट दाबा, किंवा भेटीबद्दल व्हॉइस नोट पाठवा.", en: "*No visit in progress.*\n\nTap New visit, or send a voice note about the visit."}
+visit_ready: {hi: "*Visit taiyaar: {total}/14* (7 mein se {n} steps ka score).\n\nSave kijiye, ya voice note se aur jodiye.", mr: "*भेट तयार: {total}/14* (7 पैकी {n} पायऱ्यांचा स्कोअर).\n\nसेव्ह करा, किंवा व्हॉइस नोटने आणखी जोडा.", en: "*Visit ready: {total}/14* ({n} of 7 steps scored).\n\nSave it, or add more by voice."}
+visit_saved: {hi: "*Visit #{id} save ho gayi: {total}/14.*\n\nAb yeh ab tak ki visits mein gini jayegi.", mr: "*भेट #{id} सेव्ह झाली: {total}/14.*\n\nआता ती आत्तापर्यंतच्या भेटींमध्ये मोजली जाईल.", en: "*Visit #{id} saved: {total}/14.*\n\nIt now counts in the visits so far."}
+visit_start: {hi: "*Nayi visit*\n\nVoice note bhejiye: store, aapne kya dekha, aur associate ne kaise madad ki — kya poocha, kya dikhaya, daam kab aaya, aur kya aap wapas aayenge.\n\n_Naam kabhi save nahi hote._", mr: "*नवीन भेट*\n\nव्हॉइस नोट पाठवा: स्टोअर, तुम्ही काय पाहिलं, आणि असोसिएटने कशी मदत केली — काय विचारलं, काय दाखवलं, किंमत कधी आली, आणि तुम्ही परत याल का.\n\n_नावं कधीच सेव्ह होत नाहीत._", en: "*New visit*\n\nSend a voice note: the store, what you looked at, and how the associate served you — what they asked, what they showed, when the price came up, and whether you'd come back.\n\n_Names are never saved._"}
 voice_add_prompt: {hi: "Customer ke liye voice note bhejiye — main aage bhej dunga.", mr: "ग्राहकासाठी व्हॉइस नोट पाठवा — मी पुढे पाठवतो.", en: "Record a voice note for the customer; I'll forward it."}
 voice_sent: {hi: "Bhej diya ✓", mr: "पाठवलं ✓", en: "Sent ✓"}
 voice_unavailable: {hi: "Voice samajhne ka model is test build mein band hai. Text mein likhiye ya neeche se chuniye.", mr: "या टेस्ट बिल्डमध्ये व्हॉइस समजण्याचं मॉडेल बंद आहे. टेक्स्टमध्ये लिहा किंवा खालून निवडा.", en: "The voice model is off in this test build. Type it, or pick below."}

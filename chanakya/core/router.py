@@ -85,7 +85,8 @@ CMD = {
     },
     "floor": {"floor"},
     "digest": {"digest"},
-    "visit": {"visit"},
+    "visit": {"visit", "new visit", "nayi visit", "नवीन भेट"},
+    "visits": {"visits", "store visits", "visit log", "visits so far", "भेटी"},
     "export": {"export"},
     "reset": {"reset"},
     "sold": {"sold", "bik gaya"},
@@ -196,36 +197,44 @@ async def dispatch(ctx: SkillContext) -> Reply:
                 return await visitlog.export(ctx)
             if bid.get(1) == "new":
                 return await visitlog.start(ctx)
+            if bid.get(1) == "home":
+                return await visitlog.home(ctx)
             return await visitlog.button(ctx, bid.get(0), bid.get(1), bid.get(2))
     if ctx.role == "manager":
         if name == "floor":
             return await manager.floor(ctx)
         if name == "digest":
             return await manager.digest(ctx)
-        if name in ("visit", "export"):
-            return await (visitlog.start(ctx) if name == "visit" else visitlog.export(ctx))
-        if msg.type == "audio" or (msg.type == "text" and name in (None, "help")):
+        if name in ("visit", "visits"):
+            return await visitlog.summary(ctx)  # the manager reads the visits; visitors log them
+        if name == "export":
+            return await visitlog.export(ctx)
+        if name in ("help", "brief"):
+            return manager.menu(ctx)  # 'menu', 'namaste': the menu itself, never "Heard: menu"
+        if msg.type == "audio" or (msg.type == "text" and name is None):
             return await manager.by_voice(ctx)
     if ctx.role == "expert" and msg.type in ("text", "audio") and name is None:
         return await expert.expert_message(ctx)
     if ctx.role == "visitor":
         if name == "visit":
             return await visitlog.start(ctx)
+        if name == "visits":
+            return await visitlog.summary(ctx)
         if name == "export":
             return await visitlog.export(ctx)
         if msg.type in ("text", "audio"):
             return await visitlog.on_note(ctx)
     if ctx.role in ("manager", "expert", "visitor"):  # never an associate's sales session from another role's phone
-        return _role_help(ctx)
+        return await _role_help(ctx)
     return await dispatch_associate(ctx, name, arg)
 
 
-def _role_help(ctx: SkillContext) -> Reply:
+async def _role_help(ctx: SkillContext) -> Reply:
     if ctx.role == "manager":
         return manager.menu(ctx)
     if ctx.role == "visitor":
-        return ctx.reply(info_reply(ctx, ctx.t("visit_start")))
-    return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
+        return await visitlog.home(ctx)
+    return await expert.home(ctx)
 
 
 LANG_BUTTONS = (("en", "English"), ("hi", "हिंदी"), ("mr", "मराठी"))
@@ -248,9 +257,9 @@ async def set_staff_language(ctx: SkillContext, lang: str) -> Reply:
     if role == "manager":
         return manager.menu(ctx)
     if role == "expert":
-        return ctx.reply(info_reply(ctx, ctx.t("expert_idle")))
+        return await expert.home(ctx)
     if role == "visitor":
-        return await visitlog.start(ctx)
+        return await visitlog.home(ctx)
     return await brief.brief(ctx)
 
 
@@ -338,6 +347,8 @@ async def manager_button(ctx: SkillContext, bid: ButtonId) -> Reply:
     if a == "nudge":
         return await manager.nudge(ctx, bid.get(1), bid.get(2))
     if a == "who":
+        return await manager.profile(ctx, bid.get(1))  # the associate's profile; their voice notes are one tap on
+    if a == "whov":
         return await manager.voice_log(ctx, bid.get(1))
     if a == "vlog":
         return await manager.voice_log(ctx)
@@ -345,6 +356,16 @@ async def manager_button(ctx: SkillContext, bid: ButtonId) -> Reply:
         return await manager.voice_detail(ctx, int(bid.get(1)))
     if a == "floor":
         return await manager.floor(ctx)
+    if a == "floorc":
+        return await manager.floor_customer(ctx, bid.get(1))
+    if a == "tip":
+        return await manager.tip(ctx, bid.get(1), bid.get(2))
+    if a == "profile":
+        return await manager.profile(ctx, bid.get(1))
+    if a == "visits":
+        return await visitlog.summary(ctx)
+    if a == "menu":
+        return manager.menu(ctx)
     return await manager.floor(ctx)
 
 
@@ -606,6 +627,8 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "khatam": lambda: review.khatam(ctx),
         "sold": lambda: follow.sold(ctx),
         "expert": lambda: expert.ask(ctx, ctx.session.extra.get("last_claim_text") or ctx.inbound.text or ""),
+        "expforce": lambda: expert.ask(ctx, ctx.session.extra.get("last_expert_q") or "", force=True),
+        "expfollow": lambda: expert.followup_hint(ctx),
         "askmgr": lambda: close.ask_manager(ctx),
         "sendoffer": lambda: close.send_to_customer(ctx),
     }

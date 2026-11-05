@@ -297,7 +297,7 @@ def _visit_rules(text: str) -> VisitEntry:
         e.price_first_by = "associate"
     elif re.search(r"(maine|customer ne|humne) (pehle )?(price|daam)", low):
         e.price_first_by = "customer"
-    m = re.search(r"(\d+)\s*(?:min|minute|minat)", low)
+    m = re.search(r"(\d+(?:\.\d+)?)\s*(?:min|minute|minat|मिनट|मिनिट)", low) or re.search(r"(?:minute|minat|min)\s*(\d+(?:\.\d+)?)", low)
     if m:
         e.minute_first_price = float(m.group(1))
     m = re.search(r"(\d+)\s*(?:sawaal|questions|prashn)", low)
@@ -307,10 +307,16 @@ def _visit_rules(text: str) -> VisitEntry:
         e.demo_shown = False
     elif re.search(r"demo (dikhaya|diya|kiya|shown)", low):
         e.demo_shown = True
-    if re.search(r"(wapas|vapas) (aaunga|aayenge|aaungi)|come back", low):
-        e.would_come_back = True
-    elif re.search(r"(wapas|vapas) nahi|won't come back|not come back", low):
+    if re.search(r"(wapas|vapas) nahi|won'?t come back|not come back|nahi aaunga|nahi aaungi", low):
         e.would_come_back = False
+    elif re.search(r"(wapas|vapas) (aaunga|aayenge|aaungi)|come back", low):
+        e.would_come_back = True
+    if re.search(r"(poora|pura) kharcha (nahi|nahin)|no full cost|full cost (nahi|not)", low):
+        e.full_cost_given = False
+    elif re.search(r"(poora|pura) kharcha (bataya|diya)|full cost (given|told|bataya)|charge by charge", low):
+        e.full_cost_given = True
+    if e.demo_shown is None and re.search(r"side by side|saath mein dikhaya|compare kar(ke|ke) dikhaya", low):
+        e.demo_shown = True
     for step, words in _STEP_WORDS.items():
         m = re.search(r"(" + "|".join(words) + r")\D{0,12}(\d)\s*(?:/\s*2|out of 2|mein se)?", low)
         if m and int(m.group(2)) <= 2:

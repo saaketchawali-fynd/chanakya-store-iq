@@ -205,7 +205,7 @@ async def test_17_expert_answer_with_number(h):
     await h.tap(f"x:{ev.payload['qid']}:save")
     h.as_("associate")
     out = await h.say("expert Does Meru 55 QLED Pro support Dolby Vision?")
-    assert "Sunil (Guide)" in out[0].body
+    assert out[0].body.startswith("*Library se* · Sunil")  # a saved answer, said plainly, by whom
 
 
 async def test_18_window_closed(h):

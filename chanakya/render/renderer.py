@@ -43,6 +43,8 @@ TEMPLATE_NAMES = (
     "demo",
     "homecompare",
     "addons",
+    "visit",
+    "visits",
 )
 WIDTH = 1080
 MAX_HEIGHT = 1350
@@ -346,28 +348,35 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
         "en": {"title": "Before the shift", "changes": "Stock changes", "offers": "Today's offers", "followups": "Follow-ups",
                "focus": "Today's focus", "keep": "Keep in mind"},
     },
+    "visit": {  # one store visit, scored by the reference rubric (the visitor's language)
+        "hi": {"kicker": "Store visit", "title": "Visit ka scorecard", "scored": "Score hue steps", "guide": "Guide",
+               "not_guide": "Guide se neeche", "unscored": "Note mein nahi aaya", "best": "Sabse achhi baat",
+               "worst": "Sabse kamzor baat", "foot": "Sirf visitor ki baat se · naam save nahi hote"},
+        "mr": {"kicker": "स्टोअर भेट", "title": "भेटीचं स्कोअरकार्ड", "scored": "स्कोअर झालेल्या पायऱ्या", "guide": "गाइड",
+               "not_guide": "गाइडच्या खाली", "unscored": "नोटमध्ये आलं नाही", "best": "सर्वात चांगलं वाक्य",
+               "worst": "सर्वात कमकुवत वाक्य", "foot": "फक्त भेट देणाऱ्याच्या सांगण्यावरून · नावं सेव्ह होत नाहीत"},
+        "en": {"kicker": "Store visit", "title": "Visit scorecard", "scored": "Steps scored", "guide": "Guide",
+               "not_guide": "Below Guide", "unscored": "Not in the note", "best": "Best moment",
+               "worst": "Weakest moment", "foot": "Only from what the visitor said · names are never saved"},
+    },
+    "visits": {  # visits so far, beside the October store visits
+        "hi": {"kicker": "Store visits", "title": "Ab tak ki visits", "visits": "Visits", "measure": "Kya dekha",
+               "these": "Ye visits", "october": "October", "steps": "Har step ka average (0–2)",
+               "foot": "October: Reliance Digital, 6 scored baatcheet"},
+        "mr": {"kicker": "स्टोअर भेटी", "title": "आत्तापर्यंतच्या भेटी", "visits": "भेटी", "measure": "काय पाहिलं",
+               "these": "या भेटी", "october": "ऑक्टोबर", "steps": "प्रत्येक पायरीची सरासरी (0–2)",
+               "foot": "ऑक्टोबर: Reliance Digital, 6 स्कोअर केलेले संवाद"},
+        "en": {"kicker": "Store visits", "title": "Visits so far", "visits": "Visits", "measure": "Measure",
+               "these": "These visits", "october": "October", "steps": "Average per step (0–2)",
+               "foot": "October: Reliance Digital, 6 scored conversations"},
+    },
     "digest": {
-        "hi": {
-            "kicker": "Sabha",
-            "title": "Aaj ka Digest",
-            "kpis": "Aaj",
-            "heatmap": "Steps (0–2)",
-            "gaps": "Sabse bada gap",
-        },
-        "mr": {
-            "kicker": "सभा",
-            "title": "आजचा डायजेस्ट",
-            "kpis": "आज",
-            "heatmap": "पायऱ्या (0–2)",
-            "gaps": "सर्वात मोठी उणीव",
-        },
-        "en": {
-            "kicker": "Huddle",
-            "title": "Today's Digest",
-            "kpis": "Today",
-            "heatmap": "Steps (0–2)",
-            "gaps": "Biggest gap",
-        },
+        "hi": {"kicker": "Sabha", "title": "Aaj ki sabha", "kpis": "Aaj", "heatmap": "Steps (0–2)", "gaps": "Sabse bada gap",
+               "best": "Aaj ka best", "since": "Store visits ke baad", "october": "October", "today": "Aaj"},
+        "mr": {"kicker": "सभा", "title": "आजची सभा", "kpis": "आज", "heatmap": "पायऱ्या (0–2)", "gaps": "सर्वात मोठी उणीव",
+               "best": "आजचं सर्वोत्तम", "since": "स्टोअर भेटींनंतर", "october": "ऑक्टोबर", "today": "आज"},
+        "en": {"kicker": "Huddle", "title": "Today's huddle", "kpis": "Today", "heatmap": "Steps (0–2)", "gaps": "Biggest gap",
+               "best": "Best today", "since": "Since the store visits", "october": "October", "today": "Today"},
     },
 }
 
@@ -1303,28 +1312,78 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
                      "8 protection plans available (₹1,499 – ₹6,999)",
                      "2 customer follow-ups due today"],
         }
+    if template == "visit":
+        return {
+            "head": p("Electronics store · TV, 55 inch", "इलेक्ट्रॉनिक्स स्टोअर · TV, 55 इंच", "Electronics store · TV, 55 inch"),
+            "total": "5", "scored": 5, "guide": False,
+            "rows": [
+                {"name": p("Maan kar sudhaara", "मान्य करून दुरुस्त", "Validate"), "score": None, "evidence": ""},
+                {"name": p("Ghar samjha", "घर समजलं", "Assess"), "score": 1, "evidence": p("Product se pehle 2 sawaal", "प्रॉडक्टआधी 2 प्रश्न", "2 questions before the product")},
+                {"name": p("Fayda", "फायदा", "Translate"), "score": 1, "evidence": p("Kuch features aam bhasha mein", "काही फीचर्स साध्या शब्दांत", "Some features in everyday words")},
+                {"name": p("Demo", "डेमो", "Demonstrate"), "score": 0, "evidence": p("Koi demo nahi", "डेमो नाही", "No demo")},
+                {"name": p("Poora kharcha", "पूर्ण खर्च", "Complete"), "score": 2, "evidence": p("Installation aur warranty bataye", "इन्स्टॉलेशन आणि वॉरंटी सांगितली", "Installation and warranty told")},
+                {"name": "Close", "score": 0, "evidence": p("Daam pehle associate ne bola", "किंमत आधी असोसिएटने सांगितली", "The associate led with the price")},
+                {"name": "Follow-through", "score": 1, "evidence": p("Number liya", "नंबर घेतला", "Took the number")},
+            ],
+            "facts": [
+                {"k": p("Daam pehle", "किंमत आधी", "Price first"), "v": p("Associate · minute 2", "असोसिएट · मिनिट 2", "Associate · minute 2")},
+                {"k": p("Product se pehle ghar ke sawaal", "प्रॉडक्टआधी घराचे प्रश्न", "Home questions before the product"), "v": "2"},
+                {"k": p("Demo dikhaya", "डेमो दाखवला", "Demo shown"), "v": p("Nahi", "नाही", "No")},
+                {"k": p("Poora kharcha bataya", "पूर्ण खर्च सांगितला", "Full cost given"), "v": p("Haan", "हो", "Yes")},
+                {"k": p("Wapas aayenge", "परत येतील", "Would come back"), "v": p("Nahi", "नाही", "No")},
+            ],
+            "best": "This one has a better warranty, installation is free.",
+            "worst": "Sir, this is 45,000, best price.",
+        }
+    if template == "visits":
+        return {
+            "n": "4",
+            "table": [
+                {"k": p("14 mein score: range (median)", "14 पैकी स्कोअर: रेंज (मीडियन)", "Score of 14: range (median)"), "v": "5–12 (8)", "b": "3–13 (6)"},
+                {"k": p("Guide level par (11+)", "गाइड लेव्हलवर (11+)", "At Guide level (11+)"), "v": "1 of 4", "b": "2 of 6"},
+                {"k": p("Daam ki baat pehle associate ne ki", "किंमतीबद्दल आधी असोसिएट बोलला", "Associate spoke about the price first"), "v": "2 of 4", "b": "6 of 6"},
+                {"k": p("Pehle daam ka minute (median)", "पहिल्या किंमतीचा मिनिट (मीडियन)", "Minute of the first price (median)"), "v": "6", "b": "7.5"},
+                {"k": p("Pehle product se pehle ghar ke sawaal (median)", "पहिल्या प्रॉडक्टआधी घराचे प्रश्न (मीडियन)", "Home questions before the first product (median)"), "v": "3", "b": "2"},
+                {"k": p("Is associate ke paas wapas aayenge", "या असोसिएटकडे परत येतील", "Would come back to this associate"), "v": "2 of 4", "b": "2 of 6"},
+            ],
+            "steps": [
+                {"name": p("Maan kar sudhaara", "मान्य करून दुरुस्त", "Validate"), "avg": 1.0},
+                {"name": p("Ghar samjha", "घर समजलं", "Assess"), "avg": 1.5},
+                {"name": p("Fayda", "फायदा", "Translate"), "avg": 0.8},
+                {"name": p("Demo", "डेमो", "Demonstrate"), "avg": 1.2},
+                {"name": p("Poora kharcha", "पूर्ण खर्च", "Complete"), "avg": 1.0},
+                {"name": "Close", "avg": 0.5},
+                {"name": "Follow-through", "avg": None},
+            ],
+        }
     if template == "digest":
         return {
             "kpis": [
-                {"label": p("Baatcheet", "संवाद", "Conversations"), "value_str": "6"},
+                {"label": p("Baat-cheet", "संवाद", "Conversations"), "value_str": "6"},
                 {"label": p("Guide level", "गाइड लेव्हल", "Guide level"), "value_str": "2/6"},
-                {"label": p("Median score", "मध्य स्कोअर", "Median score"), "value_str": "9/14"},
-                {"label": p("Pehle daam poocha", "आधी किंमत विचारली", "Asked price first"), "value_str": "4"},
+                {"label": p("Median score", "मीडियन स्कोअर", "Median score"), "value_str": "9/14"},
+                {"label": p("Daam pehle: customer / associate", "किंमत आधी: ग्राहक / असोसिएट", "Price first: customer / associate"), "value_str": "4 / 2"},
+                {"label": p("Pehla daam (min)", "पहिली किंमत (मि.)", "First price (min)"), "value_str": "11"},
+                {"label": p("Product se pehle ghar ke sawaal (median)", "प्रॉडक्टआधी घराचे प्रश्न (मीडियन)", "Home questions before the product (median)"), "value_str": "4"},
+                {"label": p("Parivaar Card", "परिवार कार्ड", "Family cards"), "value_str": "3"},
+                {"label": p("Install: theek / dikkat", "इन्स्टॉल: ठीक / अडचण", "Installs: OK / issue"), "value_str": "2 / 0"},
+            ],
+            "since": [
+                {"label": p("Median score (14 mein)", "मीडियन स्कोअर (14 पैकी)", "Median score (of 14)"), "oct": "6", "today": "9"},
+                {"label": p("Daam pehle associate ne bola", "किंमत आधी असोसिएटने सांगितली", "Associate spoke price first"), "oct": "6/6", "today": "2/6"},
+                {"label": p("Product se pehle sawaal (median)", "प्रॉडक्टआधी प्रश्न (मीडियन)", "Questions before the product (median)"), "oct": "2", "today": "4"},
             ],
             "heatmap": {
                 "associates": ["Ravi", "Pooja", "Amit"],
                 "steps": p(
                     ["Maan", "Ghar", "Fayda", "Demo", "Kharcha", "Close", "Follow"],
                     ["मान्य", "घर", "फायदा", "डेमो", "खर्च", "क्लोज", "फॉलो"],
-                    ["Val", "Ass", "Tra", "Dem", "Com", "Clo", "Fol"],
+                    ["Validate", "Assess", "Translate", "Demo", "Cost", "Close", "Follow"],
                 ),
                 "cells": [[2, 2, 1, 2, 2, 2, 1], [1, 2, 0, 1, 2, 1.5, 2], [0, 1, 1, None, 1, 0, 0.5]],
             },
-            "gaps_text": p(
-                "Ravi: Fayda batana sabse kam. 45-sec clip bhejein?",
-                "रवी: फायदा सांगणं सर्वात कमी. 45 सेकंदांची क्लिप पाठवू?",
-                "Ravi: Translate is lowest. Send the 45-sec clip?",
-            ),
+            "gaps_text": p("Pooja: aaj Translate sabse kam", "पूजा: आज Translate सर्वात कमी", "Pooja: Translate is the lowest step today"),
+            "best_text": p("Ravi: 13/14, sabse mazboot Assess", "रवी: 13/14, सर्वात चांगलं Assess", "Ravi: 13/14, strongest at Assess"),
         }
     return {}
 
@@ -1521,14 +1580,24 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
         if d.get("no_offers"):
             rows.append(str(d["no_offers"]))
         rows += [f"• {k}" for k in d.get("keep") or []]
+    elif tpl == "visit":
+        rows.append(f"{d.get('total')}/14 · {d.get('scored')}/7")
+        rows += [f"{x.get('name')}: {'?' if x.get('score') is None else x.get('score')} · {x.get('evidence') or ''}" for x in aslist(d.get("rows"))]
+        rows += [f"{x.get('k')}: {x.get('v')}" for x in aslist(d.get("facts"))]
+    elif tpl == "visits":
+        rows += [f"{x.get('k')}: {x.get('v')} ({x.get('b')})" for x in aslist(d.get("table"))]
+        rows += [f"{x.get('name')}: {'—' if x.get('avg') is None else x.get('avg')}" for x in aslist(d.get("steps"))]
     elif tpl == "digest":
         rows += [f"{k.get('label')}: {k.get('value_str')}" for k in d.get("kpis") or []]
         hm = d.get("heatmap") or {}
         for i, a in enumerate(hm.get("associates") or []):
             cells = (hm.get("cells") or [])[i] if i < len(hm.get("cells") or []) else []
             rows.append(f"{a}: " + " ".join("-" if c is None else str(c) for c in cells))
+        rows += [f"{s.get('label')}: {s.get('oct')} → {s.get('today')}" for s in aslist(d.get("since"))]
         if d.get("gaps_text"):
             rows.append(str(d["gaps_text"]))
+        if d.get("best_text"):
+            rows.append(str(d["best_text"]))
     else:
         rows += [f"{k}: {_flatten(v)}" for k, v in d.items() if k != "labels"]
     return title, [r for r in rows if r and r.strip()]

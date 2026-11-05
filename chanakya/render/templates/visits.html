@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{# Visits so far: the reference's "What the team found" table, from the logged visits, beside the October visits
+   (Reliance Digital, 6 scored conversations), and the average of each step. #}
+{% set tb = (table|aslist)[:8] %}
+{% set ss = (steps|aslist)[:7] %}
+{% block style %}
+  .tbl { padding: 8px 28px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 19px; font-weight: 800; letter-spacing: 1.1px; text-transform: uppercase; color: var(--muted);
+       padding: 14px 8px 10px; }
+  th.c, td.c { text-align: center; }
+  td { padding: 14px 8px; border-top: 1.5px solid var(--line); font-size: 24px; color: var(--ink); }
+  td.k { font-weight: 600; color: var(--text); width: 46%; }
+  td.v { font-weight: 800; font-size: 26px; }
+  td.b { color: var(--muted); font-weight: 600; }
+  .bars { padding: 18px 28px 12px; }
+  .bar { display: flex; align-items: center; gap: 16px; padding: 8px 0; }
+  .bar .n { width: 240px; flex: none; font-size: 23px; font-weight: 700; color: var(--ink); }
+  .bar .t { flex: 1; height: 22px; border-radius: 99px; background: #EEF0F4; overflow: hidden; }
+  .bar .t i { display: block; height: 100%; border-radius: 99px; background: var(--saffron); }
+  .bar .t i.hi { background: var(--green); } .bar .t i.lo { background: var(--red); }
+  .bar .v { width: 64px; text-align: right; font-size: 23px; font-weight: 800; color: var(--ink); }
+{% endblock %}
+{% block header %}
+  <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+  <h1 class="{{ L.title|dv }}">{{ L.title }}</h1>
+  <div class="sub">{{ L.visits }}: <span class="num">{{ n }}</span></div>
+{% endblock %}
+{% block content %}
+  <section class="card tbl">
+    <table>
+      <tr><th>{{ L.measure }}</th><th class="c">{{ L.these }}</th><th class="c">{{ L.october }}</th></tr>
+      {% for r in tb %}<tr><td class="k{{ r.k|dv }}">{{ r.k }}</td><td class="v c num">{{ r.v }}</td><td class="b c num">{{ r.b }}</td></tr>{% endfor %}
+    </table>
+  </section>
+  <section class="sec">
+    <div class="label{{ L.steps|dv }}">{{ icon('list', 26) }}{{ L.steps }}</div>
+    <div class="card bars">
+      {% for s in ss %}<div class="bar"><span class="n{{ s.name|dv }}">{{ s.name }}</span>
+        <span class="t">{% if s.avg is not none %}<i class="{{ 'hi' if s.avg >= 1.5 else ('lo' if s.avg < 1 else '') }}" style="width: {{ (s.avg / 2 * 100)|round|int }}%"></i>{% endif %}</span>
+        <span class="v num">{{ s.avg if s.avg is not none else '—' }}</span></div>{% endfor %}
+    </div>
+  </section>
+{% endblock %}
+{% block foot_left %}{{ L.foot }}{% endblock %}

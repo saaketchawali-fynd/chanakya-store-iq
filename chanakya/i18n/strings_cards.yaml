@@ -53,3 +53,204 @@ kh_total_note_addons: {hi: "product, installation aur jo joda", mr: "प्र�
 fact_price: {hi: "Shelf par daam {price}", mr: "शेल्फवरील किंमत {price}", en: "Shelf price {price}"}
 fact_offer: {hi: "Offer: {offer}", mr: "ऑफर: {offer}", en: "Offer: {offer}"}
 fact_fit: {hi: "Is ghar se match: {fit}", mr: "या घराशी जुळणी: {fit}", en: "Match for this home: {fit}"}
+# ---- the store visit log (user, 5 Nov 2026): home, the rubric questions, the scorecard and visits so far
+visit_home:
+  hi: "*Store visit log*\n\nCustomer ban kar store gaye? Voice note mein bataiye kaisa raha. Main use saat steps par, 14 mein se, score karunga, bilkul store visits ki tarah.\n\n_Naam kabhi save nahi hote._"
+  mr: "*स्टोअर भेट लॉग*\n\nग्राहक म्हणून स्टोअरला गेलात? व्हॉइस नोटमध्ये सांगा कसं झालं. मी त्याला सात पायऱ्यांवर, 14 पैकी, स्कोअर करेन, अगदी स्टोअर भेटींसारखं.\n\n_नावं कधीच सेव्ह होत नाहीत._"
+  en: "*Store visit log*\n\nVisited a store as a customer? Tell me how it went in a voice note. I'll score it on the seven steps, out of 14, just like the store visits.\n\n_Names are never saved._"
+visit_home_count: {hi: "• Ab tak visits: {n} · median {m}/14", mr: "• आत्तापर्यंत भेटी: {n} · मीडियन {m}/14", en: "• Visits logged: {n} · median {m}/14"}
+visit_more:
+  hi: "*Aur jodiye*\n\nJo yaad aaye, ek aur voice note mein bhejiye: features ke baare mein kya kaha, poora kharcha, offer ya follow-up."
+  mr: "*आणखी जोडा*\n\nजे आठवेल ते आणखी एका व्हॉइस नोटमध्ये पाठवा: फीचर्सबद्दल काय सांगितलं, पूर्ण खर्च, ऑफर किंवा फॉलो-अप."
+  en: "*Add more*\n\nSend another voice note with anything you remember: what they said about the features, the full cost, the offer or the follow-up."
+visit_export_one: {hi: "*Visit log:* 1 visit (CSV)", mr: "*भेट लॉग:* 1 भेट (CSV)", en: "*Visit log:* 1 visit (CSV)"}
+b_visit_continue: {hi: "Visit jaari rakhein", mr: "भेट सुरू ठेवा", en: "Continue visit"}
+b_visits_sofar: {hi: "Ab tak ki visits", mr: "आत्तापर्यंत भेटी", en: "Visits so far"}
+b_visit_score_0: {hi: "0 · nahi kiya", mr: "0 · नाही", en: "0 · not done"}
+b_visit_score_1: {hi: "1 · thoda", mr: "1 · थोडं", en: "1 · partly"}
+b_visit_score_2: {hi: "2 · poora", mr: "2 · पूर्ण", en: "2 · fully"}
+visit_ask_step: {hi: "*{step}: kaisa kiya?*\n\n{rubric}", mr: "*{step}: कसं केलं?*\n\n{rubric}", en: "*{step}: how did they do?*\n\n{rubric}"}
+visit_rubric_validate:
+  hi: "Jab aapne kuch aadha sahi kaha: 2 = pehle maana, phir pyaar se sudhaara · 1 = seedha sudhaara · 0 = bahas ki ya anasuna kiya."
+  mr: "तुम्ही काहीसं बरोबर बोललात तेव्हा: 2 = आधी मान्य केलं, मग नम्रपणे दुरुस्त केलं · 1 = थेट दुरुस्त केलं · 0 = वाद घातला किंवा दुर्लक्ष केलं."
+  en: "When you said something partly right: 2 = agreed first, then corrected politely · 1 = corrected bluntly · 0 = argued or ignored it."
+visit_rubric_assess:
+  hi: "Pehle product se pehle ghar ke baare mein sawaal: 2 = chaar ya zyada · 1 = do-teen · 0 = ek ya koi nahi."
+  mr: "पहिल्या प्रॉडक्टआधी घराबद्दल प्रश्न: 2 = चार किंवा जास्त · 1 = दोन-तीन · 0 = एक किंवा एकही नाही."
+  en: "Questions about your home before the first product: 2 = four or more · 1 = two or three · 0 = none or one."
+visit_rubric_translate:
+  hi: "Features aapke ghar ke hisaab se aam bhasha mein: 2 = zyada-tar · 1 = kuch · 0 = sirf specs."
+  mr: "फीचर्स तुमच्या घराच्या दृष्टीने साध्या शब्दांत: 2 = बहुतेक · 1 = काही · 0 = फक्त स्पेक्स."
+  en: "Features in everyday words for your home: 2 = most of them · 1 = some · 0 = only spec words."
+visit_rubric_demonstrate:
+  hi: "2 = do products ka farak saath dikhaya · 1 = ek product dikhaya · 0 = koi demo nahi."
+  mr: "2 = दोन प्रॉडक्ट्सचा फरक शेजारी दाखवला · 1 = एक प्रॉडक्ट दाखवला · 0 = डेमो नाही."
+  en: "2 = showed the difference side by side · 1 = showed one product · 0 = no demo."
+visit_rubric_complete:
+  hi: "2 = poora kharcha, ek-ek charge (installation, accessories, warranty) · 1 = thoda · 0 = sirf product ka daam."
+  mr: "2 = पूर्ण खर्च, प्रत्येक चार्ज (इन्स्टॉलेशन, अॅक्सेसरीज, वॉरंटी) · 1 = थोडं · 0 = फक्त प्रॉडक्टची किंमत."
+  en: "2 = the full cost, charge by charge (installation, accessories, warranty) · 1 = part of it · 0 = only the product price."
+visit_rubric_close:
+  hi: "2 = daam demo ke baad, aapne pehle poocha, koi dabaav nahi · 1 = demo ke baad, thoda dabaav · 0 = unhone pehle daam bola, ya dabaav."
+  mr: "2 = किंमत डेमोनंतर, तुम्ही आधी विचारलं, दबाव नाही · 1 = डेमोनंतर, थोडा दबाव · 0 = त्यांनी आधी किंमत सांगितली, किंवा दबाव."
+  en: "2 = price only after the demo, you asked first, no pressure · 1 = after the demo, some pressure · 0 = they led with the price, or pressure."
+visit_rubric_follow_through:
+  hi: "2 = consent li, summary bheji aur follow-up rakha · 1 = thoda · 0 = kuch nahi."
+  mr: "2 = संमती घेतली, सारांश पाठवला आणि फॉलो-अप ठरवला · 1 = थोडं · 0 = काहीच नाही."
+  en: "2 = took your consent, sent a summary and set a follow-up · 1 = some of it · 0 = none."
+visit_card_caption:
+  hi: "*Visit ka score: {total}/14* (7 mein se {n} steps).\n\nHar score sirf aapki baat se hai; card par wajah likhi hai."
+  mr: "*भेटीचा स्कोअर: {total}/14* (7 पैकी {n} पायऱ्या).\n\nप्रत्येक स्कोअर फक्त तुम्ही सांगितलेल्यावरून; कारण कार्डवर आहे."
+  en: "*The visit, scored: {total}/14* ({n} of 7 steps).\n\nEach score comes only from what you said; the card shows why."
+visit_ready_missing:
+  hi: "_Note mein nahi aaye steps: {k}. Voice se jodiye, ya unke bina save kijiye._"
+  mr: "_नोटमध्ये न आलेल्या पायऱ्या: {k}. व्हॉइसने जोडा, किंवा त्यांच्याशिवाय सेव्ह करा._"
+  en: "_Steps not in the note: {k}. Add them by voice, or save without them._"
+visit_yes: {hi: "Haan", mr: "हो", en: "Yes"}
+visit_no: {hi: "Nahi", mr: "नाही", en: "No"}
+visit_minute: {hi: "minute {m}", mr: "मिनिट {m}", en: "minute {m}"}
+visit_f_price: {hi: "Daam pehle", mr: "किंमत आधी", en: "Price first"}
+visit_f_questions: {hi: "Product se pehle ghar ke sawaal", mr: "प्रॉडक्टआधी घराचे प्रश्न", en: "Home questions before the product"}
+visit_f_demo: {hi: "Demo dikhaya", mr: "डेमो दाखवला", en: "Demo shown"}
+visit_f_cost: {hi: "Poora kharcha bataya", mr: "पूर्ण खर्च सांगितला", en: "Full cost given"}
+visit_f_back: {hi: "Wapas aayenge", mr: "परत येतील", en: "Would come back"}
+visits_none:
+  hi: "*Abhi tak koi visit save nahi.*\n\nStore visit ke baare mein voice note se shuru kijiye."
+  mr: "*अजून कोणतीही भेट सेव्ह नाही.*\n\nस्टोअर भेटीबद्दल व्हॉइस नोटने सुरुवात करा."
+  en: "*No visits saved yet.*\n\nStart one with a voice note about a store visit."
+visits_caption:
+  hi: "*Ab tak visits: {n}* · median {m}/14\n\nOctober ki store visits ke saath (Reliance Digital: median 6, daam pehle associate ne 6 mein se 6 baar)."
+  mr: "*आत्तापर्यंत भेटी: {n}* · मीडियन {m}/14\n\nऑक्टोबरच्या स्टोअर भेटींसोबत (Reliance Digital: मीडियन 6, किंमत आधी असोसिएटने 6 पैकी 6 वेळा)."
+  en: "*Visits so far: {n}* · median {m}/14\n\nSide by side with the October store visits (Reliance Digital: median 6, price first by the associate in 6 of 6)."
+visits_weakest: {hi: "_In visits mein sabse kamzor step: {step}._", mr: "_या भेटींमधली सर्वात कमकुवत पायरी: {step}._", en: "_Weakest step across these visits: {step}._"}
+vs_score: {hi: "14 mein score: range (median)", mr: "14 पैकी स्कोअर: रेंज (मीडियन)", en: "Score of 14: range (median)"}
+vs_guide: {hi: "Guide level par (11+)", mr: "गाइड लेव्हलवर (11+)", en: "At Guide level (11+)"}
+vs_price_assoc: {hi: "Daam ki baat pehle associate ne ki", mr: "किंमतीबद्दल आधी असोसिएट बोलला", en: "Associate spoke about the price first"}
+vs_minute: {hi: "Pehle daam ka minute (median)", mr: "पहिल्या किंमतीचा मिनिट (मीडियन)", en: "Minute of the first price (median)"}
+vs_questions: {hi: "Pehle product se pehle ghar ke sawaal (median)", mr: "पहिल्या प्रॉडक्टआधी घराचे प्रश्न (मीडियन)", en: "Home questions before the first product (median)"}
+vs_demo: {hi: "Demo dikhaya", mr: "डेमो दाखवला", en: "Demo shown"}
+vs_back: {hi: "Is associate ke paas wapas aayenge", mr: "या असोसिएटकडे परत येतील", en: "Would come back to this associate"}
+mgr_row_visits: {hi: "Store visits", mr: "स्टोअर भेटी", en: "Store visits"}
+mgr_row_visits_d: {hi: "Visits ka score, 14 mein se, October ke saath", mr: "भेटींचा स्कोअर, 14 पैकी, ऑक्टोबरसोबत", en: "Visits scored out of 14, beside October's"}
+visit_ev_close_assoc: {hi: "Daam ki baat pehle associate ne ki", mr: "किंमतीबद्दल आधी असोसिएट बोलला", en: "The associate spoke about the price first"}
+visit_ev_close_assoc_at: {hi: "Daam ki baat pehle associate ne ki (minute {m})", mr: "किंमतीबद्दल आधी असोसिएट बोलला (मिनिट {m})", en: "The associate spoke about the price first (minute {m})"}
+visit_ev_close_cust: {hi: "Daam customer ne pehle poocha", mr: "किंमत ग्राहकाने आधी विचारली", en: "The customer asked about the price first"}
+visit_ev_close_cust_at: {hi: "Daam customer ne pehle poocha (minute {m})", mr: "किंमत ग्राहकाने आधी विचारली (मिनिट {m})", en: "The customer asked about the price first (minute {m})"}
+visit_ev_pressure: {hi: "Daam par dabaav ('sirf aaj', 'last piece')", mr: "किंमतीवर दबाव ('फक्त आज', 'शेवटचा पीस')", en: "Pressure on the price ('today only', 'last piece')"}
+visit_ev_no_demo: {hi: "Koi demo nahi", mr: "डेमो नाही", en: "No demo"}
+visit_ev_demo: {hi: "Product chala kar dikhaya", mr: "प्रॉडक्ट चालवून दाखवला", en: "Showed the product working"}
+visit_ev_side: {hi: "Farak saath-saath dikhaya", mr: "फरक शेजारी शेजारी दाखवला", en: "Showed the difference side by side"}
+visit_ev_questions: {hi: "Product se pehle ghar ke {q} sawaal", mr: "प्रॉडक्टआधी घराचे {q} प्रश्न", en: "{q} home questions before the product"}
+visit_ev_cost: {hi: "Poora kharcha, ek-ek charge bataya", mr: "पूर्ण खर्च, प्रत्येक चार्ज सांगितला", en: "Gave the full cost, charge by charge"}
+visit_ev_price_only: {hi: "Sirf product ka daam bataya", mr: "फक्त प्रॉडक्टची किंमत सांगितली", en: "Only the product price"}
+visit_ev_by_visitor: {hi: "Aapka score", mr: "तुमचा स्कोअर", en: "Your score"}
+# ---- Ask an expert: the expert's queue, the question with its product facts, the clean answer (user, 5 Nov 2026)
+expert_home_none:
+  hi: "*Abhi koi sawaal intezaar mein nahi.*\n\nJab koi associate aisi baat poochega jo data mein nahi hai, woh pehle yahan aayegi. Jawab text ya voice note mein."
+  mr: "*सध्या कोणताही प्रश्न वाट पाहत नाही.*\n\nअसोसिएटने डेटामध्ये नसलेली गोष्ट विचारली की ती आधी इथे येईल. उत्तर टेक्स्ट किंवा व्हॉइस नोटमध्ये."
+  en: "*No questions waiting.*\n\nWhen an associate asks something the data doesn't cover, it comes here first. Answer by text or voice note."
+expert_home_some:
+  hi: "*Intezaar mein sawaal: {n}*\n\nEk chuniye aur text ya voice note mein jawab dijiye; seedha associate tak jayega."
+  mr: "*वाट पाहणारे प्रश्न: {n}*\n\nएक निवडा आणि टेक्स्ट किंवा व्हॉइस नोटमध्ये उत्तर द्या; थेट असोसिएटकडे जाईल."
+  en: "*Questions waiting: {n}*\n\nPick one and answer by text or voice note; it goes straight to the associate."
+expert_home_lib: {hi: "• Library mein jawab: {n}. Wahi sawaal agli baar turant answer hota hai.", mr: "• लायब्ररीतील उत्तरं: {n}. तोच प्रश्न पुढच्या वेळी लगेच सुटतो.", en: "• Answers in the library: {n}. The same question is answered instantly next time."}
+list_expert_q: {hi: "Sawaal", mr: "प्रश्न", en: "Questions"}
+b_expert_queue: {hi: "Sawaal dekho", mr: "प्रश्न पहा", en: "Open questions"}
+expert_ago_now: {hi: "abhi", mr: "आत्ता", en: "just now"}
+expert_ago_min: {hi: "{m} min", mr: "{m} मिनिट", en: "{m} min"}
+expert_q_product: {hi: "*Product:* {name}", mr: "*प्रॉडक्ट:* {name}", en: "*Product:* {name}"}
+expert_q_how: {hi: "_Text ya voice mein jawab dijiye. Customer ke liye ek line ho to 'Bolo:' ke baad likhiye._", mr: "_टेक्स्ट किंवा व्हॉइसमध्ये उत्तर द्या. ग्राहकासाठी एक ओळ असेल तर 'बोला:' नंतर लिहा._", en: "_Answer by text or voice. For a line the associate can say, put it after 'Say:'._"}
+expert_answering:
+  hi: "*Jawab: {name} ka sawaal*\n> {question}"
+  mr: "*उत्तर: {name} यांचा प्रश्न*\n> {question}"
+  en: "*Answering {name}*\n> {question}"
+expert_sent:
+  hi: "*{name} ko bhej diya.*\n\nWoh abhi customer ke saath hain."
+  mr: "*{name} यांना पाठवलं.*\n\nते आत्ता ग्राहकासोबत आहेत."
+  en: "*Sent to {name}.*\n\nThey're with the customer now."
+expert_thanks_dunno:
+  hi: "*Shukriya.*\n\nAssociate customer ko batayenge ki pakka karke baad mein batayenge."
+  mr: "*धन्यवाद.*\n\nअसोसिएट ग्राहकाला सांगतील की खात्री करून नंतर कळवू."
+  en: "*Thank you.*\n\nThe associate will tell the customer it will be confirmed later."
+b_expert_anyway: {hi: "Expert se hi poocho", mr: "एक्सपर्टलाच विचारा", en: "Ask expert anyway"}
+b_expert_follow: {hi: "Aur poocho", mr: "आणखी विचारा", en: "Ask a follow-up"}
+expert_follow_hint:
+  hi: "*Expert se phir poochiye*\n\nBoliye ya likhiye: *expert* aur sawaal. Jaise: _expert kya isme eARC hai?_"
+  mr: "*एक्सपर्टला पुन्हा विचारा*\n\nबोला किंवा लिहा: *expert* आणि प्रश्न. उदा.: _expert यात eARC आहे का?_"
+  en: "*Ask the expert again*\n\nSay or type *expert* and the question. For example: _expert does it support eARC?_"
+# ---- the department manager: huddle card, floor, associate profile, voice log, approvals (user, 5 Nov 2026)
+kpi_price_first_ca: {hi: "Daam pehle: customer / associate", mr: "किंमत आधी: ग्राहक / असोसिएट", en: "Price first: customer / associate"}
+kpi_questions: {hi: "Product se pehle ghar ke sawaal (median)", mr: "प्रॉडक्टआधी घराचे प्रश्न (मीडियन)", en: "Home questions before the product (median)"}
+kpi_install_ok: {hi: "Install: theek / dikkat", mr: "इन्स्टॉल: ठीक / अडचण", en: "Installs: OK / issue"}
+base_median: {hi: "Median score (14 mein)", mr: "मीडियन स्कोअर (14 पैकी)", en: "Median score (of 14)"}
+base_price_assoc: {hi: "Daam pehle associate ne bola", mr: "किंमत आधी असोसिएटने सांगितली", en: "Associate spoke price first"}
+base_questions: {hi: "Product se pehle sawaal (median)", mr: "प्रॉडक्टआधी प्रश्न (मीडियन)", en: "Questions before the product (median)"}
+digest_gap_card: {hi: "{name}: aaj {step} sabse kam", mr: "{name}: आज {step} सर्वात कमी", en: "{name}: {step} is the lowest step today"}
+digest_best_card: {hi: "{name}: {total}/14, sabse mazboot {step}", mr: "{name}: {total}/14, सर्वात चांगलं {step}", en: "{name}: {total}/14, strongest at {step}"}
+digest_best_line: {hi: "_Aaj ka best: {name}, {total}/14._", mr: "_आजचं सर्वोत्तम: {name}, {total}/14._", en: "_Best today: {name}, {total}/14._"}
+step_short_validate: {hi: "Maan", mr: "मान्य", en: "Validate"}
+step_short_assess: {hi: "Ghar", mr: "घर", en: "Assess"}
+step_short_translate: {hi: "Fayda", mr: "फायदा", en: "Translate"}
+step_short_demonstrate: {hi: "Demo", mr: "डेमो", en: "Demo"}
+step_short_complete: {hi: "Kharcha", mr: "खर्च", en: "Cost"}
+step_short_close: {hi: "Close", mr: "क्लोज", en: "Close"}
+step_short_follow_through: {hi: "Follow", mr: "फॉलो", en: "Follow"}
+list_floor: {hi: "Customer", mr: "ग्राहक", en: "Customers"}
+floor_tap: {hi: "_Kisi customer par tap kijiye: unka Home Card, aur associate ko ek tip._", mr: "_एखाद्या ग्राहकावर टॅप करा: त्यांचं होम कार्ड, आणि असोसिएटला एक टिप._", en: "_Tap a customer: their Home Card, and a tip for the associate._"}
+floor_row: {hi: "{cat} · {step} · {demo} · {m} min", mr: "{cat} · {step} · {demo} · {m} मिनिट", en: "{cat} · {step} · {demo} · {m} min"}
+floor_c_head: {hi: "*{assoc} · {who}* · {cat}", mr: "*{assoc} · {who}* · {cat}", en: "*{assoc} · {who}* · {cat}"}
+floor_c_step: {hi: "• Abhi: {step} · {m} min se", mr: "• आत्ता: {step} · {m} मिनिटांपासून", en: "• Now: {step} · for {m} min"}
+floor_c_gone: {hi: "*Yeh customer ab floor par nahi.*", mr: "*हा ग्राहक आता फ्लोअरवर नाही.*", en: "*That customer has left the floor.*"}
+b_send_tip: {hi: "Tip bhejo", mr: "टिप पाठवा", en: "Send the tip"}
+b_floor: {hi: "Floor", mr: "फ्लोअर", en: "Floor"}
+b_huddle: {hi: "Sabha", mr: "सभा", en: "Huddle"}
+tip_whisper:
+  hi: "*Manager ki tip* · {step}\n\n{tip}"
+  mr: "*मॅनेजरची टिप* · {step}\n\n{tip}"
+  en: "*A tip from your manager* · {step}\n\n{tip}"
+tip_sent:
+  hi: "*{name} ko tip bhej di.*\n> {tip}"
+  mr: "*{name} यांना टिप पाठवली.*\n> {tip}"
+  en: "*Tip sent to {name}.*\n> {tip}"
+profile_head: {hi: "*{name}* · aaj", mr: "*{name}* · आज", en: "*{name}* · today"}
+profile_today: {hi: "• Customer: {s} · median {m}/14 · Guide {g} / {n}", mr: "• ग्राहक: {s} · मीडियन {m}/14 · गाइड {g} / {n}", en: "• Customers: {s} · median {m}/14 · Guide {g} of {n}"}
+profile_today_none: {hi: "• Customer: {s} · aaj abhi koi score nahi", mr: "• ग्राहक: {s} · आज अजून स्कोअर नाही", en: "• Customers: {s} · no scores yet today"}
+profile_steps: {hi: "• Sabse mazboot: {best} ({b}) · sabse kamzor: {worst} ({w})", mr: "• सर्वात चांगलं: {best} ({b}) · सर्वात कमकुवत: {worst} ({w})", en: "• Strongest: {best} ({b}) · weakest: {worst} ({w})"}
+profile_steps_note: {hi: "_Pichhle 7 din, {n} score hue customer._", mr: "_मागचे 7 दिवस, {n} स्कोअर झालेले ग्राहक._", en: "_Last 7 days, {n} scored customers._"}
+profile_wins: {hi: "• Jeet: {what}", mr: "• जीत: {what}", en: "• Wins: {what}"}
+profile_voice: {hi: "• Aaj voice notes: {n}", mr: "• आज व्हॉइस नोट्स: {n}", en: "• Voice notes today: {n}"}
+b_clip_for: {hi: "Clip: {step}", mr: "क्लिप: {step}", en: "Clip: {step}"}
+b_voice_notes: {hi: "Voice notes", mr: "व्हॉइस नोट्स", en: "Voice notes"}
+vlog_heard: {hi: "*Suna*\n> {text}", mr: "*ऐकलं*\n> {text}", en: "*Heard*\n> {text}"}
+vlog_got: {hi: "*Samjha*\n{lines}", mr: "*समजलं*\n{lines}", en: "*Understood*\n{lines}"}
+vlog_asked: {hi: "*Maanga*: {what}", mr: "*मागितलं*: {what}", en: "*Asked for*: {what}"}
+intent_new_customer: {hi: "naya customer", mr: "नवीन ग्राहक", en: "a new customer"}
+intent_customer_info: {hi: "customer ki jaankari", mr: "ग्राहकाची माहिती", en: "customer details"}
+intent_price_asked: {hi: "customer ne daam poocha", mr: "ग्राहकाने किंमत विचारली", en: "the customer asked the price"}
+intent_customer_claim: {hi: "customer ki ek baat jaanchna", mr: "ग्राहकाचं म्हणणं तपासणं", en: "checking something the customer said"}
+intent_objection: {hi: "customer ki aapatti", mr: "ग्राहकाची हरकत", en: "a customer objection"}
+intent_choose_option: {hi: "ek option chuna", mr: "एक पर्याय निवडला", en: "picked an option"}
+intent_request_options: {hi: "options dikhana", mr: "पर्याय दाखवणं", en: "the options"}
+intent_request_cost: {hi: "poora kharcha", mr: "पूर्ण खर्च", en: "the full cost"}
+intent_request_offers: {hi: "offers", mr: "ऑफर्स", en: "the offers"}
+intent_demo_done: {hi: "demo ho gaya", mr: "डेमो झाला", en: "demo done"}
+intent_consent_yes: {hi: "customer ki haan", mr: "ग्राहकाची संमती", en: "the customer's consent"}
+intent_ask_question: {hi: "expert se sawaal", mr: "एक्सपर्टला प्रश्न", en: "a question for the expert"}
+intent_demo_next: {hi: "agla demo", mr: "पुढचा डेमो", en: "the next demo"}
+intent_request_tryon: {hi: "ghar mein dekhna", mr: "घरात बघणं", en: "see it in the home"}
+intent_sold: {hi: "bik gaya", mr: "विकला गेला", en: "sold"}
+intent_not_today: {hi: "aaj nahi", mr: "आज नाही", en: "not today"}
+intent_lost: {hi: "customer chala gaya", mr: "ग्राहक गेला", en: "customer lost"}
+intent_request_delivery: {hi: "delivery", mr: "डिलिव्हरी", en: "delivery"}
+intent_request_emi: {hi: "EMI", mr: "EMI", en: "EMI"}
+intent_send_family_card: {hi: "Parivaar Card bhejna", mr: "परिवार कार्ड पाठवणं", en: "send the Family Card"}
+intent_set_reminder: {hi: "reminder", mr: "रिमाइंडर", en: "a reminder"}
+intent_next_step: {hi: "agla step", mr: "पुढची पायरी", en: "the next step"}
+approval_product: {hi: "*Product:* {name} · {price}", mr: "*प्रॉडक्ट:* {name} · {price}", en: "*Product:* {name} · {price}"}
+approval_live: {hi: "*Aaj ke offers:* {offers}", mr: "*आजचे ऑफर्स:* {offers}", en: "*Live offers:* {offers}"}
+approval_live_none: {hi: "*Aaj ke offers:* is product par koi nahi", mr: "*आजचे ऑफर्स:* या प्रॉडक्टवर नाही", en: "*Live offers:* none on this product today"}
+approval_told:
+  hi: "*Ho gaya.* {name} ko bataya:\n> {text}"
+  mr: "*झालं.* {name} यांना सांगितलं:\n> {text}"
+  en: "*Done.* {name} was told:\n> {text}"
+floor_no_cat: {hi: "category abhi nahi", mr: "कॅटेगरी अजून नाही", en: "no category yet"}

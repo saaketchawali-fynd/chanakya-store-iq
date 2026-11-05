@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{# One store visit, as the reference scorecard: the seven steps 0–2 with what earned the score, the total out of 14
+   and the level (Guide at 11+), and the facts that matter most. Only what the visitor said. #}
+{% set rs = (rows|aslist)[:7] %}
+{% set fs = (facts|aslist)[:5] %}
+{% block style %}
+  .hd-row { align-items: center; }
+  .tot { flex: none; text-align: center; padding: 14px 26px; border-radius: 26px; background: rgba(255,255,255,.1);
+         border: 1.5px solid rgba(255,255,255,.18); }
+  .tot .v { font-size: 64px; font-weight: 800; line-height: 1; color: #fff; }
+  .tot .v small { font-size: 30px; color: #C7CBD6; font-weight: 700; }
+  .tot .lv { margin-top: 8px; font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #A5B4FC; }
+  .tot.guide .lv { color: #6EE7B7; }
+  .steps { padding: 10px 28px; }
+  .st { display: flex; align-items: center; gap: 18px; padding: 13px 0; }
+  .st + .st { border-top: 1.5px solid var(--line); }
+  .st .n { width: 230px; flex: none; font-size: 25px; font-weight: 700; color: var(--ink); }
+  .st .p { flex: none; width: 64px; height: 50px; border-radius: 14px; display: flex; align-items: center;
+           justify-content: center; font-size: 26px; font-weight: 800; color: #fff; background: #C9CDD6; }
+  .st .p.s0 { background: var(--red); } .st .p.s1 { background: var(--saffron); } .st .p.s2 { background: var(--green); }
+  .st .e { flex: 1; min-width: 0; font-size: 21px; color: var(--muted); line-height: 1.32; }
+  .facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
+  .fact { background: var(--surface); border: 1.5px solid var(--line); border-radius: 22px; padding: 16px 22px; }
+  .fact .k { font-size: 19px; font-weight: 700; color: var(--muted); }
+  .fact .v { margin-top: 4px; font-size: 26px; font-weight: 800; color: var(--ink); }
+  .q { margin-top: 18px; padding: 18px 24px; }
+  .q .l { font-size: 18px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+  .q .t { margin-top: 4px; font-size: 23px; font-style: italic; color: var(--ink); line-height: 1.35; }
+{% endblock %}
+{% block header %}
+  <div class="hd-row">
+    <div class="grow">
+      <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
+      <h1 class="{{ head|dv }}">{{ head or L.title }}</h1>
+      <div class="sub">{{ L.scored }}: <span class="num">{{ scored }}</span>/7</div>
+    </div>
+    <div class="tot{% if guide %} guide{% endif %}"><div class="v num">{{ total }}<small>/14</small></div>
+      <div class="lv">{% if guide %}{{ L.guide }}{% else %}{{ L.not_guide }}{% endif %}</div></div>
+  </div>
+{% endblock %}
+{% block content %}
+  <section class="card steps">
+    {% for r in rs %}<div class="st"><span class="n{{ r.name|dv }}">{{ r.name }}</span>
+      <span class="p{% if r.score is not none %} s{{ r.score }}{% endif %} num">{{ r.score if r.score is not none else '?' }}</span>
+      <span class="e">{{ r.evidence or L.unscored }}</span></div>{% endfor %}
+  </section>
+  <section class="facts">
+    {% for f in fs %}<div class="fact"><div class="k{{ f.k|dv }}">{{ f.k }}</div><div class="v num">{{ f.v }}</div></div>{% endfor %}
+  </section>
+  {% if best %}<section class="card q"><div class="l">{{ L.best }}</div><div class="t">“{{ best }}”</div></section>{% endif %}
+  {% if worst %}<section class="card q"><div class="l">{{ L.worst }}</div><div class="t">“{{ worst }}”</div></section>{% endif %}
+{% endblock %}
+{% block foot_left %}{{ L.foot }}{% endblock %}
