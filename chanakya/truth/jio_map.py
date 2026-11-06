@@ -372,15 +372,13 @@ def brand_from_name(row: dict, why: str) -> str | None:
     return None
 
 
-CATEGORY_WORDS = ("tv", "television", "led", "oled", "qled", "smart", "inch", "air conditioner", " ac", "split",
-                  "window", "ton", "washing", "washer", "load", "kg", "refrigerator", "fridge", "litre", "liter",
-                  "door", "laptop", "notebook", "macbook", "chromebook", "core", "ryzen", "gb")
+JUNK = re.compile(r"hello\s*world|\btest\b|\bdummy\b|lorem|\basdf|\bsample product\b", re.I)
 
 
 def junk_listing(row: dict) -> bool:
-    """A test or placeholder listing ('helloworld1'): its name says nothing of any product kind."""
-    name = " " + ((row.get("info") or {}).get("name") or "").lower() + " "
-    return not any(w in name for w in CATEGORY_WORDS)
+    """A test or placeholder listing ('helloworld1', 'Package Length Test'): only names that say so, never a real
+    product whose name just lacks the usual words ('HP Fortis14 (PQC/8/64…)', 'RECONNECT SAC 1.5T …')."""
+    return bool(JUNK.search((row.get("info") or {}).get("name") or ""))
 
 
 def map_product(p: dict, category: str) -> dict | None:

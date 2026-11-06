@@ -579,5 +579,7 @@ def test_a_brand_variant_is_corrected_from_the_name_not_dropped():
     row = {"brand": "Voltas Beko", "info": {"name": "Voltas 340 Litres 2 Star Frost Free Refrigerator"}}
     assert jio_map.brand_from_name(row, "brand:voltas beko!=voltas") == "Voltas"
     assert jio_map.brand_from_name({"info": {"name": "Onida Liliput 6.5 Kg"}}, "brand:samsung!=onida") is None
-    assert jio_map.junk_listing({"info": {"name": "helloworld1"}})
-    assert not jio_map.junk_listing({"info": {"name": "Samsung 189 cm (75 Inch) 4K Ultra HD Smart TV"}})
+    assert jio_map.junk_listing({"info": {"name": "helloworld1"}}) and jio_map.junk_listing({"info": {"name": "Package Length Test"}})
+    for real in ("Samsung 189 cm (75 Inch) 4K Ultra HD Smart TV", "HP Fortis14 (PQC/8/64/14/HD/Chrome/Black)",
+                 "RECONNECT SAC 1.5T Inv3S RHSAB1507"):
+        assert not jio_map.junk_listing({"info": {"name": real}}), real

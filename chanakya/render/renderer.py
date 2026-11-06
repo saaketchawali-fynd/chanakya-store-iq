@@ -1744,6 +1744,7 @@ def make_env() -> Environment:
 # Chromium keeps part of every card it draws (pictures included) for as long as its page process lives, so the
 # page process is replaced every RECYCLE_AFTER cards, and sooner when the instance nears its memory limit.
 RECYCLE_AFTER = 25
+MIN_RENDERS_BEFORE_FRESH = 4
 MEMORY_HIGH = 0.8  # share of the instance's memory limit
 CHROMIUM_ARGS = [
     "--no-sandbox",
@@ -1789,7 +1790,12 @@ class Renderer:
             await self._close_quietly()
             return
         if warm_up:
+            from chanakya.app import memory
+
             for name in TEMPLATE_NAMES:
+                used = memory.used_fraction()
+                if used is not None and used > MEMORY_HIGH * 0.9:
+                    break  # memory already high at start-up: the rest warms on first use, not now
                 try:
                     await self._render_html(
                         Card.model_construct(template=name, lang="hi", data=sample_data(name, "hi"))
@@ -1847,7 +1853,9 @@ class Renderer:
         from chanakya.app import memory
 
         used = memory.used_fraction()
-        if used is not None and used > MEMORY_HIGH and self.renders > 0:
+        # memory high: a fresh page process, but only after a few cards on this one (6 Nov 2026: at start-up, with
+        # the sync running, every warm-up card started Chromium afresh, 16 times, and memory stayed at 430 MB)
+        if used is not None and used > MEMORY_HIGH and self.renders >= MIN_RENDERS_BEFORE_FRESH:
             from chanakya.log import get_log
 
             get_log("renderer").warning("memory_high_fresh_chromium", renders=self.renders, **memory.snapshot())

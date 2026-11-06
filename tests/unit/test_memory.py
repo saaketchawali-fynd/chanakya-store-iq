@@ -98,14 +98,17 @@ async def test_chromium_keeps_no_card_and_starts_fresh(fresh_renderer):
 
 async def test_chromium_starts_fresh_when_memory_is_high(fresh_renderer, monkeypatch):
     r = fresh_renderer
+    monkeypatch.setattr(R, "RECYCLE_AFTER", 100)  # only the memory rule here, not the routine recycle
     await r.render(_card("offer"))
     monkeypatch.setattr(memory, "used_fraction", lambda: 0.9)
+    for _ in range(3):
+        await r.render(_card("offer"))
+    assert r.fresh_starts == 0  # a few cards first: never a fresh start on every card (the 6 Nov start-up cascade)
     await r.render(_card("offer"))
-    await r.render(_card("offer"))
-    assert r.fresh_starts == 2  # every card while memory is high gets a clean page process
+    assert r.fresh_starts == 1  # then a clean page process while memory stays high
     monkeypatch.setattr(memory, "used_fraction", lambda: 0.5)
     await r.render(_card("offer"))
-    assert r.fresh_starts == 2
+    assert r.fresh_starts == 1
 
 
 async def test_chromium_comes_back_after_a_failed_card(fresh_renderer):
