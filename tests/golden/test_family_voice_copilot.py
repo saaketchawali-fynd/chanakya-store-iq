@@ -100,8 +100,8 @@ async def test_manager_voice_and_voice_log(h, monkeypatch):
     await h.voice("assess_1")  # an associate voice note
     h.as_("manager")
     out = await h.say("aaj ka digest")
-    assert any(m.card and m.card.template == "digest" for m in out)
-    assert "_Voice notes: 1 · 1 " in (out[0].body or out[0].caption or "")  # beside the huddle's eight numbers
+    card = next(m.card for m in out if m.card and m.card.template == "digest")
+    assert next(k["value_str"] for k in card.data["kpis"] if "Voice" in k["label"]) == "1/1"  # understood / all
 
     async def heard(audio, mime=None):
         return "Ravi ke voice notes dikhao"

@@ -115,7 +115,8 @@ async def events_insert(events: list[Event], at: datetime) -> None:
 
 
 async def events_for(
-    session_id: str | None = None, types: list[str] | None = None, since: datetime | None = None
+    session_id: str | None = None, types: list[str] | None = None, since: datetime | None = None,
+    until: datetime | None = None,
 ) -> list[EventRow]:
     async with db.session() as s:
         q = select(EventRow)
@@ -127,6 +128,8 @@ async def events_for(
         rows = list((await s.execute(q)).scalars())
     if since:
         rows = [r for r in rows if (aware(r.at) or since) >= since]
+    if until:  # one day's events: [since, until)
+        rows = [r for r in rows if (aware(r.at) or since or until) < until]
     return rows
 
 

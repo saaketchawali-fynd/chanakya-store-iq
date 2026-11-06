@@ -3,27 +3,40 @@
 from __future__ import annotations
 
 import statistics
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta
 
 from chanakya.channel.limits import truncate, truncate_title
 from chanakya.core import repo
 from chanakya.core.buttons import encode
+from chanakya.core.clock import IST
 from chanakya.core.coach import info_reply
 from chanakya.core.contracts import Button, Card, ListRow, ListSection, OutMessage, Reply
+from chanakya.core.days import parse_day
 from chanakya.core.status import short_name
 from chanakya.skills.base import SkillContext
 from chanakya.skills.review import STEPS
 from chanakya.truth import fmt
 
 
-async def _today_data(ctx: SkillContext) -> dict:
-    start = ctx.now.replace(hour=0, minute=0, second=0, microsecond=0)
-    sessions = await ctx.svc.sessions.since(start - timedelta(hours=6))
-    sessions = [(r, st) for r, st in sessions if (repo.aware(r.created_at) or start) >= start]
-    scores = [sc for sc in await repo.scores_for(limit=500) if (repo.aware(sc.at) or start) >= start]
-    events = await repo.events_for(since=start)
+async def _day_data(ctx: SkillContext, day: date | None = None) -> dict:
+    """One day's data (today by default): the customers started that day, its scores and its events, and the staff."""
+    day = day or ctx.now.date()
+    start = datetime.combine(day, time.min, tzinfo=IST)
+    end = start + timedelta(days=1)
+
+    def inside(at) -> bool:
+        at = repo.aware(at) or start
+        return start <= at < end
+
+    sessions = [(r, st) for r, st in await ctx.svc.sessions.since(start - timedelta(hours=6)) if inside(r.created_at)]
+    scores = [sc for sc in await repo.scores_for(limit=5000) if inside(sc.at)]
+    events = await repo.events_for(since=start, until=end)
     staff = {s.wa_id: s for s in await repo.staff_all()}
-    return {"start": start, "sessions": sessions, "scores": scores, "events": events, "staff": staff}
+    return {"day": day, "start": start, "sessions": sessions, "scores": scores, "events": events, "staff": staff}
+
+
+async def _today_data(ctx: SkillContext) -> dict:
+    return await _day_data(ctx)
 
 
 # the October store visits (Store_Visit_Findings_Reference_27Oct2026): Reliance Digital, 6 scored conversations
@@ -182,99 +195,236 @@ async def tip(ctx: SkillContext, wa_id: str | None, step: str | None) -> Reply:
                                 [Button(id=encode("m", "floor"), title=ctx.t("b_floor"))]), to_assoc)
 
 
-async def digest(ctx: SkillContext, to: str | None = None) -> Reply:
-    """Today's huddle card: eight numbers from today's data, 'since the store visits' (the October baseline beside
-    today), each associate's steps, the biggest gap with its clip, and the best today."""
-    d = await _today_data(ctx)
+def _day_name(ctx: SkillContext, day: date) -> str:
+    """'Aaj', 'Kal', else 'Budhvaar, 5 Nov' (Roman Hinglish day names in Hindi)."""
+    today = ctx.now.date()
+    if day == today:
+        return ctx.t("day_today")
+    if day == today - timedelta(days=1):
+        return ctx.t("day_yesterday")
+    return ctx.reg.raw(f"{fmt.day_name(day, ctx.lang, roman=True)}, {fmt.date_short(day, ctx.lang)}", "clock:day")
+
+
+def _day_short(ctx: SkillContext, day: date) -> str:
+    today = ctx.now.date()
+    if day in (today, today - timedelta(days=1)):
+        return _day_name(ctx, day)
+    return ctx.reg.raw(fmt.date_short(day, ctx.lang), "clock:day")
+
+
+def _day_buttons(ctx: SkillContext, day: date) -> list[Button]:
+    """The day before, and back to today (or the floor, when this is today)."""
+    prev = day - timedelta(days=1)
+    title = ctx.reg.raw(truncate_title("◀ " + _day_short(ctx, prev)), "clock:day")
+    btns = [Button(id=encode("m", "digest", prev.isoformat()), title=title)]
+    if day == ctx.now.date():
+        btns.append(Button(id=encode("m", "floor"), title=ctx.t("b_floor")))
+    else:
+        btns.append(Button(id=encode("m", "digest"), title=ctx.t("b_huddle")))
+    return btns
+
+
+def _status(ctx: SkillContext, r, st, today: bool, reason: str | None) -> tuple[str, str, str]:
+    """A customer's status from the session and what the associate marked: sold (with the product), follow-up or
+    didn't buy (with the reason they picked), still on the floor, left open, or closed."""
+    out = st.extra.get("outcome")
+    if out == "sold" or st.extra.get("sale_marked"):
+        key = "sold"
+    elif out in ("followup", "lost"):
+        key = out
+    elif r.status == "active":
+        key = "floor" if today else "open"
+    else:
+        key = "closed"
+    text = ctx.t(f"dg_st_{key}")
+    if key == "sold" and st.chosen_sku:
+        p = ctx.facts.product_sync(st.chosen_sku)
+        if p is not None:
+            from chanakya.skills import common as C
+
+            text += " · " + C.product_name(ctx, p)
+    elif key in ("followup", "lost") and reason:
+        text += " · " + ctx.t(f"obj_row_{reason}")
+    return text, {"sold": "g", "followup": "o", "lost": "r", "floor": "b"}.get(key, "n"), key
+
+
+async def digest(ctx: SkillContext, day: date | None = None, to: str | None = None, heard: str | None = None,
+                 future: bool = False) -> Reply:
+    """One day's huddle, voice first (today by default; any day the manager asks for): the answer in 3 lines at once
+    (the funnel, how the day ended, the gap), then the dashboard card with the buttons: the funnel and how the day
+    ended, the quality numbers, the team, each customer and their status, October beside the day, the gap and the
+    best. Everything from that day's sessions, scores and events: nothing estimated."""
+    today = ctx.now.date()
+    day = day or today
+    name = _day_name(ctx, day)
+    footer = None
+    if heard:
+        snip = " ".join(heard.split())
+        footer = ctx.t("footer_heard", text=ctx.reg.raw(snip if len(snip) <= 38 else snip[:37] + "…", "voice:transcript"))
+    if future or day > today:
+        ctx.ev("digest_shown", day=day.isoformat(), future=True)
+        m = info_reply(ctx, ctx.t("digest_future", day=name), [Button(id=encode("m", "digest"), title=ctx.t("b_huddle"))], to=to)
+        m.footer = footer or m.footer
+        return ctx.reply(m)
+    d = await _day_data(ctx, day)
     n = ctx.reg.num
-    totals = [sc.total for sc in d["scores"]]
-    guide = sum(1 for t in totals if t >= 11)
+    sessions = sorted(d["sessions"], key=lambda x: repo.aware(x[0].created_at) or d["start"])
+    if not sessions and not d["scores"]:
+        ctx.ev("digest_shown", day=day.isoformat(), customers=0)
+        m = info_reply(ctx, ctx.t("digest_empty", day=name), _day_buttons(ctx, day), to=to)
+        m.footer = footer or m.footer
+        return ctx.reply(m)
     ev = d["events"]
+    totals = [sc.total for sc in d["scores"]]
     pf = _price_first(ev)
     pf_cust = sum(1 for p in pf.values() if p.get("who") == "customer")
     pf_assoc = sum(1 for p in pf.values() if p.get("who") == "associate")
-    minutes = [p["minute"] for p in pf.values() if p.get("minute") is not None]
     qs = _questions_before_product(ev)
-    parivaar = sum(1 for e in ev if e.type == "parivaar_sent")
-    inst_ok = sum(1 for e in ev if e.type == "install_confirmed")
-    inst_bad = sum(1 for e in ev if e.type == "install_problem")
     med = statistics.median(totals) if totals else None
+    vn = [e for e in ev if e.type == "voice_note"]
+    vn_ok = [e for e in vn if (e.payload or {}).get("understood") or (e.payload or {}).get("intents")]
+    reasons = {e.session_id: (e.payload or {}).get("objection") for e in ev if e.type == "objection_handled" and e.session_id}
+    is_today = day == today
+    rows, cust = [], []
+    for r, st in sessions:
+        text, tone, key = _status(ctx, r, st, is_today, reasons.get(st.id))
+        rows.append((r, st, text, tone, key))
+    total = len(rows)
+    keys = [x[4] for x in rows]
+    sold, follow, lost = keys.count("sold"), keys.count("followup"), keys.count("lost")
+    demos = sum(1 for x in rows if x[1].demo_done)
+    opts = sum(1 for x in rows if x[1].option_labels or x[1].shortlist)
+    costed = sum(1 for x in rows if x[1].cost_snapshot)
+
+    def pct(k: int) -> int:
+        return round(100 * k / total) if total else 0
+
+    funnel = []  # what the associates did with each customer, from the sessions themselves
+    for i, (label, k) in enumerate((("kpi_customers", total), ("fn_options", opts), ("fn_demo", demos),
+                                    ("fn_cost", costed), ("kpi_sold", sold))):
+        funnel.append({"label": ctx.t(label), "n": n(k, "calc:digest"), "w": max(pct(k), 6) if k else 0,
+                       "pct": f"{n(pct(k), 'calc:digest')}%" if i else ""})
+    outcomes = [{"label": ctx.t(f"dg_st_{k}"), "n": n(keys.count(k), "calc:digest"), "k": keys.count(k),
+                 "tone": {"sold": "g", "followup": "o", "lost": "r", "floor": "b"}.get(k, "n")}
+                for k in ("sold", "followup", "lost", "floor", "open", "closed") if keys.count(k)]
+    said = [reasons[x[1].id] for x in rows if reasons.get(x[1].id)]
+    top = sorted({o: said.count(o) for o in said}.items(), key=lambda kv: -kv[1])[:3]
+    why = " · ".join(f"{ctx.t(f'obj_row_{o}')} {n(c, 'calc:digest')}" for o, c in top) or None
     dash = "–"
-    kpis = [
-        {"label": ctx.t("kpi_conversations"), "value_str": n(len(d["sessions"]), "calc:digest")},
-        {"label": ctx.t("kpi_guide"), "value_str": f"{n(guide, 'calc:digest')}/{n(len(totals), 'calc:digest')}"},
-        {"label": ctx.t("kpi_median"), "value_str": f"{n(med, 'calc:digest')}/14" if med is not None else dash},
-        {"label": ctx.t("kpi_price_first_ca"), "value_str": f"{n(pf_cust, 'calc:digest')} / {n(pf_assoc, 'calc:digest')}"},
-        {"label": ctx.t("kpi_minute"), "value_str": n(statistics.median(minutes), "calc:digest") if minutes else dash},
-        {"label": ctx.t("kpi_questions"), "value_str": n(statistics.median(qs), "calc:digest") if qs else dash},
-        {"label": ctx.t("kpi_parivaar"), "value_str": n(parivaar, "calc:digest")},
-        {"label": ctx.t("kpi_install_ok"), "value_str": f"{n(inst_ok, 'calc:digest')} / {n(inst_bad, 'calc:digest')}"},
-    ]
     b_n, b_of = BASELINE["price_assoc"]
-    since = [
-        {"label": ctx.t("base_median"), "oct": str(BASELINE["median"]), "today": n(med, "calc:digest") if med is not None else dash},
-        {"label": ctx.t("base_price_assoc"), "oct": f"{b_n}/{b_of}",
-         "today": f"{n(pf_assoc, 'calc:digest')}/{n(len(pf), 'calc:digest')}" if pf else dash},
-        {"label": ctx.t("base_questions"), "oct": str(BASELINE["questions"]),
-         "today": n(statistics.median(qs), "calc:digest") if qs else dash},
+    oct_med, oct_q = ctx.reg.raw(str(BASELINE["median"]), "reference:store_visits_oct"), ctx.reg.raw(str(BASELINE["questions"]), "reference:store_visits_oct")
+    oct_pf = ctx.reg.raw(f"{b_n}/{b_of}", "reference:store_visits_oct")
+    kpis = [  # the quality numbers, each with October's store visits beside it where the reference has one
+        {"label": ctx.t("kpi_median"), "value_str": f"{n(med, 'calc:digest')}/14" if med is not None else dash,
+         "sub": ctx.t("kpi_oct", v=oct_med)},
+        {"label": ctx.t("kpi_price_first_ca"), "value_str": f"{n(pf_cust, 'calc:digest')} / {n(pf_assoc, 'calc:digest')}",
+         "sub": ctx.t("kpi_oct_assoc", v=oct_pf)},
+        {"label": ctx.t("kpi_questions"), "value_str": n(statistics.median(qs), "calc:digest") if qs else dash,
+         "sub": ctx.t("kpi_oct", v=oct_q)},
+        {"label": ctx.t("kpi_voice_ok"), "value_str": f"{n(len(vn_ok), 'calc:digest')}/{n(len(vn), 'calc:digest')}"},
     ]
-    for r in since:
-        ctx.reg.raw(r["oct"], "reference:store_visits_oct")
-    ctx.reg.static("14 11")
+    staff = d["staff"]
+    people = [wa for wa, s in staff.items() if (s.base_role or s.role) == "associate"]  # never a demo role switch
+    people += [st.associate_wa_id for _, st in sessions if st.associate_wa_id not in people]
+    team = []
+    for wa in people:
+        mine = [x for x in rows if x[1].associate_wa_id == wa]
+        sc = [s.total for s in d["scores"] if s.associate_wa_id == wa]
+        st_ = staff.get(wa)
+        team.append({
+            "name": st_.name if st_ else wa[-4:],
+            "c": n(len(mine), "calc:digest"),
+            "d": n(sum(1 for x in mine if x[1].demo_done), "calc:digest"),
+            "s": n(sum(1 for x in mine if x[4] == "sold"), "calc:digest"),
+            "m": f"{n(statistics.median(sc), 'calc:digest')}/14" if sc else dash,
+            "v": n(sum(1 for e in vn if e.actor_wa_id == wa), "calc:digest"),
+            "low": dash,
+            "_wa": wa,
+            "_k": (-len(mine), st_.name if st_ else wa),
+        })
+    team.sort(key=lambda x: x.pop("_k"))
+    for r, st, text, tone, _ in rows[:4]:
+        who = staff.get(st.associate_wa_id)
+        cname = short_name(st.home.customer_name)
+        pack = ctx.packs.get(st.home.category) if st.home.category else None
+        at = repo.aware(r.created_at)
+        cust.append({
+            "time": ctx.reg.raw(at.astimezone(IST).strftime("%H:%M"), "session:time") if at else "",
+            "cust": ctx.reg.raw(f"{st.code} {cname}" if cname and cname != "–" else st.code, "session:code"),
+            "assoc": who.name if who else "?",
+            "cat": ctx.pick(pack.label) if pack else dash,
+            "demo": "yes" if st.demo_done else "",
+            "status": text,
+            "tone": tone,
+        })
+    more = ctx.t("dg_more", n=n(len(rows) - 4, "calc:digest")) if len(rows) > 4 else None
+    ctx.reg.static("14 11 4 100")
     by_assoc: dict[str, list] = {}
     for sc in d["scores"]:
         by_assoc.setdefault(sc.associate_wa_id, []).append(sc)
-    names, cells = [], []
     worst = None
-    for wa, rows in by_assoc.items():
-        st = d["staff"].get(wa)
-        names.append(st.name if st else wa[-4:])
-        avg = {s: round(sum((r.steps or {}).get(s, 0) for r in rows) / len(rows), 1) for s in STEPS}
-        cells.append([_cell(avg[s]) for s in STEPS])
+    for wa, srows in by_assoc.items():  # each associate's weakest step that day (the average over their scores)
+        st = staff.get(wa)
+        avg = {s: sum((r.steps or {}).get(s, 0) for r in srows) / len(srows) for s in STEPS}
         low = min(STEPS, key=lambda s: avg[s])
+        if avg[low] == max(avg.values()):
+            continue  # every step the same: no weakest step to name
+        for t in team:
+            if t["_wa"] == wa:
+                t["low"] = ctx.t(f"step_short_{low}")
         if worst is None or avg[low] < worst[2]:
             worst = (wa, st.name if st else "", avg[low], low)
+    for t in team:
+        t.pop("_wa", None)
     best = max(d["scores"], key=lambda sc: sc.total, default=None)
-    best_text = None
-    if best is not None:
-        bst = d["staff"].get(best.associate_wa_id)
-        top = max(STEPS, key=lambda s: (best.steps or {}).get(s, 0))
-        best_text = ctx.t("digest_best_card", name=bst.name if bst else "", total=n(best.total, "calc:digest"),
-                          step=ctx.t(f"step_{top}"))
-    if worst:
-        caption = ctx.t("digest_gap", name=worst[1], step=ctx.t(f"step_{worst[3]}"))
-        gaps = ctx.t("digest_gap_card", name=worst[1], step=ctx.t(f"step_{worst[3]}"))
-        extra = []
-        if best is not None:
-            bst = d["staff"].get(best.associate_wa_id)
-            extra.append(ctx.t("digest_best_line", name=bst.name if bst else "", total=n(best.total, "calc:digest")))
+    lines = [ctx.t("digest_funnel_line", day=name, c=n(total, "calc:digest"), o=n(opts, "calc:digest"),
+                   d=n(demos, "calc:digest"), k=n(costed, "calc:digest"), s=n(sold, "calc:digest"))]
+    ended = [f"{ctx.t(f'dg_st_{k}')} {n(keys.count(k), 'calc:digest')}" for k in ("followup", "lost", "floor", "open", "closed")
+             if keys.count(k)]  # how the rest of the day ended (only what happened), and the reason said most
+    if top:
+        ended.append(ctx.t("digest_top_reason", reason=ctx.t(f"obj_row_{top[0][0]}")))
+    if ended:
+        lines.append(" · ".join(ended))
+    if worst:  # where to coach: the weakest step of the day, and the best score
+        line = ctx.t("digest_gap_line", name=worst[1], step=ctx.t(f"step_short_{worst[3]}"))  # as on the card
+        if best is not None and len(by_assoc) > 1:  # the best only means something beside someone else
+            bst = staff.get(best.associate_wa_id)
+            line += " · " + ctx.t("digest_best_short", name=bst.name if bst else "", total=n(best.total, "calc:digest"))
+        lines.append(line)
     else:
-        caption = gaps = ctx.t("digest_no_data")
-        extra = []
-    vn = [e for e in ev if e.type == "voice_note"]
-    if vn:  # the associates' voice notes today, and how many were understood (the voice log is one tap away)
-        ok = sum(1 for e in vn if (e.payload or {}).get("understood") or (e.payload or {}).get("intents"))
-        extra.append(ctx.t("kpi_voice") + ": " + ctx.t("kpi_voice_val", n=n(len(vn), "calc:digest"), ok=n(ok, "calc:digest")))
-    if extra:  # one quiet line: the best today and the voice notes
-        caption += "\n_" + " · ".join(x.strip("_ ").rstrip(".") for x in extra) + "_"
+        lines.append(ctx.t("digest_no_scores"))
+    if day == today:
+        title = ctx.t("digest_title_today")
+    elif day == today - timedelta(days=1):
+        title = ctx.t("digest_title_yesterday")
+    else:
+        title = ctx.t("digest_title_day", day=name)
+    full = ctx.reg.raw(f"{fmt.day_name(day, ctx.lang, roman=True)}, {fmt.date_short(day, ctx.lang)}", "clock:day")
     card = Card(
         template="digest",
         lang=ctx.lang,
         data={  # type: ignore[arg-type]
+            "labels": {"kicker": f"{ctx.t('b_huddle')} · {full}", "title": title},
+            "funnel": funnel,
+            "outcomes": outcomes,
+            "why": why,
             "kpis": kpis,
-            "since": since,
-            "heatmap": {"associates": names, "steps": [ctx.t(f"step_short_{s}") for s in STEPS], "cells": cells},
-            "gaps_text": gaps,
-            "best_text": best_text,
+            "team": team[:4],  # one screen: at most 4 people and 4 customers (the rest: '+N aur')
+            "customers": cust,
+            "more": more,
         },
     )
     btns = []
     if worst:
-        btns = [Button(id=encode("m", "nudge", worst[0], worst[3]), title=ctx.t("b_send_nudge"))]
-    if not to:
-        btns += [Button(id=encode("m", "floor"), title=ctx.t("b_floor")), Button(id=encode("m", "team"), title=ctx.t("b_team"))]
-    m = info_reply(ctx, caption, btns[:3], card=card, to=to)
-    return ctx.reply(m)
+        nudge = truncate_title(ctx.t("b_nudge_clip", name=worst[1]))
+        btns = [Button(id=encode("m", "nudge", worst[0], worst[3]), title=nudge)]
+    btns += _day_buttons(ctx, day)
+    ctx.ev("digest_shown", day=day.isoformat(), customers=total, options=opts, demos=demos, full_cost=costed, sold=sold,
+           followup=follow, lost=lost, scores=len(totals), voice_notes=len(vn))
+    quick = info_reply(ctx, "\n".join(lines[:3]), to=to)  # the answer first, in words, before the card is drawn
+    quick.footer = footer
+    m = info_reply(ctx, ctx.t("digest_card_line", title=title), btns[:3], card=card, to=to)
+    return ctx.reply(quick, m)
 
 
 async def team(ctx: SkillContext) -> Reply:
@@ -405,13 +555,19 @@ async def nudge(ctx: SkillContext, wa_id: str, step: str) -> Reply:
 
 # ---------------------------------------------------------------- voice first for the manager, and the voice log
 MGR_WORDS = {
-    "digest": ["digest", "sabha", "report", "aaj kaisa", "summary", "डायजेस्ट", "रिपोर्ट", "अहवाल", "सारांश"],
+    "digest": ["digest", "sabha", "report", "aaj kaisa", "summary", "dashboard", "kya hua", "kaisa raha", "kaisa gaya",
+               "kaisa tha", "how was", "what happened", "डायजेस्ट", "रिपोर्ट", "अहवाल", "सारांश", "क्या हुआ", "कैसा रहा",
+               "काय झालं", "काय झाले", "कसा गेला", "कसा होता", "funnel", "analytics", "फनेल"],
     "floor": ["floor", "abhi kaun", "live", "kaun kya kar", "फ्लोर", "आत्ता कोण"],
     "team": ["team", "sab log", "टीम"],
     "approvals": ["approval", "manzoori", "manjoori", "मंजूरी", "मंजुरी"],
     "voice": ["voice", "awaaz", "recording", "voice log", "voice note", "आवाज", "व्हॉइस"],
     "visits": ["visits", "store visit", "store visits", "mystery", "भेटी", "स्टोअर भेट"],
 }
+
+
+GREET = {"hi", "hii", "hello", "hey", "helo", "good morning", "gm", "morning", "namaste", "namaskar", "हाय", "हॅलो",
+         "हेलो", "नमस्ते", "नमस्कार", "सुप्रभात"}
 
 
 def menu(ctx: SkillContext, heard: str | None = None) -> Reply:
@@ -449,9 +605,16 @@ async def by_voice(ctx: SkillContext) -> Reply:
             return ctx.reply(info_reply(ctx, ctx.t("voice_retry" if ctx.ai.live else "voice_unavailable")))
     staff = {s.wa_id: s for s in await repo.staff_all()}
     what, who = _match(text, staff)
-    ctx.ev("manager_voice" if msg.type == "audio" else "manager_text", what=what, transcript=" ".join(text.split())[:200])
+    asked = parse_day(text, ctx.now.date())  # 'kal ka digest', '3 Nov kaisa raha', 'सोमवारचा अहवाल'
+    if asked and (what in (None, "digest") or (what in ("floor", "team") and asked.day != ctx.now.date())):
+        what = "digest"  # a day said on its own, or a past day's floor or team, is that day's huddle
+    if what is None and not who and " ".join(text.lower().strip(" .!?,").split()) in GREET:
+        what = "digest"  # 'hi', 'good morning': voice first, today's numbers at once
+    ctx.ev("manager_voice" if msg.type == "audio" else "manager_text", what=what,
+           day=asked.day.isoformat() if asked else None, transcript=" ".join(text.split())[:200])
     if what == "digest":
-        return await digest(ctx)
+        return await digest(ctx, asked.day if asked else None, heard=text if msg.type == "audio" else None,
+                            future=bool(asked and asked.future))
     if what == "floor":
         return await floor(ctx)
     if what == "team":

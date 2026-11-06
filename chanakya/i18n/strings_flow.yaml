@@ -240,7 +240,7 @@ fc_install: {hi: "Installation", mr: "Installation", en: "Installation"}
 fc_warranty: {hi: "Warranty", mr: "Warranty", en: "Warranty"}
 fc_warranty_years: {hi: "{n} year brand warranty", mr: "{n} year brand warranty", en: "{n} year brand warranty"}
 fc_reply: {hi: "Reply here to talk to {associate}", mr: "Reply here to talk to {associate}", en: "Reply here to talk to {associate}"}
-footer_voice_mgr: {hi: "Bolkar bhi: 'digest', 'team', 'voice log' — voice note", mr: "बोलूनही: 'digest', 'team', 'voice log' — व्हॉइस नोट", en: "Or say it: 'digest', 'team', 'voice log' by voice note"}
+footer_voice_mgr: {hi: "Boliye: 'kal ka digest', 'team', 'voice log'", mr: "बोला: 'कालचा अहवाल', 'team', 'voice log'", en: "Say: 'yesterday's digest', 'team', 'voice log'"}
 # ---- manager: voice first, and the voice log
 list_mgr: {hi: "Menu", mr: "मेनू", en: "Menu"}
 mgr_row_digest: {hi: "Aaj ki sabha", mr: "आजची सभा", en: "Today's huddle"}
@@ -264,6 +264,36 @@ b_vlog: {hi: "Voice log", mr: "व्हॉइस लॉग", en: "Voice log"}
 b_vlog_who: {hi: "{name} ke notes", mr: "{name} च्या नोट्स", en: "{name}'s notes"}
 kpi_voice: {hi: "Voice notes", mr: "व्हॉइस नोट्स", en: "Voice notes"}
 kpi_voice_val: {hi: "{n} · {ok} samjhe", mr: "{n} · {ok} समजल्या", en: "{n} · {ok} understood"}
+# ---- the huddle for any day the manager asks for ('kal ka digest', '3 Nov kaisa raha', 'सोमवारचा अहवाल')
+day_today: {hi: "Aaj", mr: "आज", en: "Today"}
+day_yesterday: {hi: "Kal", mr: "काल", en: "Yesterday"}
+digest_title_today: {hi: "Aaj ki sabha", mr: "आजची सभा", en: "Today's huddle"}
+digest_title_yesterday: {hi: "Kal ki sabha", mr: "कालची सभा", en: "Yesterday's huddle"}
+digest_title_day: {hi: "{day} ki sabha", mr: "सभा: {day}", en: "Huddle: {day}"}
+digest_funnel_line: {hi: "*{day}:* customer {c} → options {o} → demo {d} → kharcha {k} → bikri {s}", mr: "*{day}:* ग्राहक {c} → पर्याय {o} → डेमो {d} → खर्च {k} → विक्री {s}", en: "*{day}:* customers {c} → options {o} → demo {d} → full cost {k} → sold {s}"}
+digest_top_reason: {hi: "sabse zyada: {reason}", mr: "सर्वात जास्त: {reason}", en: "top reason: {reason}"}
+digest_card_line: {hi: "*{title}* — funnel, team, har customer, coaching.", mr: "*{title}* — फनेल, टीम, प्रत्येक ग्राहक, कोचिंग.", en: "*{title}* — the funnel, the team, each customer, coaching."}
+fn_options: {hi: "Options dikhaye", mr: "पर्याय दाखवले", en: "Options shown"}
+fn_demo: {hi: "Demo diya", mr: "डेमो दिला", en: "Demo given"}
+fn_cost: {hi: "Poora kharcha", mr: "पूर्ण खर्च", en: "Full cost"}
+kpi_oct: {hi: "October: {v}", mr: "ऑक्टोबर: {v}", en: "October: {v}"}
+kpi_oct_assoc: {hi: "October: associate {v}", mr: "ऑक्टोबर: असोसिएट {v}", en: "October: associate {v}"}
+digest_gap_line: {hi: "*Gap:* {name} — {step} sabse kam", mr: "*उणीव:* {name} — {step} सर्वात कमी", en: "*Gap:* {name} — {step} is lowest"}
+digest_best_short: {hi: "best: {name} {total}/14", mr: "सर्वोत्तम: {name} {total}/14", en: "best: {name} {total}/14"}
+digest_no_scores: {hi: "Score abhi nahi: customer khatam hone par aata hai", mr: "स्कोअर अजून नाही: ग्राहक संपल्यावर येतो", en: "No scores yet: a score comes when a customer is finished"}
+digest_empty: {hi: "*{day}:* koi customer nahi tha.", mr: "*{day}:* एकही ग्राहक नव्हता.", en: "*{day}:* no customers that day."}
+digest_future: {hi: "*{day}* abhi aaya nahi. Aaj ki sabha dekhein?", mr: "*{day}* अजून आला नाही. आजची सभा पाहू?", en: "*{day}* hasn't come yet. See today's huddle?"}
+kpi_customers: {hi: "Customer", mr: "ग्राहक", en: "Customers"}
+kpi_sold: {hi: "Bikri", mr: "विक्री", en: "Sold"}
+kpi_voice_ok: {hi: "Voice notes: samjhe / kul", mr: "व्हॉइस नोट्स: समजल्या / एकूण", en: "Voice notes: understood / all"}
+dg_st_sold: {hi: "Bik gaya", mr: "विकलं", en: "Sold"}
+dg_st_followup: {hi: "Follow-up", mr: "फॉलो-अप", en: "Follow-up"}
+dg_st_lost: {hi: "Nahi liya", mr: "घेतलं नाही", en: "Didn't buy"}
+dg_st_floor: {hi: "Floor par", mr: "फ्लोअरवर", en: "On the floor"}
+dg_st_open: {hi: "Khula chhoda", mr: "उघडं राहिलं", en: "Left open"}
+dg_st_closed: {hi: "Band", mr: "बंद", en: "Closed"}
+dg_more: {hi: "+{n} aur customer", mr: "+{n} आणखी ग्राहक", en: "+{n} more customers"}
+b_nudge_clip: {hi: "Clip bhejo: {name}", mr: "क्लिप पाठवा: {name}", en: "Send clip: {name}"}
 # ---- the copilot's one line (associate only, each tip once per customer)
 tip_line: {hi: "*Sujhav:* {tip}", mr: "*सूचना:* {tip}", en: "*Tip:* {tip}"}
 tip_budget_gap: {hi: "{budget} mein is ghar ke size ka TV stock mein nahi; sabse sasta {low}. Budget ya size par pehle baat kijiye", mr: "{budget} मध्ये या घराच्या साइजचा स्टॉक नाही; सर्वात स्वस्त {low}. आधी बजेट किंवा साइजवर बोला", en: "Nothing in stock that suits this home fits {budget}; the lowest is {low}. Talk budget or size first"}

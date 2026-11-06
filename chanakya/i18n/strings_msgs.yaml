@@ -312,10 +312,6 @@ floor_today:
   mr: "*आज:* {s} संवाद · गाइड {g} / {n} · मीडियन {m}/14"
   en: "*Today:* conversations {s} · Guide {g} of {n} · median {m}/14"
 floor_follow: {hi: "follow-up baaki {t} · install risk {r}", mr: "फॉलो-अप बाकी {t} · इन्स्टॉल धोका {r}", en: "follow-ups due {t} · installs at risk {r}"}
-digest_gap:
-  hi: "*{name}: aaj {step} sabse kam.*\nUnhe iski 45 second ki clip bhejein?"
-  mr: "*{name}: आज {step} सर्वात कमी.*\nत्यांना याची 45 सेकंदांची क्लिप पाठवू?"
-  en: "*{name}: {step} is the lowest step today.*\nSend them the 45-second clip for it?"
 team_body:
   hi: "*Aaj ki team*\nHar associate ki baat-cheet aur median score. Kisi par tap kijiye: unke steps, jeet aur voice notes."
   mr: "*आजची टीम*\nप्रत्येकाचे संवाद आणि मीडियन स्कोअर. कोणावरही टॅप करा: त्यांच्या पायऱ्या, जीत आणि व्हॉइस नोट्स."

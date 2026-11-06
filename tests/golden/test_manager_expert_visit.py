@@ -1,7 +1,7 @@
 """The contest's extras, end to end (user, 5 Nov 2026: "the department manager view, 'Ask an expert', and a store
 visit log by voice note ... Ensure its seamless"): the manager's huddle, floor, tip, profile, voice log and
 approvals; the expert's queue, the question with its product facts, the clean answer and the reminder; the visit
-log's home, rubric scoring, scorecard and visits so far. In English and Hinglish."""
+log's home, rubric scoring, scorecard and visits so far. In English, Hinglish and Marathi."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ async def a_day(h, live: bool = True):
         await h.tap("g:new")
 
 
-@pytest.mark.parametrize("lang", ["en", "hi"])
+@pytest.mark.parametrize("lang", ["en", "hi", "mr"])
 async def test_manager_huddle_floor_tip_profile(h, lang):
     await a_day(h)
     h.as_("manager")
@@ -54,14 +54,14 @@ async def test_manager_huddle_floor_tip_profile(h, lang):
     assert out[0].kind == "list" and not out[0].footer.startswith(("Heard", "Suna"))  # the menu, never "Heard: menu"
     assert "m:visits" in rows(out) and "m:floor" in rows(out)
 
-    out = await h.pick("m:digest")  # the huddle: 8 numbers, October beside today, short step names, no asterisks
+    out = await h.pick("m:digest")  # the huddle: the answer in words first, then the card (funnel, team, customers)
     clean(out)
-    d = out[0].card.data
-    assert out[0].card.template == "digest" and len(d["kpis"]) == 8 and len(d["since"]) == 3
-    assert "*" not in d["gaps_text"] and d["best_text"]
-    assert {r["oct"] for r in d["since"]} == {"6", "6/6", "2"}
-    assert all(len(s) <= 9 for s in d["heatmap"]["steps"])  # 'Demo', never a broken 'Demonstrate'
-    assert all(isinstance(c, int) or not float(c).is_integer() for row in d["heatmap"]["cells"] for c in row)
+    assert out[0].card is None and out[1].card.template == "digest"
+    d = out[1].card.data
+    assert len(d["funnel"]) == 5 and len(d["kpis"]) == 4 and d["team"] and d["customers"]
+    assert {k["sub"].split()[-1] for k in d["kpis"] if k.get("sub")} == {"6", "6/6", "2"}  # October beside the day
+    assert all(len(t["low"]) <= 9 for t in d["team"])  # the weakest step's short name: 'Demo', never 'Demonstrate'
+    assert not any("*" in str(v) for v in d.values())
 
     out = await h.pick("m:floor")  # over the shoulder: who is with which customer
     clean(out)
@@ -106,7 +106,7 @@ async def test_approval_carries_product_price_offers(h):
     assert any(m.to == PHONES["associate"] for m in out)
 
 
-@pytest.mark.parametrize("lang", ["en", "hi"])
+@pytest.mark.parametrize("lang", ["en", "hi", "mr"])
 async def test_expert_queue_answer_library_reminder(h, lang):
     await to_options(h)
     await h.tap("s:C1:demo")
@@ -150,7 +150,7 @@ async def test_expert_queue_answer_library_reminder(h, lang):
     assert rem.kind == "buttons" and "> " in rem.body and any(":answer" in b.id for b in rem.buttons)
 
 
-@pytest.mark.parametrize("lang", ["en", "hi"])
+@pytest.mark.parametrize("lang", ["en", "hi", "mr"])
 async def test_visit_log_scored_by_the_rubric(h, lang):
     h.as_("visitor")
     out = await h.tap(f"g:alang:{lang}")

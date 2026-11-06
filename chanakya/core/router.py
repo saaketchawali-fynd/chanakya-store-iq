@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import re
-from datetime import timedelta
+from datetime import date, timedelta
 
 from chanakya.ai.client import AIUnavailable
 from chanakya.core import clock, repo, state
@@ -209,8 +209,10 @@ async def dispatch(ctx: SkillContext) -> Reply:
             return await visitlog.summary(ctx)  # the manager reads the visits; visitors log them
         if name == "export":
             return await visitlog.export(ctx)
-        if name in ("help", "brief"):
-            return manager.menu(ctx)  # 'menu', 'namaste': the menu itself, never "Heard: menu"
+        if name == "brief":
+            return await manager.digest(ctx)  # 'namaste': voice first, today's numbers at once (the menu on 'menu')
+        if name == "help":
+            return manager.menu(ctx)  # 'menu', 'help': the menu itself, never "Heard: menu"
         if msg.type == "audio" or (msg.type == "text" and name is None):
             return await manager.by_voice(ctx)
     if ctx.role == "expert" and msg.type in ("text", "audio") and name is None:
@@ -336,8 +338,12 @@ async def staff_command(ctx: SkillContext, name: str, arg: str) -> Reply | None:
 
 async def manager_button(ctx: SkillContext, bid: ButtonId) -> Reply:
     a = bid.get(0)
-    if a == "digest":
-        return await manager.digest(ctx)
+    if a == "digest":  # m:digest (today) or m:digest:2026-11-05 (that day)
+        try:
+            day = date.fromisoformat(bid.get(1) or "")
+        except ValueError:
+            day = None
+        return await manager.digest(ctx, day)
     if a == "team":
         return await manager.team(ctx)
     if a == "approvals":

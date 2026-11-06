@@ -371,12 +371,18 @@ LABELS: dict[str, dict[str, dict[str, str]]] = {
                "foot": "October: Reliance Digital, 6 scored conversations"},
     },
     "digest": {
-        "hi": {"kicker": "Sabha", "title": "Aaj ki sabha", "kpis": "Aaj", "heatmap": "Steps (0–2)", "gaps": "Sabse bada gap",
-               "best": "Aaj ka best", "since": "Store visits ke baad", "october": "October", "today": "Aaj"},
-        "mr": {"kicker": "सभा", "title": "आजची सभा", "kpis": "आज", "heatmap": "पायऱ्या (0–2)", "gaps": "सर्वात मोठी उणीव",
-               "best": "आजचं सर्वोत्तम", "since": "स्टोअर भेटींनंतर", "october": "ऑक्टोबर", "today": "आज"},
-        "en": {"kicker": "Huddle", "title": "Today's huddle", "kpis": "Today", "heatmap": "Steps (0–2)", "gaps": "Biggest gap",
-               "best": "Best today", "since": "Since the store visits", "october": "October", "today": "Today"},
+        "hi": {"kicker": "Sabha", "title": "Aaj ki sabha", "team": "Team", "customers": "Customer", "c_name": "Naam", "c_cust": "Cust.", "c_demo": "Demo",
+               "c_sold": "Bikri", "c_score": "Score", "c_voice": "Voice", "c_time": "Samay", "c_customer": "Customer", "c_low": "Kamzor", "c_assoc": "Associate",
+               "c_cat": "Category", "c_status": "Haal", "funnel": "Funnel", "outcome": "Din ka nateeja",
+               "why": "Kyun nahi liya"},
+        "mr": {"kicker": "सभा", "title": "आजची सभा", "team": "टीम", "customers": "ग्राहक", "c_name": "नाव", "c_cust": "ग्राहक", "c_demo": "डेमो",
+               "c_sold": "विक्री", "c_score": "स्कोअर", "c_voice": "व्हॉइस", "c_time": "वेळ", "c_customer": "ग्राहक", "c_low": "कमकुवत", "c_assoc": "असोसिएट",
+               "c_cat": "कॅटेगरी", "c_status": "स्थिती", "funnel": "फनेल", "outcome": "दिवसाचा निकाल",
+               "why": "का घेतलं नाही"},
+        "en": {"kicker": "Huddle", "title": "Today's huddle", "team": "Team", "customers": "Customers", "c_name": "Name", "c_cust": "Cust.", "c_demo": "Demo",
+               "c_sold": "Sold", "c_score": "Score", "c_voice": "Voice", "c_time": "Time", "c_customer": "Customer", "c_low": "Weakest", "c_assoc": "Associate",
+               "c_cat": "Category", "c_status": "Status", "funnel": "Funnel", "outcome": "How the day ended",
+               "why": "Why not today"},
     },
 }
 
@@ -1358,32 +1364,39 @@ def sample_data(template: str, lang: str = "hi") -> dict[str, Any]:
         }
     if template == "digest":
         return {
+            "labels": {"kicker": p("Sabha · Budhvaar, 4 Nov", "सभा · बुधवार, 4 नोव्हें.", "Huddle · Wednesday, 4 Nov"),
+                       "title": p("Kal ki sabha", "कालची सभा", "Yesterday's huddle"), "today": p("Kal", "काल", "Yesterday")},
+            "funnel": [
+                {"label": p("Customer", "ग्राहक", "Customers"), "n": "6", "w": 100, "pct": ""},
+                {"label": p("Options dikhaye", "पर्याय दाखवले", "Options shown"), "n": "5", "w": 83, "pct": "83%"},
+                {"label": p("Demo diya", "डेमो दिला", "Demo given"), "n": "4", "w": 67, "pct": "67%"},
+                {"label": p("Poora kharcha", "पूर्ण खर्च", "Full cost"), "n": "3", "w": 50, "pct": "50%"},
+                {"label": p("Bikri", "विक्री", "Sold"), "n": "2", "w": 33, "pct": "33%"},
+            ],
+            "outcomes": [
+                {"label": p("Bik gaya", "विकलं", "Sold"), "n": "2", "k": 2, "tone": "g"},
+                {"label": p("Follow-up", "फॉलो-अप", "Follow-up"), "n": "2", "k": 2, "tone": "o"},
+                {"label": p("Nahi liya", "घेतलं नाही", "Didn't buy"), "n": "1", "k": 1, "tone": "r"},
+                {"label": p("Khula chhoda", "उघडं राहिलं", "Left open"), "n": "1", "k": 1, "tone": "n"},
+            ],
+            "why": p("Daam zyada laga 2 · Ghar pe poochna hai 1", "किंमत जास्त वाटली 2 · घरी विचारायचं आहे 1", "Price feels high 2 · Will ask family 1"),
             "kpis": [
-                {"label": p("Baat-cheet", "संवाद", "Conversations"), "value_str": "6"},
-                {"label": p("Guide level", "गाइड लेव्हल", "Guide level"), "value_str": "2/6"},
-                {"label": p("Median score", "मीडियन स्कोअर", "Median score"), "value_str": "9/14"},
-                {"label": p("Daam pehle: customer / associate", "किंमत आधी: ग्राहक / असोसिएट", "Price first: customer / associate"), "value_str": "4 / 2"},
-                {"label": p("Pehla daam (min)", "पहिली किंमत (मि.)", "First price (min)"), "value_str": "11"},
-                {"label": p("Product se pehle ghar ke sawaal (median)", "प्रॉडक्टआधी घराचे प्रश्न (मीडियन)", "Home questions before the product (median)"), "value_str": "4"},
-                {"label": p("Parivaar Card", "परिवार कार्ड", "Family cards"), "value_str": "3"},
-                {"label": p("Install: theek / dikkat", "इन्स्टॉल: ठीक / अडचण", "Installs: OK / issue"), "value_str": "2 / 0"},
+                {"label": p("Median score", "मीडियन स्कोअर", "Median score"), "value_str": "9/14", "sub": p("October: 6", "ऑक्टोबर: 6", "October: 6")},
+                {"label": p("Daam pehle: customer / associate", "किंमत आधी: ग्राहक / असोसिएट", "Price first: customer / associate"), "value_str": "4 / 2", "sub": p("October: associate 6/6", "ऑक्टोबर: असोसिएट 6/6", "October: associate 6/6")},
+                {"label": p("Product se pehle ghar ke sawaal (median)", "प्रॉडक्टआधी घराचे प्रश्न (मीडियन)", "Home questions before the product (median)"), "value_str": "4", "sub": p("October: 2", "ऑक्टोबर: 2", "October: 2")},
+                {"label": p("Voice notes: samjhe / kul", "व्हॉइस नोट्स: समजल्या / एकूण", "Voice notes: understood / all"), "value_str": "11/12"},
             ],
-            "since": [
-                {"label": p("Median score (14 mein)", "मीडियन स्कोअर (14 पैकी)", "Median score (of 14)"), "oct": "6", "today": "9"},
-                {"label": p("Daam pehle associate ne bola", "किंमत आधी असोसिएटने सांगितली", "Associate spoke price first"), "oct": "6/6", "today": "2/6"},
-                {"label": p("Product se pehle sawaal (median)", "प्रॉडक्टआधी प्रश्न (मीडियन)", "Questions before the product (median)"), "oct": "2", "today": "4"},
+            "team": [
+                {"name": "Ravi", "c": "3", "d": "2", "s": "1", "m": "11/14", "v": "7", "low": p("Follow", "फॉलो", "Follow")},
+                {"name": "Pooja", "c": "2", "d": "1", "s": "1", "m": "9/14", "v": "4", "low": p("Fayda", "फायदा", "Translate")},
+                {"name": "Amit", "c": "1", "d": "1", "s": "0", "m": "6/14", "v": "1", "low": p("Maan", "मान्य", "Validate")},
             ],
-            "heatmap": {
-                "associates": ["Ravi", "Pooja", "Amit"],
-                "steps": p(
-                    ["Maan", "Ghar", "Fayda", "Demo", "Kharcha", "Close", "Follow"],
-                    ["मान्य", "घर", "फायदा", "डेमो", "खर्च", "क्लोज", "फॉलो"],
-                    ["Validate", "Assess", "Translate", "Demo", "Cost", "Close", "Follow"],
-                ),
-                "cells": [[2, 2, 1, 2, 2, 2, 1], [1, 2, 0, 1, 2, 1.5, 2], [0, 1, 1, None, 1, 0, 0.5]],
-            },
-            "gaps_text": p("Pooja: aaj Translate sabse kam", "पूजा: आज Translate सर्वात कमी", "Pooja: Translate is the lowest step today"),
-            "best_text": p("Ravi: 13/14, sabse mazboot Assess", "रवी: 13/14, सर्वात चांगलं Assess", "Ravi: 13/14, strongest at Assess"),
+            "customers": [
+                {"time": "11:05", "cust": "C1 Shah", "assoc": "Ravi", "cat": "TV", "demo": "yes", "status": p("Bik gaya · Meru 55 QLED Pro", "विकलं · Meru 55 QLED Pro", "Sold · Meru 55 QLED Pro"), "tone": "g"},
+                {"time": "12:20", "cust": "C2 Mehta", "assoc": "Pooja", "cat": "AC", "demo": "yes", "status": p("Follow-up · Ghar pe poochna hai", "फॉलो-अप · घरी विचारायचं आहे", "Follow-up · Will ask family"), "tone": "o"},
+                {"time": "14:40", "cust": "C3", "assoc": "Amit", "cat": p("Fridge", "फ्रिज", "Fridge"), "demo": "yes", "status": p("Nahi liya · Daam zyada laga", "घेतलं नाही · किंमत जास्त वाटली", "Didn't buy · Price feels high"), "tone": "r"},
+                {"time": "17:10", "cust": "C4 Iyer", "assoc": "Ravi", "cat": "TV", "demo": "", "status": p("Khula chhoda", "उघडं राहिलं", "Left open"), "tone": "n"},
+            ],
         }
     return {}
 
@@ -1588,16 +1601,13 @@ def _fallback_rows(card: Card) -> tuple[str, list[str]]:
         rows += [f"{x.get('k')}: {x.get('v')} ({x.get('b')})" for x in aslist(d.get("table"))]
         rows += [f"{x.get('name')}: {'—' if x.get('avg') is None else x.get('avg')}" for x in aslist(d.get("steps"))]
     elif tpl == "digest":
-        rows += [f"{k.get('label')}: {k.get('value_str')}" for k in d.get("kpis") or []]
-        hm = d.get("heatmap") or {}
-        for i, a in enumerate(hm.get("associates") or []):
-            cells = (hm.get("cells") or [])[i] if i < len(hm.get("cells") or []) else []
-            rows.append(f"{a}: " + " ".join("-" if c is None else str(c) for c in cells))
-        rows += [f"{s.get('label')}: {s.get('oct')} → {s.get('today')}" for s in aslist(d.get("since"))]
-        if d.get("gaps_text"):
-            rows.append(str(d["gaps_text"]))
-        if d.get("best_text"):
-            rows.append(str(d["best_text"]))
+        rows += [" → ".join(f"{f.get('label')} {f.get('n')}" for f in aslist(d.get("funnel")))] if d.get("funnel") else []
+        rows += [" · ".join(f"{o.get('label')} {o.get('n')}" for o in aslist(d.get("outcomes")))] if d.get("outcomes") else []
+        if d.get("why"):
+            rows.append(str(d["why"]))
+        rows += [f"{k.get('label')}: {k.get('value_str')}" + (f" ({k.get('sub')})" if k.get("sub") else "") for k in d.get("kpis") or []]
+        rows += [f"{t.get('name')}: {t.get('c')} · {t.get('d')} · {t.get('s')} · {t.get('m')} · {t.get('v')} · {t.get('low')}" for t in aslist(d.get("team"))]
+        rows += [f"{c.get('time')} {c.get('cust')} · {c.get('assoc')} · {c.get('cat')} · {c.get('status')}" for c in aslist(d.get("customers"))]
     else:
         rows += [f"{k}: {_flatten(v)}" for k, v in d.items() if k != "labels"]
     return title, [r for r in rows if r and r.strip()]

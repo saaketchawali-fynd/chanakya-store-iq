@@ -179,12 +179,6 @@ expert_follow_hint:
 kpi_price_first_ca: {hi: "Daam pehle: customer / associate", mr: "किंमत आधी: ग्राहक / असोसिएट", en: "Price first: customer / associate"}
 kpi_questions: {hi: "Product se pehle ghar ke sawaal (median)", mr: "प्रॉडक्टआधी घराचे प्रश्न (मीडियन)", en: "Home questions before the product (median)"}
 kpi_install_ok: {hi: "Install: theek / dikkat", mr: "इन्स्टॉल: ठीक / अडचण", en: "Installs: OK / issue"}
-base_median: {hi: "Median score (14 mein)", mr: "मीडियन स्कोअर (14 पैकी)", en: "Median score (of 14)"}
-base_price_assoc: {hi: "Daam pehle associate ne bola", mr: "किंमत आधी असोसिएटने सांगितली", en: "Associate spoke price first"}
-base_questions: {hi: "Product se pehle sawaal (median)", mr: "प्रॉडक्टआधी प्रश्न (मीडियन)", en: "Questions before the product (median)"}
-digest_gap_card: {hi: "{name}: aaj {step} sabse kam", mr: "{name}: आज {step} सर्वात कमी", en: "{name}: {step} is the lowest step today"}
-digest_best_card: {hi: "{name}: {total}/14, sabse mazboot {step}", mr: "{name}: {total}/14, सर्वात चांगलं {step}", en: "{name}: {total}/14, strongest at {step}"}
-digest_best_line: {hi: "_Aaj ka best: {name}, {total}/14._", mr: "_आजचं सर्वोत्तम: {name}, {total}/14._", en: "_Best today: {name}, {total}/14._"}
 step_short_validate: {hi: "Maan", mr: "मान्य", en: "Validate"}
 step_short_assess: {hi: "Ghar", mr: "घर", en: "Assess"}
 step_short_translate: {hi: "Fayda", mr: "फायदा", en: "Translate"}

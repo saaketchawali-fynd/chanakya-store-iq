@@ -1,98 +1,106 @@
 {% extends "base.html" %}
-{# Today's huddle: eight numbers from today's data (4×2), 'since the store visits' (October beside today), the step
-   heatmap per associate (0–2), the biggest gap and the best today. #}
-{% set hm = heatmap or {} %}
-{% set steps = hm.steps|aslist %}
-{% set people = hm.associates|aslist %}
-{% set cells = hm.cells or [] %}
+{# One day's huddle, as a dashboard (today, or any day the manager asked for by voice), on one screen: the funnel
+   (what the associates did with each customer) and how the day ended, the quality numbers with October beside them,
+   the team (each person's score and weakest step: where to coach), each customer and their status. #}
 {% block style %}
   .kpis { display: grid; grid-template-columns: repeat({{ [kpis|length, 4]|min if kpis else 1 }}, 1fr); gap: 14px; }
-  .kpi { background: var(--surface); border-radius: 24px; box-shadow: var(--shadow-sm); padding: 18px 20px; min-width: 0; }
-  .kpi .v { font-size: 42px; font-weight: 800; color: var(--ink); line-height: 1.1; letter-spacing: -.5px; white-space: nowrap; }
+  .kpi { background: var(--surface); border-radius: 24px; box-shadow: var(--shadow-sm); padding: 14px 20px; min-width: 0; }
+  .kpi .v { font-size: 40px; font-weight: 800; color: var(--ink); line-height: 1.1; letter-spacing: -.5px; white-space: nowrap; }
   .kpi .k { font-size: 19px; color: var(--muted); margin-top: 6px; line-height: 1.28; font-weight: 600; }
-  .since { padding: 8px 26px; }
-  .since table { border-spacing: 0; }
-  .since th { font-size: 18px; letter-spacing: 1px; text-transform: uppercase; padding: 12px 6px 8px; }
-  .since th.l { text-align: left; }
-  .since td { height: auto; border-radius: 0; padding: 12px 6px; font-size: 24px; color: var(--ink); background: none;
-              border-top: 1.5px solid var(--line); }
-  .since td.l { text-align: left; font-weight: 600; color: var(--text); width: 52%; }
-  .since td.oc { color: var(--muted); font-weight: 700; }
-  .since td.tc { font-weight: 800; color: var(--ink); }
-  .heat { padding: 22px 26px 18px; }
-  table { width: 100%; border-collapse: separate; border-spacing: 7px; table-layout: fixed; }
-  th { font-size: 19px; font-weight: 700; color: var(--muted); text-align: center; vertical-align: bottom; line-height: 1.2;
-       padding-bottom: 4px; word-break: break-word; }
-  th.nm, td.nm { width: 170px; text-align: left; }
-  td { height: 60px; border-radius: 14px; text-align: center; font-size: 25px; font-weight: 800; color: #fff; }
-  td.nm { color: var(--ink); font-weight: 700; font-size: 27px; background: none;  }
-  td.g { background: var(--green); } td.o { background: var(--saffron); } td.r { background: #EF4444; }
-  td.na { background: #F1F2F4; color: var(--faint); }
-  .legend { display: flex; gap: 26px; justify-content: flex-end; margin: 10px 8px 0; font-size: 20px; color: var(--muted); }
-  .legend span { display: inline-flex; align-items: center; gap: 8px; }
-  .legend i { width: 18px; height: 18px; border-radius: 6px; display: inline-block; }
-  .gap { display: flex; align-items: flex-start; gap: 18px; margin-top: 18px; padding: 22px 28px; border-radius: 26px;
-         background: var(--saffron-pale); }
-  .gap .bubble { width: 52px; height: 52px; background: #fff; color: var(--saffron-deep); }
-  .gap .k { display: block; font-size: 22px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--saffron-deep); }
-  .gap .k.dv { font-size: 24px; font-weight: 700; }
-  .gap .v { font-size: 27px; line-height: 1.36; color: var(--text); font-weight: 600; }
-  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
-  .duo .gap { margin-top: 0; padding: 20px 24px; }
-  .gap.best { background: #E7F7EF; }
-  .gap.best .bubble { color: var(--green); }
-  .gap.best .k { color: var(--green); }
+  .tbl { padding: 4px 24px 12px; }
+  .tb { width: 100%; border-collapse: collapse; table-layout: auto; }
+  .tb th { font-size: 17px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 700;
+           padding: 14px 8px 10px; text-align: center; vertical-align: bottom; white-space: nowrap; }
+  .tb td { color: var(--ink); font-size: 24px; font-weight: 700; padding: 10px 8px; border-top: 1.5px solid var(--line);
+           text-align: center; vertical-align: middle; }
+  .tb th.l, .tb td.l { text-align: left; }
+  .tb td.nm { font-size: 25px; font-weight: 800; }
+  .tb td.mut { color: var(--muted); font-weight: 600; font-size: 21px; white-space: nowrap; }
+  .tb td.ok { color: var(--green); }
+  .tb td.low { color: #B91C1C; font-size: 21px; }
+  .pill { display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .pill.g { background: var(--green-pale); color: var(--green-deep); }
+  .pill.o { background: #FFF4E5; color: #B45309; }
+  .pill.r { background: #FEECEC; color: #B91C1C; }
+  .pill.b { background: var(--saffron-pale); color: var(--saffron-deep); }
+  .pill.n { background: #F1F2F4; color: var(--muted); }
+  .more { font-size: 20px; color: var(--muted); margin: 8px 8px 0; text-align: right; }
+  .kpi .s { font-size: 17px; color: var(--faint); margin-top: 4px; font-weight: 600; }
+  .fun { padding: 16px 26px 18px; }
+  .frow { display: grid; grid-template-columns: 220px 1fr 78px; align-items: center; gap: 14px; margin: 5px 0; }
+  .frow .fl { font-size: 21px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .frow .track { display: flex; justify-content: center; }
+  .frow .bar { height: 36px; border-radius: 12px; background: var(--saffron); color: #fff; font-weight: 800; font-size: 22px;
+               display: flex; align-items: center; justify-content: center; min-width: 52px; }
+  .frow.last .bar { background: var(--green); }
+  .frow .bar.z { background: #E5E7EB; color: var(--muted); }
+  .frow .fp { font-size: 20px; color: var(--muted); font-weight: 700; text-align: right; }
+  .end { border-top: 1.5px solid var(--line); margin-top: 14px; padding-top: 14px; }
+  .end .k { font-size: 17px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .end .k.dv { font-size: 19px; letter-spacing: 0; }
+  .obar { display: flex; height: 30px; border-radius: 10px; overflow: hidden; margin-top: 10px; background: #F1F2F4; }
+  .obar i { display: block; height: 100%; }
+  .obar i.g, .olegend i.g { background: #059669; } .obar i.o, .olegend i.o { background: #F59E0B; }
+  .obar i.r, .olegend i.r { background: #EF4444; } .obar i.b, .olegend i.b { background: #4F46E5; }
+  .obar i.n, .olegend i.n { background: #CBD5E1; }
+  .olegend { display: flex; flex-wrap: wrap; gap: 6px 24px; margin-top: 10px; font-size: 20px; color: var(--text); font-weight: 600; }
+  .olegend span { display: inline-flex; align-items: center; gap: 8px; }
+  .olegend i { width: 16px; height: 16px; border-radius: 5px; display: inline-block; }
+  .why { margin-top: 10px; font-size: 20px; color: var(--muted); font-weight: 600; line-height: 1.35; }
+  .why b { color: var(--text); font-weight: 700; }
 {% endblock %}
 {% block header %}
   <div class="kicker{{ L.kicker|dv }}">{{ L.kicker }}</div>
   <h1 class="{{ L.title|dv }}">{{ L.title }}</h1>
 {% endblock %}
 {% block content %}
+  {% set fun = funnel|aslist %}
+  {% if fun %}
+  <section>
+    <div class="label{{ L.funnel|dv }}">{{ icon('trend', 26) }}{{ L.funnel }}</div>
+    <div class="card fun">
+      {% for f in fun[:5] %}<div class="frow{{ ' last' if loop.last else '' }}"><div class="fl{{ f.label|dv }}">{{ f.label }}</div><div class="track"><div class="bar num{{ ' z' if not f.w else '' }}" style="width: {{ f.w or 0 }}%">{{ f.n }}</div></div><div class="fp num">{{ f.pct }}</div></div>{% endfor %}
+      {% set oc = outcomes|aslist %}
+      {% if oc %}
+      <div class="end">
+        <div class="k{{ L.outcome|dv }}">{{ L.outcome }}</div>
+        <div class="obar">{% for o in oc %}<i class="{{ o.tone }}" style="flex: {{ o.k or 0 }}"></i>{% endfor %}</div>
+        <div class="olegend">{% for o in oc %}<span class="{{ o.label|dv }}"><i class="{{ o.tone }}"></i>{{ o.label }} <b class="num">{{ o.n }}</b></span>{% endfor %}</div>
+        {% if why %}<div class="why{{ why|dv }}"><b>{{ L.why }}:</b> {{ why }}</div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
   {% set kpis = kpis|aslist %}
   {% if kpis %}
-  <section class="kpis">
-    {% for k in kpis[:8] %}<div class="kpi"><div class="v num">{{ k.value_str }}</div><div class="k">{{ k.label }}</div></div>{% endfor %}
+  <section class="kpis sec">
+    {% for k in kpis[:4] %}<div class="kpi"><div class="v num">{{ k.value_str }}</div><div class="k{{ k.label|dv }}">{{ k.label }}</div>{% if k.sub %}<div class="s{{ k.sub|dv }}">{{ k.sub }}</div>{% endif %}</div>{% endfor %}
   </section>
   {% endif %}
-  {% set sn = since|aslist %}
-  {% if sn %}
+  {% set team = team|aslist %}
+  {% if team %}
   <section class="sec">
-    <div class="label{{ L.since|dv }}">{{ icon('store', 26) }}{{ L.since }}</div>
-    <div class="card since">
-      <table>
-        <tr><th class="l"></th><th>{{ L.october }}</th><th>{{ L.today }}</th></tr>
-        {% for r in sn[:3] %}<tr><td class="l{{ r.label|dv }}">{{ r.label }}</td><td class="oc num">{{ r.oct }}</td><td class="tc num">{{ r.today }}</td></tr>{% endfor %}
+    <div class="label{{ L.team|dv }}">{{ icon('users', 26) }}{{ L.team }}</div>
+    <div class="card tbl">
+      <table class="tb">
+        <tr><th class="l">{{ L.c_name }}</th><th>{{ L.c_cust }}</th><th>{{ L.c_demo }}</th><th>{{ L.c_sold }}</th><th>{{ L.c_score }}</th><th>{{ L.c_voice }}</th><th class="l">{{ L.c_low }}</th></tr>
+        {% for t in team[:4] %}<tr><td class="l nm">{{ t.name }}</td><td class="num">{{ t.c }}</td><td class="num">{{ t.d }}</td><td class="num">{{ t.s }}</td><td class="num">{{ t.m }}</td><td class="num">{{ t.v }}</td><td class="l {{ 'low' if t.low and t.low != '–' else 'mut' }}{{ (t.low or '')|dv }}">{{ t.low or '–' }}</td></tr>{% endfor %}
       </table>
     </div>
   </section>
   {% endif %}
-  {% if people %}
+  {% set cust = customers|aslist %}
+  {% if cust %}
   <section class="sec">
-    <div class="label{{ L.heatmap|dv }}">{{ icon('users', 26) }}{{ L.heatmap }}</div>
-    <div class="card heat">
-      <table>
-        <tr><th class="nm"></th>{% for s in steps %}<th>{{ s }}</th>{% endfor %}</tr>
-        {% for a in people[:8] %}
-        {% set row = (cells[loop.index0] if loop.index0 < cells|length else []) or [] %}
-        <tr><td class="nm">{{ a }}</td>
-          {% for s in steps %}
-          {% set c = row[loop.index0] if loop.index0 < row|length else none %}
-          {% if c is none %}<td class="na">–</td>
-          {% else %}{% set v = c|float %}<td class="{{ 'g' if v >= 1.5 else ('o' if v >= 0.75 else 'r') }} num">{{ c }}</td>{% endif %}
-          {% endfor %}
-        </tr>
-        {% endfor %}
+    <div class="label{{ L.customers|dv }}">{{ icon('user', 26) }}{{ L.customers }}</div>
+    <div class="card tbl">
+      <table class="tb">
+        <tr><th class="l">{{ L.c_time }}</th><th class="l">{{ L.c_customer }}</th><th class="l">{{ L.c_assoc }}</th><th class="l">{{ L.c_cat }}</th><th>{{ L.c_demo }}</th><th class="l">{{ L.c_status }}</th></tr>
+        {% for c in cust[:4] %}<tr><td class="l mut num">{{ c.time }}</td><td class="l nm">{{ c.cust }}</td><td class="l">{{ c.assoc }}</td><td class="l mut{{ c.cat|dv }}">{{ c.cat }}</td>{% if c.demo == 'yes' %}<td class="ok">{{ icon('check', 26) }}</td>{% else %}<td class="mut">–</td>{% endif %}<td class="l"><span class="pill {{ c.tone or 'n' }}{{ c.status|dv }}">{{ c.status }}</span></td></tr>{% endfor %}
       </table>
-      <div class="legend"><span><i style="background:#059669"></i>2</span><span><i style="background:#4F46E5"></i>1</span><span><i style="background:#EF4444"></i>0</span></div>
+      {% if more %}<div class="more{{ more|dv }}">{{ more }}</div>{% endif %}
     </div>
   </section>
-  {% endif %}
-  {% if gaps_text and best_text %}
-  <section class="duo">
-    <div class="gap"><span class="bubble">{{ icon('target', 28) }}</span><div><span class="k{{ L.gaps|dv }}">{{ L.gaps }}</span><span class="v">{{ gaps_text }}</span></div></div>
-    <div class="gap best"><span class="bubble">{{ icon('star', 28) }}</span><div><span class="k{{ L.best|dv }}">{{ L.best }}</span><span class="v">{{ best_text }}</span></div></div>
-  </section>
-  {% elif gaps_text %}
-  <section class="gap"><span class="bubble">{{ icon('target', 28) }}</span><div><span class="k{{ L.gaps|dv }}">{{ L.gaps }}</span><span class="v">{{ gaps_text }}</span></div></section>
   {% endif %}
 {% endblock %}
