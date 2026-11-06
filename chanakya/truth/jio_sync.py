@@ -241,7 +241,9 @@ async def sync(s: Settings, facts) -> dict:
         extras = list(FETCH_EXTRA.get("accessories") or [])
         flagged = list(FETCH_EXTRA.get("flagged") or [])
         counts = {"products": len(products), "offers": len(offers), "protection_plans": len(plans),
-                  "promotion_errors": errors, "accessories": len(extras), "flagged": len(flagged)}
+                  "promotion_errors": errors, "accessories": len(extras),
+                  "flagged": sum(1 for f in flagged if f.get("action") == "left_out"),  # left out of the catalogue
+                  "corrected": sum(1 for f in flagged if f.get("action") == "corrected")}  # kept, one slip set aside
         for r in products:
             counts[r["category"]] = counts.get(r["category"], 0) + 1
         report = catalog_report(products)
@@ -257,7 +259,8 @@ async def sync(s: Settings, facts) -> dict:
             a["with_size_range"] += 1 if r["info"].get("fits_in") else 0
         report["accessories"] = acc
         report["unmapped_categories"] = FETCH_EXTRA.get("unmapped") or {}
-        report["flagged"] = flagged[:20]  # left out of the catalogue, and why (not in the counts above)
+        report["flagged"] = [f for f in flagged if f.get("action") == "left_out"][:20]  # left out, and why
+        report["corrected"] = [f for f in flagged if f.get("action") == "corrected"][:20]  # kept: brand or size fixed
         meta = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "counts": counts, "domain": s.jio_domain,
                 "catalog": report}
         await write(s, products + extras, offers, plans, meta)

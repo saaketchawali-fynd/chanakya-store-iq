@@ -163,7 +163,7 @@ def _sane(it: dict, **kw) -> dict:
     return out
 
 
-async def test_misbranded_or_implausible_listings_are_left_out(tmp_path, monkeypatch):
+async def test_misbranded_left_out_slips_corrected(tmp_path, monkeypatch):
     voltas = TJ.item("Voltas Beko")
     misbranded = _sane(voltas, price={"effective": {"min": 30000, "max": 30000}, "marked": {"min": 35000, "max": 35000}})
     tiny = _sane(TJ.item("Samsung 12 kg Fully Automatic"), item_code="555", uid=555, slug="tiny-wm")
@@ -172,11 +172,14 @@ async def test_misbranded_or_implausible_listings_are_left_out(tmp_path, monkeyp
     assert jio_map.implausible(jio_map.map_product(misbranded, "wm")) == ["brand:apple!=voltas beko", "dims:50x50x50"]
     h, st = await jio(tmp_path, monkeypatch, items=items)
     try:
-        flagged = {f["sku"]: f["why"] for f in (await jio_sync.last_meta())["catalog"]["flagged"]}
-        assert set(flagged) == {str(misbranded["item_code"]), "555"} and st["counts"]["flagged"] == 2
-        assert st["counts"]["wm"] == 4  # the two left out are not counted as washing machines
+        meta = (await jio_sync.last_meta())["catalog"]
+        flagged = {f["sku"]: f["why"] for f in meta["flagged"]}
+        # another brand's product is left out; a real product with impossible dimensions is kept without them
+        assert set(flagged) == {str(misbranded["item_code"])} and st["counts"]["flagged"] == 1
+        assert {f["sku"] for f in meta["corrected"]} == {"555"} and st["counts"]["corrected"] == 1
+        assert st["counts"]["wm"] == 5
         wm = {p.sku for p in h.rt.facts.products_sync("wm")}
-        assert not wm & set(flagged)
+        assert not wm & set(flagged) and "555" in wm and not h.rt.facts.product_sync("555").dims
         cands = h.rt.facts.rank_label(ImageRead(kind="label", brand="Voltas Beko", category="wm",
                                                 model_text="Voltas Beko 10 Kg 5 Star Top Loading", confidence=0.9))
         assert not {sku for sku, _ in cands} & set(flagged)
@@ -567,3 +570,14 @@ async def test_new_twice_at_once_makes_one_customer(h):
     assert [x.code for x in await h.rt.svc.sessions.active(PHONES["associate"])] == ["C1"]
     await h.say("new")  # a later 'new' is a new customer, as always
     assert {x.code for x in await h.rt.svc.sessions.active(PHONES["associate"])} == {"C1", "C2"}
+
+
+
+def test_a_brand_variant_is_corrected_from_the_name_not_dropped():
+    row = {"brand": "LG1", "info": {"name": "LG 139.7 cms (55 Inch) Ultra HD (4K) Smart LED TV 55SM8100"}}
+    assert jio_map.brand_from_name(row, "brand:lg1!=lg") == "LG"
+    row = {"brand": "Voltas Beko", "info": {"name": "Voltas 340 Litres 2 Star Frost Free Refrigerator"}}
+    assert jio_map.brand_from_name(row, "brand:voltas beko!=voltas") == "Voltas"
+    assert jio_map.brand_from_name({"info": {"name": "Onida Liliput 6.5 Kg"}}, "brand:samsung!=onida") is None
+    assert jio_map.junk_listing({"info": {"name": "helloworld1"}})
+    assert not jio_map.junk_listing({"info": {"name": "Samsung 189 cm (75 Inch) 4K Ultra HD Smart TV"}})
