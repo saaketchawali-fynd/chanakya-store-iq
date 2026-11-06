@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 # ---------- 8.2 Understand ----------
@@ -95,6 +95,15 @@ class Understanding(BaseModel):
     avoid: list[WantPair] = []
     asks: list[str] = []
     upgrade: bool = False
+
+    @field_validator("customer_name")
+    @classmethod
+    def _plain_name(cls, v: str | None) -> str | None:
+        """The name as the model heard it is cleaned before anything stores or shows it (6 Nov 2026: an injected
+        'name' reached the footer and the firewall's allowed numbers): letters and spaces, ≤ 3 words, ≤ 24 chars."""
+        from chanakya.core.status import clean_customer_name
+
+        return clean_customer_name(v)
 
 
 # ---------- 8.3 Read image ----------

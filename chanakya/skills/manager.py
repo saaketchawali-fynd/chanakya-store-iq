@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import statistics
 from datetime import date, datetime, time, timedelta
 
@@ -29,7 +30,8 @@ async def _day_data(ctx: SkillContext, day: date | None = None) -> dict:
         return start <= at < end
 
     sessions = [(r, st) for r, st in await ctx.svc.sessions.since(start - timedelta(hours=6)) if inside(r.created_at)]
-    scores = [sc for sc in await repo.scores_for(limit=5000) if inside(sc.at)]
+    ids = {r.id for r, _ in sessions}  # a customer's score counts on the day the customer came, even after midnight
+    scores = [sc for sc in await repo.scores_for(limit=5000) if sc.session_id in ids]
     events = await repo.events_for(since=start, until=end)
     staff = {s.wa_id: s for s in await repo.staff_all()}
     return {"day": day, "start": start, "sessions": sessions, "scores": scores, "events": events, "staff": staff}
@@ -44,6 +46,16 @@ BASELINE = {"median": 6, "price_assoc": (6, 6), "questions": 2}
 # where a customer is → the step to coach next (the step's own tip and clip)
 COACH_STEP = {"assess": "assess", "recommend": "translate", "demonstrated": "complete", "complete": "close",
               "close": "close", "follow": "follow_through", "closed": "follow_through"}
+
+
+def nm(ctx: SkillContext, st, wa: str | None = None) -> str:
+    """The associate's name, or 'Associate ··1234' until they tell it (an empty row title is refused by WhatsApp);
+    the digits are the staff record's own."""
+    name = (getattr(st, "name", "") or "").strip()
+    if name:
+        return name
+    wa = wa or getattr(st, "wa_id", "") or ""
+    return ctx.reg.raw(f"Associate ··{wa[-4:]}", "staff:wa_id") if wa else "Associate"
 
 
 def _mins(ctx: SkillContext, at) -> int:
@@ -93,7 +105,7 @@ async def floor(ctx: SkillContext) -> Reply:
     expert_open = await repo.expert_q_open()
     totals = [sc.total for sc in d["scores"]]
     g = sum(1 for t in totals if t >= 11)
-    med = statistics.median(totals) if totals else 0
+    med = statistics.median(totals) if totals else None
     tasks = [t for t in await repo.tasks_open() if repo.aware(t.due_at).date() <= ctx.now.date()]
     risk = [
         j
@@ -109,13 +121,13 @@ async def floor(ctx: SkillContext) -> Reply:
                 d=n(len(waiting_demo), "calc:floor"),
                 e=n(len(expert_open), "calc:floor"),
             ),
-            ctx.t(
+            (ctx.t(
                 "floor_today",
                 s=n(len(d["sessions"]), "calc:floor"),
                 g=n(g, "calc:floor"),
                 n=n(len(totals), "calc:floor"),
                 m=n(med, "calc:floor"),
-            )
+            ) if totals else ctx.t("floor_today_unscored", s=n(len(d["sessions"]), "calc:floor")))  # never 'median 0/14'
             + " · "
             + ctx.t("floor_follow", t=n(len(tasks), "calc:floor"), r=n(len(risk), "calc:floor")),
         ]
@@ -138,7 +150,7 @@ async def floor(ctx: SkillContext) -> Reply:
         desc = ctx.t("floor_row", cat=ctx.pick(pack.label) if pack and st.home.category else ctx.t("floor_no_cat"), step=ctx.t(f"step_{step}"),
                      demo=ctx.t("st_demo_done" if st.demo_done else "st_demo_pending"),
                      m=n(_mins(ctx, r.created_at), "calc:floor"))
-        title = f"{who.name if who else '?'} · {cust}"
+        title = f"{nm(ctx, who) if who else '?'} · {cust}"
         ctx.reg.raw(title, "session:code")
         rows.append(ListRow(id=encode("m", "floorc", st.id), title=truncate(title, 24), description=truncate(desc, 72)))
     rows.append(ListRow(id=encode("m", "digest"), title=truncate(ctx.t("mgr_row_digest"), 24),
@@ -170,7 +182,7 @@ async def floor_customer(ctx: SkillContext, session_id: str | None) -> Reply:
     step = COACH_STEP.get(getattr(s.step, "value", str(s.step)), "assess")
     pack = ctx.packs.get(s.home.category)
     now = ctx.t("floor_c_step", step=ctx.t(f"step_{step}"), m=ctx.reg.num(_mins(ctx, row[0].created_at), "calc:floor"))
-    lines = [ctx.t("floor_c_head", assoc=who.name if who else "?", who=parts[0] if parts else s.code,
+    lines = [ctx.t("floor_c_head", assoc=nm(ctx, who) if who else "?", who=parts[0] if parts else s.code,
                    cat=ctx.pick(pack.label) if pack and s.home.category else ctx.t("floor_no_cat")),
              " · ".join([now] + parts[2:]),
              ctx.t("tip_line", tip=ctx.t(f"tip_{step}"))]
@@ -191,7 +203,7 @@ async def tip(ctx: SkillContext, wa_id: str | None, step: str | None) -> Reply:
     body = ctx.t("tip_whisper", alang, step=ctx.t(f"step_{step}", alang), tip=ctx.t(f"tip_{step}", alang))
     to_assoc = info_reply(ctx, body, [Button(id=encode("g", "clip", step), title=ctx.t("b_clip", alang))], to=staff.wa_id)
     ctx.ev("manager_tip", to=staff.wa_id, coach_step=step)
-    return ctx.reply(info_reply(ctx, ctx.t("tip_sent", name=staff.name, tip=ctx.t(f"tip_{step}")),
+    return ctx.reply(info_reply(ctx, ctx.t("tip_sent", name=nm(ctx, staff), tip=ctx.t(f"tip_{step}")),
                                 [Button(id=encode("m", "floor"), title=ctx.t("b_floor"))]), to_assoc)
 
 
@@ -202,7 +214,8 @@ def _day_name(ctx: SkillContext, day: date) -> str:
         return ctx.t("day_today")
     if day == today - timedelta(days=1):
         return ctx.t("day_yesterday")
-    return ctx.reg.raw(f"{fmt.day_name(day, ctx.lang, roman=True)}, {fmt.date_short(day, ctx.lang)}", "clock:day")
+    yr = f" {day.year}" if day.year != today.year else ""
+    return ctx.reg.raw(f"{fmt.day_name(day, ctx.lang, roman=True)}, {fmt.date_short(day, ctx.lang)}{yr}", "clock:day")
 
 
 def _day_short(ctx: SkillContext, day: date) -> str:
@@ -271,7 +284,8 @@ async def digest(ctx: SkillContext, day: date | None = None, to: str | None = No
     sessions = sorted(d["sessions"], key=lambda x: repo.aware(x[0].created_at) or d["start"])
     if not sessions and not d["scores"]:
         ctx.ev("digest_shown", day=day.isoformat(), customers=0)
-        m = info_reply(ctx, ctx.t("digest_empty", day=name), _day_buttons(ctx, day), to=to)
+        m = info_reply(ctx, ctx.t("digest_empty_today" if day == today else "digest_empty", day=name),
+                       _day_buttons(ctx, day), to=to)
         m.footer = footer or m.footer
         return ctx.reply(m)
     ev = d["events"]
@@ -332,7 +346,7 @@ async def digest(ctx: SkillContext, day: date | None = None, to: str | None = No
         sc = [s.total for s in d["scores"] if s.associate_wa_id == wa]
         st_ = staff.get(wa)
         team.append({
-            "name": st_.name if st_ else wa[-4:],
+            "name": nm(ctx, st_, wa),
             "c": n(len(mine), "calc:digest"),
             "d": n(sum(1 for x in mine if x[1].demo_done), "calc:digest"),
             "s": n(sum(1 for x in mine if x[4] == "sold"), "calc:digest"),
@@ -340,7 +354,7 @@ async def digest(ctx: SkillContext, day: date | None = None, to: str | None = No
             "v": n(sum(1 for e in vn if e.actor_wa_id == wa), "calc:digest"),
             "low": dash,
             "_wa": wa,
-            "_k": (-len(mine), st_.name if st_ else wa),
+            "_k": (-len(mine), nm(ctx, st_, wa)),
         })
     team.sort(key=lambda x: x.pop("_k"))
     for r, st, text, tone, _ in rows[:4]:
@@ -351,7 +365,7 @@ async def digest(ctx: SkillContext, day: date | None = None, to: str | None = No
         cust.append({
             "time": ctx.reg.raw(at.astimezone(IST).strftime("%H:%M"), "session:time") if at else "",
             "cust": ctx.reg.raw(f"{st.code} {cname}" if cname and cname != "–" else st.code, "session:code"),
-            "assoc": who.name if who else "?",
+            "assoc": nm(ctx, who) if who else "?",
             "cat": ctx.pick(pack.label) if pack else dash,
             "demo": "yes" if st.demo_done else "",
             "status": text,
@@ -373,7 +387,7 @@ async def digest(ctx: SkillContext, day: date | None = None, to: str | None = No
             if t["_wa"] == wa:
                 t["low"] = ctx.t(f"step_short_{low}")
         if worst is None or avg[low] < worst[2]:
-            worst = (wa, st.name if st else "", avg[low], low)
+            worst = (wa, nm(ctx, st, wa), avg[low], low)
     for t in team:
         t.pop("_wa", None)
     best = max(d["scores"], key=lambda sc: sc.total, default=None)
@@ -389,7 +403,7 @@ async def digest(ctx: SkillContext, day: date | None = None, to: str | None = No
         line = ctx.t("digest_gap_line", name=worst[1], step=ctx.t(f"step_short_{worst[3]}"))  # as on the card
         if best is not None and len(by_assoc) > 1:  # the best only means something beside someone else
             bst = staff.get(best.associate_wa_id)
-            line += " · " + ctx.t("digest_best_short", name=bst.name if bst else "", total=n(best.total, "calc:digest"))
+            line += " · " + ctx.t("digest_best_short", name=nm(ctx, bst, best.associate_wa_id), total=n(best.total, "calc:digest"))
         lines.append(line)
     else:
         lines.append(ctx.t("digest_no_scores"))
@@ -399,7 +413,8 @@ async def digest(ctx: SkillContext, day: date | None = None, to: str | None = No
         title = ctx.t("digest_title_yesterday")
     else:
         title = ctx.t("digest_title_day", day=name)
-    full = ctx.reg.raw(f"{fmt.day_name(day, ctx.lang, roman=True)}, {fmt.date_short(day, ctx.lang)}", "clock:day")
+    yr = f" {day.year}" if day.year != today.year else ""
+    full = ctx.reg.raw(f"{fmt.day_name(day, ctx.lang, roman=True)}, {fmt.date_short(day, ctx.lang)}{yr}", "clock:day")
     card = Card(
         template="digest",
         lang=ctx.lang,
@@ -441,7 +456,7 @@ async def team(ctx: SkillContext) -> Reply:
             m=ctx.reg.num(statistics.median(mine), "calc:team") if mine else "–",
         )
         rows.append(
-            ListRow(id=encode("m", "profile", st.wa_id), title=truncate(st.name, 24), description=truncate(desc, 72))
+            ListRow(id=encode("m", "profile", st.wa_id), title=truncate(nm(ctx, st), 24), description=truncate(desc, 72))
         )
     ctx.reg.static("14")
     if not rows:
@@ -486,7 +501,7 @@ async def approvals(ctx: SkillContext) -> Reply:
     p = t.payload or {}
     staff = await repo.staff_by_wa(p.get("associate", ""))
     body = ctx.t(
-        "approval_for_manager", name=staff.name if staff else "", code=ctx.reg.raw(p.get("code", ""), "session:code")
+        "approval_for_manager", name=nm(ctx, staff) if staff else "", code=ctx.reg.raw(p.get("code", ""), "session:code")
     )
     s = await ctx.svc.sessions.get(t.session_id) if t.session_id else None
     extra = approval_context(ctx, s, p.get("sku"), ctx.lang)
@@ -548,7 +563,7 @@ async def nudge(ctx: SkillContext, wa_id: str, step: str) -> Reply:
         Button(id=encode("g", "quiz", step), title=ctx.t("b_quiz", lang)),
     ]
     ctx.ev("manager_nudge", to=wa_id, coach_step=step)
-    return ctx.reply(info_reply(ctx, ctx.t("nudge_sent", name=staff.name) + "\n> " + ctx.t(f"tip_{step}"),
+    return ctx.reply(info_reply(ctx, ctx.t("nudge_sent", name=nm(ctx, staff)) + "\n> " + ctx.t(f"tip_{step}"),
                                 [Button(id=encode("m", "digest"), title=ctx.t("b_huddle"))]),
                      info_reply(ctx, body, btns, to=wa_id))
 
@@ -560,14 +575,14 @@ MGR_WORDS = {
                "काय झालं", "काय झाले", "कसा गेला", "कसा होता", "funnel", "analytics", "फनेल"],
     "floor": ["floor", "abhi kaun", "live", "kaun kya kar", "फ्लोर", "आत्ता कोण"],
     "team": ["team", "sab log", "टीम"],
-    "approvals": ["approval", "manzoori", "manjoori", "मंजूरी", "मंजुरी"],
+    "approvals": ["approval", "approvals", "pending", "manzoori", "manjoori", "मंजूरी", "मंजुरी"],
     "voice": ["voice", "awaaz", "recording", "voice log", "voice note", "आवाज", "व्हॉइस"],
     "visits": ["visits", "store visit", "store visits", "mystery", "भेटी", "स्टोअर भेट"],
 }
 
 
-GREET = {"hi", "hii", "hello", "hey", "helo", "good morning", "gm", "morning", "namaste", "namaskar", "हाय", "हॅलो",
-         "हेलो", "नमस्ते", "नमस्कार", "सुप्रभात"}
+GREET = {"hi", "hii", "hello", "hey", "helo", "good morning", "gm", "morning", "good afternoon", "good evening",
+         "evening", "namaste", "namaskar", "हाय", "हॅलो", "हेलो", "नमस्ते", "नमस्कार", "सुप्रभात", "शुभ संध्याकाळ"}
 
 
 def menu(ctx: SkillContext, heard: str | None = None) -> Reply:
@@ -582,9 +597,38 @@ def menu(ctx: SkillContext, heard: str | None = None) -> Reply:
     return ctx.reply(m)
 
 
+_DEV = {"क": "k", "ख": "kh", "ग": "g", "घ": "gh", "च": "ch", "छ": "chh", "ज": "j", "झ": "jh", "ट": "t", "ठ": "th",
+        "ड": "d", "ढ": "dh", "ण": "n", "त": "t", "थ": "th", "द": "d", "ध": "dh", "न": "n", "प": "p", "फ": "f", "ब": "b",
+        "भ": "bh", "म": "m", "य": "y", "र": "r", "ल": "l", "ळ": "l", "व": "v", "श": "sh", "ष": "sh", "स": "s", "ह": "h"}
+_DEV_V = {"अ": "a", "आ": "a", "इ": "i", "ई": "i", "उ": "u", "ऊ": "u", "ए": "e", "ऐ": "ai", "ओ": "o", "औ": "au",
+          "ा": "a", "ि": "i", "ी": "i", "ु": "u", "ू": "u", "े": "e", "ै": "ai", "ो": "o", "ौ": "au", "ं": "n"}
+
+
+def _roman(word: str) -> str:
+    """A Devanagari name in Latin letters, loosely ('रवी' → 'ravi', 'पूजा' → 'puja'), to find an associate by name."""
+    out = []
+    chars = list(word)
+    for i, c in enumerate(chars):
+        if c in _DEV:
+            out.append(_DEV[c])
+            nxt = chars[i + 1] if i + 1 < len(chars) else ""
+            if nxt and nxt not in _DEV_V and nxt != "्" and nxt in _DEV:
+                out.append("a")  # the inherent vowel before another consonant
+        elif c in _DEV_V:
+            out.append(_DEV_V[c])
+    return "".join(out)
+
+
+def _loose(s: str) -> str:
+    return s.lower().replace("ee", "i").replace("oo", "u").replace("aa", "a").replace("w", "v")
+
+
 def _match(text: str, staff: dict) -> tuple[str | None, str | None]:
-    t = " " + " ".join((text or "").lower().split()) + " "
-    who = next((wa for wa, st in staff.items() if st.role == "associate" and st.name and f" {st.name.lower()} " in t), None)
+    raw = re.sub(r"['’]s\b", " ", (text or "").lower())  # "Ravi's voice notes"
+    t = " " + " ".join(raw.split()) + " "
+    words = {_loose(w) for w in re.findall(r"[a-z]+", raw)} | {_loose(_roman(w)) for w in re.findall(r"[ऀ-ॿ]+", raw)}
+    who = next((wa for wa, st in staff.items() if "associate" in (st.role, st.base_role) and st.name
+                and (f" {st.name.lower()} " in t or _loose(st.name.split()[0]) in words)), None)
     for k, words in MGR_WORDS.items():
         if any((" " + w + " ") in t if w.isascii() else w in t for w in words):
             return k, who
@@ -599,13 +643,22 @@ async def by_voice(ctx: SkillContext) -> Reply:
     text = msg.text or ""
     if msg.type == "audio" and msg.media_id:
         try:
-            audio, mime = await ctx.svc.channel.download_media(msg.media_id)
+            try:
+                audio, mime = await ctx.svc.channel.download_media(msg.media_id)
+            except Exception:  # an expired or missing media id: ask again, never a crash
+                ctx.ev("media_download_failed", kind="voice")
+                return ctx.reply(info_reply(ctx, ctx.t("media_resend_voice")))
             text = await ctx.ai.transcribe(audio, mime or msg.mime_type)
         except AIUnavailable:
             return ctx.reply(info_reply(ctx, ctx.t("voice_retry" if ctx.ai.live else "voice_unavailable")))
     staff = {s.wa_id: s for s in await repo.staff_all()}
     what, who = _match(text, staff)
     asked = parse_day(text, ctx.now.date())  # 'kal ka digest', '3 Nov kaisa raha', 'सोमवारचा अहवाल'
+    if asked and asked.bad and what in (None, "digest", "floor", "team"):  # '31 Feb', 'last week': say so, not today
+        ctx.ev("manager_voice" if msg.type == "audio" else "manager_text", what="digest", day=None, bad=asked.bad,
+               transcript=" ".join(text.split())[:200])
+        return ctx.reply(info_reply(ctx, ctx.t(f"digest_bad_{asked.bad}"), [Button(id=encode("m", "digest"),
+                                                                                  title=ctx.t("b_huddle"))]))
     if asked and (what in (None, "digest") or (what in ("floor", "team") and asked.day != ctx.now.date())):
         what = "digest"  # a day said on its own, or a past day's floor or team, is that day's huddle
     if what is None and not who and " ".join(text.lower().strip(" .!?,").split()) in GREET:
@@ -651,13 +704,13 @@ async def voice_log(ctx: SkillContext, who: str | None = None) -> Reply:
     for e in reversed(rows_ev[-10:]):
         pl = e.payload or {}
         st = staff.get(e.actor_wa_id or "")
-        title = " · ".join(x for x in ((st.name if st else "?"), pl.get("code") or "", _when(e)) if x)
+        title = " · ".join(x for x in ((nm(ctx, st) if st else "?"), pl.get("code") or "", _when(e)) if x)
         rows.append(ListRow(id=encode("m", "vnote", e.id), title=truncate(title, 24),
                             description=truncate(pl.get("transcript") or ctx.t("vlog_empty"), 72)))
     for r in rows:
         ctx.reg.raw(r.title + " " + (r.description or ""), "voice:log")
     n = ctx.reg.num(len(rows_ev), "voice:log:count")
-    name = staff[who].name if who and who in staff else None
+    name = nm(ctx, staff[who]) if who and who in staff else None
     body = ctx.t("vlog_body_who", n=n, name=name) if name else ctx.t("vlog_body", n=n)
     return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=body, list_button=truncate_title(ctx.t("list_vlog")),
                                 sections=[ListSection(rows=rows)], allowed_numbers=ctx.reg.allowed()))
@@ -707,7 +760,7 @@ async def profile(ctx: SkillContext, wa: str | None) -> Reply:
                       g=n(sum(1 for x in today if x >= 11), "calc:profile"), n=n(len(today), "calc:profile"))
     else:
         first = ctx.t("profile_today_none", s=n(sess, "calc:profile"))
-    lines = [ctx.t("profile_head", name=st.name) + " · " + first]
+    lines = [ctx.t("profile_head", name=nm(ctx, st)) + " · " + first]
     week = [sc for sc in await repo.scores_for(st.wa_id, limit=100)
             if (repo.aware(sc.at) or ctx.now) >= ctx.now - timedelta(days=7)]
     weakest = None
@@ -751,7 +804,7 @@ async def voice_detail(ctx: SkillContext, event_id: int) -> Reply:
     st = await repo.staff_by_wa(e.actor_wa_id or "")
     s = await ctx.svc.sessions.get(e.session_id) if e.session_id else None
     pack = ctx.packs.get(s.home.category) if s else None
-    head = " · ".join(x for x in ((st.name if st else "?"), pl.get("code") or "", _when(e), (pl.get("lang") or "").upper()) if x)
+    head = " · ".join(x for x in ((nm(ctx, st) if st else "?"), pl.get("code") or "", _when(e), (pl.get("lang") or "").upper()) if x)
     lines = [f"*{head}*", "> " + " ".join((pl.get("transcript") or ctx.t("vlog_empty")).split())]
     got = [x.lstrip("• ") for x in _understood_lines(ctx, pl, pack)]
     asked = [ctx.t(f"intent_{i}") for i in pl.get("intents") or [] if i != "other"]
@@ -764,5 +817,5 @@ async def voice_detail(ctx: SkillContext, event_id: int) -> Reply:
     ctx.reg.raw("\n".join(lines), "voice:log")
     btns = [Button(id=encode("m", "vlog"), title=ctx.t("b_vlog")), Button(id=encode("m", "digest"), title=ctx.t("b_huddle"))]
     if st:
-        btns.insert(1, Button(id=encode("m", "whov", st.wa_id), title=truncate_title(ctx.t("b_vlog_who", name=st.name))))
+        btns.insert(1, Button(id=encode("m", "whov", st.wa_id), title=truncate_title(ctx.t("b_vlog_who", name=nm(ctx, st)))))
     return ctx.reply(info_reply(ctx, "\n".join(lines), btns[:3]))

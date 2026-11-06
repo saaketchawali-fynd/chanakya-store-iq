@@ -290,7 +290,7 @@ def live_offers_for(ctx: SkillContext, p) -> list[tuple]:
     d = today()
     out = []
     for o in ctx.facts.snap.offers:
-        if not (o.valid_from <= d <= o.valid_to) or p.category not in (o.categories or []):
+        if not o.live(d) or p.category not in (o.categories or []):
             continue
         flt = o.filter or {}
         if any(k.startswith("with_tv") for k in flt):

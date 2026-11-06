@@ -42,6 +42,15 @@ def _demo_best_name(ctx: SkillContext) -> str:
     return C.product_name(ctx, p) if p else ctx.t("this_product", ctx.clang)
 
 
+def known_claim(ctx: SkillContext, claim_id: str | None) -> bool:
+    """A claim id the packs know. The listening model sometimes returns an id that is not in the catalogue it was
+    given ('no_such_myth'): that is no claim at all, never a question sent on to the expert."""
+    if not claim_id:
+        return False
+    cat = ctx.session.home.category if ctx.session else None
+    return ctx.packs.myth(claim_id, cat) is not None
+
+
 async def myth(ctx: SkillContext, claim_id: str) -> Reply:
     m = ctx.packs.myth(claim_id, ctx.session.home.category)
     if m is None:
@@ -105,14 +114,18 @@ async def proof(ctx: SkillContext, claim_id: str | None) -> Reply:
 async def price_rescue(ctx: SkillContext) -> Reply:
     pack = ctx.pack
     s = ctx.session
+    if not ctx.facts.snap.products:  # nothing loaded from the backend (yet): say so, never a range from nothing
+        return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
     products = ctx.facts.products_sync(pack.category)
+    if not products:  # this product is not in today's catalogue at all
+        return ctx.reply(info_reply(ctx, ctx.t("no_options"), [ctx.b("b_expert", ctx.sid("expert"))]))
     in_stock = [p for p in products if p.qty > 0]
     pool = candidate_set(products, s.home) if s.home.slots or s.home.start_level_inr else in_stock
     if s.home.slots:
         g = ctx.facts.snap.guides
         fitting = [p for p in pool if fit(p, s.home, pack, g).score >= 60]
         pool = fitting or pool
-    pool = [p for p in pool if p.qty > 0] or pool or in_stock
+    pool = [p for p in pool if p.qty > 0] or pool or in_stock or products
     low = min(p.price for p in pool)
     high = max(p.price for p in pool)
     src = ",".join(sorted(p.price_source for p in pool))

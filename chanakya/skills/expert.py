@@ -13,7 +13,7 @@ from rapidfuzz import fuzz
 
 from chanakya.ai.client import AIUnavailable
 from chanakya.brain import packs as P
-from chanakya.channel.limits import truncate
+from chanakya.channel.limits import truncate, truncate_title
 from chanakya.core import repo
 from chanakya.core.buttons import encode
 from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, kyun_block
@@ -68,12 +68,13 @@ def _product_for(ctx: SkillContext, question: str):
         return None
     prods = ctx.facts.products_sync(ctx.pack.category)
     q = question.lower()
-    best, score = None, 0.0
+    best, key = None, (0.0, False, 0)
     for p in prods:
         sc = max(fuzz.token_set_ratio(p.model.lower(), q), fuzz.token_set_ratio((ctx.pick(p.title, "en") or "").lower(), q))
-        if sc > score:
-            best, score = p, sc
-    if best is not None and score >= 85:
+        k = (sc, p.model.lower() in q, len(p.model))  # a tie ('… QLED' and '… QLED Pro' both 100): the named, longer one
+        if k > key:
+            best, key = p, k
+    if best is not None and key[0] >= 85:
         return best
     by = {p.sku: p for p in prods}
     for sku in [s.extra.get("label_scanned")] + list(s.shortlist[:1]):
@@ -231,14 +232,32 @@ async def ask(ctx: SkillContext, question: str, via_truth_check: bool = False, l
     return ctx.reply(*msgs)
 
 
+# 'one minute, checking' is not an answer (a probe sent "ok 1 min, check karta hoon" to the associate as the answer)
+HOLD = re.compile(r"^\s*(ok(ay)?|haan|ha|ji|theek hai|thik hai|noted|on it|checking|check kar(ta|ti|ke)( hoon| hu)?|"
+                  r"(ek|1|one) (min(ute)?|sec(ond)?)|wait|ruko|ruk(iye|o)|dekh(ta|ti) (hoon|hu)|let me check|"
+                  r"थांबा|बघतो|बघते|रुको|देखता हूँ|एक मिनट|ठीक है)([\s,.!]+(ok(ay)?|haan|(ek|1|one) (min(ute)?|sec(ond)?)|"
+                  r"check kar(ta|ti)( hoon| hu)?|dekh(ta|ti) (hoon|hu)|बघतो|थांबा))*[\s.!]*$", re.I)
+ADDENDUM = re.compile(r"^\s*(aur|and|also|plus|ek aur|one more|btw|आणि|और|अजून)\b", re.I)
+
+
 async def expert_message(ctx: SkillContext) -> Reply:
-    """An expert's text/voice while a question is open is the answer to the one they tapped, else the oldest one.
-    A greeting (or nothing open) shows the queue."""
+    """An expert's text/voice while a question is open is the answer to the one they tapped; with one question open,
+    that one; with several and none tapped, they are asked which. 'One minute, checking' is never sent as an
+    answer, and 'aur haan, …' right after an answer goes to that same question. A greeting shows the queue."""
     open_q = await repo.expert_q_open(ctx.actor_wa_id)
     picked = await repo.setting_get(f"expert_answering:{ctx.actor_wa_id}")
     text = ctx.inbound.text or ""
+    last = await repo.setting_get(f"expert_last_answer:{ctx.actor_wa_id}")
+    if ctx.inbound.type == "text" and last and ADDENDUM.match(text) and not picked:
+        return await _addendum(ctx, int(last), text)
     if not open_q or (ctx.inbound.type == "text" and not picked and GREETING.match(text) and len(text.split()) <= 3):
         return await home(ctx)
+    if ctx.inbound.type == "text" and HOLD.match(text):  # still checking: keep the question open, nothing goes out
+        q = next((x for x in open_q if x.id == picked), open_q[0])
+        await repo.setting_set(f"expert_answering:{ctx.actor_wa_id}", q.id)
+        return ctx.reply(info_reply(ctx, ctx.t("expert_hold_ack")))
+    if not picked and len(open_q) > 1:  # several waiting and none tapped: which one is this the answer to?
+        return await _which_question(ctx, open_q)
     q = next((x for x in open_q if x.id == picked), open_q[0])  # the question they tapped 'answer' on
     await repo.setting_set(f"expert_answering:{ctx.actor_wa_id}", None)
     assoc = await repo.staff_by_wa(q.associate_wa_id)
@@ -247,7 +266,11 @@ async def expert_message(ctx: SkillContext) -> Reply:
     clang = s.home.customer_lang if s else alang
     audio, amime = None, None
     if ctx.inbound.type == "audio" and ctx.inbound.media_id:
-        audio, amime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
+        try:
+            audio, amime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
+        except Exception:  # an expired or missing media id: ask for the answer again, the question stays open
+            ctx.ev("media_download_failed", kind="voice")
+            return ctx.reply(info_reply(ctx, ctx.t("media_resend_voice")))
     try:
         ans = await ctx.ai.format_expert_answer(ctx.inbound.text, audio, alang, clang, mime=amime)
     except AIUnavailable:
@@ -267,6 +290,7 @@ async def expert_message(ctx: SkillContext) -> Reply:
         ctx.reg.raw(n, src)
     ctx.reg.raw(ans.for_associate + " " + (ans.bolo or ""), src)
     await repo.expert_q_update(q.id, status="answered", answered_at=ctx.now, answer=ans.model_dump())
+    await repo.setting_set(f"expert_last_answer:{ctx.actor_wa_id}", q.id)  # an 'aur haan, …' joins this answer
     ctx.ev("expert_answered", sources=[src], qid=q.id)
     ctx.reg.static(q.question)
     pack = ctx.packs.get(q.category)
@@ -292,6 +316,33 @@ async def expert_message(ctx: SkillContext) -> Reply:
     return ctx.reply(to_assoc, to_expert)
 
 
+async def _which_question(ctx: SkillContext, open_q: list) -> Reply:
+    """Several questions waiting and the expert typed without tapping one: ask which (never the oldest by guess)."""
+    rows = [ListRow(id=encode("x", q.id, "answer"), title=truncate(f"#{q.id} · {q.category or ''}".strip(" ·"), 24),
+                    description=truncate(q.question, 72)) for q in open_q[:10]]
+    for r in rows:
+        ctx.reg.raw(r.title + " " + (r.description or ""), "expert:queue")
+    return ctx.reply(OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("expert_which_q"),
+                                list_button=truncate_title(ctx.t("list_choose")), sections=[ListSection(rows=rows)],
+                                allowed_numbers=ctx.reg.allowed()))
+
+
+async def _addendum(ctx: SkillContext, qid: int, text: str) -> Reply:
+    """'Aur haan, BT range 10 m hai' right after answering: added to that same answer for the same associate."""
+    q = await repo.expert_q_get(qid)
+    if q is None:
+        return await home(ctx)
+    assoc = await repo.staff_by_wa(q.associate_wa_id)
+    alang = assoc.lang if assoc else "hi"
+    ctx.reg.raw(text, f"expert:{q.id}")
+    ctx.reg.static(q.question)
+    await repo.setting_set(f"expert_last_answer:{ctx.actor_wa_id}", None)
+    ctx.ev("expert_addendum", qid=q.id)
+    body = ctx.t("expert_addendum", alang, expert=ctx.staff.name, text=truncate(text, 300)) + "\n" + \
+        ctx.t("expert_q_ctx", alang, question=truncate(q.question, 120))
+    return ctx.reply(info_reply(ctx, body, to=q.associate_wa_id), info_reply(ctx, ctx.t("expert_thanks")))
+
+
 async def expert_button(ctx: SkillContext, qid: str, action: str) -> Reply:
     if action == "list":
         return await home(ctx)
@@ -308,6 +359,11 @@ async def expert_button(ctx: SkillContext, qid: str, action: str) -> Reply:
         ctx.reg.static(q.question)
         return ctx.reply(info_reply(ctx, ctx.t("expert_answering", name=a.name if a else "", question=truncate(q.question, 200))
                                     + "\n" + ctx.t("expert_answer_prompt")))
+    if action in ("dunno", "save", "nosave") and (q.status == "open") != (action == "dunno"):
+        return ctx.reply(info_reply(ctx, ctx.t("expert_q_done"), [Button(id=encode("x", 0, "list"),
+                                                                       title=ctx.t("b_expert_queue"))]))  # stale button
+    if action == "save" and (q.answer or {}).get("saved"):
+        return ctx.reply(info_reply(ctx, ctx.t("expert_already_saved")))  # saved once: never a duplicate entry
     if action == "dunno":
         await repo.expert_q_update(q.id, status="expired")
         assoc = await repo.staff_by_wa(q.associate_wa_id)
@@ -321,6 +377,7 @@ async def expert_button(ctx: SkillContext, qid: str, action: str) -> Reply:
         e = await repo.library_add(
             category=q.category, question=q.question, answer=q.answer, expert_name=ctx.staff.name, approved=True
         )
+        await repo.expert_q_update(q.id, answer={**q.answer, "saved": True})
         ctx.ev("library_saved", qid=q.id, library_id=e.id)
         n = ctx.reg.num(len(await repo.library_all(None)), "calc:library")
         return ctx.reply(info_reply(ctx, ctx.t("library_saved", n=n), [Button(id=encode("x", 0, "list"), title=ctx.t("b_expert_queue"))]))

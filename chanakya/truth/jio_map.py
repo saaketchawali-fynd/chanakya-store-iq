@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import html
 import re
-from datetime import date
+from datetime import date, datetime, time
+from zoneinfo import ZoneInfo
 
-NUM = r"(\d+(?:\.\d+)?)"
+IST = ZoneInfo("Asia/Kolkata")
+NUM =r"(\d+(?:\.\d+)?)"
 PLACEHOLDER = "/l2_category/"  # the backend's shared placeholder picture (a generic icon sheet, not the product)
 EMPTY = {"", "none", "null", "nan", "na", "n/a", "-"}
 
@@ -280,6 +282,9 @@ def prices(p: dict) -> tuple[int | None, int | None, str]:
          wherever it was present);
       2. else, when the lowest price is under a quarter of the MRP, it is a stand-in: the highest one;
       3. else the lowest, as before.
+    The same stand-in rule holds when min == max (UAT: an AC listed at ₹1,000 everywhere, MRP and offer_price
+    ₹39,990): the stand-in is not a price; the offer_price is taken when it agrees with the MRP, else there is no
+    price. A price of ₹0 is never a price either: the product is not sellable (6 Nov 2026).
     The MRP is taken from the same end of its range, so a 'you save' is never measured against another store."""
     pr = p.get("price") or {}
     eff, mrk = pr.get("effective") or {}, pr.get("marked") or {}
@@ -289,13 +294,23 @@ def prices(p: dict) -> tuple[int | None, int | None, str]:
         return None, m_lo, "none"
     hi = hi if hi is not None else lo
     m_hi = m_hi if m_hi is not None else m_lo
-    if lo == hi:
-        return lo, m_lo, "listing"
+    if hi <= 0:
+        return None, m_lo, "none"
+
+    def stand_in(x: int, mrp: int | None) -> bool:
+        return x <= 0 or bool(mrp and x < PLACEHOLDER_SHARE * mrp)
+
     op = _rupees((p.get("_custom_json") or {}).get("offer_price"))
-    if op is not None and lo <= op <= hi:
+    if lo == hi:
+        if not stand_in(lo, m_lo):
+            return lo, m_lo, "listing"
+        if op is not None and not stand_in(op, m_hi) and (not m_hi or op <= m_hi):
+            return op, m_hi, "offer_price"
+        return None, m_lo, "stand_in"
+    if op is not None and lo <= op <= hi and op > 0:
         return op, (m_hi if op > lo else m_lo), "offer_price"
-    if m_hi and lo < PLACEHOLDER_SHARE * m_hi:
-        return hi, m_hi, "range_max"
+    if stand_in(lo, m_hi):
+        return (hi, m_hi, "range_max") if not stand_in(hi, m_hi) else (None, m_hi, "stand_in")
     return lo, m_lo, "range_min"
 
 
@@ -303,6 +318,48 @@ def price(p: dict, kind: str) -> int | None:
     """The selling price ('effective') or the MRP ('marked'), chosen by `prices`."""
     eff, mrp, _ = prices(p)
     return eff if kind == "effective" else mrp
+
+
+# Appliance and computer brands sold in Indian electronics stores: to tell a listing whose name starts with one
+# brand while its brand field says another (UAT: "Voltas Beko … Washing Machine" with brand "Apple", model "101").
+KNOWN_BRANDS = frozenset({
+    "acer", "akai", "apple", "asus", "bajaj", "beko", "blaupunkt", "blue star", "bosch", "bpl", "carrier", "crompton",
+    "daikin", "dell", "electrolux", "godrej", "haier", "havells", "hisense", "hitachi", "hp", "ifb", "iffalcon",
+    "infinix", "kelvinator", "kodak", "lenovo", "lg", "liebherr", "lloyd", "microsoft", "midea", "motorola", "msi",
+    "nokia", "o general", "onida", "panasonic", "philips", "realme", "reconnect", "redmi", "samsung", "sansui",
+    "sharp", "siemens", "sony", "tcl", "thomson", "toshiba", "vu", "voltas", "voltas beko", "whirlpool", "xiaomi",
+})
+# The smallest believable size of each product, in mm: every side of a box appliance; the longest side of a flat
+# one (a TV, an AC indoor unit, a laptop). A side over 3 m is not believable for any of them.
+MIN_SIDE_MM = {"wm": 300, "fridge": 300}
+MIN_LONG_SIDE_MM = {"tv": 300, "ac": 400, "laptop": 200}
+MAX_SIDE_MM = 3000
+
+
+def _norm(s: str) -> str:
+    return " ".join(re.sub(r"[^a-z0-9]+", " ", (s or "").lower()).split())
+
+
+def implausible(row: dict, brands: set[str] | frozenset[str] = KNOWN_BRANDS) -> list[str]:
+    """Why a mapped product cannot be trusted, or [] (6 Nov 2026: a mis-branded listing was recommended, offered
+    for a Voltas label and drawn 5 cm wide). Two checks, both from the listing's own fields:
+      - brand: its brand is nowhere in its own name, and the name starts with another known brand;
+      - size: its stated dimensions are not believable for its category (a washing machine under 30 cm).
+    A flagged product is left out of the catalogue (and counted apart on /health), never shown or drawn."""
+    why = []
+    name, brand = _norm((row.get("info") or {}).get("name") or ""), _norm(row.get("brand") or "")
+    if brand and f" {brand} " not in f" {name} ":
+        other = next((b for b in sorted(brands, key=len, reverse=True)
+                      if b != brand and (name == b or name.startswith(b + " "))), None)
+        if other:
+            why.append(f"brand:{brand}!={other}")
+    sides = [float(v) for v in (row.get("dims") or {}).values() if isinstance(v, (int, float))]
+    cat = row.get("category")
+    if sides:
+        if any(x > MAX_SIDE_MM for x in sides) or (cat in MIN_SIDE_MM and min(sides) < MIN_SIDE_MM[cat]) \
+                or (cat in MIN_LONG_SIDE_MM and max(sides) < MIN_LONG_SIDE_MM[cat]):
+            why.append("dims:" + "x".join(str(round(x)) for x in sides))
+    return why
 
 
 def map_product(p: dict, category: str) -> dict | None:
@@ -461,8 +518,30 @@ def promo_amount(promo: dict) -> tuple[float | None, int | None, int | None]:
     return None, None, None
 
 
-def map_promotions(promos_by_sku: dict[str, list[dict]], category_by_sku: dict[str, str], today: date) -> list[dict]:
-    """One Offer row per promotion id, applying to the SKUs the backend returned it for."""
+def _ist(v, end: bool = False) -> datetime | None:
+    """A backend timestamp ('2026-11-02T04:30:00Z', or a bare date) as a time in India; None if unreadable. A time
+    with no zone is read as Indian time; a bare date as the start of that day (`end`: its last second)."""
+    if not v:
+        return None
+    s = str(v).strip().replace("Z", "+00:00")
+    try:
+        t = datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if len(s) == 10 and end:
+        t = t.replace(hour=23, minute=59, second=59)
+    return (t if t.tzinfo else t.replace(tzinfo=IST)).astimezone(IST)
+
+
+def map_promotions(promos_by_sku: dict[str, list[dict]], category_by_sku: dict[str, str],
+                   now: datetime | date) -> list[dict]:
+    """One Offer row per promotion id, applying to the SKUs the backend returned it for. Its start and end are
+    the promotion's own timestamps, in Indian time (6 Nov 2026: an offer ending at 10:00 was still shown at 11:00,
+    and one starting tomorrow was applied today): kept to the minute in `filter.live_from` / `live_to`, which
+    Offer.live() checks; valid_from / valid_to are their dates. Ended promotions are dropped; future ones wait."""
+    if not isinstance(now, datetime):
+        now = datetime.combine(now, time.min, IST)
+    now = now if now.tzinfo else now.replace(tzinfo=IST)
     rows: dict[str, dict] = {}
     for sku, promos in promos_by_sku.items():
         for pr in promos:
@@ -470,21 +549,20 @@ def map_promotions(promos_by_sku: dict[str, list[dict]], category_by_sku: dict[s
             text = (pr.get("offer_text") or pr.get("promotion_name") or "").strip()
             if not pid or not text:
                 continue
-            till = pr.get("valid_till")
-            try:
-                valid_to = date.fromisoformat(str(till)[:10]) if till else None
-            except ValueError:
-                valid_to = None
-            if valid_to is None or valid_to < today:
+            end = _ist(pr.get("valid_till") or pr.get("valid_to"), end=True)
+            start = _ist(pr.get("valid_from") or pr.get("valid_since") or pr.get("start_date"))
+            if end is None or end < now or (start is not None and start > end):
                 continue
             row = rows.get(pid)
             if row is None:
                 pct, flat, cap = promo_amount(pr)
+                live = {"live_to": end.isoformat()} | ({"live_from": start.isoformat()} if start else {})
                 row = rows[pid] = {
                     "id": f"JIO-{pid}", "kind": "instant", "title": {"hi": text, "mr": text, "en": text},
                     "bank": None, "pct": pct, "flat": flat, "max_discount": cap, "min_amount": 0, "categories": [],
-                    "filter": {"skus": []}, "requires": {}, "stack_group": f"jio:{pr.get('promotion_group') or 'promo'}",
-                    "valid_from": today, "valid_to": valid_to, "with_emi": True,
+                    "filter": {"skus": [], **live}, "requires": {},
+                    "stack_group": f"jio:{pr.get('promotion_group') or 'promo'}",
+                    "valid_from": start.date() if start else now.date(), "valid_to": end.date(), "with_emi": True,
                 }
             row["filter"]["skus"].append(sku)
             if category_by_sku.get(sku) and category_by_sku[sku] not in row["categories"]:

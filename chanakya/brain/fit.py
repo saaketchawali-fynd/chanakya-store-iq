@@ -24,7 +24,7 @@ class FitResult:
     excluded: bool = False
 
     def top_rule(self) -> str | None:
-        best = sorted((c for c in self.contributions if c.match > 0), key=lambda c: -(c.weight * c.match))
+        best = sorted((c for c in self.contributions if c.match >= 1), key=lambda c: -c.weight)  # fully holds only
         return best[0].rule_id if best else None
 
 

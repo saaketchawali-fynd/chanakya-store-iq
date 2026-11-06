@@ -311,6 +311,10 @@ floor_today:
   hi: "*Aaj:* {s} baat-cheet · Guide {g} / {n} · median {m}/14"
   mr: "*आज:* {s} संवाद · गाइड {g} / {n} · मीडियन {m}/14"
   en: "*Today:* conversations {s} · Guide {g} of {n} · median {m}/14"
+floor_today_unscored:
+  hi: "*Aaj:* {s} baat-cheet · score abhi nahi"
+  mr: "*आज:* {s} संवाद · अजून स्कोअर नाही"
+  en: "*Today:* conversations {s} · no scores yet"
 floor_follow: {hi: "follow-up baaki {t} · install risk {r}", mr: "फॉलो-अप बाकी {t} · इन्स्टॉल धोका {r}", en: "follow-ups due {t} · installs at risk {r}"}
 team_body:
   hi: "*Aaj ki team*\nHar associate ki baat-cheet aur median score. Kisi par tap kijiye: unke steps, jeet aur voice notes."

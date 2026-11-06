@@ -59,7 +59,7 @@ def eligible(o: Offer, product, home: HomeCard, bank: str | None, emi: bool, tod
              bill_total: int | None = None) -> bool:
     """`with_main`: the main product in the same bill (a bundle offer on an add-on names it); `bill_total`: the
     bill's amount in this offer's categories, for an 'on bills over ₹X' offer (else this product's price)."""
-    if not (o.valid_from <= today <= o.valid_to):
+    if not o.live(today):  # to the minute for today, when the backend gave exact times
         return False
     if product.category not in (o.categories or []):
         return False

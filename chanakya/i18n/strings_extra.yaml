@@ -124,6 +124,11 @@ customer_word: {hi: "Customer", mr: "ग्राहक", en: "Customer"}
 delivery_set: {hi: "Delivery: {day} ✓", mr: "डिलिव्हरी: {day} ✓", en: "Delivery: {day} ✓"}
 digest_no_data: {hi: "Aaj abhi koi score nahi.", mr: "आज अजून स्कोअर नाही.", en: "No scores yet today."}
 expert_answer: {hi: "*Expert · {expert}:* {text}", mr: "*एक्सपर्ट · {expert}:* {text}", en: "*Expert · {expert}:* {text}"}
+expert_hold_ack: {hi: "Theek hai — sawaal khula hai. Jawab taiyaar ho to bhejiye.", mr: "ठीक आहे — प्रश्न उघडा आहे. उत्तर तयार झालं की पाठवा.", en: "Okay — the question stays open. Send the answer when it's ready."}
+expert_which_q: {hi: "Kai sawaal intezaar mein hain. Ye jawab kis sawaal ka hai? Chuniye, phir jawab bhejiye.", mr: "अनेक प्रश्न वाट पाहत आहेत. हे उत्तर कोणत्या प्रश्नाचं? निवडा, मग उत्तर पाठवा.", en: "Several questions are waiting. Which one is this answer for? Pick it, then send the answer."}
+expert_addendum: {hi: "*Expert · {expert}, aur:* {text}", mr: "*एक्सपर्ट · {expert}, आणखी:* {text}", en: "*Expert · {expert}, also:* {text}"}
+expert_q_done: {hi: "Ye sawaal pehle hi poora ho chuka hai.", mr: "हा प्रश्न आधीच पूर्ण झाला आहे.", en: "That question is already closed."}
+expert_already_saved: {hi: "Ye jawab library mein pehle se hai.", mr: "हे उत्तर लायब्ररीत आधीच आहे.", en: "That answer is already in the library."}
 expert_busy: {hi: "Expert abhi busy; customer ko card bhej kar baad mein batayenge.", mr: "एक्सपर्ट सध्या व्यस्त; ग्राहकाला कार्ड पाठवून नंतर सांगू.", en: "The expert is busy; send the card and follow up later."}
 expert_home_line: {hi: "*Customer ka ghar:* {home}", mr: "*ग्राहकाचं घर:* {home}", en: "*Customer's home:* {home}"}
 expert_idle: {hi: "*Abhi koi sawaal intezaar mein nahi.*", mr: "*सध्या कोणताही प्रश्न वाट पाहत नाही.*", en: "*No question waiting right now.*"}

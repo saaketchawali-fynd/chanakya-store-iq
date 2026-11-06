@@ -9,6 +9,7 @@ import re
 
 from chanakya.ai.schemas import NumberPair, SlotPair, Understanding
 from chanakya.brain.packs import Pack, PackRegistry
+from chanakya.core.status import clean_customer_name
 from chanakya.truth.fmt import latin_digits
 
 WORD_NUM = {
@@ -111,7 +112,7 @@ PRICE_SEEN = ("online", "amazon", "flipkart", "website", "dusri dukaan", "doosri
 
 
 def _clauses(t: str) -> list[str]:
-    return re.split(r"[.,;!?|।]| aur | but | lekin | पण ", t)
+    return re.split(r"(?<!\d)\.|\.(?!\d)|[,;!?|।]| aur | but | lekin | पण ", t)  # never '1.5' cut at its point
 
 
 def _wealthy(clause: str) -> bool:
@@ -154,13 +155,59 @@ def _norm(text: str) -> str:
     return " " + re.sub(r"\s+", " ", t).strip() + " "
 
 
+# Hinglish 21–99 as spoken (common spellings), and halves: 'pachpan hazaar' 55,000, 'dedh lakh' 1,50,000
+HI_TENS = {
+    "ikkis": 21, "baais": 22, "bais": 22, "teis": 23, "tees": 30, "chaubis": 24, "chaubees": 24, "pachis": 25,
+    "pachees": 25, "chhabbis": 26, "sattais": 27, "athais": 28, "untis": 29, "untees": 29, "iktis": 31, "battis": 32,
+    "taintis": 33, "chautis": 34, "paintis": 35, "chhattis": 36, "saintis": 37, "adtis": 38, "untalis": 39,
+    "iktalis": 41, "bayalis": 42, "taintalis": 43, "chavalis": 44, "paintalis": 45, "chhiyalis": 46, "saintalis": 47,
+    "adtalis": 48, "unchas": 49, "ikyavan": 51, "bavan": 52, "baavan": 52, "tirpan": 53, "chauvan": 54, "pachpan": 55,
+    "chhappan": 56, "sattavan": 57, "athavan": 58, "unsath": 59, "iksath": 61, "basath": 62, "tirsath": 63,
+    "chausath": 64, "painsath": 65, "chhiyasath": 66, "sarsath": 67, "adsath": 68, "unhattar": 69, "ikhattar": 71,
+    "bahattar": 72, "tihattar": 73, "chauhattar": 74, "pachhattar": 75, "pachattar": 75, "chhihattar": 76,
+    "satattar": 77, "athattar": 78, "unasi": 79, "ikyasi": 81, "bayasi": 82, "tirasi": 83, "chaurasi": 84,
+    "pachasi": 85, "chhiyasi": 86, "sattasi": 87, "athasi": 88, "navasi": 89, "ikyanve": 91, "banve": 92,
+    "tiranve": 93, "chauranve": 94, "pachanve": 95, "chhiyanve": 96, "sattanve": 97, "athanve": 98, "ninyanve": 99,
+    "dedh": 1.5, "dhai": 2.5, "dhaai": 2.5, "adhai": 2.5, "dhaee": 2.5,
+}
+EN_TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fourty": 40, "fifty": 50, "sixty": 60, "seventy": 70,
+           "eighty": 80, "ninety": 90}
+EN_UNITS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9}
+
+
 def _words_to_digits(t: str) -> str:
     def rep(m):
         return str(WORD_NUM[m.group(0).strip()])
 
+    # 'forty five' / 'forty-five' → 45; 'saadhe teen' → 3.5, 'sava do' → 2.25, 'paune do' → 1.75 (before single words)
+    t = re.sub(r"(?<![\w])(" + "|".join(EN_TENS) + r")[\s-]+(" + "|".join(EN_UNITS) + r")(?![\w])",
+               lambda m: str(EN_TENS[m.group(1)] + EN_UNITS[m.group(2)]), t)
+    t = re.sub(r"(?<![\w])(" + "|".join(sorted(HI_TENS, key=len, reverse=True)) + r")(?![\w])",
+               lambda m: _fmt_num(HI_TENS[m.group(1)]), t)
     keys = sorted(WORD_NUM, key=len, reverse=True)
     pattern = r"(?<![\wऀ-ॿ])(" + "|".join(re.escape(k) for k in keys) + r")(?![\wऀ-ॿ])"
-    return re.sub(pattern, rep, t)
+    t = re.sub(pattern, rep, t)
+    t = re.sub(r"(?<![\w])(saadhe|sadhe|saade|साडे)\s+(\d+)", lambda m: _fmt_num(int(m.group(2)) + 0.5), t)
+    t = re.sub(r"(?<![\w])(sava|savva|सव्वा)\s+(\d+)", lambda m: _fmt_num(int(m.group(2)) + 0.25), t)
+    return re.sub(r"(?<![\w])(paune|पावणे)\s+(\d+)", lambda m: _fmt_num(int(m.group(2)) - 0.25), t)
+
+
+NEGATABLE = {"sold", "demo_done", "consent_yes", "request_tryon", "send_family_card"}
+NEG_AFTER = re.compile(r"^(?:\S+\s+)?(nahi|nahin|nai|na|mat|नाही|नहीं|नको)(?![\w])")  # Hindi/Marathi: 'sold nahi'
+NEG_BEFORE = re.compile(r"(?<![\w])(not|no|never|didn'?t|don'?t|isn'?t|wasn'?t)(?:\s+\S+)?$")  # English: 'not sold'
+
+
+def _negated(t: str, phrase: str) -> bool:
+    """The phrase negated: followed by 'nahi' ('sold nahi hua', 'TV nahi, AC chahiye') or preceded by 'not' ('not
+    sold'). Directional, so in 'TV nahi, AC chahiye' only the TV is ruled out."""
+    m = re.search(r"(?<![\w])" + re.escape(phrase.lower()) + r"(?![\w])", t)
+    if not m:
+        return False
+    return bool(NEG_AFTER.search(t[m.end():].strip()) or NEG_BEFORE.search(t[:m.start()].strip()))
+
+
+def _fmt_num(v: float) -> str:
+    return str(int(v)) if float(v).is_integer() else str(v)
 
 
 def _has(t: str, phrases: list[str]) -> str | None:
@@ -192,10 +239,15 @@ def _amount(t: str) -> list[tuple[float, int]]:
     return [(v, start) for v, start, _ in _amount_spans(t)]
 
 
+CORRECTION = re.compile(r"(?<![\w])(nahi|nahin|not|sorry|actually|galti|matlab|no wait|i mean)(?![\w])|नाही|नहीं|म्हणजे")
+
+
 def extract_numbers(t: str, category: str | None) -> list[NumberPair]:
     nums: dict[str, float] = {}
+    fix = bool(CORRECTION.search(t))  # '10 feet nahi, 6 feet': the last said is the one meant
+    put = nums.__setitem__ if fix else nums.setdefault
     for m in re.finditer(NUM + r"\s*" + STEPS, t):
-        nums.setdefault("seat_distance_ft", round(float(m.group(1)) * 2.5, 1))
+        put("seat_distance_ft", round(float(m.group(1)) * 2.5, 1))
     for m in re.finditer(NUM + r"\s*" + FT, t):
         v = float(m.group(1))
         ctx = t[max(0, m.start() - 25) : m.end() + 25]
@@ -204,7 +256,7 @@ def extract_numbers(t: str, category: str | None) -> list[NumberPair]:
         elif re.search(r"wall|deewar|diwar|दीवार|भिंत|chaudi|रुंद|wide", ctx) and not re.search(r"sofa|सोफ", ctx):
             nums["wall_width_ft"] = v
         elif category in (None, "tv"):
-            nums.setdefault("seat_distance_ft", v)
+            put("seat_distance_ft", v)
     m = re.search(NUM + r"\s*[x×*]\s*" + NUM, t) or re.search(NUM + r"\s*(?:by|बाय)\s*" + NUM, t)
     if m:
         nums["room_size_sqft"] = float(m.group(1)) * float(m.group(2))
@@ -307,7 +359,8 @@ def understand_text(
     # category
     cat = None
     for c, words in (common.get("category_keywords") or {}).items():
-        if _has(t, words):
+        hit = _has(t, words)
+        if hit and not _negated(t, hit.strip()):  # 'TV nahi, AC chahiye' is an AC
             cat = c
             break
     if cat is None and category is None:  # the product not named and not known yet: read it from the needs
@@ -323,11 +376,11 @@ def understand_text(
     # name: "Shah ji", "Mrs Shah", "शाह जी"
     m = re.search(r"\b([A-Z][a-z]{2,})\s+(?:ji|Ji)\b", raw) or re.search(r"\b(?:Mrs|Mr|Ms)\.?\s+([A-Z][a-z]{2,})", raw)
     if m:
-        u.customer_name = f"{m.group(1)} ji"
+        u.customer_name = clean_customer_name(f"{m.group(1)} ji")  # 'Ignore ji' is no name
     else:
         m = re.search(r"([ऀ-ॿ]{2,})\s+जी", raw)
         if m and m.group(1) not in ("दादा", "दादी", "पिता", "माता"):
-            u.customer_name = f"{m.group(1)} जी"
+            u.customer_name = clean_customer_name(f"{m.group(1)} जी")
 
     u.numbers = extract_numbers(t, cat or category)
     if pack:
@@ -365,7 +418,8 @@ def understand_text(
         "set_reminder",
         "next_step",
     ):
-        if _has(t0, ik.get(intent, [])):
+        hit = _has(t0, ik.get(intent, []))
+        if hit and not (intent in NEGATABLE and _negated(t0, hit)):  # 'not sold', 'sold nahi hua' is not a sale
             intents.append(intent)
     # myths (customer claims)
     myth_pool = packs.all_myths(cat or category)
@@ -385,9 +439,17 @@ def understand_text(
     if u.objection == "cheaper_online" and u.claim_id == "gen_online_cheaper":
         u.claim_id = None
     # option choice: "B wala", "option B", "B pasand"
-    m = re.search(r"(?:option\s+|ऑप्शन\s*)([abc])\b", t) or re.search(
-        r"\b([abc])\s+(?:wala|vala|wali|pasand|chahiye|lenge|लेंगे|हवा|घेणार|final)", t
-    )
+    m = re.search(r"(?:option\s+|ऑप्शन\s*|पर्याय\s*)([abc])\b", t) or re.search(
+        r"\b([abc])\s+(?:wala|vala|wali|pasand|chahiye|lenge|lega|legi|लेंगे|हवा|घेणार|final|it is|please)", t
+    ) or re.search(r"(?:take|takes|taking|choose|chose|want|wants|pick|picks|go with|le rahe|lenge)\s+(?:option\s+)?([abc])\b", t) \
+        or re.fullmatch(r"\s*([abc])\s*[.!]?\s*", t)  # 'B', 'she will take B', 'go with C'
+    ordinal = re.search(r"(?:option\s+|ऑप्शन\s*)([123])\b|\b(pehla|pehle wala|first|doosra|dusra|second|teesra|tisra|third)"
+                        r"(?:\s+(?:wala|vala|wali|one|option))?\b", t)
+    if not m and ordinal and options_shown:  # 'option 2', 'doosra wala', 'the second one'
+        k = ordinal.group(1) or {"pehla": "1", "pehle wala": "1", "first": "1", "doosra": "2", "dusra": "2",
+                                 "second": "2", "teesra": "3", "tisra": "3", "third": "3"}[ordinal.group(2)]
+        u.option_choice = "ABC"[int(k) - 1]  # type: ignore[assignment]
+        intents.append("choose_option")
     if m and options_shown:
         u.option_choice = m.group(1).upper()  # type: ignore[assignment]
         intents.append("choose_option")

@@ -42,6 +42,25 @@ SAFE_WORDS = {
 }
 
 
+PHONE = re.compile(r"(?:\+?\s?9\s?1[\s-]?)?(?:\d[\s-]?){9}\d")  # a phone number, spaced or not (+91 98200 12345)
+NAMED = re.compile(  # a name said after who they are: 'associate ravi sharma ne', 'naam Ravi', 'my name is …'
+    r"\b(associate|salesman|salesperson|staff|executive|naam|name is|named|called|नाव|नाम)\s+"
+    r"((?:[a-z\u0900-\u097f]+\s?){1,2}?)(?=\s*(?:ne|ka|ki|ke|ji|ने|चा|ची|चे|ला|,|\.|$|\s(?:ne|ka|ki|ke)\b))", re.I)
+
+
+def scrub_pii(text: str | None) -> str | None:
+    """No person's name or phone number is kept (the visit log promises it): numbers become '[number]', a name said
+    after 'associate' / 'naam' becomes 'associate', and capitalised names too."""
+    if not text:
+        return text
+    from chanakya.truth.fmt import latin_digits
+
+    t = PHONE.sub("[number]", latin_digits(text))
+    t = NAMED.sub(lambda m: m.group(1) if m.group(1).lower() in ("associate", "salesman", "salesperson", "staff",
+                                                                    "executive") else m.group(1) + " [name]", t)
+    return scrub_names(t)
+
+
 def scrub_names(text: str | None) -> str | None:
     if not text:
         return text
@@ -62,8 +81,11 @@ def _merge(old: dict, new: VisitEntry) -> dict:
                 s["evidence"] = scrub_names(s.get("evidence"))
                 cur[s["step"]] = s
             out["steps"] = list(cur.values())
+        elif k == "notes" and v:  # every note of the visit, kept together, never a name or a number
+            prev = out.get("notes") or ""
+            out[k] = (prev + " | " + scrub_pii(v) if prev else scrub_pii(v))[:1000]
         elif v not in (None, [], ""):
-            out[k] = scrub_names(v) if isinstance(v, str) and k in ("best_sentence", "worst_sentence", "notes") else v
+            out[k] = scrub_pii(v) if isinstance(v, str) and k in ("best_sentence", "worst_sentence") else v
     return out
 
 
@@ -129,20 +151,41 @@ async def start(ctx: SkillContext) -> Reply:
     return ctx.reply(info_reply(ctx, ctx.t("visit_start")))
 
 
+NEW_VISIT = re.compile(r"^\s*(new|naya|nayi|nai|new visit|nayi visit|नवीन|नई|नया)\s*$", re.I)
+
+
+def _has_visit(entry: VisitEntry) -> bool:
+    """Did the note tell anything about a visit (a store, a product, what the associate did, a step)?"""
+    d = entry.model_dump()
+    return bool(d.get("steps")) or any(d.get(k) is not None for k in (
+        "store", "scenario", "price_first_by", "minute_first_price", "questions_before_first_product", "demo_shown",
+        "full_cost_given", "would_come_back"))
+
+
 async def on_note(ctx: SkillContext) -> Reply:
     text = ctx.inbound.text or ""
     draft = await repo.visit_draft(ctx.actor_wa_id)
+    if ctx.inbound.type == "text" and NEW_VISIT.match(text):
+        return await start(ctx)  # 'new' / 'naya': a new visit, never a scored note
     if ctx.inbound.type == "text" and GREETING.match(text) and len(text.split()) <= 3:
         return await home(ctx)  # 'namaste' is not a visit
     if draft is None:
         draft = await repo.visit_save(None, ctx.actor_wa_id, {}, "draft")
     audio, amime = None, None
     if ctx.inbound.type == "audio" and ctx.inbound.media_id:
-        audio, amime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
+        try:
+            audio, amime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
+        except Exception:  # an expired or missing media id: ask for the note again, never a crash
+            ctx.ev("media_download_failed", kind="voice")
+            return ctx.reply(info_reply(ctx, ctx.t("media_resend_voice")))
     try:
         entry = await ctx.ai.extract_visit(ctx.inbound.text, audio, mime=amime)
     except AIUnavailable:
         return ctx.reply(info_reply(ctx, ctx.t("voice_retry" if ctx.ai.live else "voice_unavailable")))
+    if not _has_visit(entry):  # 'ok', 'thanks', '👍', the weather: nothing to score, never a 0/14 visit
+        ctx.ev("visit_note_empty")
+        return ctx.reply(info_reply(ctx, ctx.t("visit_too_short"), [Button(id=encode("v", 0, "home", 1),
+                                                                         title=ctx.t("b_visit_home"))]))
     merged = derive_steps(_merge(draft.entry or {}, entry))
     draft = await repo.visit_save(draft.id, ctx.actor_wa_id, merged, "draft")
     ctx.ev("visit_note", log_id=draft.id, steps=len(merged.get("steps") or []))
@@ -271,9 +314,9 @@ async def summary(ctx: SkillContext, to: str | None = None) -> Reply:
     """'Visits so far': the reference's "What the team found" table, from the logged visits, beside the October
     visits (Reliance Digital). For the visitor and, from the menu, the department manager."""
     rows = [r.entry or {} for r in await repo.visits_all(final_only=True)]
-    if not rows:
-        return ctx.reply(info_reply(ctx, ctx.t("visits_none"), [Button(id=encode("v", 0, "new", "1"),
-                                                                         title=ctx.t("b_new_visit"))], to=to))
+    if not rows:  # a 'new visit' button only for the visitor: the manager's voice notes are not visit notes
+        btns = [Button(id=encode("v", 0, "new", "1"), title=ctx.t("b_new_visit"))] if ctx.role == "visitor" else []
+        return ctx.reply(info_reply(ctx, ctx.t("visits_none"), btns, to=to))
     n = len(rows)
     num = ctx.reg.num
     totals = [_total(e)[0] for e in rows]
@@ -349,6 +392,8 @@ def to_csv(rows: list) -> bytes:
 
 async def export(ctx: SkillContext) -> Reply:
     rows = await repo.visits_all(final_only=True)
+    if not rows:  # nothing saved yet: one line, never an empty file
+        return ctx.reply(info_reply(ctx, ctx.t("visit_export_none")))
     data = to_csv(rows)
     mid = await ctx.svc.channel.upload_media(data, "text/csv", "visit_log.csv")
     n = ctx.reg.num(len(rows), "visit:count")

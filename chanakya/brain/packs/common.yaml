@@ -83,7 +83,7 @@ banned_phrases: ["today only", "sirf aaj", "aaj hi", "आज ही", "सिर
 # ---- additions for offline (no-AI) understanding ----
 intent_keywords:
   new_customer: ["naya customer", "new customer", "naye customer", "नया ग्राहक", "नया कस्टमर", "नवीन ग्राहक"]
-  price_asked: ["kitne ka", "kitna hai", "kitne ki", "price kya", "price bata", "daam", "kya rate", "दाम", "कितने का", "कितना है", "किंमत", "किती आहे", "किती ला"]
+  price_asked: ["kitne ka", "kitna hai", "kitne ki", "price kya", "price bata", "price batao", "daam", "kya rate", "rate kya", "rate batao", "what's the price", "what is the price", "how much", "price please", "दाम", "कितने का", "कितना है", "किंमत", "किती आहे", "किती ला"]
   request_options: ["options dikhao", "option dikhao", "show options", "kaunsa le", "ऑप्शन दिखाओ", "पर्याय दाखवा"]
   request_cost: ["poora kharcha", "pura kharcha", "full cost", "total kitna", "पूरा खर्चा", "पूर्ण खर्च"]
   request_offers: ["offer kya", "offers dikhao", "koi offer", "discount kya", "ऑफ़र", "ऑफर काय", "ऑफर्स"]
@@ -93,7 +93,7 @@ intent_keywords:
   sold: ["bik gaya", "sold", "le liya", "order ho gaya", "बिक गया", "विकलं गेलं", "घेतलं"]
   demo_next: ["demo dikhao", "demo karo", "demo kaise", "show the demo", "डेमो दिखाओ", "डेमो दाखवा"]
   request_tryon: ["ghar mein dekho", "ghar mein dikhao", "ghar me dikhao", "try at home", "room mein dikhao", "घर में दिखाओ", "घरात दाखवा"]
-  not_today: ["kal aayenge", "baad mein aayenge", "aaj nahi lenge", "next week aayenge", "come back later", "कल आएंगे", "उद्या येऊ", "नंतर येऊ"]
+  not_today: ["kal aayenge", "kal aaenge", "kal aaynge", "baad mein aayenge", "aaj nahi lenge", "next week aayenge", "come back later", "come back tomorrow", "will come back", "think about it", "soch ke batayenge", "कल आएंगे", "उद्या येऊ", "नंतर येऊ"]
   lost: ["nahi liya", "chala gaya", "nahi lenge", "didn't buy", "नहीं लिया", "घेतलं नाही"]
   request_delivery: ["delivery kab", "kab tak aayega", "delivery date", "डिलीवरी कब", "डिलिव्हरी कधी"]
   request_emi: ["emi pe", "emi par", "on emi", "emi chahiye", "kist pe", "किस्त", "हप्त्यावर"]

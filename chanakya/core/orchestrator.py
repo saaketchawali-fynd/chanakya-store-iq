@@ -9,6 +9,7 @@ from datetime import UTC, datetime
 from chanakya.app import diag
 from chanakya.core import clock, fallback, locks, repo, router
 from chanakya.core.contracts import Event, InboundMessage, OutMessage, Reply, Step
+from chanakya.i18n.lang import t
 from chanakya.log import get_log
 from chanakya.skills.base import SkillContext
 from chanakya.truth.firewall import NumberRegistry
@@ -43,6 +44,26 @@ async def voice_footer(ctx: SkillContext, m) -> None:
     m.footer = m.footer or ctx.t("footer_voice_mgr" if ctx.role == "manager" else "footer_voice_q")
 
 
+DOUBLE_TAP_S = 2.0  # the same button on the same message again within this: a double tap, not a second answer
+
+
+def _repeat_key(msg: InboundMessage) -> str | None:
+    """What makes two inbound messages 'the same' for the double-tap guard: a tap of one button on one message, or
+    one text (a voice note, a photo is never the same as another)."""
+    if msg.type in ("button_reply", "list_reply", "template_button") and msg.reply_id:
+        return f"tap:{msg.reply_id}:{msg.context_message_id or ''}"
+    if msg.type == "text" and (msg.text or "").strip():
+        return "text:" + " ".join(msg.text.lower().split())
+    return None
+
+
+async def _to_customer(ctx: SkillContext, m) -> bool:
+    """Is this message going to a customer's phone (not a staff phone)?"""
+    if m.to == ctx.actor_wa_id:
+        return ctx.role in ("customer", "unknown")
+    return await repo.staff_by_wa(m.to) is None
+
+
 class Orchestrator:
     def __init__(self, svc, scheduler=None):
         self.svc = svc
@@ -50,6 +71,8 @@ class Orchestrator:
         self._tasks: set[asyncio.Task] = set()
         svc.orchestrator = self
         self._first: dict[str, dict] = {}  # inbound message id → {ctx, done, hold_ms}: the first-reply watchdog
+        self._inflight: dict[str, dict[str, int]] = {}  # sender → {repeat key: messages queued or running}
+        self._last_tap: dict[str, tuple[str, datetime, float]] = {}  # sender → (key, tap time, answered at): last tap
 
     def spawn(self, coro) -> asyncio.Task:
         t = asyncio.create_task(coro)
@@ -65,11 +88,21 @@ class Orchestrator:
 
     async def handle_inbound(self, msg: InboundMessage) -> None:
         t0 = msg.received_at
-        if not await repo.message_insert(
-            msg.wa_message_id, "in", msg.from_wa_id, msg.type, msg.model_dump(mode="json", exclude={"received_at"})
-        ):
+        payload = msg.model_dump(mode="json", exclude={"received_at"})
+        if msg.text and msg.from_wa_id == self.svc.settings.visitor_phone:  # the visit log keeps no names or numbers
+            from chanakya.skills.visitlog import scrub_pii
+
+            payload["text"] = scrub_pii(msg.text)
+        if not await repo.message_insert(msg.wa_message_id, "in", msg.from_wa_id, msg.type, payload):
             log.info("duplicate", wamid=msg.wa_message_id)
             return
+        key, who = _repeat_key(msg), msg.from_wa_id
+        if key and self._is_repeat(who, key, msg.timestamp):
+            log.info("double_tap_ignored", what=key.split(":", 1)[0])
+            return
+        if key:
+            mine = self._inflight.setdefault(who, {})
+            mine[key] = mine.get(key, 0) + 1
         self.spawn(self.svc.channel.mark_read_typing(msg.wa_message_id))
         holder: dict = {"ctx": None, "done": asyncio.Event(), "hold_ms": None}
         self._first[msg.wa_message_id] = holder
@@ -79,6 +112,33 @@ class Orchestrator:
         finally:
             holder["done"].set()
             self._first.pop(msg.wa_message_id, None)
+            if key:
+                self._release(who, key, msg.timestamp)
+
+    def _is_repeat(self, who: str, key: str, at: datetime) -> bool:
+        """The same tap or text from the same person while the first is still queued or running (6 Nov 2026: two
+        quick taps sent the same question twice, 'new' twice made C1 and C2), or the same button on the same message
+        tapped again within DOUBLE_TAP_S of the first (by WhatsApp's own tap times) and arriving just after it was
+        answered. Each person's messages still run one at a time (locks)."""
+        if self._inflight.get(who, {}).get(key):
+            return True
+        last = self._last_tap.get(who)
+        if not (key.startswith("tap:") and last and last[0] == key):
+            return False
+        try:
+            return abs((at - last[1]).total_seconds()) <= DOUBLE_TAP_S and time.monotonic() - last[2] < DOUBLE_TAP_S
+        except TypeError:  # a timestamp without a zone: not comparable, so not a double tap
+            return False
+
+    def _release(self, who: str, key: str, at: datetime) -> None:
+        mine = self._inflight.get(who, {})
+        mine[key] = mine.get(key, 1) - 1
+        if mine[key] <= 0:
+            mine.pop(key, None)
+        if not mine:
+            self._inflight.pop(who, None)
+        if key.startswith("tap:"):
+            self._last_tap[who] = (key, at, time.monotonic())
 
     async def _first_reply_watchdog(self, msg: InboundMessage, holder: dict, t0: datetime | None) -> None:
         """The contest's floor rule: the first reply in under 5 seconds. When nothing has gone back by
@@ -95,8 +155,15 @@ class Orchestrator:
                 or not ctx.staff.lang_set or holder["done"].is_set():
             return
         key = {"audio": "hold_voice", "image": "hold_photo"}.get(msg.type, "hold_wait")
-        try:
-            await self.svc.deliver(OutMessage(to=msg.from_wa_id, kind="text", body=ctx.t(key)))
+        try:  # the same path as every reply: the voice footer, then the checks (never sent around them)
+            reg = NumberRegistry()
+            m = OutMessage(to=msg.from_wa_id, kind="text", body=t(key, ctx.lang, reg))
+            await voice_footer(ctx, m)
+            reg.merge(ctx.reg)
+            out = self.svc.validate(m, reg, None, ctx.lang, None, ctx.session, drop_blocked=True)
+            if out is None or holder["done"].is_set():
+                return
+            await self.svc.deliver(out)
         except Exception:
             log.warning("hold_failed")
             return
@@ -128,7 +195,10 @@ class Orchestrator:
             except Exception:
                 log.exception("skill_failed", wa_id=msg.from_wa_id, type=msg.type)
                 lang = ctx.lang if ctx else "hi"
-                reply = Reply(messages=[fallback.safe_reply(msg.from_wa_id, lang, ctx.session if ctx else None)])
+                reply = Reply(messages=[fallback.role_reply(msg.from_wa_id, lang, ctx.role if ctx else None)
+                                        or fallback.safe_reply(msg.from_wa_id, lang, ctx.session if ctx else None)])
+                if ctx is not None and ctx.role in ("customer", "unknown"):
+                    reply = Reply()  # the staff fallback (staff buttons) never goes to a customer's phone
                 if ctx is None:
                     for m in reply.messages:
                         await self.svc.deliver(m)
@@ -149,7 +219,11 @@ class Orchestrator:
                 if ctx.session and ctx.role == "associate":
                     ctx.session.extra["last_touch"] = ctx.now.isoformat()
                 await voice_footer(ctx, m)
-                out = self.svc.validate(m, ctx.reg, home, lang, ctx.asking, ctx.session)
+                out = self.svc.validate(m, ctx.reg, home, lang, ctx.asking, ctx.session,
+                                        drop_blocked=await _to_customer(ctx, m))
+                if out is None:  # blocked on its way to the customer: nothing to them, the associate is told
+                    await self._customer_blocked(ctx)
+                    continue
                 if holder and first and m.to == ctx.actor_wa_id and out.card is None:
                     holder["done"].set()  # a plain message is on its way now: no holding line
                 await self.svc.deliver(out)
@@ -216,6 +290,19 @@ class Orchestrator:
         for job in reply.background:
             if ctx.session:
                 self.spawn(self.run_job(job, ctx.session.id, ctx.session.associate_wa_id))
+
+    async def _customer_blocked(self, ctx: SkillContext) -> None:
+        """A message to the customer's phone failed the checks: tell the associate it did not go (their language)."""
+        s = ctx.session
+        to = s.associate_wa_id if s else (ctx.actor_wa_id if ctx.role == "associate" else None)
+        if not to:
+            return
+        st = ctx.staff if ctx.staff and ctx.staff.wa_id == to else await repo.staff_by_wa(to)
+        lang = (st.lang if st else None) or "en"
+        try:
+            await self.svc.send_checked(OutMessage(to=to, kind="text", body=t("cust_msg_blocked", lang)), lang=lang)
+        except Exception:
+            log.warning("blocked_notice_failed")
 
     async def run_job(self, job: str, session_id: str, associate_wa_id: str) -> None:
         from chanakya.skills import tryon_flow

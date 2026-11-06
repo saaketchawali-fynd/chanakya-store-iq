@@ -309,12 +309,10 @@ class FactsService:
         return None
 
     async def offers(self, category: str, on_date: date) -> list[Offer]:
-        return [
-            o for o in self.snap.offers if category in (o.categories or []) and o.valid_from <= on_date <= o.valid_to
-        ]
+        return [o for o in self.snap.offers if category in (o.categories or []) and o.live(on_date)]
 
     async def all_offers(self, on_date: date) -> list[Offer]:
-        return [o for o in self.snap.offers if o.valid_from <= on_date <= o.valid_to]
+        return [o for o in self.snap.offers if o.live(on_date)]
 
     async def finance(self, category: str) -> list[FinancePlan]:
         return [f for f in self.snap.finance if category in (f.categories or [])]

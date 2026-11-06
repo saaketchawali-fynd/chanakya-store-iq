@@ -146,7 +146,7 @@ def live_offers(ctx: SkillContext, dept: str) -> list:
     rows = []
     for o in ctx.facts.snap.offers:
         cats = o.categories or []
-        if not (o.valid_from <= d <= o.valid_to) or (dept not in cats and not (dept == "tv" and "soundbar" in cats)):
+        if not o.live(d) or (dept not in cats and not (dept == "tv" and "soundbar" in cats)):
             continue
         if any(k.startswith("with_tv") for k in (o.filter or {})):
             continue
@@ -249,10 +249,13 @@ async def brief(ctx: SkillContext, dept: str | None = None) -> Reply:
     from today's data, then one button: today's clip (and another product)."""
     staff = ctx.staff
     msgs: list[OutMessage] = []
+    if dept in ctx.packs.packs:
+        await repo.setting_set(f"brief_pick:{ctx.actor_wa_id}", None)
     if dept not in ctx.packs.packs:
         if staff.last_brief_date is None and staff.streak == 0 and not ctx.scratch.get("welcomed"):
             msgs.append(info_reply(ctx, ctx.t("welcome_new_staff", name=staff.name)))
         msgs.append(picker(ctx))
+        await repo.setting_set(f"brief_pick:{ctx.actor_wa_id}", str(ctx.now.date()))  # 'tv' typed next = its brief
         ctx.ev("brief_picker")
         return ctx.reply(*msgs)
     d = today()

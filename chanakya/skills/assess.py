@@ -66,8 +66,26 @@ async def set_customer_lang(ctx: SkillContext, lang: str) -> Reply:
     return ctx.reply(msg)
 
 
+# what a home can be: a number outside these is a mishearing (or a model's guess), never stored
+NUMBER_BOUNDS = {"budget_inr": (1000, 5_000_000), "seat_distance_ft": (2, 40), "room_size_sqft": (30, 2000),
+                 "family_size": (1, 20), "wall_width_ft": (3, 60), "hours_per_day": (0.5, 24),
+                 "niche_width_cm": (30, 300), "pipe_run_ft": (1, 100), "floor_number": (0, 100)}
+
+
+def _sane_numbers(ctx: SkillContext, u: Understanding) -> None:
+    keep = []
+    for n in u.numbers:
+        lo, hi = NUMBER_BOUNDS.get(n.name, (float("-inf"), float("inf")))
+        if n.value is not None and lo <= float(n.value) <= hi:
+            keep.append(n)
+        else:
+            ctx.ev("number_out_of_range", name=n.name, value=n.value)
+    u.numbers = keep
+
+
 def apply_understanding(ctx: SkillContext, u: Understanding, source: str = "voice") -> int:
     """Apply slots/numbers to the Home Card. Returns the number of new slot values."""
+    _sane_numbers(ctx, u)  # ₹1, ₹10 crore, 500 ft, 0 people: not a home, not stored
     s = ctx.session
     home = s.home
     if u.category and (home.category is None or (home.category != u.category and not home.slots)):
@@ -206,6 +224,21 @@ async def on_info(
     if n_new == 0 and not u.customer_request and ctx.x.get("readback_shown") and not ctx.x.get("readback_done") \
             and not s.shortlist and C.pick_next_slot(ctx) is None:
         return ctx.reply(C.readback_nudge(ctx))  # nothing new: don't resend the read-back and its cards
+    budget_said = any(n.name == "budget_inr" for n in u.numbers) and s.home.start_level_source != "none"
+    if s.shortlist and (n_new or budget_said) and not s.chosen_sku and source != "tap":
+        # a fact changed after the options ('doori 6 feet hai', 'budget actually 80 hazaar'): say what was heard and
+        # offer the options again for it (the associate decides), never silently keep the old ones
+        m = info_reply(ctx, ctx.t("refresh_options_ask"), [ctx.b("b_options_refresh", ctx.sid("options")),
+                                                         ctx.b("b_demo_next", ctx.sid("demo")),
+                                                         ctx.b("b_status", encode("g", "status"))])
+        m.footer = noted_footer(ctx, source) or m.footer
+        return ctx.reply(m)
+    if s.shortlist and not n_new and not u.customer_request:
+        # the options are out and nothing new was understood ('B', 'LG ka dikhao', 'kal aayenge'): the next step for
+        # where the customer is, with what was heard, never the first home question again
+        m = C.resume(ctx)
+        m.footer = noted_footer(ctx, source) or m.footer
+        return ctx.reply(m)
     msgs = []
     if u.customer_request and not s.extra.get("need_validated"):
         s.extra["need_validated"] = True

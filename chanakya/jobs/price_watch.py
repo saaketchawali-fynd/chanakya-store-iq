@@ -21,7 +21,7 @@ MIN_DROP = 0.01  # a drop of at least 1% (rounding noise is not news)
 
 def _live_offers(facts, p, today) -> list[str]:
     return sorted(o.id for o in facts.snap.offers
-                  if p.category in (o.categories or []) and o.valid_from <= today <= o.valid_to
+                  if p.category in (o.categories or []) and o.live(today)
                   and (o.min_amount or 0) <= p.price and not any(k.startswith("with_tv") for k in (o.filter or {})))
 
 

@@ -45,10 +45,16 @@ TAREEKH = ("tareekh", "tarikh", "tareek", "tarik", "date", "तारीख", "�
 _SUFFIX = re.compile(r"^(\d{1,2})(?:st|nd|rd|th)$")
 
 
+RANGE = ("week", "hafte", "hafta", "hafton", "month", "mahina", "mahine", "year", "saal", "sal", "आठवड", "हफ्त", "हफ़्त",
+         "महिन", "महीन", "वर्ष", "साल")
+NEGATE = {"nahi", "nahin", "not", "na", "नाही", "नहीं", "नको"}
+
+
 @dataclass(frozen=True)
 class AskedDay:
-    day: date
+    day: date | None
     future: bool = False
+    bad: str | None = None  # 'invalid' (a date that does not exist: 31 Feb) | 'range' (a week, a month, a year)
 
 
 def _month(tok: str) -> int | None:
@@ -96,10 +102,22 @@ def _no_year(m: int, d: int, today: date) -> AskedDay | None:
 
 
 def parse_day(text: str, today: date) -> AskedDay | None:
-    """The day asked about, or None when no day was said."""
+    """The day asked about, or None when no day was said. 'kal ka nahi, aaj ka' → today (what follows a 'not');
+    '31 Feb' → bad='invalid'; 'last week' / 'is mahine' → bad='range' (one day at a time)."""
     toks = _tokens(text)
     if not toks:
         return None
+    neg = [i for i, t in enumerate(toks) if t in NEGATE]
+    if neg and neg[-1] < len(toks) - 1:  # what was said after the 'not' wins
+        tail = _parse(toks[neg[-1] + 1:], today)
+        if tail is not None:
+            return tail
+    return _parse(toks, today)
+
+
+def _parse(toks: list[str], today: date) -> AskedDay | None:
+    if any(t.startswith(r) if not r.isascii() else t == r or t == r + "s" for t in toks for r in RANGE):
+        return AskedDay(None, bad="range")
     joined = " ".join(toks)
     m = re.search(r"(?<!\d)(\d{4})-(\d{1,2})-(\d{1,2})(?!\d)", joined)  # 2026-11-03
     if m:
@@ -133,9 +151,11 @@ def parse_day(text: str, today: date) -> AskedDay | None:
             x = _valid(year, mo, d)
             if x:
                 return AskedDay(x, x > today)
+            return AskedDay(None, bad="invalid")
         got = _no_year(mo, d, today)
         if got:
             return got
+        return AskedDay(None, bad="invalid")  # '31 Feb': no such day
     for i, t in enumerate(toks):  # '3 tareekh': this month's 3rd, or last month's when it is still ahead
         if any(t == w or (not w.isascii() and t.startswith(w[:4])) for w in TAREEKH) and i > 0 and toks[i - 1].isdigit():
             d = int(toks[i - 1])

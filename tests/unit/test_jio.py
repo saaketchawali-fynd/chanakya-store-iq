@@ -55,7 +55,9 @@ def test_categories_from_the_backend():
     cats = {}
     for r in mapped():
         cats[r["category"]] = cats.get(r["category"], 0) + 1
-    assert cats == {"tv": 5, "ac": 1, "wm": 5, "fridge": 5, "laptop": 5}
+    # 4 washing machines: the "Voltas Beko" listed at ₹30,000 against an MRP of ₹2,80,000 (with no offer_price) has a
+    # stand-in, not a price (6 Nov 2026), so it is not sellable
+    assert cats == {"tv": 5, "ac": 1, "wm": 4, "fridge": 5, "laptop": 5}
 
 
 def test_product_facts_are_copied_not_invented():
@@ -99,7 +101,9 @@ def test_promotions_only_with_stated_amounts():
     rows = map_promotions({"491297651": [PROMO]}, {"491297651": "tv"}, TODAY)
     assert len(rows) == 1
     o = rows[0]
-    assert o["title"]["en"] == "Flat 10% off" and o["valid_to"] == date(2026, 11, 30)
+    # valid till 2026-11-30T23:59:59Z = 05:29 on 1 Dec in India: the date is India's, the exact end is kept too
+    assert o["title"]["en"] == "Flat 10% off" and o["valid_to"] == date(2026, 12, 1)
+    assert o["filter"]["live_to"].startswith("2026-12-01T05:29:59")
     assert (o["pct"], o["max_discount"], o["flat"]) == (10.0, 3000, None) and o["filter"]["skus"] == ["491297651"]
     vague = dict(PROMO, id="P-2", discount_rules=[{"discount_type": "bogo"}])
     o2 = map_promotions({"x": [vague]}, {"x": "tv"}, TODAY)[0]
@@ -149,7 +153,7 @@ async def test_sync_loads_only_backend_data(tmp_path, jio_backend):
     try:
         assert h.rt.facts.snap.products == {}  # live mode starts empty: no sample data
         st = await jio_sync.sync(h.rt.settings, h.rt.facts)
-        assert st["last_error"] is None and st["counts"]["products"] == 21
+        assert st["last_error"] is None and st["counts"]["products"] == 20  # the stand-in-priced washer is not sellable
         snap = h.rt.facts.snap
         assert all((p.info or {}).get("source") == "jio" for p in snap.products.values())
         assert not snap.charges and not snap.finance and not snap.exchange  # no source in the documented API
@@ -231,6 +235,9 @@ def test_price_is_the_products_own_selling_price_not_a_warehouse_stand_in():
     for it in items:
         e, m = it["price"]["effective"], it["price"]["marked"]
         eff, mrp, _ = jio_map.prices(it)
+        if eff is None:  # only a stand-in in the listing (and no offer_price that agrees with the MRP): no price
+            assert e["max"] < 0.25 * m["max"] and not (it.get("_custom_json") or {}).get("offer_price"), it["name"]
+            continue
         assert eff in {e["min"], e["max"], (it.get("_custom_json") or {}).get("offer_price")}  # never computed
         assert mrp in {m["min"], m["max"]}
         assert eff >= 0.25 * m["max"] or eff == e["max"]  # never a stand-in when a real price is there

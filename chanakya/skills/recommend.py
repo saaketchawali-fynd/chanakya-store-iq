@@ -16,6 +16,13 @@ from chanakya.skills import product_view as PV
 from chanakya.skills.base import SkillContext
 
 
+def _tryon_ok(ctx: SkillContext) -> bool:
+    """'Ghar mein dekho' only when a product in play can be drawn to scale (its size is in the data)."""
+    from chanakya.skills.tryon_flow import can_offer
+
+    return can_offer(ctx)
+
+
 def gate_options_reply(ctx: SkillContext) -> Reply:
     n = state.missing_for_options(ctx.session, ctx.pack)
     body = ctx.t("gate_options", n=ctx.reg.num(n, "calc:gate_missing"))
@@ -173,6 +180,19 @@ def _reason(ctx: SkillContext, key: str, lang: str) -> str:
     return fill(tpl, **vals)
 
 
+def _not_in_catalogue(ctx: SkillContext, wants: dict) -> list[str]:
+    """What they asked for that nothing in today's catalogue has: a brand, or a size / panel no product carries."""
+    from chanakya.brain import wants as W
+
+    prods = ctx.facts.products_sync(ctx.pack.category) if ctx.pack else []
+    out = []
+    for k, v in wants.items():
+        if not any(W.meets(p, {k: v}) for p in prods):
+            label = f'{v}"' if k == "size_in" else str(v)
+            out.append(ctx.reg.raw(label, f"note:want:{k}"))
+    return out
+
+
 def note_block(ctx: SkillContext, note: dict) -> str:
     """What the note was understood as, in bullets: the home facts; what they asked for; the TV they have now and
     the wish for something newer; the needs it must meet."""
@@ -187,6 +207,9 @@ def note_block(ctx: SkillContext, note: dict) -> str:
     parts = list(facts[:5])
     if wants:
         parts.append(ctx.t("note_line_wants", what=", ".join(wants)))
+    missing = _not_in_catalogue(ctx, note.get("wants") or {})
+    if missing:  # 'Samsung 55 inch' and no Samsung in today's catalogue: say so first, never a silent swap
+        parts.insert(0, ctx.t("note_not_stocked", what=", ".join(missing)))
     parts += rest
     if asks:
         parts.append(ctx.t("note_line_needs", what=", ".join(asks)))
@@ -363,7 +386,7 @@ async def side_by_side(ctx: SkillContext) -> Reply:
     s = ctx.session
     if len(s.option_labels) < 2:
         return await demo(ctx)
-    if ctx.pack.placeable and await tryon_flow.has_room(ctx):  # their room: draw each one in it, then compare
+    if tryon_flow.can_offer(ctx) and await tryon_flow.has_room(ctx):  # their room: draw each one in it, then compare
         return await tryon_flow.choose(ctx, "cmp", None)
     best = state.best_label(s)
     labs = [best] + [x for x in sorted(s.option_labels) if x != best]
@@ -371,7 +394,7 @@ async def side_by_side(ctx: SkillContext) -> Reply:
     if card is None:
         return await prefer(ctx)
     btns = [ctx.b("b_demo_guide", ctx.sid("demo")),
-            ctx.b("b_tryon", ctx.sid("tryon")) if ctx.pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")),
+            ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_ok(ctx) else ctx.b("b_they_chose", ctx.sid("prefer")),
             ctx.b("b_more_options", ctx.sid("moreopts"))]
     return ctx.reply(info_reply(ctx, sidebyside.summary(ctx, labs), btns, card=card))
 
@@ -609,7 +632,7 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
     else:  # the next steps with the products (user, 4 Nov 2026): compare in their home, the demo, or more
         btns = [ctx.b("b_compare_all", ctx.sid("cmpall")) if many else ctx.b("b_demo_guide", ctx.sid("demo")),
                 ctx.b("b_demo_guide", ctx.sid("demo")) if many else (
-                    ctx.b("b_tryon", ctx.sid("tryon")) if pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer"))),
+                    ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_ok(ctx) else ctx.b("b_they_chose", ctx.sid("prefer"))),
                 ctx.b("b_more_needs", ctx.sid("more"))]
     last = info_reply(ctx, "\n".join(blocks), btns)  # the next steps, last, so the buttons sit at the bottom
     if ctx.x.pop("rerank_note", None):
@@ -779,7 +802,7 @@ async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
     ctx.ev("demo_guide_sent", products=len(card.data["products"]) if card else 0)
     btns = [ctx.b("b_shown", ctx.sid("shown")),
             ctx.b("b_compare_all", ctx.sid("cmpall")) if len(s.option_labels) >= 2 else ctx.b("b_they_chose", ctx.sid("prefer")),
-            ctx.b("b_tryon", ctx.sid("tryon")) if ctx.pack.placeable else ctx.b("b_more_needs", ctx.sid("more"))]
+            ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_ok(ctx) else ctx.b("b_more_needs", ctx.sid("more"))]
     msg = info_reply(ctx, body, btns, card=card)
     msg.footer = ctx.t("guide_footer")
     return ctx.reply(msg)
@@ -946,7 +969,7 @@ def _demo_buttons(ctx: SkillContext, has_next: bool) -> list:
     btns = [ctx.b("b_shown", ctx.sid("shown"))]
     if has_next:
         btns.append(ctx.b("b_demo_next_step", ctx.sid("demo2")))
-    btns.append(ctx.b("b_tryon", ctx.sid("tryon")) if ctx.pack.placeable else ctx.b("b_they_chose", ctx.sid("prefer")))
+    btns.append(ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_ok(ctx) else ctx.b("b_they_chose", ctx.sid("prefer")))
     return btns
 
 
@@ -970,7 +993,7 @@ async def prefer(ctx: SkillContext) -> Reply:
             reason = _reason(ctx, role, ctx.lang) if role else ""
         rows.append(ListRow(id=ctx.sid("opt", lab), title=truncate(f"{lab}: {p.model}", 24), description=truncate(reason, 72)))
         ctx.reg.raw(rows[-1].title, f"product:{sku}")
-    if ctx.pack.placeable and len(s.option_labels) >= 2:  # A vs B on their wall, in one picture
+    if _tryon_ok(ctx) and len(s.option_labels) >= 2:  # A vs B on their wall, in one picture
         rows.append(ListRow(id=ctx.sid("abwall"), title=truncate(ctx.t("row_abwall"), 24),
                             description=truncate(ctx.t("row_abwall_d"), 72)))
     if ctx.pack.category == "tv" and P.number(s.home, "seat_distance", ctx.pack):  # how big it feels from the sofa

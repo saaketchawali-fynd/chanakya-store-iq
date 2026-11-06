@@ -97,7 +97,7 @@ async def test_manager_expert_visitlog(h):
     check_floor(out)
     assert out[0].body.startswith("*Floor abhi:*") and "\n*Aaj:*" in out[0].body  # right now, then today
     out = await h.say("digest")
-    assert len(out) == 1 and out[0].card is None and "koi customer nahi tha" in out[0].body  # no one yet: one line
+    assert len(out) == 1 and out[0].card is None and "koi customer nahi" in out[0].body  # no one yet: one line
     h.as_("visitor")
     await h.say("visit")
     out = await h.say(

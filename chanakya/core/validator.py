@@ -188,12 +188,14 @@ def enforce(
     asking: set[str] | None,
     fallback,
 ) -> tuple[OutMessage, list[Violation]]:
-    """Returns the message to send (auto-fixed, or the fallback) and the violations found."""
+    """Returns the message to send (auto-fixed, or the fallback) and the violations found. A fallback of None means
+    nothing is sent (a message to the customer's phone is never swapped for a staff fallback)."""
     c = check(m, reg, home, lang, banned, asking)
     for v in c.violations:
         log.warning("validator_violation", kind=v.kind, detail=v.detail)
     if c.fatal:
         fb = fallback()
-        fb.to = m.to
+        if fb is not None:
+            fb.to = m.to
         return fb, c.violations
     return c.msg, c.violations

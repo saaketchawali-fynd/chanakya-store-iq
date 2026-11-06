@@ -336,17 +336,22 @@ def comfort_range(ctx: SkillContext, footer: str | None = None) -> OutMessage:
 READBACK_MAX = 3  # said aloud: the three facts that decide the product (the Home Card shows them all)
 
 
-def asked_for(ctx: SkillContext, lang: str | None = None) -> list[tuple[str, str]]:
+def asked_for(ctx: SkillContext, lang: str | None = None, p=None) -> list[tuple[str, str]]:
     """What the customer asked for beyond the fixed questions: the data questions' answers (including 'any is
-    fine') and explicit asks from a note ('55 inch Sony'), as (label, value) in the order they were said."""
+    fine') and explicit asks from a note ('55 inch Sony'), as (label, value) in the order they were said. With a
+    product `p`: only the asks this product meets (a page never says 'OLED' for an LED TV)."""
     from chanakya.brain import data_questions as DQ
+    from chanakya.brain import wants as W
     from chanakya.truth import fmt
 
     s = ctx.session
     lang = lang or ctx.lang
     wants = s.extra.get("wants") or {}
+    met = set(W.meets(p, wants)) if p is not None else set(wants)
     out = []
     for key, v in wants.items():
+        if key not in met:
+            continue
         if key == "size_in":
             val = f'{fmt.num(v)}"'
         elif isinstance(v, (int, float)) and not isinstance(v, bool) and key in ("ton", "capacity_kg", "capacity_l", "ram_gb"):
@@ -632,3 +637,13 @@ def value_title(sd, value: str, lang: str) -> str:
     """A slot value in this language. Hindi is Roman Hinglish everywhere the associate reads it, the lines they say
     to a Hindi-speaking customer included (user, 5 Nov 2026)."""
     return sd.value_title(value, lang)
+
+
+def media_resend(ctx: SkillContext, kind: str):
+    """A voice note or photo WhatsApp could not hand over (an expired or missing media id): one line asking for it
+    again, in the associate's language, never a crash (6 Nov 2026)."""
+    ctx.ev("media_download_failed", kind=kind)
+    first = ctx.b("b_next_q", ctx.sid("go")) if ctx.session else ctx.b("b_new_customer", encode("g", "new"))
+    msg = info_reply(ctx, ctx.t("media_resend_voice" if kind == "voice" else "media_resend_photo"),
+                     [first, ctx.b("b_status", encode("g", "status"))])
+    return ctx.reply(msg)

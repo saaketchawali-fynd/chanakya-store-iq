@@ -82,7 +82,7 @@ READ_IMAGE_SYSTEM = """You read photos sent by a store associate. Decide the kin
 Return JSON only."""
 
 VISIT_SYSTEM = """Extract a store-visit log entry from a visitor's voice note about how a store associate served them
-(they visited as a customer). Never record any person's name; say 'the associate'. Use only what was said; leave a
+(they visited as a customer). Never record any person's name or phone number; say 'the associate'. Use only what was said; leave a
 field null and leave a step out when the note does not say. The note may mix Hindi, Marathi and English.
 
 Score each step 0-2 ONLY when the note gives evidence (put a short quote or paraphrase in evidence, no names):

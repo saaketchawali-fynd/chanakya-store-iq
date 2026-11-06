@@ -180,6 +180,8 @@ async def dispatch(ctx: SkillContext) -> Reply:
         return await staff_name.change(ctx, arg)
     if ctx.role == "associate" and ctx.staff and staff_name.needs_name(ctx.staff) and name not in ("role", "clock", "reset"):
         return await staff_name.capture(ctx)  # who is this? asked once, after the language
+    if name in ("exit", "restart") and ctx.role in ("manager", "expert", "visitor"):
+        return await _role_help(ctx, cancel=name == "exit")  # their own home: never the associate's customer controls
     if name in ("exit", "restart") and ctx.role != "associate":
         return await (flowctl.exit_ask(ctx) if name == "exit" else flowctl.restart_ask(ctx))
     if name in ("role", "clock", "lang") or (name == "reset" and ctx.svc.settings.demo_mode):
@@ -189,7 +191,11 @@ async def dispatch(ctx: SkillContext) -> Reply:
     if msg.type in ("button_reply", "list_reply", "template_button"):
         bid = decode(msg.reply_id)
         if bid and bid.scope == "m":
-            return await manager_button(ctx, bid)
+            try:
+                return await manager_button(ctx, bid)
+            except (ValueError, TypeError, AttributeError):  # a malformed or stale button id: the menu, never a crash
+                log.warning("bad_manager_button", bid=msg.reply_id)
+                return manager.menu(ctx)
         if bid and bid.scope == "x":
             return await expert.expert_button(ctx, bid.get(0), bid.get(1))
         if bid and bid.scope == "v":
@@ -215,7 +221,9 @@ async def dispatch(ctx: SkillContext) -> Reply:
             return manager.menu(ctx)  # 'menu', 'help': the menu itself, never "Heard: menu"
         if msg.type == "audio" or (msg.type == "text" and name is None):
             return await manager.by_voice(ctx)
-    if ctx.role == "expert" and msg.type in ("text", "audio") and name is None:
+    answering = ctx.role == "expert" and msg.type == "text" and name not in (None, "help") and \
+        bool(await repo.setting_get(f"expert_answering:{ctx.actor_wa_id}"))  # 'done…', 'Expert opinion: …' after 'I'll answer'
+    if ctx.role == "expert" and msg.type in ("text", "audio") and (name is None or answering):
         return await expert.expert_message(ctx)
     if ctx.role == "visitor":
         if name == "visit":
@@ -231,10 +239,14 @@ async def dispatch(ctx: SkillContext) -> Reply:
     return await dispatch_associate(ctx, name, arg)
 
 
-async def _role_help(ctx: SkillContext) -> Reply:
+async def _role_help(ctx: SkillContext, cancel: bool = False) -> Reply:
     if ctx.role == "manager":
         return manager.menu(ctx)
     if ctx.role == "visitor":
+        if cancel:  # 'cancel' mid-visit: the unsaved draft is dropped
+            d = await repo.visit_draft(ctx.actor_wa_id)
+            if d is not None:
+                await repo.visit_save(d.id, ctx.actor_wa_id, d.entry or {}, "discarded")
         return await visitlog.home(ctx)
     return await expert.home(ctx)
 
@@ -804,7 +816,12 @@ async def _on_speech(ctx: SkillContext) -> Reply:
             return r
     audio, amime = None, None
     if msg.type == "audio" and msg.media_id:
-        audio, amime = await ctx.svc.channel.download_media(msg.media_id)
+        try:
+            audio, amime = await ctx.svc.channel.download_media(msg.media_id)
+        except Exception:  # an expired / missing media id: ask for the note again, never a crash
+            from chanakya.skills.common import media_resend
+
+            return media_resend(ctx, "voice")
     hint = None
     if s is None or s.home.category is None:  # product not known yet: which one do the needs point to?
         words = text
@@ -849,8 +866,12 @@ async def _on_speech(ctx: SkillContext) -> Reply:
         return await close.no_invented_discount(ctx)
     # 1. new customer
     if s is None:
-        if not (u.slots or u.numbers or u.intents and set(u.intents) - {"other"}):
-            return await _fallback(ctx)
+        if u.category and await repo.setting_get(f"brief_pick:{ctx.actor_wa_id}") == str(ctx.now.date()) \
+                and len((text or "").split()) <= 2:  # 'tv' typed at the shift's product list: that product's brief
+            await repo.setting_set(f"brief_pick:{ctx.actor_wa_id}", None)
+            return await brief.brief(ctx, u.category)
+        if not (u.slots or u.numbers or u.category or u.intents and set(u.intents) - {"other"}):
+            return await _fallback(ctx)  # 'customer ko TV chahiye' starts a TV customer; only nothing at all falls back
         await assess.new_session(ctx, customer_lang=u.customer_language or ctx.lang, ask_lang=False)
         s = ctx.session
         if u.category:
@@ -873,8 +894,14 @@ async def _on_speech(ctx: SkillContext) -> Reply:
             return await complete.show_cost(ctx, resend=True)  # the full cost they already saw
         if s.shortlist and state.price_gate_open(s, ctx.pack):
             return await recommend.prefer(ctx)  # which one? then its full cost
+        scanned = ctx.facts.product_sync(s.extra.get("label_scanned")) if s.extra.get("label_scanned") else None
+        if scanned is not None and not s.shortlist:  # 'kitne ka hai?' right after a label: that product's own price
+            src = scanned.price_source
+            body = ctx.t("label_price", name=ctx.reg.raw(scanned.model, f"product:{scanned.sku}"), price=ctx.reg.inr(scanned.price, src),
+                         mrp=ctx.reg.inr(scanned.mrp, src))
+            return ctx.reply(info_reply(ctx, body, [ctx.b("b_next_q", ctx.sid("go")), ctx.b("b_compare", ctx.sid("compare"))]))
         return await validate.price_rescue(ctx)
-    if u.claim_id:
+    if u.claim_id and validate.known_claim(ctx, u.claim_id):  # an id not in the packs is no claim at all
         return await validate.myth(ctx, u.claim_id)
     if u.objection:
         return await close.objection(ctx, u.objection)
@@ -965,7 +992,7 @@ async def retry_voice(svc, msg: InboundMessage, audio: bytes, mime: str | None, 
         await svc.orchestrator.handle_inbound(msg.model_copy(update={"wa_message_id": msg.wa_message_id + RETRY_TAG}))
         return
     diag.bump("voice_retry_gave_up")
-    await svc.deliver(OutMessage(to=msg.from_wa_id, kind="text", body=tr("voice_failed_final", lang)))
+    await svc.send_checked(OutMessage(to=msg.from_wa_id, kind="text", body=tr("voice_failed_final", lang)), lang=lang)
 
 
 async def voice_step(ctx: SkillContext, u, intents: set) -> Reply | None:
@@ -1005,7 +1032,12 @@ async def voice_step(ctx: SkillContext, u, intents: set) -> Reply | None:
 async def on_image(ctx: SkillContext) -> Reply:
     msg = ctx.inbound
     s = ctx.session
-    data, mime = await ctx.svc.channel.download_media(msg.media_id)
+    try:
+        data, mime = await ctx.svc.channel.download_media(msg.media_id)
+    except Exception:  # an expired / missing media id: ask for the photo again, never a crash
+        from chanakya.skills.common import media_resend
+
+        return media_resend(ctx, "photo")
     fname = ctx.svc.media_name(msg.media_id)
     if s is None:
         await assess.new_session(ctx, ask_lang=False)

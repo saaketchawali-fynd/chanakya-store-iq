@@ -104,7 +104,7 @@ def points(ctx: SkillContext, p, lang: str, n: int = 3) -> list[dict]:
     add_hl(False, n)  # the product's own highlights that answer their needs (live data has few spec benefits)
     from chanakya.skills.common import asked_for
 
-    for lab, val in asked_for(ctx, lang):  # what they asked for about the product itself (picture type, brand …)
+    for lab, val in asked_for(ctx, lang, p):  # what they asked for that THIS product has (picture type, brand …)
         if len(out) >= n + 2:
             break
         out.append({"text": f"{lab}: {val}", "proof": None, "kind": "asked", "icon": "target"})  # 'Brand: Arka'

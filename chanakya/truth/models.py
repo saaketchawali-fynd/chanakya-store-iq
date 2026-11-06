@@ -105,6 +105,29 @@ class Offer(_Ts, Base):
     valid_to: Mapped[date] = mapped_column(Date)
     with_emi: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    def live(self, on: date, at: datetime | None = None) -> bool:
+        """Is this offer on, on this date? For today, to the minute when the backend gave exact times
+        (`filter.live_from` / `live_to`, Jio promotions in Indian time): an offer ending at 10:00 is not shown at
+        11:00, one starting tomorrow morning is not applied today (6 Nov 2026)."""
+        if not (self.valid_from <= on <= self.valid_to):
+            return False
+        flt = self.filter or {}
+        if not (flt.get("live_from") or flt.get("live_to")):
+            return True
+        from chanakya.core import clock
+
+        at = at or clock.now()
+        if at.date() != on:  # another day: that day as a whole
+            return True
+        try:
+            if flt.get("live_from") and at < datetime.fromisoformat(flt["live_from"]):
+                return False
+            if flt.get("live_to") and at > datetime.fromisoformat(flt["live_to"]):
+                return False
+        except (TypeError, ValueError):
+            return True
+        return True
+
 
 class FinancePlan(_Ts, Base):
     __tablename__ = "finance_plans"

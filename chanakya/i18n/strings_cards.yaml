@@ -61,6 +61,9 @@ visit_more:
   mr: "*आणखी जोडा*\nजे आठवेल ते आणखी एका व्हॉइस नोटमध्ये पाठवा: फीचर्सबद्दल काय सांगितलं, पूर्ण खर्च, ऑफर किंवा फॉलो-अप."
   en: "*Add more*\nSend another voice note with anything you remember: what they said about the features, the full cost, the offer or the follow-up."
 visit_export_one: {hi: "*Visit log:* 1 visit (CSV)", mr: "*भेट लॉग:* 1 भेट (CSV)", en: "*Visit log:* 1 visit (CSV)"}
+visit_export_none: {hi: "*Visit log:* abhi koi saved visit nahi. Pehle ek visit voice note se bhejiye.", mr: "*भेट लॉग:* अजून एकही सेव्ह केलेली भेट नाही. आधी एक भेट व्हॉइस नोटने पाठवा.", en: "*Visit log:* no saved visits yet. Send a visit by voice note first."}
+visit_too_short: {hi: "Isme visit ki koi baat nahi mili. Boliye: kaunsa store, kaunsa product, associate ne kya kiya.", mr: "यात भेटीबद्दल काही सापडलं नाही. सांगा: कोणतं स्टोअर, कोणतं प्रॉडक्ट, असोसिएटने काय केलं.", en: "Nothing about a visit in that. Say: which store, which product, what the associate did."}
+b_visit_home: {hi: "Visit log", mr: "भेट लॉग", en: "Visit log"}
 b_visit_continue: {hi: "Visit jaari rakhein", mr: "भेट सुरू ठेवा", en: "Continue visit"}
 b_visits_sofar: {hi: "Ab tak ki visits", mr: "आत्तापर्यंत भेटी", en: "Visits so far"}
 b_visit_score_0: {hi: "0 · nahi kiya", mr: "0 · नाही", en: "0 · not done"}

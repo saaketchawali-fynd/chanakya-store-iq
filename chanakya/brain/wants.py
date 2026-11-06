@@ -23,9 +23,18 @@ PANELS = (("mini led", "MiniLED"), ("miniled", "MiniLED"), ("oled", "OLED"), ("q
 LOADS = (("front load", "front"), ("front-load", "front"), ("top load", "top"), ("top-load", "top"))
 
 
+# brands a customer may ask for whether or not the store has them today: an ask for one the catalogue lacks is told
+# honestly ('Samsung isn't in today's catalogue'), never silently swapped
+KNOWN_BRANDS = ["Samsung", "LG", "Sony", "Panasonic", "Haier", "Whirlpool", "Voltas", "Daikin", "Godrej", "Bosch", "IFB",
+                "Hitachi", "Lloyd", "Blue Star", "Xiaomi", "Redmi", "OnePlus", "TCL", "Vu", "Acer", "Asus", "HP", "Dell",
+                "Lenovo", "Apple", "Realme", "Toshiba", "Philips", "Onida", "Carrier", "Mitsubishi", "Reconnect",
+                "Kelvinator", "Hisense", "Motorola", "Thomson", "MSI"]
+
+
 def parse(text: str, category: str | None, brands: list[str]) -> dict:
     """{'size_in': 55, 'brand': 'Sony', 'panel': 'OLED', 'ton': 1.5, 'capacity_kg': 7, 'capacity_l': 300,
     'star': 5, 'load': 'front', 'ram_gb': 16} — only what the words say, only keys that fit the category."""
+    brands = list(dict.fromkeys([*(brands or []), *KNOWN_BRANDS]))
     t = " " + " ".join((text or "").lower().split()) + " "
     w: dict = {}
     if category in (None, "tv"):
@@ -110,7 +119,8 @@ WANT_CUE = re.compile(r"chahiye|chaiye|chahte|\bwant|\bneed|\blena\b|leni|lenge|
 NEG = r"(?:nahi|nahin|nai|mat|not|no|don'?t|नहीं|नको|नाही)"
 UPGRADE = re.compile(r"new features?|naye features?|naya feature|latest|upgrade|\bbetter\b|behtar|"
                      r"naya (?:tv|wala|model)|newer|advanced|नए फ़ीचर|नए फीचर|नया|नवीन|नवे|अपग्रेड|अधिक चांगला", re.I)
-SPLIT = re.compile(r"[,.;!?|\n]+|\s(?:aur|but|lekin|par|magar|and|पर|लेकिन|और|आणि|पण)\s", re.I)
+SPLIT = re.compile(r"(?:[,;!?|\n]|(?<!\d)\.|\.(?!\d))+|\s(?:aur|but|lekin|par|magar|and|पर|लेकिन|और|आणि|पण)\s",
+                   re.I)  # '1.5 ton' is one number, never cut at its point
 BARE_TV = re.compile(r"\b(24|28|32|40|42|43|48|50|55|58|65|70|75|85)\b")
 
 

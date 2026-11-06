@@ -112,7 +112,8 @@ async def test_expert_queue_answer_library_reminder(h, lang):
     await h.tap("s:C1:demo")
     out = await h.voice("curve_unknown_spec")
     q_msg = next(m for m in out if m.to == PHONES["expert"])
-    assert "*Product:*" in q_msg.body and "· HDR: " in q_msg.body  # the product's facts from the data, the asked one first
+    # the product asked about (the Pro, not the plain QLED that shares its name) with its facts from the data
+    assert "*Product:* Meru 55\" QLED Pro" in q_msg.body and "Refresh rate: 120 Hz" in q_msg.body
 
     h.as_("expert")
     out = await h.tap(f"g:alang:{lang}")  # the queue, not "no open question"

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import base64
 import io
-import random
+import secrets
 import urllib.parse
 from datetime import datetime, timedelta
 
@@ -67,6 +67,39 @@ def slot_choices(ctx: SkillContext) -> dict[str, tuple[str, object, int, int]]:
     return out
 
 
+TOKEN_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"  # no 0/O or 1/I/L: easy to read off the QR caption and type
+TOKEN_HOURS = 48  # a code nobody has sent within two days is dead; the associate shows a fresh QR
+
+
+def new_token(code: str) -> str:
+    """The opt-in code in the QR ('C1-K7QX9M'): random, not guessable from the session code (6 Nov 2026: 'C1-1234'
+    could be guessed and reused by another number)."""
+    return f"{code}-" + "".join(secrets.choice(TOKEN_CHARS) for _ in range(6))
+
+
+def token_expired(s, now: datetime) -> bool:
+    at = s.extra.get("optin_token_at")
+    if not at:
+        return True
+    return now - datetime.fromisoformat(at) > timedelta(hours=TOKEN_HOURS)
+
+
+async def phone_opted_out(wa_id: str | None) -> bool:
+    """This number said STOP and has not opted in again by itself (QR / the code): never linked from the store's
+    side, on any session (6 Nov 2026: 'Haan, consent' after a STOP re-linked the customer)."""
+    return bool(wa_id) and bool(await repo.setting_get(f"opted_out:{wa_id}"))
+
+
+def opted_out_reply(ctx: SkillContext) -> Reply:
+    """They said STOP: say so, and offer only the QR (only the customer can choose to join again)."""
+    s = ctx.session
+    own = s.extra.get("opted_out") and s.home.customer_name  # this session's customer said it: by name
+    name = ctx.reg.raw(short_name(s.home.customer_name), "card:name") if own else ctx.t("customer_word")
+    ctx.ev("consent_refused_opted_out")
+    return ctx.reply(info_reply(ctx, ctx.t("consent_opted_out", name=name),
+                                [ctx.b("b_qr", ctx.sid("qr")), ctx.b("b_back", ctx.sid("go"))]))
+
+
 async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = False) -> Reply:
     """Consent first (QR), then the Parivaar Card. presale=True: the customer will ask the family before buying —
     the same card goes now (recommendation, full cost, offers), so the sale stays alive at home."""
@@ -75,12 +108,16 @@ async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = F
         ctx.x["presale_parivaar"] = True
     if not s.consent or not s.customer_wa_id:
         ctx.x["pending_parivaar"] = True
+        if s.extra.get("opted_out"):  # this customer said STOP: no 'Haan, consent', only their own QR scan
+            return opted_out_reply(ctx)
         cites = C.known_cites(ctx, ["decider"])
         btns = [
             ctx.b("b_qr", ctx.sid("qr")),
             ctx.b("b_consent_tap", ctx.sid("consent_tap")),
             ctx.b("b_back", ctx.sid("go")),
         ]
+        if await phone_opted_out(ctx.svc.settings.customer_phone):  # the tap's number said STOP: the QR only
+            btns.pop(1)
         say = ctx.pick(ctx.packs.common_line("consent_ask"), ctx.clang)
         why = ctx.t("kyun_consent_note", note=note) if note else ctx.t("kyun_consent")
         if not cites:
@@ -108,8 +145,10 @@ def qr_image(link: str, caption: str) -> bytes:
 
 async def show_qr(ctx: SkillContext) -> Reply:
     s = ctx.session
-    if not s.optin_token:
-        s.optin_token = f"{s.code}-{random.randint(1000, 9999)}"
+    if not s.optin_token or token_expired(s, ctx.now):  # a fresh code: whoever sends it first is this customer
+        s.optin_token = new_token(s.code)
+        s.extra["optin_token_at"] = ctx.now.isoformat()
+        s.extra.pop("optin_wa_id", None)
     settings = ctx.svc.settings
     link = f"https://wa.me/{settings.wa_test_number}?text=" + urllib.parse.quote(f"CHANAKYA {s.optin_token}")
     img = qr_image(link, "Scan -> WhatsApp -> Send")
@@ -127,6 +166,8 @@ async def show_qr(ctx: SkillContext) -> Reply:
 
 async def consent_tap(ctx: SkillContext) -> Reply:
     phone = ctx.svc.settings.customer_phone
+    if ctx.session.extra.get("opted_out") or await phone_opted_out(phone):
+        return opted_out_reply(ctx)  # they said STOP: never re-linked by the store (nor is their STOP a 24 h window)
     last = await repo.last_inbound_at(phone) if phone else None
     if not phone or not last or (ctx.now - last) > timedelta(hours=24):
         r = await show_qr(ctx)
@@ -136,10 +177,17 @@ async def consent_tap(ctx: SkillContext) -> Reply:
 
 
 async def record_consent(ctx: SkillContext, customer_wa_id: str, method: str) -> Reply:
-    """Shared by the QR opt-in (customer role) and the tap fallback. ctx.session is the associate's session."""
+    """Shared by the QR opt-in (customer role) and the tap fallback. ctx.session is the associate's session. Only
+    the customer's own QR / code ('qr') can undo their STOP; the store's tap never does."""
     s = ctx.session
+    if method != "qr" and (s.extra.get("opted_out") or await phone_opted_out(customer_wa_id)):
+        return opted_out_reply(ctx)
+    if method == "qr":  # they chose to join again
+        s.extra.pop("opted_out", None)
+        await repo.setting_set(f"opted_out:{customer_wa_id}", None)
     s.customer_wa_id = customer_wa_id
     s.consent = {"method": method, "at": ctx.now.isoformat(), "customer_wa_id": customer_wa_id}
+    s.extra.setdefault("optin_wa_id", customer_wa_id)  # this number is the session's customer from now on
     ctx.ev("consent_given", method=method)
     staff = await repo.staff_by_wa(s.associate_wa_id)
     alang = staff.lang if staff else "hi"
@@ -362,8 +410,11 @@ async def voice_add(ctx: SkillContext) -> Reply:
 
 async def forward_voice(ctx: SkillContext) -> Reply:
     s = ctx.session
+    try:
+        data, mime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
+    except Exception:  # an expired media id: ask again (still awaited, so the next note goes to the customer)
+        return C.media_resend(ctx, "voice")
     s.awaiting = None
-    data, mime = await ctx.svc.channel.download_media(ctx.inbound.media_id)
     mid = await ctx.svc.channel.upload_media(data, mime.split(";")[0] or "audio/ogg", "voice.ogg")
     return ctx.reply(
         OutMessage(to=s.customer_wa_id, kind="audio", media_id=mid, voice=True),
@@ -407,6 +458,12 @@ async def create_task(ctx: SkillContext, when: str) -> Reply:
 
 
 async def sold(ctx: SkillContext) -> Reply:
+    s = ctx.session
+    if not s.chosen_sku:  # a sale is of a product: which one did they take? (never a sale of nothing)
+        btns = [ctx.b("b_opt_label", ctx.sid("opt", k), label=k) for k in list(s.option_labels)[:3]] or \
+            [ctx.b("b_options", ctx.sid("options"))]
+        ctx.ev("sold_without_product")
+        return ctx.reply(info_reply(ctx, ctx.t("sold_which"), btns))
     ctx.x["outcome"] = "sold"
     if not ctx.x.get("sale_marked"):
         ctx.x["sale_marked"] = True

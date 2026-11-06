@@ -90,9 +90,41 @@ def _to_jpeg(data: bytes, max_side: int = 1600) -> bytes:
         return data
 
 
+def drawable(p) -> bool:
+    """Can this product be drawn to true scale: its width and height are in the data (a TV's from its screen
+    size). Without them there is no honest picture, whatever the photo (6 Nov 2026)."""
+    if p is None or p.category not in PLACEABLE:
+        return False
+    w, h = _dims_mm(p)
+    try:
+        return float(w) > 0 and float(h) > 0
+    except (TypeError, ValueError):
+        return False
+
+
+def can_offer(ctx: SkillContext) -> bool:
+    """'Ghar mein dekho' is offered only when something in play can be drawn to scale."""
+    if ctx.session is None or ctx.pack is None or not ctx.pack.placeable:
+        return False
+    skus = interested(ctx) or [p.sku for p in pick_products(ctx) if p]
+    return any(drawable(ctx.facts.product_sync(x)) for x in skus)
+
+
+def no_size_reply(ctx: SkillContext, skus: list[str] | None = None) -> Reply:
+    """Plainly: this product's size is not in the data, so it cannot be drawn (never 'retake the photo')."""
+    skus = skus if skus is not None else (interested(ctx) or [p.sku for p in pick_products(ctx) if p])
+    p = next((q for q in (ctx.facts.product_sync(x) for x in skus) if q), None)
+    name = C.product_name(ctx, p) if p else ctx.t("this_product")
+    ctx.ev("tryon_no_size", skus=list(skus)[:3])
+    return ctx.reply(info_reply(ctx, ctx.t("tryon_no_size", product=name), [ctx.b("b_go", ctx.sid("go"))]))
+
+
 async def tryon_request(ctx: SkillContext) -> Reply:
-    """'Ghar mein dekho': photo first if there is none (two answers only), then the menu of what to show."""
+    """'Ghar mein dekho': photo first if there is none (two answers only), then the menu of what to show. A product
+    whose size is not in the data is said so at once, before any photo is asked for."""
     s = ctx.session
+    if not can_offer(ctx):
+        return no_size_reply(ctx)
     raw = await repo.media_latest(s.id, "room_photo_raw")
     if raw is None:
         s.extra["tryon_after_photo"] = True
@@ -389,7 +421,16 @@ async def job(ctx: SkillContext) -> Reply:
     if raw is None:
         return ctx.reply()
     t_read = int((time.perf_counter() - t0) * 1000)
-    plans = [pl for pl in _plans(ctx, req_spec.get("mode", "auto"), req_spec.get("sku")) if pl]
+    asked = [pl for pl in _plans(ctx, req_spec.get("mode", "auto"), req_spec.get("sku")) if pl]
+    plans = []
+    for pl in asked:  # only what can be drawn to scale; the first one left is drawn solid
+        kept = [(p, solid) for p, solid in pl if drawable(p)]
+        if kept and not any(solid for _, solid in kept):
+            kept[0] = (kept[0][0], True)
+        if kept:
+            plans.append(kept)
+    if not plans and asked:  # the size is not in the data: say that, not 'retake the photo'
+        return no_size_reply(ctx, [p.sku for pl in asked for p, _ in pl if p])
     if not plans:
         return ctx.reply(info_reply(ctx, ctx.t("tryon_failed")))
     # A TV already on that wall is the best size reference: ask its size once (one tap), then draw.

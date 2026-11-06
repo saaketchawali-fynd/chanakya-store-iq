@@ -92,13 +92,12 @@ def compute_options(products: list, home: HomeCard, pack: Pack, guides: dict, wa
 def _best_reason(best, value, fits: dict[str, FitResult], pack: Pack) -> str:
     """Top contributing rule; prefer one where best beats the value option (the difference to show)."""
     fb = fits[best.sku]
-    if value:
+    full = [c for c in fb.contributions if c.match >= 1]  # a reason is said only when it fully holds ('8 ft ke liye
+    if value:                                                # sahi size' never for a size half in the band)
         fv = {c.rule_id: c.match for c in fits[value.sku].contributions}
-        diffs = sorted(
-            (c for c in fb.contributions if c.match > fv.get(c.rule_id, 0)),
-            key=lambda c: -(c.weight * (c.match - fv.get(c.rule_id, 0))),
-        )
+        diffs = sorted((c for c in full if c.match > fv.get(c.rule_id, 0)),
+                       key=lambda c: -(c.weight * (c.match - fv.get(c.rule_id, 0))))
         if diffs and diffs[0].rule_id in pack.reasons:
             return diffs[0].rule_id
-    top = fb.top_rule()
-    return top if top in pack.reasons else "value_fit"
+    top = max(full, key=lambda c: c.weight, default=None)
+    return top.rule_id if top is not None and top.rule_id in pack.reasons else "value_fit"

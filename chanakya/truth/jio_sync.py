@@ -19,7 +19,14 @@ from chanakya.core import clock
 from chanakya.log import get_log
 from chanakya.truth import db
 from chanakya.truth.jio import PLAN_LABELS, JioClient, JioError, category_of, companion_of, is_protection
-from chanakya.truth.jio_map import map_accessory, map_product, map_promotions, map_protection
+from chanakya.truth.jio_map import (
+    KNOWN_BRANDS,
+    implausible,
+    map_accessory,
+    map_product,
+    map_promotions,
+    map_protection,
+)
 from chanakya.truth.models import (
     AppSetting,
     Charge,
@@ -91,6 +98,15 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
                 if row and row["sku"] not in seen:
                     seen.add(row["sku"])
                     products.append(row)
+        # a listing that contradicts itself (another brand's name, a 5 cm washing machine) is left out, counted apart
+        brands = KNOWN_BRANDS | {" ".join(r["brand"].lower().split()) for r in products if r["brand"]}
+        flagged = []
+        for r in list(products):
+            why = implausible(r, brands)
+            if why:
+                products.remove(r)
+                flagged.append({"sku": r["sku"], "category": r["category"], "brand": r["brand"],
+                                "name": (r["info"].get("name") or "")[:90], "why": why})
         promos: dict[str, list[dict]] = {}
         errors = 0
         sem = asyncio.Semaphore(4)
@@ -106,15 +122,15 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
         await asyncio.gather(*(one(r) for r in products + extras if (r.get("info") or {}).get("slug")))
     finally:
         await client.close()
-    today = clock.now().date()
-    offers = map_promotions(promos, {r["sku"]: r["category"] for r in products + extras}, today)  # add-ons' own
+    offers = map_promotions(promos, {r["sku"]: r["category"] for r in products + extras}, clock.now())  # add-ons' own
     labels = {}
     for it in plans_raw:
         lab = ((it.get("attributes") or {}).get("fg-product-category") or "").strip().lower()
         if lab and _label_category(lab):
             labels[lab] = _label_category(lab)
     plans = [x for x in (map_protection(it, labels) for it in plans_raw) if x]
-    FETCH_EXTRA.update(accessories=extras, unmapped=dict(sorted(others.items(), key=lambda x: -x[1])[:30]))
+    FETCH_EXTRA.update(accessories=extras, unmapped=dict(sorted(others.items(), key=lambda x: -x[1])[:30]),
+                       flagged=flagged)
     return products, offers, plans, errors
 
 
@@ -205,8 +221,9 @@ async def sync(s: Settings, facts) -> dict:
         if not products:
             raise JioError(None, "the catalogue returned no products in Chanakya's categories")
         extras = list(FETCH_EXTRA.get("accessories") or [])
+        flagged = list(FETCH_EXTRA.get("flagged") or [])
         counts = {"products": len(products), "offers": len(offers), "protection_plans": len(plans),
-                  "promotion_errors": errors, "accessories": len(extras)}
+                  "promotion_errors": errors, "accessories": len(extras), "flagged": len(flagged)}
         for r in products:
             counts[r["category"]] = counts.get(r["category"], 0) + 1
         report = catalog_report(products)
@@ -222,6 +239,7 @@ async def sync(s: Settings, facts) -> dict:
             a["with_size_range"] += 1 if r["info"].get("fits_in") else 0
         report["accessories"] = acc
         report["unmapped_categories"] = FETCH_EXTRA.get("unmapped") or {}
+        report["flagged"] = flagged[:20]  # left out of the catalogue, and why (not in the counts above)
         meta = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "counts": counts, "domain": s.jio_domain,
                 "catalog": report}
         await write(s, products + extras, offers, plans, meta)

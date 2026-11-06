@@ -284,7 +284,9 @@ _STEP_WORDS = {
 
 def _visit_rules(text: str) -> VisitEntry:
     low = text.lower()
-    e = VisitEntry(notes=text[:500] or None)
+    from chanakya.skills.visitlog import scrub_pii
+
+    e = VisitEntry(notes=scrub_pii(text[:500]) or None)  # never a name or a phone number kept
     m = re.search(r"\b(juhu|andheri|belapur|ulwe|citi mall|croma|vijay sales)\b", low)
     if m:
         e.store = m.group(1).title()
@@ -304,11 +306,13 @@ def _visit_rules(text: str) -> VisitEntry:
     m = re.search(r"(\d+)\s*(?:sawaal|questions|prashn)", low)
     if m:
         e.questions_before_first_product = int(m.group(1))
-    if re.search(r"demo (nahi|nahin|no)|no demo", low):
+    if re.search(r"demo (nahi|nahin|no)|no demo|(did not|didn'?t|not|never) (show|give|do)\w* (a |any |the )?demo|"
+                 r"demo (was )?not (shown|given)|डेमो (नाही|दाखवला नाही|नहीं)", low):
         e.demo_shown = False
     elif re.search(r"demo (dikhaya|diya|kiya|shown)", low):
         e.demo_shown = True
-    if re.search(r"(wapas|vapas) nahi|won'?t come back|not come back|nahi aaunga|nahi aaungi", low):
+    if re.search(r"(wapas|vapas) nahi|won'?t come back|not come back|never come back|never coming back|"
+                 r"nahi aaunga|nahi aaungi|kabhi nahi|परत येणार नाही|नाही येणार|वापस नहीं", low):
         e.would_come_back = False
     elif re.search(r"(wapas|vapas) (aaunga|aayenge|aaungi)|come back", low):
         e.would_come_back = True
@@ -318,8 +322,8 @@ def _visit_rules(text: str) -> VisitEntry:
         e.full_cost_given = True
     if e.demo_shown is None and re.search(r"side by side|saath mein dikhaya|compare kar(ke|ke) dikhaya", low):
         e.demo_shown = True
-    for step, words in _STEP_WORDS.items():
-        m = re.search(r"(" + "|".join(words) + r")\D{0,12}(\d)\s*(?:/\s*2|out of 2|mein se)?", low)
-        if m and int(m.group(2)) <= 2:
+    for step, words in _STEP_WORDS.items():  # only a score said as a score ('demo 1/2', 'close 0 out of 2')
+        m = re.search(r"(" + "|".join(words) + r")\D{0,12}?(\d)\s*(?:/\s*2|out of 2|mein se 2|पैकी 2)", low)
+        if m and int(m.group(2)) <= 2 and not re.search(r"\b(nahi|nahin|not|no|never)\b", m.group(0)):
             e.steps.append(StepScore(step=step, score=int(m.group(2))))  # type: ignore[arg-type]
     return e

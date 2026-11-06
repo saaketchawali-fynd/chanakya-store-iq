@@ -79,7 +79,14 @@ def _cost(ctx: SkillContext) -> str | None:
     if "replace" in P.values(s.home, "trigger") and ctx.pack.slot("exchange_old") and not P.known(s.home, "exchange_old"):
         if any(e.category == ctx.pack.category for e in ctx.facts.snap.exchange):
             return _once(ctx, "exchange", ctx.t("tip_exchange"))
-    plans = [pl for pl in ctx.facts.snap.protection if pl.category == ctx.pack.category]
+    from chanakya.truth.hisaab import filter_holds
+
+    sku = s.chosen_sku or (s.cost_snapshot or {}).get("sku")
+    p = ctx.facts.product_sync(sku) if sku else None
+    if p is None:
+        return None
+    # only the plans that cover this product (a resQ plan is for one price band: '₹20,000 to ₹30,000')
+    plans = [pl for pl in ctx.facts.snap.protection if pl.category == p.category and filter_holds(pl.filter, p)]
     on_bill = {str(ln.get("code", "")) for ln in (s.cost_snapshot or {}).get("lines") or []}
     if plans and not on_bill & {pl.code for pl in plans}:  # not already on the bill as a suggestion
         cheap = min(plans, key=lambda pl: pl.price)
