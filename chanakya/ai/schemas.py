@@ -105,7 +105,8 @@ class Spec(BaseModel):
 
 
 BoxLabel = Literal[
-    "wall", "sofa", "door", "window", "existing_tv", "tv_unit", "person", "socket", "floor_tile", "ceiling_line"
+    "wall", "sofa", "door", "window", "existing_tv", "tv_unit", "person", "socket", "floor_tile", "ceiling_line",
+    "tv_spot",  # where a TV would really go on the main wall (centred on the unit, or on the clear stretch of wall)
 ]
 
 

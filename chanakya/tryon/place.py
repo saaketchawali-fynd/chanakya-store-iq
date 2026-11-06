@@ -1,8 +1,9 @@
 """Placement (spec 17.1.4): where each product goes on the wall, in centimetres, from geometry only.
 
-TV: on the old TV's centre when one is on the wall (the customer's real spot); else above the TV unit
-(wall mount: bottom edge 15 cm above the unit top; stand: on the unit top); else centre 105 cm above the
-floor, centred on the sofa opposite or on the wall. AC: top edge 30 cm below the ceiling (bottom edge at
+TV: on the old TV's centre when one is on the wall (the customer's real spot); else on the spot the photo reading
+chose (centred on the TV unit under it); else above the TV unit (wall mount: bottom edge 15 cm above the unit top;
+stand: on the unit top); else centre 105 cm above the floor, centred on the sofa opposite or on the clear stretch
+of the wall. AC: top edge 30 cm below the ceiling (bottom edge at
 least 210 cm above the floor). WM: standing on the floor line. Everything is clamped inside the wall."""
 
 from __future__ import annotations
@@ -51,7 +52,7 @@ class Placed:
     back: float = 0.0  # back face, cm in front of the wall
     door: str | None = None  # fridge door type (drawing only)
     photo: bytes | None = field(default=None, repr=False)  # the product's catalogue photo (drawn from it if usable)
-    anchor: str = ""  # why it is placed there: wall_centre | sofa | unit | old_tv (shown on /health)
+    anchor: str = ""  # why it is placed there: old_tv | spot_unit | spot | unit | sofa | wall_centre (on /health)
     photo_status: str = ""  # used | none | rejected (the drawn product): shown on /health
 
 
@@ -116,6 +117,33 @@ def _avoid(uc: float, zc: float, w: float, h: float, objs: list[_Obj], lo: float
     return min(ok, key=lambda c: abs(c - uc)) if ok else uc
 
 
+def _free_spans(lo: float, hi: float, zc: float, h: float, objs: list[_Obj], gap: float) -> list[tuple[float, float]]:
+    """The clear stretches of wall in [lo, hi] at the product's height (between doors and windows)."""
+    blocks = sorted((o.u0 - gap, o.u1 + gap) for o in objs if zc - h / 2 < o.z1 and zc + h / 2 > o.z0)
+    spans, cur = [], lo
+    for a, b in blocks:
+        if a > cur:
+            spans.append((cur, min(a, hi)))
+        cur = max(cur, b)
+        if cur >= hi:
+            break
+    if cur < hi:
+        spans.append((cur, hi))
+    return [(a, b) for a, b in spans if b > a]
+
+
+def _centre_free(uc: float, zc: float, w: float, h: float, objs: list[_Obj], lo: float, hi: float) -> float:
+    """Centred on the clear stretch of wall it belongs to, as it would really be hung (user, 6 Nov 2026: "realistically
+    placed on the customer wall ... the best fit"): the stretch around the target when the TV fits in it, else the
+    widest stretch it fits in; only when none fits, the nearest clear spot."""
+    spans = [sp for sp in _free_spans(lo, hi, zc, h, objs, OBSTACLE_GAP_CM) if sp[1] - sp[0] >= w]
+    if not spans:
+        return _avoid(uc, zc, w, h, objs, lo, hi)
+    home = next((sp for sp in spans if sp[0] <= uc <= sp[1]), None)
+    sp = home or max(spans, key=lambda sp: (sp[1] - sp[0], -abs((sp[0] + sp[1]) / 2 - uc)))
+    return (sp[0] + sp[1]) / 2
+
+
 def _clamp(v: float, size: float, lo: float, hi: float) -> float:
     if hi - lo >= size:
         return min(max(v, lo + size / 2), hi - size / 2)
@@ -157,19 +185,41 @@ def _plausible_tv(o: _Obj | None) -> bool:
     return o is not None and 50 <= (o.u1 - o.u0) <= 220 and 30 <= (o.z1 - o.z0) <= 130
 
 
+SPOT_SNAP = 0.3  # a spot over a TV unit is centred on the unit when within this share of the unit's width of its centre
+
+
+def _spot(wall: Wall, room: Room, lo: float, hi: float) -> float | None:
+    """u (cm) of the centre of the spot the photo reading chose for the TV, when it lies on the visible wall."""
+    b = room.first("tv_spot")
+    if b is None:
+        return None
+    p = wall.to_wall([((b[0] + b[2]) / 2, (b[1] + b[3]) / 2)])
+    if not np.all(np.isfinite(p)):
+        return None
+    u = float(p[0, 0])
+    return u if lo <= u <= hi else None
+
+
 def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float, mount: str):
-    """Where the TV goes (user, 2–4 Nov 2026: centred and believable): on/above the TV already there or a real TV
-    unit, but only when that is TV-sized and near the middle of the wall; over a wide, central sofa; else the middle
-    of the visible wall. Returns (u, z, anchor)."""
+    """Where the TV goes (user, 2–6 Nov 2026: centred, believable, the best fit for this room):
+    1. on the TV already on the wall (TV-sized, near the middle): the customer's real spot;
+    2. the spot the photo reading chose (as an interior designer would hang it): centred on the TV unit under it;
+    3. above a real TV unit near the middle of the wall;
+    4. over a wide, central sofa;
+    5. centred on the clear stretch of the visible wall (between doors and windows).
+    Returns (u, z, anchor)."""
     ceiling = wall.ceiling_z or WALL_HEIGHT_CM
     lo0, hi0 = _u_range(wall, TV_CENTRE_ABOVE_FLOOR_CM)
+    openings = (objs.get("door") or []) + (objs.get("window") or [])
     old = (objs.get("existing_tv") or [None])[0]
     old = old if _plausible_tv(old) and _central(old, lo0, hi0) else None
-    unit = _real_unit(objs.get("tv_unit") or [], w)
-    unit = unit if (_central(unit, lo0, hi0) or mount == "stand") else None  # a stand must stand on its unit
+    any_unit = _real_unit(objs.get("tv_unit") or [], w)
+    spot = _spot(wall, room, lo0, hi0) if old is None else None
+    unit = any_unit if (_central(any_unit, lo0, hi0) or mount == "stand") else None  # a stand must stand on its unit
     anchored = True
-    anchor = "old_tv" if old is not None else "unit" if unit is not None else "wall_centre"
+    resolve = False  # a spot from the reading is checked against the doors and windows
     if old is not None:
+        anchor = "old_tv"
         ob = room.first("existing_tv")
         uc, zc = (float(v) for v in wall.to_wall([((ob[0] + ob[2]) / 2, (ob[1] + ob[3]) / 2)])[0])
         if unit is not None and unit.u0 - w / 2 < uc < unit.u1 + w / 2:
@@ -177,7 +227,16 @@ def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float,
                 zc = unit.z1 + STAND_GAP_CM + h / 2
             elif zc - h / 2 < unit.z1 + 4:
                 zc = unit.z1 + 4 + h / 2
+    elif spot is not None:
+        below = any_unit if any_unit is not None and any_unit.u0 <= spot <= any_unit.u1 else None
+        if below is not None:  # over the TV unit: centred on it, at the unit's height
+            anchor = "spot_unit"
+            uc = below.uc if abs(spot - below.uc) <= SPOT_SNAP * (below.u1 - below.u0) else spot
+            zc = below.z1 + (STAND_GAP_CM if mount == "stand" else TV_ABOVE_UNIT_CM) + h / 2
+        else:
+            anchor, uc, zc, resolve = "spot", spot, TV_CENTRE_ABOVE_FLOOR_CM, True
     elif unit is not None:
+        anchor = "unit"
         uc = unit.uc
         zc = unit.z1 + (STAND_GAP_CM if mount == "stand" else TV_ABOVE_UNIT_CM) + h / 2
     else:
@@ -192,10 +251,12 @@ def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float,
     zc = min(zc, ceiling - CEILING_MARGIN_CM - h / 2) if h < ceiling - 2 * CEILING_MARGIN_CM else zc
     zc = max(zc, FLOOR_MARGIN_CM + h / 2)
     lo, hi = _u_range(wall, zc)
-    if not anchored:
-        uc = _avoid(uc, zc, w, h, (objs.get("door") or []) + (objs.get("window") or []), lo, hi)
+    if anchor in ("wall_centre", "spot") and _overlaps(uc, zc, w, h, openings, OBSTACLE_GAP_CM):
+        uc = _centre_free(uc, zc, w, h, openings, lo, hi)  # over a door or window: centred on the clear stretch instead
+    elif anchor == "sofa":
+        uc = _avoid(uc, zc, w, h, openings, lo, hi)
     uc = _clamp(uc, w, 0.0, wall.width_cm)
-    if not anchored:
+    if not anchored or resolve:
         uc = _clamp(uc, w, lo, hi)
     return uc, _fit_frame_z(wall, uc, zc, h, ceiling), anchor
 

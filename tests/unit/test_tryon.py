@@ -573,3 +573,53 @@ async def test_fast():
         t = time.perf_counter()
         res = await run(req)
         assert res.image and time.perf_counter() - t < 3
+
+
+# ---------- where the TV really goes (user, 6 Nov 2026: "realistically placed on the customer wall ... best fit") ----
+def _plain_room(*boxes: tuple[str, list[int]]) -> ImageRead:
+    """A frontal wall filling the photo, with the given boxes ([ymin, xmin, ymax, xmax], 0-1000)."""
+    return ImageRead(kind="room", frontal=True, floor_y=900,
+                     boxes=[Box(label="wall", box_2d=[0, 0, 900, 1000])] + [Box(label=lb, box_2d=b) for lb, b in boxes])
+
+
+def _x(res, sku="TV-MER-55-QL120") -> float:
+    """The TV's centre as a share of the photo width."""
+    box = dict(res.planned)[sku]
+    return (box[0] + box[2]) / 2 / 1080
+
+
+async def test_tv_goes_on_the_spot_the_reading_chose_centred_on_its_unit():
+    """A TV unit at the edge of the photo (before: ignored, the TV floated in the middle of the wall); the reading's
+    spot is over it, a little off its centre: the TV is centred on the unit, just above it."""
+    read = _plain_room(("tv_unit", [700, 0, 900, 280]), ("tv_spot", [420, 30, 660, 300]))
+    res = await run(TryonRequest(photo=_photo("room_living"), read=read, products=[TV55], wall_width_ft=16))
+    assert res.error is None and res.placement["TV-MER-55-QL120"]["anchor"] == "spot_unit"
+    assert abs(_x(res) - 0.14) < 0.01  # the unit's centre, not the spot's (0.165) nor the wall's (0.5)
+    box = dict(res.planned)["TV-MER-55-QL120"]
+    assert 0.6 * 810 < box[3] < 0.7 * 810  # just above the unit top (at 0.7 of the photo)
+    before = await run(TryonRequest(photo=_photo("room_living"), read=_plain_room(("tv_unit", [700, 0, 900, 280])),
+                                    products=[TV55], wall_width_ft=16))
+    assert before.placement["TV-MER-55-QL120"]["anchor"] == "wall_centre"  # without the spot: the old rule
+
+
+async def test_tv_spot_on_a_bare_wall_and_a_wrong_spot_over_a_window():
+    read = _plain_room(("tv_spot", [380, 560, 640, 860]))
+    res = await run(TryonRequest(photo=_photo("room_living"), read=read, products=[TV55], wall_width_ft=12))
+    assert res.placement["TV-MER-55-QL120"]["anchor"] == "spot" and abs(_x(res) - 0.71) < 0.02
+    read = _plain_room(("window", [200, 600, 700, 1000]), ("tv_spot", [380, 640, 640, 940]))  # the spot is wrong
+    res = await run(TryonRequest(photo=_photo("room_living"), read=read, products=[TV55], wall_width_ft=12))
+    box = dict(res.planned)["TV-MER-55-QL120"]
+    assert box[2] < 0.6 * 1080 and abs(_x(res) - 0.29) < 0.03  # off the window: centred on the clear wall (0–0.6)
+
+
+async def test_tv_is_centred_on_the_clear_wall_not_pushed_against_a_window():
+    """Nothing to stand on: the middle of the wall; if that would cover a window, the middle of the clear stretch
+    of wall beside it (before: shifted just enough to touch the window frame)."""
+    res = await run(TryonRequest(photo=_photo("room_living"), read=_plain_room(), products=[TV55], wall_width_ft=12))
+    assert res.placement["TV-MER-55-QL120"]["anchor"] == "wall_centre" and abs(_x(res) - 0.5) < 0.01
+    read = _plain_room(("window", [150, 480, 650, 760]))
+    res = await run(TryonRequest(photo=_photo("room_living"), read=read, products=[TV55], wall_width_ft=12))
+    box = dict(res.planned)["TV-MER-55-QL120"]
+    win_left = 0.48 * 1080
+    assert box[2] < win_left and abs(_x(res) - 0.235) < 0.03  # the clear stretch is 0–0.47 of the wall
+    assert win_left - box[2] > 0.06 * 1080  # with room to spare, not flush against the window frame (8 cm)

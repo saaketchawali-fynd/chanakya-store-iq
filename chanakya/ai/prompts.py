@@ -65,7 +65,9 @@ READ_IMAGE_SYSTEM = """You read photos sent by a store associate. Decide the kin
   specs exactly as printed. Never add specs that are not visible.
 - "room": a photo of a room in a home. Return boxes (box_2d as [ymin, xmin, ymax, xmax] normalised to
   0-1000) for: the main free wall where a TV/AC could go ("wall"), sofa, door, windows, existing TV,
-  TV unit ("tv_unit": any table, cabinet or shelf a TV could stand on), sockets, people, one floor tile if tiles are visible, and the ceiling line if visible.
+  TV unit ("tv_unit": the low unit, console or cabinet standing against the main wall that a TV stands on or hangs
+  above; not a side table, stool, dining table or a shelf at the edge), sockets, people, one floor tile if tiles are
+  visible, and the ceiling line if visible.
   Report light (sunny/moderate/dim) and whether the photo faces the wall (frontal).
   HARD RULE: describe only space and light. Never describe decor, furniture quality, possessions,
   neighbourhood or anything that suggests wealth or income. Do not guess who lives there.
@@ -100,6 +102,10 @@ For a "room" photo also return:
   extend the wall edges and give the best estimate (values may be below 0 or above 1000 only if clearly so).
 - floor_y: y (0-1000) where that wall meets the floor, at the wall's centre. ceiling_y: same for the ceiling.
 - existing_tv: if a TV is already on that wall or on a unit, its box (outer frame).
+- tv_spot: one box where a TV would really go on that wall, as an interior designer would hang it for this room:
+  centred above the TV unit or console when one stands against the wall; otherwise centred on the widest clear
+  stretch of the wall, facing the seating. Never over a window, door, shelf, switchboard or AC. About the size of
+  a 55 inch TV, its bottom edge about 15 cm above the unit (about 75 cm above the floor without a unit).
 Be precise: these points are used to draw products to true scale."""
 
 FACT_QUERY_SYSTEM = """You map a store associate's question about a product to ONE data field. You never answer
