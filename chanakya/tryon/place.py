@@ -19,7 +19,9 @@ from chanakya.tryon.scale import TV_FACE_DEPTH_CM, WALL_HEIGHT_CM, tv_height_cm,
 
 SAFFRON = (99, 102, 241)  # the accent (indigo) for comparison outlines; the name is kept for callers
 BEZEL = (17, 17, 17)
-TV_CENTRE_ABOVE_FLOOR_CM = 105.0
+TV_CENTRE_ABOVE_FLOOR_CM = 115.0  # the lowest a wall TV's centre goes (user, 6 Nov 2026: "it places so low")
+TV_CENTRE_BARE_WALL_CM = 120.0  # nothing to hang it above: as Mumbai homes hang it (bottom about 90 cm up)
+SPOT_Z_RANGE = (110.0, 140.0)  # the reading's spot height (an interior designer's judgement) is used inside this band
 TV_ABOVE_UNIT_CM = 15.0
 STAND_GAP_CM = 6.0  # pedestal: panel bottom above the TV-unit top
 TV_ABOVE_SOFA_CM = 10.0
@@ -188,16 +190,24 @@ def _plausible_tv(o: _Obj | None) -> bool:
 SPOT_SNAP = 0.3  # a spot over a TV unit is centred on the unit when within this share of the unit's width of its centre
 
 
-def _spot(wall: Wall, room: Room, lo: float, hi: float) -> float | None:
-    """u (cm) of the centre of the spot the photo reading chose for the TV, when it lies on the visible wall."""
+def _spot(wall: Wall, room: Room, lo: float, hi: float) -> tuple[float, float] | None:
+    """(u, z) in cm of the centre of the spot the photo reading chose for the TV, when it lies on the visible wall."""
     b = room.first("tv_spot")
     if b is None:
         return None
     p = wall.to_wall([((b[0] + b[2]) / 2, (b[1] + b[3]) / 2)])
     if not np.all(np.isfinite(p)):
         return None
-    u = float(p[0, 0])
-    return u if lo <= u <= hi else None
+    u, z = float(p[0, 0]), float(p[0, 1])
+    return (u, z) if lo <= u <= hi else None
+
+
+def _wall_tv_z(z: float, h: float, unit_top: float | None = None) -> float:
+    """A wall-mounted TV's centre: never below eye level seated (user, 6 Nov 2026: "it places so low"), and at least
+    the gap above the TV unit under it."""
+    if unit_top is not None:
+        z = max(z, unit_top + TV_ABOVE_UNIT_CM + h / 2)
+    return max(z, TV_CENTRE_ABOVE_FLOOR_CM)
 
 
 def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float, mount: str):
@@ -228,20 +238,24 @@ def _tv(wall: Wall, room: Room, objs: dict[str, list[_Obj]], w: float, h: float,
             elif zc - h / 2 < unit.z1 + 4:
                 zc = unit.z1 + 4 + h / 2
     elif spot is not None:
-        below = any_unit if any_unit is not None and any_unit.u0 <= spot <= any_unit.u1 else None
-        if below is not None:  # over the TV unit: centred on it, at the unit's height
+        su, sz = spot
+        below = any_unit if any_unit is not None and any_unit.u0 <= su <= any_unit.u1 else None
+        if below is not None:  # over the TV unit: centred on it, hung above it
             anchor = "spot_unit"
-            uc = below.uc if abs(spot - below.uc) <= SPOT_SNAP * (below.u1 - below.u0) else spot
-            zc = below.z1 + (STAND_GAP_CM if mount == "stand" else TV_ABOVE_UNIT_CM) + h / 2
-        else:
-            anchor, uc, zc, resolve = "spot", spot, TV_CENTRE_ABOVE_FLOOR_CM, True
+            uc = below.uc if abs(su - below.uc) <= SPOT_SNAP * (below.u1 - below.u0) else su
+            zc = below.z1 + STAND_GAP_CM + h / 2 if mount == "stand" else _wall_tv_z(0.0, h, below.z1)
+        else:  # a bare wall: the height the reading chose (inside a sensible band), centred on that clear stretch
+            anchor, resolve = "spot", True
+            zc = min(max(sz, SPOT_Z_RANGE[0]), SPOT_Z_RANGE[1])
+            lo, hi = _u_range(wall, zc)
+            uc = _centre_free(su, zc, w, h, openings, lo, hi)
     elif unit is not None:
         anchor = "unit"
         uc = unit.uc
-        zc = unit.z1 + (STAND_GAP_CM if mount == "stand" else TV_ABOVE_UNIT_CM) + h / 2
+        zc = unit.z1 + STAND_GAP_CM + h / 2 if mount == "stand" else _wall_tv_z(0.0, h, unit.z1)
     else:
         anchored = False
-        zc = TV_CENTRE_ABOVE_FLOOR_CM
+        zc = TV_CENTRE_BARE_WALL_CM
         lo, hi = _u_range(wall, zc)
         sofa = _facing_sofa(objs.get("sofa") or [], lo, hi)
         uc = sofa.uc if sofa is not None else (lo + hi) / 2  # else the middle of the visible wall

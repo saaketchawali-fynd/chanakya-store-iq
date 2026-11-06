@@ -219,13 +219,42 @@ def _greeting(ctx: SkillContext, name: str) -> str:
     return ctx.t(key, "en", name=name)
 
 
-async def brief(ctx: SkillContext) -> Reply:
-    """Step 1 of the shift start: the pre-read card, then one button: today's clip."""
+PICK_ORDER = ("tv", "ac", "wm", "fridge", "laptop")
+
+
+def picker(ctx: SkillContext) -> OutMessage:
+    """Which product's stock and offers first (user, 6 Nov 2026: "give the option to select the product ... before
+    showing"): one list, the associate's own product first, each row with today's numbers from the data."""
+    from chanakya.channel.limits import truncate
+    from chanakya.core.contracts import ListRow, ListSection
+
+    own = _dept(ctx)
+    rows = []
+    for cat in sorted(PICK_ORDER, key=lambda c: c != own):
+        if cat not in ctx.packs.packs or not ctx.facts.products_sync(cat):
+            continue
+        st = stock_section(ctx, cat)
+        n_off = ctx.reg.num(len(live_offers(ctx, cat)), f"offers:{cat}:live")
+        title = ctx.t(f"brief_cat_{cat}")
+        rows.append(ListRow(id=encode("g", "briefcat", cat), title=truncate(title[:1].upper() + title[1:], 24),
+                            description=truncate(ctx.t("brief_pick_row", n=st["n"], k=n_off), 72)))
+    ctx.reg.static(" ".join(r.title for r in rows))
+    return OutMessage(to=ctx.actor_wa_id, kind="list", body=ctx.t("brief_pick_body"),
+                      list_button=truncate_title(ctx.t("list_choose")), sections=[ListSection(rows=rows[:10])],
+                      allowed_numbers=ctx.reg.allowed())
+
+
+async def brief(ctx: SkillContext, dept: str | None = None) -> Reply:
+    """Step 1 of the shift start: which product (today's numbers on each row), then that product's pre-read card
+    from today's data, then one button: today's clip (and another product)."""
     staff = ctx.staff
     msgs: list[OutMessage] = []
-    if staff.last_brief_date is None and staff.streak == 0 and not ctx.scratch.get("welcomed"):
-        msgs.append(info_reply(ctx, ctx.t("welcome_new_staff", name=staff.name)))
-    dept = _dept(ctx)
+    if dept not in ctx.packs.packs:
+        if staff.last_brief_date is None and staff.streak == 0 and not ctx.scratch.get("welcomed"):
+            msgs.append(info_reply(ctx, ctx.t("welcome_new_staff", name=staff.name)))
+        msgs.append(picker(ctx))
+        ctx.ev("brief_picker")
+        return ctx.reply(*msgs)
     d = today()
     changes = await ctx.facts.stock_changes(staff.store_id, dept)
     order = {"out_of_stock": 0, "back_in_stock": 1, "low": 2}
@@ -259,7 +288,8 @@ async def brief(ctx: SkillContext) -> Reply:
     caption = ctx.t("brief_pre_caption", n=stock["n"], cat=ctx.t(f"brief_cat_{dept}"),
                     n_off=ctx.reg.num(len(offers), "offers:live"))
     focus, _ = await focus_step(ctx)
-    msgs.append(info_reply(ctx, caption, [ctx.b("b_clip_next", encode("g", "clip", focus))], card=card))
+    btns = [ctx.b("b_clip_next", encode("g", "clip", focus)), ctx.b("b_other_product", encode("g", "brief"))]
+    msgs.append(info_reply(ctx, caption, btns, card=card))
     staff.last_brief_date = d
     ctx.ev("brief_shown", dept=dept, available=stock["_avail"], offers=len(offers), changes=len(changes))
     return ctx.reply(*msgs)

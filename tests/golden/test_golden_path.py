@@ -5,7 +5,7 @@ from __future__ import annotations
 from chanakya.core import repo
 from chanakya.sim.harness import PHONES
 from tests.conftest import make_harness
-from tests.helpers import button_ids, check_floor, options_view, texts
+from tests.helpers import button_ids, check_floor, open_brief, options_view, texts
 
 
 async def ev_types(sid):
@@ -31,7 +31,8 @@ async def test_golden_path(tmp_path):
         #   ready → only then the customer button
         out = await step(h.tap, "g:alang:hi")
         assert "naam" in out[0].body.lower() and not any(m.card for m in out)  # then: who is this? (no dummy name)
-        out = await step(h.say, "mera naam Amit hai")
+        out = await step(h.say, "mera naam Amit hai")  # then which product: today's stock and offers for it
+        out = await step(open_brief, h, out, "tv")
         brief = next(m for m in out if m.card and m.card.template == "brief")
         assert "Amit" in brief.card.data["greeting"]
         assert brief.card.lang == "en"  # one card, in English
@@ -40,7 +41,7 @@ async def test_golden_path(tmp_path):
         offs = brief.card.data["offers"]
         assert offs and all(o["badge"] and o["title"] and o["till"] for o in offs)
         assert offs[0]["kind"] == "ends"  # the offers ending soonest come first
-        assert [b.title for b in brief.buttons] == ["Aaj ki training"]  # one step, not every option at once
+        assert [b.title for b in brief.buttons] == ["Aaj ki training", "Doosra product"]  # the next step, or another product
         out = await step(h.tap, brief.buttons[0].id)
         assert any(m.kind == "video" for m in out) and button_ids(out) == ["g:ready:translate"]
         out = await step(h.tap, "g:ready:translate")

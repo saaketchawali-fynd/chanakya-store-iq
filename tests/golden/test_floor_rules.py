@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import asyncio
 
+import pytest
+
 from chanakya.core import repo
 from chanakya.i18n.lang import t
 from chanakya.sim.harness import PHONES
@@ -89,3 +91,15 @@ async def test_the_associate_decides(h):
     await h.tap("s:C1:opt:B")
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     assert s.chosen_sku == s.option_labels["B"]
+
+
+@pytest.mark.parametrize("lang, said", [("hi", "start level aap"), ("en", "you set the start level"), ("mr", "स्टार्ट लेव्हल तुम्ही")])
+async def test_the_start_level_rule_opens_every_customer(h, lang, said):
+    """Store rule 3, at the start of the journey (user, 6 Nov 2026): Store IQ never guesses wealth from appearance;
+    the associate sets the start level. Said on the opener, and again where the start level is set."""
+    await h.tap(f"g:alang:{lang}")
+    out = await h.tap("g:new")
+    kyun = next(ln for ln in out[0].body.split("\n") if ln.startswith(("*Kyun*", "*का*", "*Why*")) or "·" in ln)
+    assert said in kyun.lower()
+    s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
+    assert s.home.start_level_inr is None  # nothing set until the associate sets it

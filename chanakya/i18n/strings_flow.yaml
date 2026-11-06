@@ -10,7 +10,7 @@ st_new: {hi: "{code} · Naya customer", mr: "{code} · नवीन ग्रा
 
 # ---------- opener ----------
 bolo_opener: {hi: "Namaste! Reliance Digital mein aapka swagat hai. Ghar ke liye kya dekh rahe hain?", mr: "नमस्कार! Reliance Digital मध्ये तुमचं स्वागत आहे. आज घरासाठी काय बघताय?", en: "Welcome to Reliance Digital! What are you looking for at home today?"}
-kyun_opener: {hi: "Pehle product, phir ghar ke 4 sawaal, ek-ek karke", mr: "आधी उत्पादन, मग घराचे 4 प्रश्न, एकेक करून", en: "Product first, then 4 home questions, one at a time"}
+kyun_opener: {hi: "Pehle product, phir ghar ke 4 sawaal · Budget dikhawat se kabhi nahi: start level aap poochkar tay karenge", mr: "आधी उत्पादन, मग घराचे 4 प्रश्न · बजेट दिसण्यावरून कधीच नाही: स्टार्ट लेव्हल तुम्ही विचारून ठरवाल", en: "Product first, then 4 home questions · Never a budget from looks: you set the start level, by asking"}
 list_product: {hi: "Product chuniye", mr: "उत्पादन निवडा", en: "Choose product"}
 cat_tv: {hi: "TV", mr: "टीव्ही", en: "TV"}
 cat_tv_d: {hi: "Size, picture aur awaaz, kamre ke hisaab se", mr: "खोलीनुसार साइज, पिक्चर आणि आवाज", en: "Size, picture and sound for the room"}
@@ -41,7 +41,7 @@ kyun_photo_ask: {hi: "Apne ghar mein sahi size dekh kar faisla aasaan hota hai",
 
 # ---------- comfort range ----------
 bolo_range: {hi: "Taaki main sahi wale dikhaun — aapne lagbhag kitne tak ka socha hai?", mr: "म्हणजे मी योग्य दाखवेन — साधारण किती पर्यंतचा विचार केलाय?", en: "So I show you the right ones: roughly what range did you have in mind?"}
-kyun_range: {hi: "Sirf 3 options chunne ke liye; ye daam ke roop mein bataya nahi jaata", mr: "फक्त 3 पर्याय निवडण्यासाठी; हे किंमत म्हणून सांगितलं जात नाही", en: "Only to pick which 3 to show; never quoted as a price"}
+kyun_range: {hi: "Start level aap tay karte hain, dikhawat se kabhi nahi · sirf 3 options chunne ke liye, daam ke roop mein nahi", mr: "स्टार्ट लेव्हल तुम्ही ठरवता, दिसण्यावरून कधीच नाही · फक्त 3 पर्याय निवडण्यासाठी, किंमत म्हणून नाही", en: "You set the start level, never from looks · only to pick which 3 to show, never quoted as a price"}
 list_range: {hi: "Range chuniye", mr: "रेंज निवडा", en: "Choose range"}
 range_upto: {hi: "{a} tak", mr: "{a} पर्यंत", en: "Up to {a}"}
 range_between: {hi: "{a} – {b}", mr: "{a} – {b}", en: "{a} – {b}"}
@@ -195,6 +195,9 @@ brief_cat_ac: {hi: "AC", mr: "AC", en: "ACs"}
 brief_cat_wm: {hi: "washing machine", mr: "वॉशिंग मशीन", en: "washing machines"}
 brief_cat_fridge: {hi: "fridge", mr: "फ्रिज", en: "fridges"}
 brief_cat_laptop: {hi: "laptop", mr: "लॅपटॉप", en: "laptops"}
+brief_pick_body: {hi: "*Shift se pehle:* aaj ka stock aur offers, data se.\nKis product ka dekhna hai? Neeche chuniye.", mr: "*शिफ्टआधी:* आजचा स्टॉक आणि ऑफर्स, डेटामधून.\nकोणत्या प्रॉडक्टचं बघायचं? खाली निवडा.", en: "*Before the shift:* today's stock and offers, from the data.\nWhich product? Pick below."}
+brief_pick_row: {hi: "Stock: {n} model · offers: {k}", mr: "स्टॉक: {n} मॉडेल · ऑफर: {k}", en: "In stock: {n} · offers: {k}"}
+b_other_product: {hi: "Doosra product", mr: "दुसरं प्रॉडक्ट", en: "Another product"}
 brief_keep_plans: {hi: "{n} protection plan uplabdh ({span})", mr: "{n} protection plans उपलब्ध ({span})", en: "{n} protection plans available ({span})"}
 brief_keep_tasks: {hi: "Aaj {n} customer follow-up", mr: "आज {n} ग्राहक फॉलो-अप", en: "{n} customer follow-ups due today"}
 brief_hello_morning: {hi: "Good morning, {name}", mr: "Good morning, {name}", en: "Good morning, {name}"}

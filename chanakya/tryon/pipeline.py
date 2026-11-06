@@ -124,6 +124,8 @@ def _prepare(req: TryonRequest, res: TryonResult) -> _Prepared | None:
     res.px_per_cm = round(sc.wall.scale_at(primary.rect[0], primary.rect[1])[0], 4)
     res.planned = [(p.sku, p.box) for p in placed]
     res.placement = {p.sku: {"anchor": p.anchor, "x": round((p.box[0] + p.box[2]) / 2 / max(1, clean.width), 2),
+                             "y": round((p.box[1] + p.box[3]) / 2 / max(1, clean.height), 2),  # share of the height
+                             "centre_cm": round(p.rect[1]), "width_cm": round(p.rect[2]),  # above the floor line
                              "photo": p.photo_status} for p in placed if p.solid}
     res.quads = [(p.sku, p.quad) for p in placed]
     return _Prepared(category, placed, composite, sc, room, clean)

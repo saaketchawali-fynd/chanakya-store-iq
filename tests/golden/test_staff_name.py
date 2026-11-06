@@ -7,6 +7,7 @@ from chanakya.sim.harness import PHONES
 from chanakya.skills.staff_name import clean_name
 from chanakya.truth import seed
 from tests.conftest import make_harness
+from tests.helpers import open_brief
 
 
 def test_names_are_cleaned():
@@ -29,7 +30,7 @@ async def test_first_contact_asks_the_name_then_uses_it(tmp_path):
         assert "name" in out[0].body.lower()
         out = await h.say("1234")
         assert "type your name" in out[0].body.lower()
-        out = await h.say("Amit")
+        out = await open_brief(h, await h.say("Amit"))
         b = next(m for m in out if m.card and m.card.template == "brief")
         assert b.card.data["greeting"].endswith("Amit")
         st = await repo.staff_by_wa(PHONES["associate"])
@@ -52,7 +53,7 @@ async def test_name_by_voice(tmp_path, monkeypatch):
             return "mera naam Rahul hai"
 
         monkeypatch.setattr(h.rt.ai, "transcribe", heard)
-        out = await h.voice_bytes(b"OggS-name")
+        out = await open_brief(h, await h.voice_bytes(b"OggS-name"))
         assert any(m.card and m.card.template == "brief" for m in out)
         assert (await repo.staff_by_wa(PHONES["associate"])).name == "Rahul"
     finally:
@@ -73,7 +74,7 @@ async def test_restart_is_never_taken_as_a_name(tmp_path):
         assert not st.name_set and st.name_asked
         out = await h.say("restart")  # still not a name
         assert "naam" in out[0].body.lower() and not (await R.staff_by_wa(PHONES["associate"])).name_set
-        out = await h.say("Amit")
+        out = await open_brief(h, await h.say("Amit"))
         assert any(m.card and m.card.template == "brief" for m in out)
         assert (await R.staff_by_wa(PHONES["associate"])).name == "Amit"
     finally:

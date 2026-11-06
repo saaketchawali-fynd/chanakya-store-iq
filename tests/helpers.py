@@ -149,3 +149,10 @@ def options_view(msgs: list[OutMessage]):
              "points": list(d.get("needs") or []) + list(d.get("also") or []), "image": d.get("image"),
              "offer": {"text": d.get("offer_text"), "none": d.get("offer_none")}} for lab, d in pages.items()]
     return SimpleNamespace(template="options", lang="en", data={"options": opts})
+
+
+async def open_brief(h, out, cat: str = "tv"):
+    """The shift start asks which product first (user, 6 Nov 2026): pick it, then the pre-read card follows."""
+    rows = [r.id for m in out for sec in (m.sections or []) for r in sec.rows]
+    assert f"g:briefcat:{cat}" in rows, rows  # the product picker, today's numbers on each row
+    return await h.pick(f"g:briefcat:{cat}")

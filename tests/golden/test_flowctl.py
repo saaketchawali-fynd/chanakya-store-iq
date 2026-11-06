@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from chanakya.core import repo
 from chanakya.sim.harness import PHONES
-from tests.helpers import button_ids, check_floor, texts
+from tests.helpers import button_ids, check_floor, open_brief, texts
 
 
 def rows(msg):
@@ -63,7 +63,7 @@ async def test_start_over_from_the_very_beginning(h):
     out = await h.tap("g:restartok")
     assert [b.id for b in out[0].buttons] == ["g:alang:en", "g:alang:hi", "g:alang:mr"]  # step 0: language
     assert await h.rt.svc.sessions.active(PHONES["associate"]) == []
-    out = await h.tap("g:alang:en")  # then the brief, in English
+    out = await open_brief(h, await h.tap("g:alang:en"))  # then the brief (its product first), in English
     assert any(m.card and m.card.template == "brief" and m.card.lang == "en" for m in out)
     out = await h.tap("g:new")
     assert "C3" in texts(out) or "C1" in texts(out)

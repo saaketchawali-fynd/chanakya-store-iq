@@ -498,6 +498,8 @@ async def global_action(ctx: SkillContext, bid: ButtonId) -> Reply:
         return await review.last_score(ctx)
     if a == "brief":
         return await brief.brief(ctx)
+    if a == "briefcat":  # the product chosen for today's stock and offers
+        return await brief.brief(ctx, bid.get(1))
     if a == "catalog":
         page = bid.get(2, "0")
         return await catalog.show(ctx, bid.get(1), int(page) if page.isdigit() else 0)

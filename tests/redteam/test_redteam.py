@@ -15,7 +15,7 @@ from chanakya.core.contracts import Button, InboundMessage, OutMessage
 from chanakya.sim.harness import PHONES
 from chanakya.truth.firewall import NumberRegistry
 from tests.conftest import make_harness
-from tests.helpers import answer_complete, button_ids, check_floor, pay, pick, texts, to_options
+from tests.helpers import answer_complete, button_ids, check_floor, open_brief, pay, pick, texts, to_options
 
 
 async def session(h):
@@ -294,7 +294,7 @@ async def test_language_picker_then_single_language(tmp_path):
         assert len(out) == 1 and [b.title for b in out[0].buttons] == ["English", "हिंदी", "मराठी"]
         out = await hh.tap("g:alang:mr")
         assert "नाव" in out[0].body  # the name, in Marathi, right after the language
-        out = await hh.say("माझं नाव सुनीता")
+        out = await open_brief(hh, await hh.say("माझं नाव सुनीता"))
         b = next(m for m in out if m.card and m.card.template == "brief")
         assert b.card.lang == "en" and "प्रशिक्षण" in b.buttons[0].title  # English card, Marathi messages
         out = await hh.tap("g:new")

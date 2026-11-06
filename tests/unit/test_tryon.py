@@ -191,9 +191,9 @@ async def test_scale_floor_to_ceiling_true_width():
     res = await run(TryonRequest(photo=photo, read=_read(boxes, ["wall"], floor_y=fy, ceiling_y=cy), products=[TV55]))
     assert res.scale_source == "ceiling" and res.scale_confidence == pytest.approx(0.6)
     await _check_true_width(res, ppc)
-    # wall-mounted, no TV unit: centre ≈ 105 cm above the floor line
+    # wall-mounted, nothing to hang it above: centre ≈ 120 cm above the floor line (user, 6 Nov 2026: "so low")
     b = dict(res.planned)[TV55.sku]
-    assert abs((fy - (b[1] + b[3]) / 2) / ppc - 105) <= 4
+    assert abs((fy - (b[1] + b[3]) / 2) / ppc - 120) <= 4
 
 
 async def test_scale_floor_tile_true_width():
@@ -301,7 +301,7 @@ async def test_perspective_wall_quad_matches_the_homography():
         assert _within(np.linalg.norm(p[0] - p[3]), h_cm, 0.03) and _within(np.linalg.norm(p[1] - p[2]), h_cm, 0.03)
         assert abs(p[0][1] - p[1][1]) < 1.5 and abs(p[0][0] - p[3][0]) < 1.5  # level and plumb on the wall
     p = [backproject(c, front) for c in dict(res.quads)[TV55.sku]]
-    assert abs(np.mean([v[1] for v in p]) - 105) < 4  # centre 105 cm above the floor
+    assert abs(np.mean([v[1] for v in p]) - 120) < 4  # centre 120 cm above the floor (a bare wall)
     # the rendered frame really is at the quad: dark pixels just inside the left edge, wall just outside
     g = np.asarray(_img(res.image).convert("L"), dtype=np.float32)
     tl, bl = np.asarray(dict(res.quads)[TV55.sku][0]), np.asarray(dict(res.quads)[TV55.sku][3])
@@ -329,7 +329,8 @@ async def test_tv_unit_anchor_and_stand_mount():
     b = dict(res.planned)[TV55.sku]
     assert abs((b[0] + b[2]) / 2 - 700) <= 4  # centred on the TV unit
     unit_top = boxes["tv_unit"][1]
-    assert _within((unit_top - b[3]) / ppc, 15, 0.25)  # wall mount: bottom edge 15 cm above the unit
+    # wall mount above a 45 cm unit: at least 15 cm above it, and the centre never below 115 cm ("so low")
+    assert (unit_top - b[3]) / ppc >= 15 and abs((fy - (b[1] + b[3]) / 2) / ppc - 115) <= 4
     stand = TryonProduct(**{**TV55.__dict__, "mount": "stand"})
     res = await run(TryonRequest(photo=photo, read=read, products=[stand]))
     b = dict(res.planned)[TV55.sku]
@@ -603,9 +604,13 @@ async def test_tv_goes_on_the_spot_the_reading_chose_centred_on_its_unit():
 
 
 async def test_tv_spot_on_a_bare_wall_and_a_wrong_spot_over_a_window():
+    """On a bare wall the reading's spot decides the height and which clear stretch; the TV is centred on that
+    stretch (user, 6 Nov 2026: "not at the center of the space/wall ... it places so low")."""
     read = _plain_room(("tv_spot", [380, 560, 640, 860]))
     res = await run(TryonRequest(photo=_photo("room_living"), read=read, products=[TV55], wall_width_ft=12))
-    assert res.placement["TV-MER-55-QL120"]["anchor"] == "spot" and abs(_x(res) - 0.71) < 0.02
+    assert res.placement["TV-MER-55-QL120"]["anchor"] == "spot" and abs(_x(res) - 0.5) < 0.02  # the wall's centre
+    box = dict(res.planned)["TV-MER-55-QL120"]
+    assert abs((box[1] + box[3]) / 2 / 810 - 0.51) < 0.03  # at the spot's height (its centre at 0.51 of the photo)
     read = _plain_room(("window", [200, 600, 700, 1000]), ("tv_spot", [380, 640, 640, 940]))  # the spot is wrong
     res = await run(TryonRequest(photo=_photo("room_living"), read=read, products=[TV55], wall_width_ft=12))
     box = dict(res.planned)["TV-MER-55-QL120"]

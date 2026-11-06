@@ -40,7 +40,11 @@ async def journey(h, lang: str) -> list:
 
     await go(h.say, "namaste")
     await go(h.tap, f"g:alang:{lang}")
-    out = await go(h.say, "my name is Amit")
+    out = await go(h.say, "my name is Amit")  # then which product's stock and offers: every product, one by one
+    for cat in ("ac", "wm", "fridge", "laptop", "tv"):
+        out = await go(h.pick, f"g:briefcat:{cat}")
+        if cat != "tv":
+            await go(h.tap, "g:brief")
     await go(h.tap, next(b.id for m in out for b in m.buttons))  # today's training
     await go(h.tap, "g:ready:translate")
     await go(h.tap, "g:new")

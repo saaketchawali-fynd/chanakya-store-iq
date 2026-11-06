@@ -85,7 +85,7 @@ tryon_like: {hi: "{size}\" pasand", mr: "{size}\" आवडला", en: "Like {s
 home_card_caption: {hi: "Home Card: {known}/{total} ghar ki baatein pata", mr: "होम कार्ड: घराच्या {known}/{total} गोष्टी माहीत", en: "Home Card: {known}/{total} home facts known"}
 home_row_sports: {hi: "Cricket kaun dekhta", mr: "क्रिकेट कोण पाहतं", en: "Watches cricket"}
 start_level_by_you: {hi: "aapne set kiya", mr: "तुम्ही ठरवलं", en: "set by you"}
-start_level_not_told: {hi: "Budget nahi bataya", mr: "बजेट सांगितलं नाही", en: "Budget not told"}
+start_level_not_told: {hi: "Abhi tay nahi: aap poochkar set karein (dikhawat se kabhi nahi)", mr: "अजून ठरलं नाही: तुम्ही विचारून ठरवा (दिसण्यावरून कधीच नाही)", en: "Not set: you set it by asking (never from looks)"}
 benefit_card_caption: {hi: "Benefit Card — customer ko dikhaiye", mr: "फायदा कार्ड — ग्राहकाला दाखवा", en: "Benefit Card: show the customer"}
 ignore_prefix: {hi: "Is ghar ke liye kam zaroori:", mr: "या घरासाठी कमी महत्त्वाचं:", en: "Less important for this home:"}
 exchange_text: {hi: "Purane TV/appliance ka exchange: {low} – {high} (bill se alag)", mr: "जुन्या उपकरणाचा एक्सचेंज: {low} – {high} (बिलापासून वेगळं)", en: "Exchange for the old one: {low} – {high} (separate from the bill)"}

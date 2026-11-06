@@ -11,11 +11,12 @@ from __future__ import annotations
 import re
 
 from chanakya.ai.schemas import Understanding
+from chanakya.core import repo
 from chanakya.core.clock import today
 from chanakya.sim.harness import PHONES
 from chanakya.truth import jio_sync
 from chanakya.truth.jio import JioClient
-from tests.helpers import button_ids, check_floor, options_view, pick, to_options
+from tests.helpers import button_ids, check_floor, open_brief, options_view, pick, to_options
 from tests.unit.test_jio import ITEMS, PROMO, backend, item, live
 
 
@@ -26,8 +27,11 @@ async def session(h):
 async def test_shift_start_is_one_step_at_a_time(h):
     out = await h.say("namaste")
     check_floor(out)
+    assert not any(m.card for m in out)  # first: which product (stock and offers for that product)
+    out = await open_brief(h, out, "tv")
+    check_floor(out)
     m = next(m for m in out if m.card and m.card.template == "brief")
-    assert m.card.lang == "en" and button_ids(out) == ["g:clip:translate"]  # one next step, nothing else
+    assert m.card.lang == "en" and button_ids(out) == ["g:clip:translate", "g:brief"]  # the clip next, or another product
     d = m.card.data
     assert d["stock"]["n"] and d["stock"]["tiles"] and d["offers"]  # stock and offers from the data
     for k in d["keep"]:  # every 'keep in mind' point carries a number from the data, never a generic rule
@@ -45,7 +49,7 @@ async def test_live_data_brief_never_invents_stock_counts(tmp_path, monkeypatch)
     h = await live(tmp_path)
     try:
         await jio_sync.sync(h.rt.settings, h.rt.facts)
-        out = await h.say("namaste")
+        out = await open_brief(h, await h.say("namaste"), "tv")
         b = next(m for m in out if m.card and m.card.template == "brief")
         assert not [c for c in b.card.data["changes"] if c["kind"] == "low"]
         assert "out of" not in str(b.card.data["changes"])  # nothing changed yet
@@ -145,3 +149,22 @@ async def test_one_card_per_visual_everywhere(h):
     await h.tap("s:C1:shown")
     out = await pick(h)
     assert sum(1 for m in out if m.card or m.image_bytes) == 1 and all(m.card.lang == "en" for m in out if m.card)
+
+
+async def test_brief_for_the_product_chosen(h):
+    """User, 6 Nov 2026: stock and offers only ever showed TVs. Now the product is chosen first, each row with its
+    numbers for today, and the card is that product's, from today's data."""
+    out = await h.say("namaste")
+    rows = {r.id: r.description for m in out for sec in (m.sections or []) for r in sec.rows}
+    assert {"g:briefcat:tv", "g:briefcat:ac", "g:briefcat:wm", "g:briefcat:fridge"} <= set(rows)
+    assert all(re.search(r"\d", d) for d in rows.values())  # today's stock and offers on every row
+    out = await open_brief(h, out, "ac")
+    check_floor(out)
+    d = next(m for m in out if m.card and m.card.template == "brief").card.data
+    n_ac = sum(1 for p in h.rt.facts.products_sync("ac") if p.qty > 0 or p.nearby_qty > 0)
+    assert d["cat"] == "ACs" and d["stock"]["n"] == str(n_ac) and d["stock"]["tiles"]
+    out = await open_brief(h, await h.tap("g:brief"), "fridge")  # another product
+    d = next(m for m in out if m.card and m.card.template == "brief").card.data
+    assert d["cat"] == "fridges"
+    evs = [e.payload.get("dept") for e in await repo.events_for(types=["brief_shown"])]
+    assert evs[-2:] == ["ac", "fridge"]
