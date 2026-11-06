@@ -21,7 +21,9 @@ from chanakya.truth import db
 from chanakya.truth.jio import PLAN_LABELS, JioClient, JioError, category_of, companion_of, is_protection
 from chanakya.truth.jio_map import (
     KNOWN_BRANDS,
+    brand_from_name,
     implausible,
+    junk_listing,
     map_accessory,
     map_product,
     map_promotions,
@@ -98,15 +100,31 @@ async def fetch(s: Settings) -> tuple[list[dict], list[dict], list[dict], int]:
                 if row and row["sku"] not in seen:
                     seen.add(row["sku"])
                     products.append(row)
-        # a listing that contradicts itself (another brand's name, a 5 cm washing machine) is left out, counted apart
+        # a listing that contradicts itself: a real product with a slip in one field is kept and the slip set aside
+        # (brand 'LG1' on an LG TV → LG, from its own name; a 75" TV listed 17 cm wide → no dimensions, the size from
+        # its name); only another brand's product (an Onida washer branded Samsung) or a junk listing is left out
         brands = KNOWN_BRANDS | {" ".join(r["brand"].lower().split()) for r in products if r["brand"]}
         flagged = []
         for r in list(products):
             why = implausible(r, brands)
-            if why:
+            if not why and not junk_listing(r):
+                continue
+            action = "left_out"
+            if junk_listing(r):
+                why = [*why, "junk_name"]
+            else:
+                bad_brand = [w for w in why if w.startswith("brand:")]
+                fixed = brand_from_name(r, bad_brand[0]) if bad_brand else None
+                if not bad_brand or fixed:
+                    if fixed:
+                        r["brand"] = fixed
+                    if any(w.startswith("dims:") for w in why):
+                        r["dims"] = {}
+                    action = "corrected"
+            if action == "left_out":
                 products.remove(r)
-                flagged.append({"sku": r["sku"], "category": r["category"], "brand": r["brand"],
-                                "name": (r["info"].get("name") or "")[:90], "why": why})
+            flagged.append({"sku": r["sku"], "category": r["category"], "brand": r["brand"], "action": action,
+                            "name": (r["info"].get("name") or "")[:90], "why": why})
         promos: dict[str, list[dict]] = {}
         errors = 0
         sem = asyncio.Semaphore(4)

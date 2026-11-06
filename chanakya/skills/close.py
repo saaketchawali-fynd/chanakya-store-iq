@@ -174,10 +174,16 @@ async def quote(ctx: SkillContext, alt: bool = False) -> Reply:
         ctx.ev("finance_shown", sources=[f"calc:emi:{q.plan_id}"], plan_id=q.plan_id, monthly=q.monthly,
                months=q.months, total=q.total, extra=q.extra)
         say = finance_sentence(ctx, q, ctx.clang)
-    elif extras > 0:
-        say = ctx.tc("bolo_total_today", total=total_str)
-    else:
-        say = ctx.tc("payable_now", payable=res.payable_str)
+    else:  # one sentence in English (user, 6 Nov 2026: the final clean total is always English), every part from the data: product + add-ons − today's offer = what they pay today
+        src = f"calc:total_today:{sku}"
+        parts = [ctx.t("cost_part_product", "en", price=ctx.reg.inr(p.price, p.price_source))]
+        if extras > 0:
+            parts.append(ctx.t("cost_part_addons", "en", amt=ctx.reg.inr(extras, src)))
+        off = int(p.price) - int(res.payable)
+        if off > 0:
+            parts.append(ctx.t("cost_part_offer", "en", amt=ctx.reg.inr(off, src)))
+        say = ctx.t("cost_sentence", "en", parts=" ".join(parts), total=total_str) if len(parts) > 1 else \
+            ctx.t("payable_now", "en", payable=total_str)
     if res.applied:  # the Kyun line is the associate's: offer name and date in their language
         a = res.applied[0]
         o = next((o for o in ctx.facts.snap.offers if o.id == a.id), None)

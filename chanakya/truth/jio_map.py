@@ -362,6 +362,27 @@ def implausible(row: dict, brands: set[str] | frozenset[str] = KNOWN_BRANDS) -> 
     return why
 
 
+def brand_from_name(row: dict, why: str) -> str | None:
+    """'brand:lg1!=lg' / 'brand:voltas beko!=voltas': the listed brand is a variant of the one its own name starts with
+    (one begins with the other), so the name's brand is the real one; another brand altogether gives None."""
+    listed, named = why.split(":", 1)[1].split("!=")
+    if listed.startswith(named) or named.startswith(listed):
+        name = (row.get("info") or {}).get("name") or ""
+        return " ".join(name.split()[: len(named.split())]) or None
+    return None
+
+
+CATEGORY_WORDS = ("tv", "television", "led", "oled", "qled", "smart", "inch", "air conditioner", " ac", "split",
+                  "window", "ton", "washing", "washer", "load", "kg", "refrigerator", "fridge", "litre", "liter",
+                  "door", "laptop", "notebook", "macbook", "chromebook", "core", "ryzen", "gb")
+
+
+def junk_listing(row: dict) -> bool:
+    """A test or placeholder listing ('helloworld1'): its name says nothing of any product kind."""
+    name = " " + ((row.get("info") or {}).get("name") or "").lower() + " "
+    return not any(w in name for w in CATEGORY_WORDS)
+
+
 def map_product(p: dict, category: str) -> dict | None:
     """Rows for Product (+ price fields) from one getProducts item; None without a selling price."""
     eff, mrp = price(p, "effective"), price(p, "marked")

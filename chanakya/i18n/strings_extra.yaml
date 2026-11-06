@@ -72,6 +72,10 @@ bolo_options_ready: {hi: "Aapke ghar ke hisaab se 3 sahi options dikhata hoon.",
 this_product: {hi: "ye model", mr: "हे मॉडेल", en: "this model"}
 other_product: {hi: "dusra model", mr: "दुसरं मॉडेल", en: "the other model"}
 payable_now: {hi: "Aaj aapko {payable} dena hoga.", mr: "आज देय रक्कम {payable} आहे.", en: "Today's payable amount is {payable}."}
+cost_sentence: {hi: "{parts} — aaj ka poora kharcha {total}.", mr: "{parts} — आजचा पूर्ण खर्च {total}.", en: "{parts}: your full cost today is {total}."}
+cost_part_product: {hi: "Product {price}", mr: "प्रॉडक्ट {price}", en: "Product {price}"}
+cost_part_addons: {hi: "+ saath ka saamaan aur installation {amt}", mr: "+ सोबतचं सामान आणि इन्स्टॉलेशन {amt}", en: "+ add-ons and installation {amt}"}
+cost_part_offer: {hi: "− aaj ka offer {amt}", mr: "− आजची ऑफर {amt}", en: "− today's offer {amt}"}
 honest_offer: {hi: "Ye offer {date} tak hai — taareekh card par hai.", mr: "हा ऑफर {date} पर्यंत आहे — तारीख कार्डवर आहे.", en: "This offer runs until {date}; the date is on the card."}
 honest_stock: {hi: "{product} abhi store mein {qty} hain.", mr: "{product} सध्या स्टोअरमध्ये {qty} आहेत.", en: "{product}: {qty} in the store right now."}
 honest_generic: {hi: "Aaram se sochiye, saari jaankari aapke WhatsApp par bhej dunga.", mr: "निवांत विचार करा, सगळी माहिती तुमच्या WhatsApp वर पाठवतो.", en: "Take your time; I'll send everything to your WhatsApp."}
