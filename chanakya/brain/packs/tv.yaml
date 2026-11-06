@@ -325,6 +325,7 @@ reasons:
 benefits:
   - id: b_motion
     weight: 2
+    general: true
     when_spec: {refresh_hz: {gte: 120}}
     when_slots: {content: {has_any: [sports, sports_some, gaming]}}
     cites: [content]
@@ -333,6 +334,7 @@ benefits:
     card: {hi: "Cricket mein ball saaf", mr: "क्रिकेटमध्ये बॉल स्पष्ट", en: "Sharp ball in cricket"}
   - id: b_bright
     weight: 2
+    general: true
     when_spec_any: [{brightness_nits: {gte: 500}}, {anti_glare: {eq: true}}]
     when_slots: {room_light: {in: [sunny]}}
     cites: [room_light]
@@ -354,6 +356,7 @@ benefits:
     card: {hi: "Kam awaaz mein saaf dialogue", mr: "कमी आवाजात स्पष्ट संवाद", en: "Clear dialogue, low volume"}
   - id: b_angle
     weight: 1
+    general: true
     when_spec: {wide_angle: {eq: true}}
     when_slots: {seating: {in: [wide]}}
     cites: [seating]
@@ -361,6 +364,7 @@ benefits:
     card: {hi: "Side se bhi sahi rang", mr: "बाजूनेही योग्य रंग", en: "True colour from the side"}
   - id: b_dark
     weight: 1
+    general: true
     when_spec: {panel: {in: [OLED, MiniLED]}}
     when_slots: {room_light: {in: [dim]}, content: {has_any: [movies]}}
     cites: [room_light, content]
@@ -368,6 +372,7 @@ benefits:
     card: {hi: "Movies theatre jaisi", mr: "सिनेमा थिएटरसारखा", en: "Theatre-like movies"}
   - id: b_apps
     weight: 0.5
+    general: true
     when_spec: {apps: {nonempty: true}}
     when_slots: {content: {has_any: [movies, kids]}}
     cites: [content]

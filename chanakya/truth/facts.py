@@ -95,6 +95,54 @@ class Snapshot:
     content: list[Content] = field(default_factory=list)
 
 
+def _code(s: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+
+def _codes(text: str) -> set[str]:
+    """Model-number-like tokens printed on a label: letters and digits together, 5+ characters ('KD-43X7002E')."""
+    out = set()
+    for tok in re.split(r"[\s,;:()]+", text or ""):
+        c = _code(tok)
+        if len(c) >= 5 and re.search(r"\d", c) and re.search(r"[a-z]", c):
+            out.add(c)
+    return out
+
+
+_SPEC_UNITS = (("capacity_kg", r"(\d+(?:\.\d+)?)\s*(?:kg|kilo)"), ("capacity_l", r"(\d{2,4})\s*(?:l|ltr|litres?|liters?)\b"),
+               ("ton", r"(\d(?:\.\d+)?)\s*tons?\b"), ("size_in", r"(\d{2,3})\s*(?:\"|inch|in\b)"))
+
+
+def _words(s: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9]+(?:\.[0-9]+)?", (s or "").lower()))
+
+
+def _cover(label: str, name: str) -> float:
+    """How much of what the label says is in this product's full name (0–100): a label that says 'Pro' is not the
+    model without 'Pro', and a label showing part of a long name still matches it."""
+    said = _words(label)
+    return 100.0 * len(said & _words(name)) / len(said) if said else 0.0
+
+
+SPEC_TOLERANCE = {"size_in": 0.6, "capacity_l": 3.0}  # inches (54.6 vs 55) and litres (rounding); kg and ton exact
+
+
+def _label_specs(read: ImageRead, text: str) -> dict[str, float]:
+    """The sizes a label states (kg, litres, ton, inch), to check against the data."""
+    out: dict[str, float] = {}
+    if read.size_in:
+        out["size_in"] = float(read.size_in)
+    low = " ".join([text.lower()] + [f"{sp.value} {sp.unit or ''} {sp.name}".lower() for sp in read.specs or []])
+    for key, rx in _SPEC_UNITS:
+        m = re.search(rx, low)
+        if m and key not in out:
+            try:
+                out[key] = float(m.group(1))
+            except ValueError:
+                pass
+    return out
+
+
 class FactsService:
     def __init__(self, store_id: str):
         self.store_id = store_id
@@ -166,19 +214,34 @@ class FactsService:
         return (cands[0][0], cands[0][1]) if cands else (None, 0.0)
 
     def rank_label(self, read: ImageRead, category_hint: str | None = None) -> list[tuple[str, float]]:
-        """Exact product from a label QR; else fuzzy model match (rapidfuzz) boosted by brand, size and category."""
+        """The product on a shelf label, from the backend's own catalogue (user, 6 Nov 2026: real labels, real data):
+        an exact product from a Chanakya QR; else the model number printed anywhere on the label (exact, or with a
+        suffix such as '/TL'); else the printed name matched to the product's full name. The label's own specs (kg,
+        litres, ton, inch) must agree with the data; the brand must too."""
         if read.sku and read.sku in self.snap.products:
             return [(read.sku, 100.0)]
         text = " ".join(x for x in [read.brand or "", read.model_text or ""] if x).strip()
-        if not text and read.size_in is None:
+        printed = " ".join(x for x in [read.model_text or "", read.raw_text or ""] if x)
+        if not text and read.size_in is None and not printed:
             return []
         cat = read.category or category_hint
+        codes = _codes(printed)
+        said = _label_specs(read, " ".join([text, read.raw_text or ""]))
         scored: list[tuple[str, float]] = []
+        exact: set[str] = set()
+        read_model = _code(read.model_text or "")
         for p in self.snap.products.values():
             if cat and p.category != cat:
                 continue
-            if read.model_text:
-                s = float(fuzz.ratio(read.model_text.lower(), p.model.lower()))
+            mn = _code((p.info or {}).get("model_number") or "")
+            name = (p.info or {}).get("name") or (p.title or {}).get("en") or p.model
+            if read_model and read_model in (_code(p.model), mn):
+                exact.add(p.sku)  # the label's model text is this product's model, letter for letter
+            if mn and len(mn) >= 5 and any(c == mn or (len(c) >= 6 and (mn.startswith(c) or c.startswith(mn))) for c in codes):
+                s = 96.0  # its model number is printed on the label
+                exact.add(p.sku)
+            elif read.model_text:
+                s = max(float(fuzz.ratio(read.model_text.lower(), p.model.lower())), _cover(text, name))
             elif text:
                 s = float(fuzz.token_sort_ratio(text.lower(), p.model.lower()))
             else:
@@ -187,12 +250,19 @@ class FactsService:
                 s += 5
             elif read.brand:
                 s -= 25
-            size = (p.specs or {}).get("size_in")
-            if read.size_in and size:
-                s += 5 if abs(float(size) - float(read.size_in)) < 0.6 else -30
+            for key, v in said.items():  # what the label says must be what the data says
+                have = (p.specs or {}).get(key)
+                if have is not None:
+                    try:
+                        s += 5 if abs(float(have) - v) <= SPEC_TOLERANCE.get(key, 0.01) else -60  # contradicts: out
+                    except (TypeError, ValueError):
+                        pass
             if read.confidence is not None and read.confidence < 0.5:
                 s *= read.confidence / 0.5
-            scored.append((p.sku, max(0.0, min(100.0, s))))
+            scored.append((p.sku, s))
+        if exact:  # an exact model on the label decides: near namesakes ('… QLED' for '… QLED Pro') fall back
+            scored = [(sku, sc if sku in exact else sc - 15) for sku, sc in scored]
+        scored = [(sku, max(0.0, min(100.0, sc))) for sku, sc in scored]
         return sorted(scored, key=lambda x: -x[1])[:3]
 
     def find_in_text(self, text: str, category: str | None = None) -> str | None:

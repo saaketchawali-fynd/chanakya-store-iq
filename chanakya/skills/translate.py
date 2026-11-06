@@ -63,12 +63,34 @@ def _spec_keys(cond: dict) -> set[str]:
     return set((cond or {}).keys())
 
 
+HOME_KEYS = {"distance": "seat_distance", "sqft": "room_size", "people": "family_size", "hours": "hours_per_day"}
+SPEC_KEYS = {"kg": "capacity_kg", "ton": "ton", "size": "size_in"}
+COMPUTED = {"who", "monthly_bill", "five_year_saving"}
+
+
+def fillable(ctx: SkillContext, p, b) -> bool:
+    """Every value the line needs is in the data (the product's specs, the Home Card): never a line with a hole
+    in it ('stays cold for  hours')."""
+    home, pack = ctx.session.home, ctx.pack
+    for key in P.placeholders(" ".join(b.say.values())):
+        if key in COMPUTED:
+            continue
+        if key in HOME_KEYS:
+            if P.number(home, HOME_KEYS[key], pack) is None:
+                return False
+        elif p.spec(SPEC_KEYS.get(key, key)) in (None, "", []):
+            return False
+    return True
+
+
 def matching(ctx: SkillContext, p) -> list:
     pack = ctx.pack
     g = ctx.facts.snap.guides
     home = ctx.session.home
     out = []
     for i, b in enumerate(pack.benefits):
+        if not fillable(ctx, p, b):
+            continue
         if b.when_spec and not P.eval_spec_cond(p, home, b.when_spec, pack, g):
             continue
         if b.when_spec_any and not P.eval_spec_any(p, home, b.when_spec_any, pack, g):
@@ -126,18 +148,22 @@ async def fill(ctx: SkillContext, text: str, p, lang: str) -> str:
 
 
 async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
-    s = ctx.session
-    sp = ctx.facts.product_sync(read.sku) if read.sku else None
-    cat = s.home.category or (sp.category if sp else None) or (ctx.staff.dept if ctx.staff else None) or "tv"
-    cands = ctx.facts.rank_label(read, cat)
+    # the label decides the product; the category filters only when the label itself says it (a washing machine
+    # label scanned by a TV associate is still a washing machine)
+    cands = ctx.facts.rank_label(read, None)
     if read.raw_text:
         ctx.ev("label_text_ignored_as_instructions", text=read.raw_text[:80])
     if not ctx.facts.snap.products:  # nothing loaded from the backend (yet) to match the label against
         return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
     if not cands or cands[0][1] < 40:
+        seen = " ".join(x for x in (read.brand, read.model_text) if x).strip()
+        if seen:  # read clearly, but not a product in today's catalogue: say so, never a near guess
+            ctx.ev("label_not_in_catalogue", seen=seen[:80])
+            return ctx.reply(info_reply(ctx, ctx.t("label_not_found", model=ctx.reg.raw(truncate(seen, 40), "label:read"))))
         return ctx.reply(info_reply(ctx, ctx.t("label_unknown")))
     sku, conf = cands[0]
-    if conf < 70:
+    close = len(cands) > 1 and cands[1][1] >= 70 and conf - cands[1][1] < 5  # two models fit the label: never guess
+    if conf < 70 or close:
         rows = [
             ListRow(id=ctx.sid("label", c[0]), title=truncate(ctx.facts.product_sync(c[0]).model, 24))
             for c in cands
@@ -204,12 +230,32 @@ def hl_points(ctx: SkillContext, p, n: int = 3, general: bool = False) -> list:
     return HL.points(p, ctx.session.home, _wants(ctx), ctx.pack, n=n, general=general)
 
 
-def hl_say(ctx: SkillContext, p, pt, lang: str) -> str:
+def hl_say(ctx: SkillContext, p, pt, lang: str, plain: bool = False) -> str:
     """The customer line for a highlight point, its proof registered from the product's own highlight."""
     from chanakya.brain import highlights as HL
 
     ctx.reg.raw(pt.proof, f"highlight:{p.sku}")
-    return ctx.reg.static(HL.say(pt, lang))
+    return ctx.reg.static(HL.say(pt, lang, plain=plain))
+
+
+def _general_line(ctx: SkillContext, p, said: list):
+    """The pack's product-only line (true for any home, proven by the product's own spec), the strongest not yet
+    said: on a label scan before the home is known, the label's spec in daily-life words (the Translate step:
+    '7.5 kg: one bedsheet and six shirts in one wash')."""
+    pack = ctx.pack
+    if pack is None or p.category != pack.category:
+        return None
+    g, home = ctx.facts.snap.guides, ctx.session.home
+    out = []
+    for i, b in enumerate(pack.benefits):
+        if not b.general or b.id in said or not fillable(ctx, p, b):
+            continue
+        if b.when_spec and not P.eval_spec_cond(p, home, b.when_spec, pack, g):
+            continue
+        if b.when_spec_any and not P.eval_spec_any(p, home, b.when_spec_any, pack, g):
+            continue
+        out.append((b.weight, -i, b))
+    return max(out, key=lambda x: (x[0], x[1]))[2] if out else None
 
 
 def _next_benefit(ctx: SkillContext, p, said: list, general: bool = False):
@@ -235,17 +281,25 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         said.clear()
     gate = state.options_gate_open(ctx.session, ctx.pack)
     kind, nxt = _next_benefit(ctx, p, said)
-    if nxt is None and first and gate:  # the home is known but nothing of it matches: the product's own best point
+    gen = _general_line(ctx, p, said) if nxt is None and first else None
+    if nxt is None and first and gen is None:  # nothing for this home (yet): the product's own best highlight
         kind, nxt = _next_benefit(ctx, p, said, general=True)
     if nxt is None and first:
-        # no home facts match yet: show the product from the data, and steer back to the home questions
+        # no home facts match yet: the label's spec in daily-life words (or the product), then the home questions
         card = await product_card_en(ctx, p)
         slot = C.pick_next_slot(ctx)
         btns = [ctx.b("b_next_q", ctx.sid("go")), ctx.b("b_compare", ctx.sid("compare")),
                 ctx.b("b_options", ctx.sid("options"))]
         n = state.missing_for_options(ctx.session, ctx.pack)
-        say = ctx.tc("bolo_label_intro" if n else "bolo_label_ready", product=C.product_name(ctx, p))
-        why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing")) if n else ctx.t("kyun_options_ready")
+        gate_why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing")) if n else ctx.t("kyun_options_ready")
+        if gen is not None:  # true for any home, proven by this product's own spec
+            say = await fill(ctx, ctx.pick(gen.say, ctx.clang), p, ctx.clang)
+            said.append(gen.id)
+            ctx.ev("benefit_said", rule_id=gen.id, cites=[], sku=sku, general=True)
+            why = ctx.t("kyun_label_spec") + " · " + gate_why
+        else:
+            say = ctx.tc("bolo_label_intro" if n else "bolo_label_ready", product=C.product_name(ctx, p))
+            why = gate_why
         cites = C.known_cites(ctx) or ([slot] if slot else [])
         if slot and not C.known_cites(ctx):
             ctx.asking.add(slot)
@@ -265,7 +319,7 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
         vt = ctx.reg.static(", ".join(sd.value_title(v, ctx.lang) for v in P.values(ctx.session.home, cite))) if sd else ""
         why = ctx.t("kyun_benefit", value=vt)
     else:
-        say = hl_say(ctx, p, nxt, lang)
+        say = hl_say(ctx, p, nxt, lang, plain=first and not said)
         rid = f"hl_{nxt.theme}"
         cites_all = [n.slot for n in _theme_needs(ctx, nxt.theme) if n.slot and P.known(ctx.session.home, n.slot)]
         why = ctx.t("kyun_hl" if nxt.need else "kyun_hl_general", proof=ctx.reg.raw(nxt.proof, f"highlight:{p.sku}"))
@@ -280,9 +334,11 @@ async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     card = None
     if first:
         card = await product_card_en(ctx, p)
-        if not gate:  # judge the fit only once the home is understood
+        if not gate:  # judge the fit only once the home is understood: the home fact it answers, then what is left
             n = state.missing_for_options(ctx.session, ctx.pack)
-            why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
+            gate_why = ctx.t("kyun_label_gate", n=ctx.reg.num(n, "calc:gate_missing"))
+            known = [c for c in cites_all if P.known(ctx.session.home, c)]
+            why = f"{why} · {gate_why}" if known else gate_why
             btns = [btns[0], btns[1], ctx.b("b_next_q", ctx.sid("go"))]
     cites = [c for c in cites_all if P.known(ctx.session.home, c)] or cites_all or C.known_cites(ctx)
     facts = card_facts(ctx, p, card) if card is not None else []

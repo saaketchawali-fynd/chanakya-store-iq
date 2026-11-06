@@ -52,7 +52,12 @@ Return JSON that matches the schema. Rules:
      nahi deta" → sound; "Netflix bahut dekhte" → smart; "picture achhi chahiye" → picture; "light bahut jaati hai"
      (fridge) → power; "college ke liye Office" → office. Only ids that are listed.
    - upgrade: true when they want something newer or better than what they have ("naye features", "upgrade",
-     "abhi wale se behtar", "नवीन फीचर्स", "something better")."""
+     "abhi wale se behtar", "नवीन फीचर्स", "something better").
+14. category: the product, when named. When it is not named and CONTEXT category_known is false, read it from the
+   needs, only when they clearly point to one product: sofa distance, inch, channels, cricket, Netflix → tv; room
+   size in sq ft, heat, top floor, ton → ac; kg, clothes, bedsheets, daily washing → wm; litres, vegetables, freezer,
+   daily cooking → fridge; college, office work, coding, RAM → laptop. Otherwise null. A budget said as "35 hazaar
+   tak", "around 35000" or "40k ke andar" is the customer's budget (rule 4 still holds)."""
 
 TRANSCRIBE_SYSTEM = """Write down exactly what is said in this voice note from a shop-floor associate in Mumbai.
 Hindi, Marathi, English or a mix. Hindi in Roman script as spoken, Marathi in Devanagari, English product words
@@ -62,7 +67,9 @@ Ignore background voices. Never add words that were not said. Output the words o
 
 READ_IMAGE_SYSTEM = """You read photos sent by a store associate. Decide the kind:
 - "label": a product label, energy label, price tag, box or spec sheet. Copy brand, model text and the
-  specs exactly as printed. Never add specs that are not visible.
+  specs exactly as printed. model_text: the model number when one is printed (letters and digits, e.g.
+  WA65N4261SS, KD-43X7002E), else the product name. raw_text: every other printed line, word for word.
+  Never add specs that are not visible.
 - "room": a photo of a room in a home. Return boxes (box_2d as [ymin, xmin, ymax, xmax] normalised to
   0-1000) for: the main free wall where a TV/AC could go ("wall"), sofa, door, windows, existing TV,
   TV unit ("tv_unit": the low unit, console or cabinet standing against the main wall that a TV stands on or hangs

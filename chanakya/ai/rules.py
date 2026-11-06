@@ -100,16 +100,47 @@ WEALTH_CUES = ("car", "gaadi", "gadi", "bmw", "mercedes", "audi", "kapde", "kapd
                "गाडी", "कपडे", "श्रीमंत", "अमीर", "दिखते", "लगते", "दिसतात", "वाटतात")
 
 
+# a budget said without the word (user, 6 Nov 2026: the needs by voice, understood on its own): an amount followed
+# by 'tak' / 'ke andar' / 'पर्यंत' / 'aas paas', or after 'under' / 'around' / 'lagbhag'. Never a price seen elsewhere.
+BUDGET_AFTER = re.compile(r"^\s*(?:tak|tk|ke andar|andar|ke under|tak ka|tak ki|ke aas ?paas|aas ?paas|ke around|ki range|"
+                          r"तक|पर्यंत|च्या आत|के आसपास|आसपास|के अंदर)")
+BUDGET_BEFORE = re.compile(r"(?:under|upto|up to|around|about|approx\.?|approximately|lagbhag|within|below|max|maximum|"
+                           r"kareeb|लगभग|करीब|साधारण)\s*$")
+PRICE_SEEN = ("online", "amazon", "flipkart", "website", "dusri dukaan", "doosri dukaan", "mil raha", "mil rha", "dekha",
+              "ऑनलाइन", "बघितल", "देखा")
+
+
+def _clauses(t: str) -> list[str]:
+    return re.split(r"[.,;!?|।]| aur | but | lekin | पण ", t)
+
+
+def _wealthy(clause: str) -> bool:
+    return any(re.search(rf"(?<!\w){re.escape(c)}(?!\w)", clause) for c in WEALTH_CUES)
+
+
+def budget_said(t: str) -> float | None:
+    """The amount said as the customer's budget without the word 'budget' ('35 hazaar tak', 'around 35000'), in a
+    clause that is not about a price seen elsewhere (online, another shop) nor about their car, clothes or looks."""
+    for clause in _clauses(t):
+        if any(w in clause for w in PRICE_SEEN) or _wealthy(clause):
+            continue
+        for v, start, end in _amount_spans(clause):
+            if BUDGET_AFTER.match(clause[end:end + 18]) or BUDGET_BEFORE.search(clause[max(0, start - 16):start]):
+                return v
+    return None
+
+
 def explicit_budget(transcript: str | None) -> bool:
-    """True when the note says a budget as a budget ('budget 50 hazaar', '50 hazaar tak ka'), and that clause is not
-    about the customer's car, clothes, jewellery or looks. With no transcript to check (a test fixture), True."""
+    """True when the note says a budget as a budget ('budget 50 hazaar', '50 hazaar tak', 'around 35000'), and that
+    clause is not about the customer's car, clothes, jewellery or looks. With no transcript to check (a test fixture),
+    True."""
     if not transcript:
         return True
     t = _norm(transcript)
     if not any(w in t for w in BUDGET_WORDS):
-        return False
-    for clause in re.split(r"[.,;!?|।]| aur | but | lekin | पण ", t):
-        if any(w in clause for w in BUDGET_WORDS) and any(re.search(rf"(?<!\w){re.escape(c)}(?!\w)", clause) for c in WEALTH_CUES):
+        return budget_said(_words_to_digits(t)) is not None
+    for clause in _clauses(t):
+        if any(w in clause for w in BUDGET_WORDS) and _wealthy(clause):
             return False
     return True
 
@@ -143,18 +174,22 @@ def _has(t: str, phrases: list[str]) -> str | None:
     return best
 
 
-def _amount(t: str) -> list[tuple[float, int]]:
-    """Money-like amounts: '50000', '50k', '50 hazaar', '1.2 lakh', '₹45,000' → (value, position)."""
+def _amount_spans(t: str) -> list[tuple[float, int, int]]:
+    """Money-like amounts: '50000', '50k', '50 hazaar', '1.2 lakh', '₹45,000' → (value, start, end)."""
     out = []
     for m in re.finditer(NUM + r"\s*" + LAKH, t):
-        out.append((float(m.group(1)) * 100000, m.start()))
+        out.append((float(m.group(1)) * 100000, m.start(), m.end()))
     for m in re.finditer(NUM + r"\s*" + THOUSAND, t):
-        out.append((float(m.group(1)) * 1000, m.start()))
+        out.append((float(m.group(1)) * 1000, m.start(), m.end()))
     for m in re.finditer(r"(?<![\d.])(\d{4,7})(?![\d.])", t):
         v = float(m.group(1))
         if 5000 <= v <= 900000:
-            out.append((v, m.start()))
-    return out
+            out.append((v, m.start(), m.end()))
+    return sorted(out, key=lambda a: a[1])
+
+
+def _amount(t: str) -> list[tuple[float, int]]:
+    return [(v, start) for v, start, _ in _amount_spans(t)]
 
 
 def extract_numbers(t: str, category: str | None) -> list[NumberPair]:
@@ -195,7 +230,45 @@ def extract_numbers(t: str, category: str | None) -> list[NumberPair]:
         if amts:
             pos = min((t.find(w) for w in BUDGET_WORDS if w in t), default=0)
             nums["budget_inr"] = min(amts, key=lambda a: abs(a[1] - pos))[0]
+    else:
+        said = budget_said(t)
+        if said is not None:
+            nums["budget_inr"] = said
     return [NumberPair(name=k, value=v) for k, v in nums.items()]  # type: ignore[arg-type]
+
+
+# 2. the product, when the note does not name it (user, 6 Nov 2026: "when the associate defines the home conditions,
+# reqs etc by voice note ... it should be able to understand and give the best fit products on its own")
+CATEGORY_CUES: dict[str, tuple[str, ...]] = {
+    "tv": (r"sofa", "सोफ", r"\binch", "इंच", r"cricket", "क्रिकेट", r"\bmatch\b", "मॅच", "मैच", r"netflix", r"\bott\b",
+           r"youtube", r"serial", "सीरियल", "मालिका", r"channel", "चैनल", "चॅनेल", r"\bmovies?\b", "सिनेमा", r"\bnews\b"),
+    "ac": (r"sq\.? ?ft", r"sqft", r"square f", "स्क्वेअर", "वर्ग फ", r"garmi", "गर्मी", "उकाडा", r"\btons?\b", "टन",
+           r"top floor", r"humid", r"\bdhoop wala kamra"),
+    "wm": (r"\bkg\b", "किलो", r"kapd", "कपड", r"bedsheet", "चादर", r"towel", r"\bdhul", r"\bdhot", "धुला", "धुण", "धुत",
+           r"washing", r"jeans", r"uniform"),
+    "fridge": (r"lit(?:re|er)", "लीटर", "लिटर", r"sab[zj]i", r"vegetable", "भाजी", "सब्ज़ी", "सब्जी", r"freezer", r"\bbarf\b",
+               r"\bice\b", r"doodh", r"\bmilk\b", "दूध", r"khana ban", r"\bcook", "स्वयंपाक", "खाना बन", r"leftover"),
+    "laptop": (r"college", "कॉलेज", r"office work", r"coding", r"gaming", r"\bram\b", r"\bgb\b", r"\bzoom\b",
+               r"online class", r"excel", r"programming", r"assignment"),
+}
+
+
+def infer_category(text: str, packs: PackRegistry) -> str | None:
+    """The product the note is about: named ('TV', 'एसी'), else read from the needs when they clearly point to one
+    product (sofa distance and cricket → TV; sq ft and heat → AC; clothes and kg → washing machine; vegetables and
+    litres → fridge; college and coding → laptop). None when it is not clear: then the associate is asked."""
+    t = _norm(text)
+    for c, words in (packs.common.get("category_keywords") or {}).items():
+        if _has(t, words):
+            return c
+    score = {}
+    for c in packs.packs:
+        cues = sum(1 for rx in CATEGORY_CUES.get(c, ()) if re.search(rx, t))
+        score[c] = len({sp.slot for sp in extract_slots(t, packs.get(c))}) + 3 * min(cues, 3)
+    ranked = sorted(score.items(), key=lambda kv: -kv[1])
+    if not ranked or ranked[0][1] < 4 or (len(ranked) > 1 and ranked[0][1] - ranked[1][1] < 3):
+        return None
+    return ranked[0][0]
 
 
 def extract_slots(t: str, pack: Pack) -> list[SlotPair]:
@@ -237,6 +310,8 @@ def understand_text(
         if _has(t, words):
             cat = c
             break
+    if cat is None and category is None:  # the product not named and not known yet: read it from the needs
+        cat = infer_category(raw, packs)
     u.category = cat  # type: ignore[assignment]
     pack = packs.get(cat or category) or packs.get("tv")
 

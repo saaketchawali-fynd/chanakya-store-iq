@@ -188,6 +188,7 @@ benefits:
     card: {hi: "Hafte bhar ka saamaan aaram se", mr: "आठवड्याचं सामान आरामात", en: "A week's food, with room"}
   - id: b_freezer
     weight: 2
+    general: true
     when_spec: {freezer_l: {gte: 70}}
     when_slots: {shopping: {in: [weekly, frozen]}}
     cites: [shopping]
@@ -195,6 +196,7 @@ benefits:
     card: {hi: "Bada freezer, hafte ka stock", mr: "मोठा फ्रीझर, आठवड्याचा स्टॉक", en: "Big freezer for the week"}
   - id: b_convertible
     weight: 1.5
+    general: true
     when_spec: {convertible: {eq: true}}
     when_slots: {shopping: {known: true}}
     cites: [shopping]
@@ -202,6 +204,7 @@ benefits:
     card: {hi: "Freezer ko fridge banaiye", mr: "फ्रीझरचा फ्रिज करा", en: "Freezer turns into fridge"}
   - id: b_fresh
     weight: 1.5
+    general: true
     when_spec: {crisper_l: {gte: 25}}
     when_slots: {shopping: {in: [daily]}}
     cites: [shopping]
@@ -209,6 +212,7 @@ benefits:
     card: {hi: "Sabzi zyada din taaza", mr: "भाजी जास्त दिवस ताजी", en: "Greens stay fresh longer"}
   - id: b_power
     weight: 2
+    general: true
     when_spec: {stabiliser_free: {eq: true}}
     when_slots: {power_cuts: {in: ["yes"]}}
     cites: [power_cuts]
@@ -216,6 +220,7 @@ benefits:
     card: {hi: "Bijli jaane par bhi thanda", mr: "वीज गेली तरी थंड", en: "Cold even in power cuts"}
   - id: b_inverter
     weight: 1
+    general: true
     when_spec: {inverter_compressor: {eq: true}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
@@ -223,6 +228,7 @@ benefits:
     card: {hi: "Kam awaaz, kam bill", mr: "कमी आवाज, कमी बिल", en: "Quiet, lower bill"}
   - id: b_frost
     weight: 0.8
+    general: true
     when_spec: {frost_free: {eq: true}}
     when_slots: {shopping: {known: true}}
     cites: [shopping]

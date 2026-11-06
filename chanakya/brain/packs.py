@@ -106,6 +106,9 @@ class Benefit(_M):
     say: dict[str, str]
     say_who: dict[str, str] = {}
     card: dict[str, str] = {}
+    # true of the product whatever the home ('7.5 kg: one bedsheet and six shirts in one wash'): said on a label scan
+    # before the home questions; a line about this home ('right for your 10 ft') never is
+    general: bool = False
 
 
 class Demo(_M):

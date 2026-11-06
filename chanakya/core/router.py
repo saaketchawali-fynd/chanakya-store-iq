@@ -724,9 +724,12 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
     return await _fallback(ctx)
 
 
-async def _understand_ctx(ctx: SkillContext) -> dict:
+async def _understand_ctx(ctx: SkillContext, hint: str | None = None) -> dict:
+    """What the listening ear needs: the product's slots and values, myths, brands, library, options shown. When the
+    product is not known yet, the one the note points to (`hint`, from its words) is used, marked as not known."""
     s = ctx.session
-    pack = ctx.pack or ctx.packs.get("tv")
+    known_cat = s.home.category if s else None
+    pack = ctx.pack if known_cat else (ctx.packs.get(hint) if hint else None) or ctx.pack or ctx.packs.get("tv")
     known = {k: [v.value for v in vals] for k, vals in (s.home.slots.items() if s else [])}
     lib = await repo.library_all(pack.category)
     opts = {}
@@ -734,7 +737,8 @@ async def _understand_ctx(ctx: SkillContext) -> dict:
         p = ctx.facts.product_sync(sku)
         opts[k] = p.model if p else sku
     return {
-        "category": (s.home.category if s else None) or (ctx.staff.dept if ctx.staff else "tv"),
+        "category": known_cat or hint or (ctx.staff.dept if ctx.staff else "tv"),
+        "category_known": bool(known_cat),
         "known_slots": known,
         "slots": [
             {
@@ -751,6 +755,14 @@ async def _understand_ctx(ctx: SkillContext) -> dict:
         "options_shown": opts,
         "themes": __import__("chanakya.brain.highlights", fromlist=["catalogue"]).catalogue(pack.category),
     }
+
+
+async def reread_note(ctx: SkillContext, transcript: str) -> Reply:
+    """A note told before the product was known, read again once it is, with that product's slots and values: the
+    same path as a new note, so the needs told in one note give the right products at once (user, 6 Nov 2026)."""
+    ctx.ev("note_reread", chars=len(transcript))
+    ctx.inbound = ctx.inbound.model_copy(update={"type": "text", "text": transcript, "reply_id": None})
+    return await _on_speech(ctx)
 
 
 async def on_speech(ctx: SkillContext) -> Reply:
@@ -791,8 +803,22 @@ async def _on_speech(ctx: SkillContext) -> Reply:
     audio, amime = None, None
     if msg.type == "audio" and msg.media_id:
         audio, amime = await ctx.svc.channel.download_media(msg.media_id)
+    hint = None
+    if s is None or s.home.category is None:  # product not known yet: which one do the needs point to?
+        words = text
+        if words is None and audio is not None and ctx.ai.live:
+            try:
+                words = await ctx.ai.hear(audio, amime or msg.mime_type)  # cached: understanding does not pay twice
+            except AIUnavailable:
+                words = None
+        if words and not words.startswith("FIX:"):
+            from chanakya.ai.rules import infer_category
+
+            hint = infer_category(words, ctx.packs)
     try:
-        u = await ctx.ai.understand(text, audio, await _understand_ctx(ctx), mime=amime or msg.mime_type)
+        u = await ctx.ai.understand(text, audio, await _understand_ctx(ctx, hint), mime=amime or msg.mime_type)
+        if hint and not u.category and (s is None or s.home.category is None):
+            u.category = hint  # type: ignore[assignment]
     except AIUnavailable:
         btns = [
             ctx.b("b_next_q", ctx.sid("go")) if s else ctx.b("b_new_customer", encode("g", "new")),

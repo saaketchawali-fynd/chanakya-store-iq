@@ -319,6 +319,7 @@ benefits:
     card: {hi: "Garam kamre mein bhi thandak", mr: "गरम खोलीतही थंडावा", en: "Cool even in a hot room"}
   - id: b_quiet
     weight: 1
+    general: true
     when_spec: {noise_db: {lte: 38}}
     when_slots: {hours_per_day: {known: true}}
     cites: [hours_per_day]
@@ -326,6 +327,7 @@ benefits:
     card: {hi: "Raat mein shaant", mr: "रात्री शांत", en: "Quiet at night"}
   - id: b_wifi
     weight: 0.5
+    general: true
     when_spec: {wifi: {eq: true}}
     when_slots: {app_control: {in: ["yes"]}}
     cites: [app_control]

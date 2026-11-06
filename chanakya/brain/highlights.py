@@ -100,7 +100,8 @@ def _data() -> dict:
                                  t.get("demo") or {}, t.get("label") or t["id"], tuple(t.get("specs") or ()),
                                  tuple(str(k).lower() for k in t.get("keywords") or ()), t.get("demo_one")))
             themes[cat] = out
-        _DATA = {"prefix": raw.get("prefix") or {}, "say": raw.get("say") or {}, "themes": themes}
+        _DATA = {"prefix": raw.get("prefix") or {}, "say": raw.get("say") or {}, "say_plain": raw.get("say_plain") or {},
+                 "themes": themes}
     return _DATA
 
 
@@ -328,12 +329,16 @@ def differences(a, b, home, wants: dict | None, pack) -> list[Point]:
     return out
 
 
-def say(pt: Point, lang: str, prefix: str | None = None) -> str:
-    """The customer line: "{need}: {daily life}. It has '{proof}'." (the caller registers pt.proof)."""
+def say(pt: Point, lang: str, prefix: str | None = None, plain: bool = False) -> str:
+    """The customer line: "{need}: {daily life}. It has '{proof}'." (the caller registers pt.proof). `plain`: the
+    first line said about a product (a label scan): no "Also worth knowing" before it."""
     d = _data()
+    line = pt.say.get(lang) or pt.say.get("en") or ""
+    if plain and not pt.need:
+        tpl = d["say_plain"].get(lang) or d["say_plain"]["en"]
+        return tpl.format(line=line[:1].upper() + line[1:], proof=pt.proof)
     pre = d["prefix"].get(prefix or pt.need or "general") or d["prefix"]["general"]
     tpl = d["say"].get(lang) or d["say"]["en"]
-    line = pt.say.get(lang) or pt.say.get("en") or ""
     return tpl.format(prefix=pre.get(lang) or pre.get("en"), line=line, proof=pt.proof)
 
 

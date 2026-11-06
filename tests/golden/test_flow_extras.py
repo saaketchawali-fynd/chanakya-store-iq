@@ -59,7 +59,7 @@ async def test_category_question_when_product_unknown(h):
     await repo.staff_update(PHONES["associate"], dept="all")
     await h.tap("g:new")
     await h.tap("s:C1:lang:hi")
-    out = await h.say("sofa se das feet hai, dopahar mein dhoop aati hai")
+    out = await h.say("kamre mein dopahar mein dhoop aati hai, das feet")  # not clear which product ('sofa se' = TV)
     rows = [r.id for sec in out[0].sections for r in sec.rows]
     assert out[0].kind == "list" and rows[:3] == ["s:C1:cat:tv", "s:C1:cat:ac", "s:C1:cat:wm"] and "s:C1:cat:fridge" in rows
     out = await h.pick("s:C1:cat:tv")

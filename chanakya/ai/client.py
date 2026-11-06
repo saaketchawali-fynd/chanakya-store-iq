@@ -133,7 +133,8 @@ class AIClient:
     def _rules(self, text: str, ctx: dict) -> Understanding:
         myths = [m["id"] for m in ctx.get("myths", [])] or None
         return rules.understand_text(
-            text, self.packs, ctx.get("category"), myths, options_shown=bool(ctx.get("options_shown")),
+            text, self.packs, ctx.get("category") if ctx.get("category_known", True) else None, myths,
+            options_shown=bool(ctx.get("options_shown")),
             brands=ctx.get("brands") or [],
         )
 

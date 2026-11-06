@@ -303,6 +303,7 @@ reasons:
 benefits:
   - id: b_kg_big
     weight: 3
+    general: true
     when_spec: {capacity_kg: {gte: 8}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
@@ -310,6 +311,7 @@ benefits:
     card: {hi: "Ek baar mein 2 jeans + 2 bedsheet", mr: "एका वेळी 2 जीन्स + 2 बेडशीट", en: "2 jeans + 2 bedsheets per wash"}
   - id: b_kg_mid
     weight: 3
+    general: true
     when_spec: {capacity_kg: {in: [7, 7.5]}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
@@ -317,6 +319,7 @@ benefits:
     card: {hi: "Ek baar mein 1 bedsheet + 6 shirt", mr: "एका वेळी 1 बेडशीट + 6 शर्ट", en: "1 bedsheet + 6 shirts per wash"}
   - id: b_kg_small
     weight: 3
+    general: true
     when_spec: {capacity_kg: {lt: 7}}
     when_slots: {family_size: {known: true}}
     cites: [family_size]
@@ -324,6 +327,7 @@ benefits:
     card: {hi: "Do logon ke kapde ek baar mein", mr: "दोघांचे कपडे एका वेळी", en: "Clothes for two per wash"}
   - id: b_bend
     weight: 1.5
+    general: true
     when_spec: {load: {eq: top}}
     when_slots: {elders_back: {in: ["yes"]}}
     cites: [elders_back]
@@ -331,6 +335,7 @@ benefits:
     card: {hi: "Jhukna nahi padega", mr: "वाकावं लागणार नाही", en: "No bending"}
   - id: b_heater
     weight: 1
+    general: true
     when_spec: {heater: {eq: true}}
     when_slots: {water: {in: [hard]}}
     cites: [water]
@@ -338,6 +343,7 @@ benefits:
     card: {hi: "Khare paani mein bhi saaf", mr: "खारट पाण्यातही स्वच्छ", en: "Clean in hard water"}
   - id: b_rpm
     weight: 1
+    general: true
     when_spec: {rpm: {gte: 1000}}
     when_slots: {drying: {in: ["yes"]}}
     cites: [drying]
@@ -345,6 +351,7 @@ benefits:
     card: {hi: "Baarish mein jaldi sukhein", mr: "पावसात लवकर वाळतात", en: "Faster drying in monsoon"}
   - id: b_quick
     weight: 0.5
+    general: true
     when_spec: {quick_wash: {eq: true}}
     when_slots: {wash_load: {has_any: [daily, uniforms]}}
     cites: [wash_load]

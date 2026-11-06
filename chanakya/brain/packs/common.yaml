@@ -100,7 +100,7 @@ intent_keywords:
   send_family_card: ["family ko bhejo", "ghar walon ko bhejo", "family card", "parivaar card bhejo", "घरवालों को भेजो", "घरच्यांना पाठवा"]
   set_reminder: ["yaad dilana", "reminder lagao", "remind me", "follow up lagao", "याद दिलाना", "आठवण करून द्या"]
   next_step: ["ab kya karun", "aage kya", "next kya", "what next", "अब क्या करूं", "पुढे काय"]
-looks_bait: ["ameer", "amir", "rich lag", "rich hai", "rich customer", "paise wale", "paisewale", "mehenga dikhao", "mehnga dikhao", "costly dikhao", "sabse mehenga", "looks rich", "श्रीमंत", "अमीर", "पैसेवाले", "पैसे वाले", "सबसे महंगा"]
+looks_bait: ["ameer", "amir", "rich lag", "rich hai", "rich customer", "paise wale", "paisewale", "mehenga dikhao", "mehnga dikhao", "costly dikhao", "sabse mehenga", "looks rich", "श्रीमंत", "अमीर", "पैसेवाले", "पैसे वाले", "सबसे महंगा", "bmw", "mercedes", "audi se", "badi gaadi", "branded kapde", "branded clothes", "mehenge kapde", "gehne pehne", "महागडी गाडी", "ब्रँडेड कपडे", "बड़ी गाड़ी"]
 category_keywords:
   tv: ["tv", "television", "led tv", "qled", "oled", "टीवी", "टीव्ही"]
   ac: [" ac ", "a.c.", "air conditioner", "split ac", "inverter ac", "एसी", "एअर कंडिशनर"]

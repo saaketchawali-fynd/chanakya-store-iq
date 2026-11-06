@@ -42,6 +42,10 @@ async def set_category(ctx: SkillContext, cat: str) -> Reply:
     s.home.category = cat  # type: ignore[assignment]
     ctx.ev("category_set", category=cat)
     pending = s.extra.pop("pending_u", None)
+    if pending and (pending.get("transcript") or "").strip():  # a note told before the product: read it again now
+        from chanakya.core import router
+
+        return await router.reread_note(ctx, pending["transcript"])
     u = Understanding.model_validate(pending) if pending else Understanding()
     return await on_info(ctx, u, "voice" if pending else "tap")
 

@@ -51,6 +51,10 @@ say:  # {prefix}: {line}. It has '{proof}'.
   en: "{prefix}: {line}. It has '{proof}'."
   hi: "{prefix}: {line}. Ismein '{proof}' hai."
   mr: "{prefix}: {line}. यात '{proof}' आहे."
+say_plain:  # the first line on a label scan (nothing said before it): {line}. It has '{proof}'.
+  en: "{line}. It has '{proof}'."
+  hi: "{line}. Ismein '{proof}' hai."
+  mr: "{line}. यात '{proof}' आहे."
 
 themes:
   tv:

@@ -194,6 +194,7 @@ benefits:
     card: {hi: "Software + 20 tab, bina atke", mr: "सॉफ्टवेअर + 20 टॅब, न अडकता", en: "Software + 20 tabs, no lag"}
   - id: b_weight
     weight: 2
+    general: true
     when_spec: {weight_kg: {lte: 1.6}}
     when_slots: {carry: {in: [daily]}}
     cites: [carry]
@@ -208,6 +209,7 @@ benefits:
     card: {hi: "Poora din bina charger", mr: "दिवसभर चार्जरशिवाय", en: "All day, no charger"}
   - id: b_gpu_design
     weight: 2
+    general: true
     when_spec: {gpu: {eq: dedicated}}
     when_slots: {software: {has_any: [cad, editing]}}
     cites: [software]
@@ -215,6 +217,7 @@ benefits:
     card: {hi: "Design-video tez", mr: "डिझाइन-व्हिडिओ वेगवान", en: "Faster design and video"}
   - id: b_gpu_game
     weight: 2
+    general: true
     when_spec: {gpu: {eq: dedicated}}
     when_slots: {gaming: {in: ["yes"]}}
     cites: [gaming]
@@ -222,6 +225,7 @@ benefits:
     card: {hi: "Game smooth", mr: "गेम्स स्मूथ", en: "Smooth gaming"}
   - id: b_storage
     weight: 1
+    general: true
     when_spec: {storage_gb: {gte: 1024}}
     when_slots: {software: {has_any: [editing, cad]}}
     cites: [software]

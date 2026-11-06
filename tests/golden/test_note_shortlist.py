@@ -59,3 +59,71 @@ async def test_a_short_note_still_goes_one_question_at_a_time(h):
     await h.tap("s:C1:lang:en")
     out = await h.voice("assess_short")  # room and distance only
     assert out[0].body.startswith("*Bolo*:") and "s:C1:slot:trigger:replace" in button_ids(out)
+
+
+# ---------- the needs by voice, the product not named (user, 6 Nov 2026: "when the associate defines the home
+# conditions, reqs etc by voice note (not photo); it should be able to understand and give the best fit products") ---
+# Three home facts (or a clear ask) still decide: the contest scores asking about the home, and a budget is not one.
+def test_the_product_is_read_from_the_needs():
+    from chanakya.ai.rules import infer_category
+
+    packs = __import__("chanakya.brain.packs", fromlist=["load_packs"]).load_packs()
+    assert infer_category("living room, sofa se 10 feet, papa cricket dekhte hain", packs) == "tv"
+    assert infer_category("150 sq ft bedroom, top floor, garmi bahut", packs) == "ac"
+    assert infer_category("बेडरूम 140 स्क्वेअर फूट, खूप उकाडा", packs) == "ac"
+    assert infer_category("5 log, roz kapde dhulte hain, bedsheet bahut", packs) == "wm"
+    assert infer_category("4 log, roz khana banta hai, hafte mein sabzi laate hain", packs) == "fridge"
+    assert infer_category("beta college mein, coding aur gaming", packs) == "laptop"
+    assert infer_category("customer ke ghar mein 4 log hain", packs) is None  # not clear: the associate is asked
+
+
+def test_a_budget_said_without_the_word():
+    from chanakya.ai.rules import _norm, budget_said, explicit_budget
+
+    for said, amount in (("35 hazaar tak", 35000), ("around 35000", 35000), ("40k ke andar", 40000),
+                         ("45 हजारपर्यंत", 45000), ("lagbhag 60 hazaar", 60000), ("under 50k", 50000)):
+        assert budget_said(_norm(said)) == amount and explicit_budget(said), said
+    assert budget_said(_norm("online 40 hazaar tak mil raha hai")) is None  # a price seen elsewhere
+    assert budget_said(_norm("bmw se aaye 2 lakh tak dikhao")) is None and not explicit_budget("BMW se aaye, 2 lakh tak")
+
+
+async def test_a_note_that_does_not_name_the_product_gives_the_products(h):
+    await h.tap("g:new")
+    out = await h.say("150 sq ft bedroom, top floor, garmi bahut lagti hai, bijli bill kam chahiye, 40 hazaar tak")
+    check_floor(out)
+    s = await session(h)
+    assert s.home.category == "ac" and s.home.start_level_inr == 40000 and len(s.shortlist) == 3
+    assert out[0].body.startswith("*Note se samjha:*") and "₹40,000" in out[0].body
+    assert sum(1 for m in out if m.card is not None and m.card.template == "product") == 3
+
+
+async def test_marathi_note_without_the_product(h):
+    await h.tap("g:new")
+    out = await h.say("बेडरूम 140 स्क्वेअर फूट, वरचा मजला, खूप उकाडा, रात्री लागतो, दोघं राहतात, 40 हजारपर्यंत")
+    s = await session(h)
+    assert s.home.category == "ac" and s.home.start_level_inr == 40000 and len(s.shortlist) == 3
+    assert any(m.card is not None and m.card.template == "product" for m in out)
+
+
+async def test_an_unclear_note_asks_the_product_then_reads_the_note_again(h):
+    """Not clear which product: the associate is asked; once they tap it, the same note is read again with that
+    product's questions, and the products come at once (before: the note's details were lost)."""
+    await h.tap("g:new")
+    out = await h.say("naya ghar hai, living room, dhoop bahut aati hai, 50 hazaar tak")  # a TV? an AC? not clear
+    s = await session(h)
+    assert s.home.category is None and not s.home.slots
+    assert any(r.id == "s:C1:cat:tv" for m in out for sec in m.sections for r in sec.rows)
+    out = await h.pick("s:C1:cat:tv")
+    assert await repo.events_for(s.id, ["note_reread"])
+    s = await session(h)
+    assert s.home.category == "tv" and s.home.start_level_inr == 50000
+    assert {"trigger", "room", "room_light"} <= set(s.home.slots) and len(s.shortlist) == 3
+    assert any(m.card is not None and m.card.template == "product" for m in out)
+
+
+async def test_looks_never_set_the_budget_even_with_the_needs(h):
+    await h.tap("g:new")
+    out = await h.say("customer BMW se aaye, branded kapde, 2 lakh tak ka dikhao, sofa se 12 feet")
+    assert "dikhawat" in out[0].body.lower()  # 'I don't guess from appearance. Ask: how much have they thought of?'
+    s = await session(h)
+    assert s.home.start_level_inr is None
