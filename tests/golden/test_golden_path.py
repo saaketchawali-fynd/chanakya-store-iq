@@ -55,47 +55,39 @@ async def test_golden_path(tmp_path):
         out = await step(h.tap, "s:C1:lang:mr")
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.customer_lang == "mr"
-        # 4 a short voice note (room, distance, budget) → ONE message: why now? (Marathi line to say), what was
-        #   understood in the footer. (A note that tells all the needs goes straight to the products: see
-        #   test_note_shortlist.)
-        out = await step(h.voice, "assess_short")
-        assert len(out) == 1
-        coach = out[0]
-        assert coach.coach and "जुना टीव्ही" in coach.body and coach.body.startswith("*Bolo*:") and "*Kyun*:" in coach.body
-        assert coach.footer.startswith("Samjha: 10 ft")
-        assert button_ids(out) == ["s:C1:slot:trigger:replace", "s:C1:slot:trigger:new_home", "s:C1:voiceq:trigger"]
+        # 4 the needs in one voice note (room, distance, light, cricket, cartoons, budget): Assess is the 4 home
+        #   questions, all told, so the products come at once (user, 11 Nov 2026): the Home Card with what was
+        #   understood, one page per product, then one clear choice
+        out = await step(h.voice, "assess_1")
+        head = out[0]
+        assert head.card and head.card.template == "home" and head.card.data["known"] == 4
+        cap = head.body or head.caption
+        assert cap.startswith("*Note se samjha:*") and "10 ft" in cap and "₹50,000" in cap  # the budget, as said
+        assert len(out) == 5 and all(m.card and m.card.template == "product" for m in out[1:4])
+        card = options_view(out)
+        assert [o["label"] + o["title"] for o in card.data["options"]] == [
+            'AArka 55" 4K',
+            'BMeru 55" QLED Pro',
+            'CMeru 65" QLED Pro',
+        ]
+        assert button_ids(out) == ["s:C1:proceed", "s:C1:moreopts", "s:C1:doubt"]  # Proceed · More options · Doubt
+        assert out[4].header == "Step 5/9 · 3 options aur demo" and "Dikhane wala farak" in out[4].body
+        assert all(o["offer"]["text"] for o in card.data["options"])  # every option shows its offer (or none)
         s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
         assert s.home.slots["seat_distance"][-1].value == "d8_10" and s.home.slots["room"][-1].value == "living"
         assert s.home.start_level_inr == 50000 and s.home.start_level_source == "associate_voice"
-        assert "₹" not in texts(out, footer=False)
-        # 5 replacing → the old TV's size → the 4 home facts are known: room photo? (2 buttons only)
-        out = await step(h.tap, "s:C1:slot:trigger:replace")
-        assert button_ids(out)[0] == "s:C1:slot:old_size:o32"
-        out = await step(h.tap, "s:C1:slot:old_size:o43")
-        assert button_ids(out)[0] == "s:C1:slot:room_light:sunny"  # the home questions the note did not answer
-        out = await step(h.tap, "s:C1:slot:room_light:sunny")
-        out = await step(h.say, "papa cricket dekhte hain, bachche cartoon")  # the answer said, not tapped
-        assert len(out) == 1 and button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"]
-        # 6 photo → read it back (budget already said, so no range question) with the Home Card + try-on
-        out = await step(h.tap, "s:C1:photo_yes")
-        assert len(out) == 1 and not out[0].buttons
-        out = await step(h.photo, "room_living.jpg")
-        q = out[0]
-        assert button_ids([q]) == ["s:C1:readback_ok", "s:C1:readback_edit"]
-        assert q.card and q.card.template == "home" and q.card.data["known"] == 4
-        assert "हॉल" in q.body and "10 ft" in q.body  # the home said back, in the customer's Marathi
-        assert not [m for m in out if m.image_bytes]  # no picture dropped into the questions: it waits for the options
-        s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
-        assert s.extra.get("room_read")  # the room was read in the background, ready for 'Ghar mein dekho'
-        # 7 read-back confirmed → any doubts? → a doubt from the list → agree, then correct
-        out = await step(h.tap, "s:C1:readback_ok")
-        assert button_ids(out) == ["s:C1:options", "s:C1:doubt", "s:C1:pricefirst_q"]
+        prices = [f"₹{p.price:,}" for p in (h.rt.facts.product_sync(x) for x in s.option_labels.values())]
+        assert prices
+        assert not any(pr in texts(out) for pr in prices) and "price" not in str(card.data)  # offers yes, prices no
+        assert card.data["options"][1]["points"]  # built from this home's answers
+        # 5 a doubt from the list (Validate) → agree, then correct, in the customer's Marathi
         out = await step(h.tap, "s:C1:doubt")
         assert "s:C1:myth:tv_4k_useless" in [r.id for sec in out[0].sections for r in sec.rows]
         out = await step(h.pick, "s:C1:myth:tv_4k_useless")
         assert "बरोबर, बहुतेक चॅनेल HD" in out[0].body
         assert button_ids(out)[:2] == ["s:C1:go", "s:C1:proof:tv_4k_useless"]
-        # 8 label → b_motion with a trial close → 'matters' → b_bright, product card, no price
+        assert out[0].header == "Step 3/9 · Pehle maano, phir sudhaaro"
+        # 6 label (Translate) → b_motion with a trial close → 'matters' → b_bright, product card, no price
         out = await step(h.photo, "label_meru55.jpg")
         assert "120 Hz" in out[0].body and out[0].card and out[0].card.template == "product"
         assert "हे तुमच्या कामाचं आहे का?" in out[0].body and button_ids(out)[0] == "s:C1:bt:yes:b_motion"
@@ -104,39 +96,23 @@ async def test_golden_path(tmp_path):
         evs = await repo.events_for(s.id, ["benefit_said", "label_read"])
         assert [e.payload.get("rule_id") for e in evs if e.type == "benefit_said"] == ["b_motion", "b_bright"]
         assert next(e for e in evs if e.type == "label_read").payload["sku"] == "TV-MER-55-QL120"
-        # 9 offers too early → gate, no numbers
+        # 7 offers asked before the demo → the live offers on these products (terms only), never a product's price
         out = await step(h.say, "offers")
-        assert "Daam demo ke baad" in out[0].body and "₹" not in texts(out, footer=False)
-        assert "s:C1:override:price:asked" in button_ids(out)
-        # 10 options: one product page per option, then the next steps → the demo on tap
-        out = await step(h.tap, "s:C1:options")
-        assert len(out) == 5 and not out[0].card and len(out[0].body.split("\n")) <= 2  # how many, for this home
-        assert all(m.card and m.card.template == "product" for m in out[1:4]) and out[4].buttons  # a page each, then next
-        card = options_view(out)
-        assert [o["label"] + o["title"] for o in card.data["options"]] == [
-            'AArka 55" 4K',
-            'BMeru 55" QLED Pro',
-            'CMeru 65" QLED Pro',
-        ]
-        assert button_ids(out) == ["s:C1:cmpall", "s:C1:demo", "s:C1:more"]  # side by side, demo guide, tell me more
-        assert all(o["offer"]["text"] for o in card.data["options"])  # every option shows its offer (or none)
-        s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
-        prices = [f"₹{p.price:,}" for p in (h.rt.facts.product_sync(x) for x in s.option_labels.values())]
-        assert prices
-        assert not any(pr in texts(out) for pr in prices) and "price" not in str(card.data)  # offers yes, prices no
-        assert card.data["options"][1]["points"]  # built from this home's answers
-        # 10a side by side: their room photo is here, so each option is drawn on their wall, then one detailed table
-        out = await step(h.tap, "s:C1:cmpall")
+        assert out[0].kind == "list" and not any(pr in texts(out) for pr in prices)
+        # 8 Proceed → their own space: the room photo (asked once) → each option drawn on their wall, then one
+        #   detailed table; no home question again
+        out = await step(h.tap, "s:C1:proceed")
+        assert button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"]
+        out = await step(h.tap, "s:C1:photo_yes")
+        assert len(out) == 1 and not out[0].buttons
+        out = await step(h.photo, "room_living.jpg")
         sbs = next(m.card for m in out if m.card and m.card.template == "homecompare")
         assert sbs.data["in_room"] and len(sbs.data["cols"]) == 3
         assert {sec["title"] for sec in sbs.data["sections"]} >= {"For your needs", "Features", "Cost and offers"}
         cost = next(sec for sec in sbs.data["sections"] if sec["title"] == "Cost and offers")
         assert all(c["value"] == "After the demo" for c in cost["rows"][0]["cells"])  # the price is still after the demo
-        # 10b Ghar mein dekho → straight to the picture: B solid, C as the outline
-        out = await step(h.tap, "s:C1:tryon")
-        tryon = [m for m in out if m.image_bytes]
-        assert len(tryon) == 1 and "55" in tryon[0].body and "65" in tryon[0].body
-        assert "tryon_sent" in await ev_types(s.id)
+        assert "tryon_ab_sent" in await ev_types(s.id)
+        assert button_ids(out)[0] == "s:C1:demo" and "s:C1:tryon" not in button_ids(out)  # done: not offered again
         out = await step(h.tap, "s:C1:demo")
         evs = await repo.events_for(s.id, ["demo_recipe_sent"])
         assert evs[-1].payload["recipe"] == "glare_test"

@@ -10,7 +10,7 @@ from chanakya.brain import packs as P
 from chanakya.brain.fit import fit
 from chanakya.channel.limits import truncate
 from chanakya.core import state
-from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, step
 from chanakya.core.contracts import Card, ListRow, ListSection, OutMessage, Reply
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
@@ -176,6 +176,7 @@ def label_echo(ctx: SkillContext, read: ImageRead) -> str | None:
     return None if banned_in(ctx, out) else out
 
 
+@step(4)
 async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
     # the label decides the product; the category filters only when the label itself says it (a washing machine
     # label scanned by a TV associate is still a washing machine)
@@ -216,6 +217,7 @@ async def on_label(ctx: SkillContext, read: ImageRead) -> Reply:
     return await show_sku(ctx, sku, conf, scanned=True)
 
 
+@step(4)
 async def show_sku(ctx: SkillContext, sku: str, conf: float = 100.0, scanned: bool = False) -> Reply:
     """`scanned`: a photo of the shelf label (its price is printed there, so it is said at once); a product asked
     about by voice or a button keeps the price for after the demo."""
@@ -301,6 +303,7 @@ def _next_benefit(ctx: SkillContext, p, said: list, general: bool = False):
     return None, None
 
 
+@step(4)
 async def benefit(ctx: SkillContext, first: bool = False) -> Reply:
     x = ctx.x
     sku = x.get("label_sku") or ctx.session.chosen_sku or state.best_sku(ctx.session)
@@ -440,6 +443,7 @@ def _theme_needs(ctx: SkillContext, theme_id: str) -> tuple:
     return th.needs if th else ()
 
 
+@step(4)
 async def benefit_reply(ctx: SkillContext, answer: str, rule_id: str | None) -> Reply:
     """Trial-close answer: 'matters' is remembered (it steers the options); then the next benefit, or what to ignore."""
     x = ctx.x
@@ -649,6 +653,7 @@ def _better(va, vb, key: str) -> str | None:
     return None
 
 
+@step(4)
 async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
     """Two labels → side by side from the database, with which is better for THIS home."""
     a, b = ctx.facts.product_sync(sku_a), ctx.facts.product_sync(sku_b)
@@ -704,6 +709,7 @@ async def compare(ctx: SkillContext, sku_a: str, sku_b: str) -> Reply:
     return ctx.reply(info_reply(ctx, body, btns, card=card))
 
 
+@step(4)
 async def compare_smart(ctx: SkillContext) -> Reply:
     """'Compare' on a product: straight away with the customer's best pick (or, with no shortlist, the closest
     same-size model in stock); another label photo still works too."""
@@ -724,6 +730,7 @@ async def compare_smart(ctx: SkillContext) -> Reply:
     return await compare(ctx, sku, other)
 
 
+@step(4)
 async def compare_prompt(ctx: SkillContext) -> Reply:
     ctx.x["compare_pending"] = True
     m = info_reply(ctx, ctx.t("compare_send"))

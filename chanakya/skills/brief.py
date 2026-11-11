@@ -16,7 +16,7 @@ from chanakya.config import ROOT
 from chanakya.core import repo
 from chanakya.core.buttons import encode
 from chanakya.core.clock import now, today
-from chanakya.core.coach import info_reply
+from chanakya.core.coach import info_reply, step
 from chanakya.core.contracts import Button, Card, HomeCard, OutMessage, Reply
 from chanakya.skills.base import SkillContext
 from chanakya.skills.review import STEPS
@@ -244,6 +244,7 @@ def picker(ctx: SkillContext) -> OutMessage:
                       allowed_numbers=ctx.reg.allowed())
 
 
+@step(1)
 async def brief(ctx: SkillContext, dept: str | None = None) -> Reply:
     """Step 1 of the shift start: which product (today's numbers on each row), then that product's pre-read card
     from today's data, then one button: today's clip (and another product)."""
@@ -298,6 +299,7 @@ async def brief(ctx: SkillContext, dept: str | None = None) -> Reply:
     return ctx.reply(*msgs)
 
 
+@step(1)
 async def clip(ctx: SkillContext, step: str) -> Reply:
     """Step 2: today's clip (the weakest step), then 'I'm ready'."""
     step = step if step in STEPS else "translate"
@@ -319,6 +321,7 @@ async def clip(ctx: SkillContext, step: str) -> Reply:
                                 btns))
 
 
+@step(1)
 async def ready(ctx: SkillContext, step: str) -> Reply:
     """Step 3: ready for the floor. Only now the customer button (or simply a voice note)."""
     step = step if step in STEPS else "translate"
@@ -342,6 +345,7 @@ def _quiz_for(ctx: SkillContext, step: str):
     return next((q for q in qs if q.step == step), qs[0] if qs else None)
 
 
+@step(1)
 async def quiz(ctx: SkillContext, step: str) -> Reply:
     q = _quiz_for(ctx, step)
     if q is None:
@@ -350,6 +354,7 @@ async def quiz(ctx: SkillContext, step: str) -> Reply:
     return ctx.reply(info_reply(ctx, ctx.pick(q.q), btns))
 
 
+@step(1)
 async def answer(ctx: SkillContext, qid: str, aid: str) -> Reply:
     q = None
     for p in ctx.packs.packs.values():

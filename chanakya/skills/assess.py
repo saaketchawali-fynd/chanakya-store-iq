@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from chanakya.ai.schemas import Understanding
 from chanakya.brain import packs as P
-from chanakya.core import state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import info_reply
+from chanakya.core.coach import info_reply, step
 from chanakya.core.contracts import Button, Reply
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -14,6 +13,7 @@ from chanakya.skills.base import SkillContext
 LANG_TITLES = {"hi": "b_lang_hi", "mr": "b_lang_mr", "en": "b_lang_en"}
 
 
+@step(2)
 async def new_session(ctx: SkillContext, customer_lang: str | None = None, ask_lang: bool = True) -> Reply:
     """A new customer. The customer's language starts as the associate's (changeable from the menu); the first
     message is the opener: the welcome line to say and the product list."""
@@ -31,13 +31,15 @@ def category_question(ctx: SkillContext) -> Reply:
     return ctx.reply(C.category_message(ctx))
 
 
+@step(2)
 async def set_category(ctx: SkillContext, cat: str) -> Reply:
     s = ctx.session
     if cat not in ctx.packs.packs:
         return category_question(ctx)
     if s.home.category and s.home.category != cat:  # a different product: the home facts start over
         s.home.slots = {}
-        for k in ("photo_asked", "budget_asked", "readback_done", "doubts_asked", "range_bands", "range_id"):
+        for k in ("photo_asked", "budget_asked", "readback_done", "doubts_asked", "range_bands", "range_id",
+                  "assess_closed", "details_done", "sbs_shown"):
             s.extra.pop(k, None)
     s.home.category = cat  # type: ignore[assignment]
     ctx.ev("category_set", category=cat)
@@ -50,20 +52,23 @@ async def set_category(ctx: SkillContext, cat: str) -> Reply:
     return await on_info(ctx, u, "voice" if pending else "tap")
 
 
+@step(2)
 async def customer_lang_picker(ctx: SkillContext) -> Reply:
     btns = [ctx.b(LANG_TITLES[lg], ctx.sid("lang", lg)) for lg in ("en", "hi", "mr")]
     return ctx.reply(info_reply(ctx, ctx.t("clang_pick_body"), btns))
 
 
+@step(2)
 async def set_customer_lang(ctx: SkillContext, lang: str) -> Reply:
     if lang not in ("hi", "mr", "en"):
         lang = ctx.lang
     ctx.session.home.customer_lang = lang  # type: ignore[assignment]
     ctx.ev("customer_lang_set", lang=lang)
     note = ctx.t("clang_set", language=ctx.t(f"lang_name_{lang}"))
-    msg = C.next_question_or_options(ctx)
-    msg.footer = note[:60]
-    return ctx.reply(msg)
+    r = await C.next_step(ctx)
+    if r.messages:
+        r.messages[0].footer = note[:60]
+    return r
 
 
 # what a home can be: a number outside these is a mishearing (or a model's guess), never stored
@@ -210,20 +215,17 @@ def apply_product_meaning(ctx: SkillContext, u: Understanding, source: str = "vo
     return n
 
 
+@step(2)
 async def on_info(
     ctx: SkillContext, u: Understanding, source: str = "voice", applied: bool = False, gate_before: bool | None = None,
     n_new: int | None = None,
 ) -> Reply:
-    """Default rule (7.4 #10): apply, then need-validation or the next question (+ Home Card / budget list)."""
+    """Default rule (7.4 #10): apply, then the next home question (with the Home Card after a note), or the products
+    once the home questions are done."""
     s = ctx.session
     pack = ctx.pack
-    if gate_before is None:
-        gate_before = state.options_gate_open(s, pack)
     if not applied:
         n_new = apply_understanding(ctx, u, source)
-    if n_new == 0 and not u.customer_request and ctx.x.get("readback_shown") and not ctx.x.get("readback_done") \
-            and not s.shortlist and C.pick_next_slot(ctx) is None:
-        return ctx.reply(C.readback_nudge(ctx))  # nothing new: don't resend the read-back and its cards
     budget_said = any(n.name == "budget_inr" for n in u.numbers) and s.home.start_level_source != "none"
     if s.shortlist and (n_new or budget_said) and not s.chosen_sku and source != "tap":
         # a fact changed after the options ('doori 6 feet hai', 'budget actually 80 hazaar'): say what was heard and
@@ -239,20 +241,20 @@ async def on_info(
         m = C.resume(ctx)
         m.footer = noted_footer(ctx, source) or m.footer
         return ctx.reply(m)
-    msgs = []
-    if u.customer_request and not s.extra.get("need_validated"):
+    footer = noted_footer(ctx, source)
+    slot = C.pick_next_slot(ctx) if not s.extra.get("assess_closed") else None
+    if u.customer_request and not s.extra.get("need_validated") and slot:
         s.extra["need_validated"] = True
         ctx.ev("need_validated", text=u.customer_request)
-        slot = C.pick_next_slot(ctx)
         say = ctx.pick(ctx.packs.common_line("need_validation"), ctx.clang)
-        if slot:  # agree with what they asked for, then the next home question in the same breath
-            say = f"{say} {ctx.pick(pack.slot(slot).ask, ctx.clang)}"
-            msgs.append(C.question_reply(ctx, slot, say_override=say, why_override=ctx.t("kyun_need_validation")))
-        else:
-            msgs.append(C.next_question_or_options(ctx, footer=noted_footer(ctx, source)))
+        say = f"{say} {ctx.pick(pack.slot(slot).ask, ctx.clang)}"  # agree with what they asked, then the next question
+        r = ctx.reply(C.question_reply(ctx, slot, say_override=say, why_override=ctx.t("kyun_need_validation")))
     else:
-        msgs.append(C.next_question_or_options(ctx, footer=noted_footer(ctx, source)))
-    return ctx.reply(*msgs)
+        r = await C.next_step(ctx, footer=footer)
+    if source != "tap" and n_new and len(r.messages) == 1 and r.messages[0].buttons and r.messages[0].card is None:
+        # the contest's Assess: a voice note → a card of the customer's home, and the next question with it
+        r.messages[0].card = C.english(ctx, lambda: C.home_card(ctx))
+    return r
 
 
 def note_facts(ctx: SkillContext) -> list[str]:
@@ -319,11 +321,12 @@ def noted_footer(ctx: SkillContext, source: str) -> str | None:
     return ctx.t("footer_noted", facts=out) if out else None
 
 
+@step(2)
 async def tap_slot(ctx: SkillContext, slot: str, val: str) -> Reply:
     pack = ctx.pack
     sd = pack.slot(slot)
     if not sd:
-        return ctx.reply(C.next_question_or_options(ctx))
+        return await C.next_step(ctx)
     u = Understanding(transcript="", slots=[])
     from chanakya.ai.schemas import SlotPair
 
@@ -359,6 +362,7 @@ async def tap_slot(ctx: SkillContext, slot: str, val: str) -> Reply:
     return await on_info(ctx, u, "tap")
 
 
+@step(2)
 async def set_budget(ctx: SkillContext, band_id: str) -> Reply:
     pack = ctx.pack
     s = ctx.session
@@ -369,7 +373,7 @@ async def set_budget(ctx: SkillContext, band_id: str) -> Reply:
         s.extra["range_id"] = band_id
         s.extra["budget_asked"] = True
         ctx.ev("comfort_range_set", band=band_id, low=rb["a"], high=rb["b"])
-        return ctx.reply(C.next_question_or_options(ctx))
+        return await C.next_step(ctx)
     band = next((b for b in pack.budget_bands if b.id == band_id), None)
     if band and band.inr:
         s.home.start_level_inr = int(band.inr)
@@ -378,15 +382,17 @@ async def set_budget(ctx: SkillContext, band_id: str) -> Reply:
         s.home.start_level_inr = None
         s.home.start_level_source = "none"
     s.extra["budget_asked"] = True
-    return ctx.reply(C.next_question_or_options(ctx))
+    return await C.next_step(ctx)
 
 
+@step(2)
 async def readback_ok(ctx: SkillContext) -> Reply:
     ctx.x["readback_done"] = True
     ctx.ev("readback_confirmed")
-    return ctx.reply(C.next_question_or_options(ctx))
+    return await C.next_step(ctx)
 
 
+@step(2)
 async def readback_edit(ctx: SkillContext) -> Reply:
     """'Change something': the known answers as a list; the one tapped is asked again, then the read-back repeats."""
     from chanakya.channel.limits import truncate, truncate_title
@@ -409,11 +415,12 @@ async def readback_edit(ctx: SkillContext) -> Reply:
                                 allowed_numbers=ctx.reg.allowed()))
 
 
+@step(2)
 async def reask(ctx: SkillContext, slot: str) -> Reply:
     """Ask one known question again (from 'Change something'); the new tap replaces the old answer."""
     pack = ctx.pack
     if not pack or not pack.slot(slot):
-        return ctx.reply(C.next_question_or_options(ctx))
+        return await C.next_step(ctx)
     ctx.x["readback_done"] = False
     return ctx.reply(C.question_reply(ctx, slot))
 
@@ -441,6 +448,7 @@ async def doubt_voice(ctx: SkillContext) -> Reply:
     return ctx.reply(m)
 
 
+@step(2)
 async def photo_yes(ctx: SkillContext) -> Reply:
     """Customer has a photo: ask for it, nothing else on screen."""
     ctx.session.awaiting = "room_photo"
@@ -450,14 +458,24 @@ async def photo_yes(ctx: SkillContext) -> Reply:
     return ctx.reply(m)
 
 
+@step(2)
 async def photo_no(ctx: SkillContext) -> Reply:
-    """No photo: carry on with what the customer says."""
+    """No photo: carry on with what the customer says (with the products out: on to showing them)."""
     ctx.x["photo_asked"] = True
     ctx.session.awaiting = None
     ctx.x.pop("tryon_after_photo", None)
-    return ctx.reply(C.next_question_or_options(ctx, footer=ctx.t("footer_photo_none")))
+    if ctx.session.shortlist:
+        from chanakya.skills import recommend
+
+        r = await recommend.side_by_side(ctx)
+    else:
+        r = await C.next_step(ctx)
+    if r.messages and not r.messages[0].footer:
+        r.messages[0].footer = ctx.t("footer_photo_none")
+    return r
 
 
+@step(2)
 async def photo_prompt(ctx: SkillContext) -> Reply:
     ctx.session.awaiting = "room_photo"
     btns = [
@@ -468,8 +486,9 @@ async def photo_prompt(ctx: SkillContext) -> Reply:
     return ctx.reply(info_reply(ctx, ctx.t("room_photo_send"), btns))
 
 
+@step(2)
 async def go(ctx: SkillContext) -> Reply:
-    return ctx.reply(C.next_question_or_options(ctx))
+    return await C.next_step(ctx)
 
 
 async def status(ctx: SkillContext) -> Reply:
@@ -503,6 +522,7 @@ async def status(ctx: SkillContext) -> Reply:
     return ctx.reply(msg)
 
 
+@step(2)
 async def data_explain(ctx: SkillContext, key: str) -> Reply:
     """'Explain the difference': a simple analogy for each choice in the customer's language, a hint from this home,
     and the stock behind each (for the associate). Then the customer answers knowing what they choose."""
@@ -513,7 +533,7 @@ async def data_explain(ctx: SkillContext, key: str) -> Reply:
     s = ctx.session
     vals = (s.extra.get("dq_vals") or {}).get(key) or []
     if len(vals) < 2:
-        return ctx.reply(C.next_question_or_options(ctx))
+        return await C.next_step(ctx)
     cl = ctx.clang
     parts = [explain.analogy(key, v, cl) for v in vals[:2]]
     hint = explain.need_hint(key, s.home, ctx.pack, cl)
@@ -535,6 +555,7 @@ async def data_explain(ctx: SkillContext, key: str) -> Reply:
     return ctx.reply(coach_reply(ctx, say, why, C.known_cites(ctx), btns, do="do_explain"))
 
 
+@step(2)
 async def data_answer(ctx: SkillContext, key: str, choice: str) -> Reply:
     """A data question answered: the chosen value becomes a want (it filters the shortlist); 'any' is fine too."""
     s = ctx.session
@@ -555,9 +576,10 @@ async def data_answer(ctx: SkillContext, key: str, choice: str) -> Reply:
         from chanakya.skills import recommend
 
         return await recommend.show_options(ctx, override_checked=True)
-    return ctx.reply(C.next_question_or_options(ctx))
+    return await C.next_step(ctx)
 
 
+@step(2)
 async def voice_answer(ctx: SkillContext, slot: str) -> Reply:
     """The voice button on a question: just speak (Hindi, English or Marathi); every tap answer is still here."""
     from chanakya.core.coach import info_reply
@@ -565,7 +587,7 @@ async def voice_answer(ctx: SkillContext, slot: str) -> Reply:
     pack = ctx.pack
     sd = pack.slot(slot) if pack else None
     if sd is None:
-        return ctx.reply(C.next_question_or_options(ctx))
+        return await C.next_step(ctx)
     ctx.asking.add(slot)
     ctx.x["last_question"] = slot
     q = ctx.pick(sd.ask, ctx.clang)

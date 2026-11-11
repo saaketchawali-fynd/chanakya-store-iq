@@ -31,8 +31,9 @@ async def session(h):
 async def test_each_option_is_one_english_page_built_from_this_home(h):
     out = await to_options(h)
     check_floor(out)
-    pages = [x for x in out if x.card]
-    assert pages and all(x.card.template == "product" and x.card.lang == "en" for x in pages)  # one page per option
+    assert out[0].card.template == "home" and out[0].card.lang == "en"  # Assess ends in the Home Card, in English
+    pages = [x for x in out if x.card and x.card.template == "product"]
+    assert pages and all(x.card.lang == "en" for x in pages)  # one page per option
     s = await session(h)
     assert len(pages) == len(s.option_labels)  # no copy in the associate's language
     d = options_view(out).data
@@ -61,8 +62,8 @@ async def test_show_customer_keeps_a_next_step_and_bill_is_english(h):
 async def test_english_associate_gets_the_same_one_card(h):
     await h.say("lang en")
     out = await to_options(h, clang="en")
-    pages = [x for x in out if x.card]
-    assert pages and all(x.card.lang == "en" for x in pages)  # one English page per option, no copy
+    pages = [x for x in out if x.card and x.card.template == "product"]
+    assert pages and all(x.card.lang == "en" for x in out if x.card)  # one English page per option, no copy
     assert len(pages) == len(options_view(out).data["options"])
 
 

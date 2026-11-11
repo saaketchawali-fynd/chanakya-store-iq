@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw
 from chanakya.brain import packs as P
 from chanakya.core import repo, state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, kyun_block
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, kyun_block, step
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, Card, OutMessage, Reply, Step
 from chanakya.core.status import short_name
 from chanakya.skills import common as C
@@ -100,6 +100,7 @@ def opted_out_reply(ctx: SkillContext) -> Reply:
                                 [ctx.b("b_qr", ctx.sid("qr")), ctx.b("b_back", ctx.sid("go"))]))
 
 
+@step(8)
 async def parivaar(ctx: SkillContext, note: str | None = None, presale: bool = False) -> Reply:
     """Consent first (QR), then the Parivaar Card. presale=True: the customer will ask the family before buying —
     the same card goes now (recommendation, full cost, offers), so the sale stays alive at home."""
@@ -143,6 +144,7 @@ def qr_image(link: str, caption: str) -> bytes:
     return buf.getvalue()
 
 
+@step(8)
 async def show_qr(ctx: SkillContext) -> Reply:
     s = ctx.session
     if not s.optin_token or token_expired(s, ctx.now):  # a fresh code: whoever sends it first is this customer
@@ -164,6 +166,7 @@ async def show_qr(ctx: SkillContext) -> Reply:
     )
 
 
+@step(8)
 async def consent_tap(ctx: SkillContext) -> Reply:
     phone = ctx.svc.settings.customer_phone
     if ctx.session.extra.get("opted_out") or await phone_opted_out(phone):
@@ -400,6 +403,7 @@ def _offer_title(ctx: SkillContext, offer_id: str, lang: str) -> str:
     return pick(o.title, lang) if o else offer_id
 
 
+@step(8)
 async def voice_add(ctx: SkillContext) -> Reply:
     s = ctx.session
     if not s.customer_wa_id:
@@ -408,6 +412,7 @@ async def voice_add(ctx: SkillContext) -> Reply:
     return ctx.reply(info_reply(ctx, ctx.t("voice_add_prompt")))
 
 
+@step(8)
 async def forward_voice(ctx: SkillContext) -> Reply:
     s = ctx.session
     try:
@@ -422,6 +427,7 @@ async def forward_voice(ctx: SkillContext) -> Reply:
     )
 
 
+@step(8)
 async def task_menu(ctx: SkillContext) -> Reply:
     btns = [ctx.b(key, ctx.sid("task_when", when)) for when, key in TASK_WHEN.items()]
     return ctx.reply(info_reply(ctx, ctx.t("task_when_ask", name=_cust_name(ctx)), btns))
@@ -444,6 +450,7 @@ def _due(now: datetime, when: str) -> datetime:
     return (now + timedelta(days=days)).replace(hour=11, minute=0, second=0, microsecond=0)
 
 
+@step(8)
 async def create_task(ctx: SkillContext, when: str) -> Reply:
     s = ctx.session
     due = _due(ctx.now, when)
@@ -457,6 +464,7 @@ async def create_task(ctx: SkillContext, when: str) -> Reply:
     return ctx.reply(info_reply(ctx, ctx.t("task_done", name=_cust_name(ctx), when=label), btns))
 
 
+@step(8)
 async def sold(ctx: SkillContext) -> Reply:
     s = ctx.session
     if not s.chosen_sku:  # a sale is of a product: which one did they take? (never a sale of nothing)
@@ -518,6 +526,7 @@ def site_summary(ctx: SkillContext) -> tuple[dict, str, list[str]]:
     return needs, " · ".join(parts), risks
 
 
+@step(8)
 async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
     s = ctx.session
     key = INSTALL_SLOTS.get(slot_id, INSTALL_SLOTS["t1"])[0]
@@ -593,6 +602,7 @@ async def create_install(ctx: SkillContext, slot_id: str) -> Reply:
     return ctx.reply(*(msgs + r.messages))
 
 
+@step(8)
 async def task_action(ctx: SkillContext, task_id: int, done: bool) -> Reply:
     """A task reminder's [Ho gaya ✓] / [Kal yaad dilao]: acts on that task only."""
     if done:

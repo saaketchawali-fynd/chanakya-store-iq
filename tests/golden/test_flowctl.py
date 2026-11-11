@@ -18,8 +18,8 @@ async def start_customer(h):
 
 
 async def test_coach_replies_carry_a_menu_hint(h):
-    await start_customer(h)
-    out = await h.tap("s:C1:slot:trigger:new_home")
+    await h.tap("g:new")
+    out = await h.pick("s:C1:cat:tv")  # the first home question
     coach = next(m for m in out if m.coach)
     assert coach.footer.startswith("Bolkar bhi: voice note") and coach.footer.endswith("menu") and len(coach.footer) <= 60
 

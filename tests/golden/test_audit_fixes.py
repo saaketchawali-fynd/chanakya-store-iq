@@ -52,15 +52,14 @@ async def test_two_options_keep_their_roles(tmp_path, monkeypatch):
         await h.close()
 
 
-async def test_unclear_text_at_the_read_back_does_not_resend_the_cards(h):
+async def test_unclear_text_after_the_products_does_not_resend_the_cards(h):
     from tests.helpers import assess_steps
 
-    await assess_steps(h)
-    out = await h.tap("s:C1:photo_no")
-    assert any(m.card for m in out)  # the read-back with the Home Card
+    out = await assess_steps(h)
+    assert any(m.card and m.card.template == "home" for m in out)  # the 4 questions → the Home Card and the products
     out = await h.say("ok")
-    assert not any(m.card for m in out)
-    assert button_ids(out) == ["s:C1:readback_ok", "s:C1:readback_edit"]
+    assert not any(m.card for m in out)  # nothing new: the way on, never the cards again
+    assert button_ids(out)[0] == "s:C1:proceed"
 
 
 async def test_roles_stay_apart(h):

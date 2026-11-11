@@ -9,7 +9,7 @@ from chanakya.brain.fit import fit
 from chanakya.brain.options import candidate_set
 from chanakya.core import state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, step
 from chanakya.core.contracts import Reply
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -51,6 +51,7 @@ def known_claim(ctx: SkillContext, claim_id: str | None) -> bool:
     return ctx.packs.myth(claim_id, cat) is not None
 
 
+@step(3)
 async def myth(ctx: SkillContext, claim_id: str) -> Reply:
     m = ctx.packs.myth(claim_id, ctx.session.home.category)
     if m is None:
@@ -92,6 +93,7 @@ async def myth(ctx: SkillContext, claim_id: str) -> Reply:
     return ctx.reply(coach_reply(ctx, line, why, cites, btns, do="do_myth"))
 
 
+@step(3)
 async def proof(ctx: SkillContext, claim_id: str | None) -> Reply:
     m = ctx.packs.myth(claim_id, ctx.session.home.category) if claim_id else None
     if m and m.proof == "kharcha":
@@ -105,12 +107,13 @@ async def proof(ctx: SkillContext, claim_id: str | None) -> Reply:
         return recommend.gate_price_reply(ctx)
     demo = ctx.pack.demo(m.proof) if (m and m.proof) else None
     if demo is None:
-        return ctx.reply(C.next_question_or_options(ctx))
+        return await C.next_step(ctx)
     from chanakya.skills import recommend
 
     return ctx.reply(recommend.demo_message(ctx, demo, other_label=None))
 
 
+@step(3)
 async def price_rescue(ctx: SkillContext) -> Reply:
     pack = ctx.pack
     s = ctx.session
@@ -144,6 +147,7 @@ async def price_rescue(ctx: SkillContext) -> Reply:
                                  do="do_price_rescue"))
 
 
+@step(3)
 async def unknown_claim(ctx: SkillContext, question: str | None) -> Reply:
     from chanakya.skills import expert
 
@@ -154,6 +158,7 @@ def looks_bait(ctx: SkillContext, text: str) -> bool:
     return bool(text) and contains_any(text, ctx.packs.common.get("looks_bait", []))
 
 
+@step(3)
 async def no_looks(ctx: SkillContext) -> Reply:
     ctx.ev("guard_looks")
     if ctx.session and ctx.pack:
@@ -166,6 +171,7 @@ def banned_in(ctx: SkillContext, text: str) -> str | None:
     return next((b for b in ctx.packs.banned if b in low), None)
 
 
+@step(3)
 async def honest_version(ctx: SkillContext, phrase: str) -> Reply:
     """The associate typed a pressure line. Offer the honest version from data; never repeat the phrase."""
     from chanakya.core.clock import today

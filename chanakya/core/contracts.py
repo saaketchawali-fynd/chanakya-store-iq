@@ -71,6 +71,7 @@ class OutMessage(BaseModel):
     to: str
     kind: Literal["text", "buttons", "list", "image", "audio", "video", "document", "template", "reaction", "cta_url"]
     body: str | None = None  # ≤ 3 lines (validator)
+    header: str | None = None  # the step it serves ('Step 2 of 9 · Assess'): the bold header of a buttons / list message
     footer: str | None = None  # ≤ 60 chars
     buttons: list[Button] = []  # ≤ 3
     list_button: str | None = None  # ≤ 20 chars

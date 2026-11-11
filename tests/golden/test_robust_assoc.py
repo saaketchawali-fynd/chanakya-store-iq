@@ -100,7 +100,7 @@ async def test_a_product_named_with_no_customer_open_starts_one(h):
 async def test_a_brand_not_in_the_catalogue_is_said(h):
     await h.tap("g:new")
     out = await h.say("Samsung 55 inch chahiye, hall, sofa se 9 feet, budget 60 hazaar")
-    assert re.search(r"Samsung aaj ke catalogue mein nahi", out[0].body)
+    assert re.search(r"Samsung aaj ke catalogue mein nahi", out[0].body or out[0].caption)  # said first, on the Home Card
 
 
 async def test_price_after_a_label_is_that_products(h):

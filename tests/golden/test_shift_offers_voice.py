@@ -145,7 +145,9 @@ async def test_voice_note_with_nothing_new_shows_what_was_heard(h, monkeypatch):
 async def test_one_card_per_visual_everywhere(h):
     """Options, bill, offer card and try-on: one visual each, in English (no copy for the associate)."""
     out = await to_options(h, photo="room_living.jpg")
-    assert sum(1 for m in out if m.card) == len(options_view(out).data["options"])  # one page per option, no copy
+    n_pages = sum(1 for m in out if m.card and m.card.template == "product")
+    assert n_pages == len(options_view(out).data["options"])  # one page per option, no copy
+    assert sum(1 for m in out if m.card and m.card.template == "home") == 1  # and the Home Card, once
     await h.tap("s:C1:shown")
     out = await pick(h)
     assert sum(1 for m in out if m.card or m.image_bytes) == 1 and all(m.card.lang == "en" for m in out if m.card)

@@ -442,41 +442,61 @@ def resume(ctx: SkillContext) -> OutMessage:
     elif s.demo_done or s.chosen_sku:
         btns = [ctx.b("b_cost_show", ctx.sid("cost_show")), ctx.b("b_offers", ctx.sid("offers")),
                 ctx.b("b_status", encode("g", "status"))]
+    elif not s.extra.get("assess_closed"):  # the products are out: the way on, not the cards again
+        btns = [ctx.b("b_proceed", ctx.sid("proceed")), ctx.b("b_demo_next", ctx.sid("demo")),
+                ctx.b("b_status", encode("g", "status"))]
     else:
-        btns = [ctx.b("b_options", ctx.sid("options")), ctx.b("b_demo_next", ctx.sid("demo")),
+        btns = [ctx.b("b_demo_next", ctx.sid("demo")), ctx.b("b_they_chose", ctx.sid("prefer")),
                 ctx.b("b_status", encode("g", "status"))]
     return info_reply(ctx, ctx.t("resume_body"), btns)
 
 
-def next_question_or_options(ctx: SkillContext, lead: str | None = None, footer: str | None = None) -> OutMessage:
-    """Exactly ONE next step. Assess runs in a fixed order: product → why now → the 4 home questions; then (once)
-    room photo → comfort range → read it back → any doubts → options. Voice notes fill several at once; whatever is
-    already known is skipped."""
-    pack = ctx.pack
+def assess_question(ctx: SkillContext, lead: str | None = None, footer: str | None = None) -> OutMessage | None:
+    """Assess (user, 11 Nov 2026): the product's 4 home questions in its fixed order, and nothing else. Whatever a
+    voice note already told is skipped; a question today's stock cannot act on is replaced by one about what the
+    models on sale differ on, only until the home is known well enough. None once Assess is done: the products
+    come next, never a photo, budget, read-back or doubts question first. After the options (or 'Proceed') no
+    home question is ever asked again."""
     s = ctx.session
-    if s.home.category is None or ctx.packs.get(s.home.category) is None:
-        return category_message(ctx)
+    if s.shortlist or s.extra.get("assess_closed"):
+        return None
     slot = pick_next_slot(ctx)
     if slot:
         msg = question_reply(ctx, slot, say_override=lead)
         if footer:
             msg.footer = footer
         return msg
-    if not s.shortlist:
-        x = ctx.x
-        dq = data_question(ctx, footer=footer)
-        if dq is not None:
-            return dq
-        if pack.placeable and not x.get("photo_asked") and not s.tryon_done:
-            return photo_question(ctx, footer=footer)
-        if s.home.start_level_inr is None and not x.get("budget_asked"):
-            return comfort_range(ctx, footer=footer)
-        if not x.get("readback_done"):
-            return readback(ctx, footer=footer)
-        if not x.get("doubts_asked"):
-            return doubts(ctx, footer=footer)
-        return options_ready(ctx, footer=footer)
-    return resume(ctx)
+    if not state.options_gate_open(s, ctx.pack):
+        return data_question(ctx, footer=footer)
+    return None
+
+
+def next_question_or_options(ctx: SkillContext, lead: str | None = None, footer: str | None = None) -> OutMessage:
+    """Exactly ONE next step as one message: the next home question, else the way on (the products, or the next
+    step once they are out). The skills use next_step(), which shows the products themselves."""
+    s = ctx.session
+    if s.home.category is None or ctx.packs.get(s.home.category) is None:
+        return category_message(ctx)
+    msg = assess_question(ctx, lead, footer)
+    if msg is not None:
+        return msg
+    return resume(ctx) if s.shortlist else options_ready(ctx, footer=footer)
+
+
+async def next_step(ctx: SkillContext, lead: str | None = None, footer: str | None = None):
+    """The next step of the journey: the product (if not chosen), the next home question, the products as soon as
+    the home questions are done, or what comes next once they are out. Never the same question twice."""
+    s = ctx.session
+    if s.home.category is None or ctx.packs.get(s.home.category) is None:
+        return ctx.reply(category_message(ctx))
+    msg = assess_question(ctx, lead, footer)
+    if msg is not None:
+        return ctx.reply(msg)
+    if s.shortlist:
+        return ctx.reply(resume(ctx))
+    from chanakya.skills import recommend
+
+    return await recommend.show_options(ctx, assessed=True, footer=footer)
 
 
 def home_card(ctx: SkillContext) -> Card:

@@ -17,6 +17,16 @@ from chanakya.log import get_log
 log = get_log("whatsapp")
 
 
+
+HEADER_MAX = 60  # WhatsApp: a text header of an interactive message
+
+
+def spaced(text: str | None) -> str:
+    """The lines of a message with a blank line between them (user, 11 Nov 2026): the associate reads it at a glance
+    with the customer waiting. Still the same ≤ 3 lines (checked before this), only spaced apart when sent."""
+    lines = [ln.rstrip() for ln in (text or "").split("\n") if ln.strip()]
+    return "\n\n".join(lines)
+
 class WhatsAppChannel:
     renders_cards = True
 
@@ -73,18 +83,20 @@ class WhatsAppChannel:
     def payload(self, m: OutMessage) -> dict:
         base = {"messaging_product": "whatsapp", "recipient_type": "individual", "to": m.to}
         if m.kind == "text":  # a text message has no footer field: the footer goes last, in italics
-            body = (m.body or "") + (f"\n\n_{m.footer}_" if m.footer else "")
+            body = spaced(m.body) + (f"\n\n_{m.footer}_" if m.footer else "")
             return base | {"type": "text", "text": {"preview_url": False, "body": body}}
         if m.kind == "buttons":
             inter: dict = {
                 "type": "button",
-                "body": {"text": m.body or " "},
+                "body": {"text": spaced(m.body) or " "},
                 "action": {
                     "buttons": [{"type": "reply", "reply": {"id": b.id, "title": b.title}} for b in m.buttons[:3]]
                 },
             }
             if m.media_id:
                 inter["header"] = {"type": "image", "image": {"id": m.media_id}}
+            elif m.header:
+                inter["header"] = {"type": "text", "text": m.header[:HEADER_MAX]}
             if m.footer:
                 inter["footer"] = {"text": m.footer}
             return base | {"type": "interactive", "interactive": inter}
@@ -93,7 +105,8 @@ class WhatsAppChannel:
                 "type": "interactive",
                 "interactive": {
                     "type": "list",
-                    "body": {"text": m.body or " "},
+                    **({"header": {"type": "text", "text": m.header[:HEADER_MAX]}} if m.header else {}),
+                    "body": {"text": spaced(m.body) or " "},
                     **({"footer": {"text": m.footer}} if m.footer else {}),
                     "action": {
                         "button": m.list_button or "Chuniye",
@@ -110,7 +123,7 @@ class WhatsAppChannel:
         if m.kind == "image":
             img = {"id": m.media_id}
             if m.caption or m.body:
-                img["caption"] = (m.caption or m.body) + (f"\n\n_{m.footer}_" if m.footer else "")
+                img["caption"] = spaced(m.caption or m.body) + (f"\n\n_{m.footer}_" if m.footer else "")
             return base | {"type": "image", "image": img}
         if m.kind == "audio":
             return base | {"type": "audio", "audio": {"id": m.media_id, **({"voice": True} if m.voice else {})}}

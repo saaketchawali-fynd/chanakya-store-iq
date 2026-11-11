@@ -13,7 +13,7 @@ from chanakya.brain.fit import fit, tv_size_range
 from chanakya.brain.options import candidate_set
 from chanakya.channel.limits import truncate
 from chanakya.core import repo, state
-from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, step
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, ListRow, ListSection, OutMessage, Reply
 from chanakya.log import get_log
 from chanakya.skills import common as C
@@ -67,11 +67,16 @@ async def on_room_photo(ctx: SkillContext, data: bytes, filename: str | None) ->
     jpeg = _to_jpeg(data)
     await repo.media_put(s.id, "room_photo_raw", jpeg, "image/jpeg", ctx.now, days=1)
     s.extra["room_photo_name"] = filename
-    if s.extra.pop("tryon_after_photo", False):
-        s.extra["tryon_req"] = {"mode": "auto"}
+    after = s.extra.pop("tryon_after_photo", False)
+    if not after and s.shortlist and can_offer(ctx):  # the products are out: a room photo means 'show them here'
+        after = "cmp" if len(s.option_labels) >= 2 else "auto"
+        s.extra["assess_closed"] = True
+    if after:  # asked for to show them in this space ('Ghar mein dekho', or 'Proceed': each option on the wall)
+        s.extra["tryon_req"] = {"mode": after if after in ("cmp", "ab") else "auto"}
         return ctx.reply(info_reply(ctx, ctx.t("tryon_drawing")), background=["tryon"])
-    nxt = C.next_question_or_options(ctx, footer=ctx.t("footer_photo_saved"))
-    return ctx.reply(nxt, background=["room_read"])
+    r = await C.next_step(ctx, footer=ctx.t("footer_photo_saved"))
+    r.background = list(dict.fromkeys([*r.background, "room_read"]))
+    return r
 
 
 def _to_jpeg(data: bytes, max_side: int = 1600) -> bytes:
@@ -119,6 +124,7 @@ def no_size_reply(ctx: SkillContext, skus: list[str] | None = None) -> Reply:
     return ctx.reply(info_reply(ctx, ctx.t("tryon_no_size", product=name), [ctx.b("b_go", ctx.sid("go"))]))
 
 
+@step(5)
 async def tryon_request(ctx: SkillContext) -> Reply:
     """'Ghar mein dekho': photo first if there is none (two answers only), then the menu of what to show. A product
     whose size is not in the data is said so at once, before any photo is asked for."""
@@ -132,6 +138,7 @@ async def tryon_request(ctx: SkillContext) -> Reply:
     return await choose(ctx, "auto", None)  # straight to the picture (the best pick + the next size); more via 'Aur dikhao'
 
 
+@step(5)
 async def menu(ctx: SkillContext) -> Reply:
     """Ready-made choices, built from what the customer is considering (no thinking needed by the associate)."""
     s = ctx.session
@@ -180,6 +187,7 @@ async def has_room(ctx: SkillContext) -> bool:
     return bool(s and await repo.media_latest(s.id, "room_photo_raw"))
 
 
+@step(5)
 async def choose(ctx: SkillContext, mode: str, arg: str | None) -> Reply:
     ctx.x["tryon_req"] = {"mode": mode, "sku": arg}
     return ctx.reply(background=["tryon"])
@@ -563,6 +571,7 @@ def _tryon_message(ctx: SkillContext, pl: list[tuple], image: bytes) -> OutMessa
     return m
 
 
+@step(5)
 async def set_old_tv(ctx: SkillContext, size: str) -> Reply:
     s = ctx.session
     if size.isdigit():
@@ -570,6 +579,7 @@ async def set_old_tv(ctx: SkillContext, size: str) -> Reply:
     return ctx.reply(background=["tryon"])
 
 
+@step(5)
 async def set_wall_width(ctx: SkillContext, key: str) -> Reply:
     ft = WALL_WIDTHS.get(key)
     if ft:
@@ -591,6 +601,7 @@ async def customer_photo(ctx: SkillContext) -> Reply:
     )
 
 
+@step(5)
 async def pick(ctx: SkillContext, sku: str) -> Reply:
     """'55 pasand' after the try-on: record the preference; continue to options / cost."""
     s = ctx.session
@@ -606,4 +617,4 @@ async def pick(ctx: SkillContext, sku: str) -> Reply:
     size = p.spec("size_in")
     if size:
         s.home.notes.append(f"tryon_pick:{size}")
-    return ctx.reply(C.next_question_or_options(ctx))
+    return await C.next_step(ctx)

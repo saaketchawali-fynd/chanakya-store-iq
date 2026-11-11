@@ -10,7 +10,7 @@ st_new: {hi: "{code} · Naya customer", mr: "{code} · नवीन ग्रा
 
 # ---------- opener ----------
 bolo_opener: {hi: "Namaste! Reliance Digital mein aapka swagat hai. Ghar ke liye kya dekh rahe hain?", mr: "नमस्कार! Reliance Digital मध्ये तुमचं स्वागत आहे. आज घरासाठी काय बघताय?", en: "Welcome to Reliance Digital! What are you looking for at home today?"}
-kyun_opener: {hi: "Pehle product, phir ghar ke 4 sawaal · Budget dikhawat se kabhi nahi: start level aap poochkar tay karenge", mr: "आधी उत्पादन, मग घराचे 4 प्रश्न · बजेट दिसण्यावरून कधीच नाही: स्टार्ट लेव्हल तुम्ही विचारून ठरवाल", en: "Product first, then 4 home questions · Never a budget from looks: you set the start level, by asking"}
+kyun_opener: {hi: "Pehle product, phir ghar ke 4 sawaal, phir sahi 3 product · Budget dikhawat se kabhi nahi: customer bataye to start level aap tay karte hain", mr: "आधी उत्पादन, मग घराचे 4 प्रश्न, मग योग्य 3 उत्पादनं · बजेट दिसण्यावरून कधीच नाही: ग्राहक सांगेल तेव्हा स्टार्ट लेव्हल तुम्ही ठरवता", en: "Product first, then 4 home questions, then the 3 that fit · Never a budget from looks: you set the start level, from what the customer says"}
 list_product: {hi: "Product chuniye", mr: "उत्पादन निवडा", en: "Choose product"}
 cat_tv: {hi: "TV", mr: "टीव्ही", en: "TV"}
 cat_tv_d: {hi: "Size, picture aur awaaz, kamre ke hisaab se", mr: "खोलीनुसार साइज, पिक्चर आणि आवाज", en: "Size, picture and sound for the room"}
@@ -494,11 +494,30 @@ b_compare_all: {hi: "Side-by-side", mr: "शेजारी तुलना", en
 note_ask_happy: {hi: "*Customer ko ye sahi lag rahe hain?* Haan to side-by-side dikhaiye; nahi to aur options.", mr: "*ग्राहकाला हे योग्य वाटतायत का?* हो तर शेजारी तुलना दाखवा; नाही तर आणखी पर्याय.", en: "*Do these feel right to them?* If yes, show them side by side; if not, more options."}
 b_happy: {hi: "Haan, sahi hain", mr: "हो, योग्य आहेत", en: "Yes, these fit"}
 b_more_options: {hi: "Aur options", mr: "आणखी पर्याय", en: "More options"}
+# ---- the options' one clear choice (user, 11 Nov 2026): Proceed, or once after a voice note More details
+opts_home: {hi: "*Ghar:* {facts}", mr: "*घर:* {facts}", en: "*Home:* {facts}"}
+opts_next: {hi: "*Aage:* inhe unki apni jagah mein dikhaiye, phir demo.", mr: "*पुढे:* हे त्यांच्या स्वतःच्या जागेत दाखवा, मग डेमो.", en: "*Next:* show these in their own space, then the demo."}
+opts_next_note: {hi: "*Customer ko ye sahi lag rahe hain?* Haan to Aage badho; pakka karna ho to Aur jaankari (2-3 sawaal).", mr: "*ग्राहकाला हे योग्य वाटतायत का?* हो तर पुढे चला; खात्री हवी तर आणखी माहिती (2-3 प्रश्न).", en: "*Do these feel right to them?* If yes, Proceed; to be surer, More details (2-3 questions)."}
+opts_show_diff: {hi: "*Dikhane wala farak:* {what} ({a} vs {b})", mr: "*दाखवायचा फरक:* {what} ({a} vs {b})", en: "*The difference to show:* {what} ({a} vs {b})"}
+b_proceed: {hi: "Aage badho", mr: "पुढे चला", en: "Proceed"}
+b_more_details: {hi: "Aur jaankari", mr: "आणखी माहिती", en: "More details"}
+b_cust_doubt: {hi: "Customer ka shak", mr: "ग्राहकाची शंका", en: "Customer doubt"}
+# ---- the contest's 9 steps, named on each message to the associate (WhatsApp header)
+step_hdr: {hi: "Step {n}/9 · {name}", mr: "पायरी {n}/9 · {name}", en: "Step {n} of 9 · {name}"}
+step_1: {hi: "Taiyari (shift se pehle)", mr: "तयारी (शिफ्टआधी)", en: "Before the shift"}
+step_2: {hi: "Ghar samjho", mr: "घर समजून घ्या", en: "Assess"}
+step_3: {hi: "Pehle maano, phir sudhaaro", mr: "आधी मान्य करा, मग दुरुस्त", en: "Validate"}
+step_4: {hi: "Saral samjhao", mr: "सोप्या भाषेत", en: "Translate"}
+step_5: {hi: "3 options aur demo", mr: "3 पर्याय आणि डेमो", en: "Recommend and demonstrate"}
+step_6: {hi: "Poora kharcha", mr: "पूर्ण खर्च", en: "Complete"}
+step_7: {hi: "Close: offer aakhir mein", mr: "क्लोज: ऑफर शेवटी", en: "Close"}
+step_8: {hi: "Follow through", mr: "फॉलो-थ्रू", en: "Follow through"}
+step_9: {hi: "Review", mr: "रिव्ह्यू", en: "Review"}
 opts_head_new: {hi: "*Pehle ke best fits wahi* + naye jawab se {n} naye {cat}:", mr: "*आधीचे best fits तसेच* + नव्या उत्तरांवरून {n} नवे {cat}:", en: "*The earlier best fits stay* + {n} new {cat} from the new answers:"}
 opts_head_broader: {hi: "*Naye jawab se best fits wahi rahe* — {n} aur {cat} dekhne ke liye:", mr: "*नव्या उत्तरांनंतरही best fits तेच* — पाहण्यासाठी आणखी {n} {cat}:", en: "*The new answers keep the same best fits* — {n} more {cat} to see:"}
 reason_new: {hi: "Naya fit", mr: "नवा फिट", en: "New fit"}
 reason_broader: {hi: "Aur option", mr: "आणखी पर्याय", en: "More option"}
-followup_lead: {hi: "*Follow-up {n}* — note mein ye nahi aaya:", mr: "*फॉलो-अप {n}* — नोटमध्ये हे आलं नाही:", en: "*Follow-up {n}* — the note didn't cover this:"}
+followup_lead: {hi: "Aur jaankari {n}/{total} · note mein ye nahi aaya", mr: "आणखी माहिती {n}/{total} · नोटमध्ये हे नव्हतं", en: "More details {n} of {total} · not in the note"}
 sbs_head: {hi: "*Side-by-side* — card customer ke saath dekhiye, har ek unki zaroorat par:", mr: "*शेजारी तुलना* — कार्ड ग्राहकासोबत पाहा, प्रत्येक त्यांच्या गरजेवर:", en: "*Side by side* — go through the card with them, each on their needs:"}
 sbs_tail_locked: {hi: "_Daam demo ke baad khulega · ab Demo guide se dikhaiye_", mr: "_किंमत डेमोनंतर · आता डेमो गाइडने दाखवा_", en: "_Prices open after the demo · next, show it with the Demo guide_"}
 sbs_tail: {hi: "_Jo pasand aaye, use 'Kaunsa sahi laga' se chuniye_", mr: "_जे आवडेल ते 'कोणता योग्य वाटला' मधून निवडा_", en: "_Pick the one they like under 'Which one felt right'_"}

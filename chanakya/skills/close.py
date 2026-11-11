@@ -9,7 +9,7 @@ from chanakya.brain import packs as P
 from chanakya.core import repo, state
 from chanakya.core.buttons import encode
 from chanakya.core.clock import today
-from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply
+from chanakya.core.coach import bolo_block, coach_reply, do_block, info_reply, step
 from chanakya.core.contracts import CUSTOMER_PHONE_LANG, Button, OutMessage, Reply, Step
 from chanakya.i18n.lang import fill
 from chanakya.skills import common as C
@@ -26,6 +26,14 @@ def _sku(ctx: SkillContext) -> str | None:
     return s.chosen_sku or state.best_sku(s)
 
 
+
+def may_exchange(home) -> bool:
+    """Could there be an old one to exchange: replacing it, one they have now, or not known (the 'why now' question
+    is no longer part of Assess, user 11 Nov 2026). Not for a new home or a second one."""
+    vals = P.values(home, "trigger")
+    return "replace" in vals or bool(home.existing) or not vals
+
+@step(7)
 async def offers(ctx: SkillContext) -> Reply:
     """Close, in order: (replacing → is the old one working?) → how will they pay? → (card/EMI → which bank?) →
     the offer card with the full cost today. Only offers from the data, only those this payment gets."""
@@ -50,7 +58,7 @@ async def offers(ctx: SkillContext) -> Reply:
 
         return await complete.show_cost(ctx)
     pack = ctx.pack
-    if ("replace" in P.values(s.home, "trigger") and pack.slot("exchange_old") and not P.known(s.home, "exchange_old")
+    if (may_exchange(s.home) and pack.slot("exchange_old") and not P.known(s.home, "exchange_old")
             and not ctx.x.get("exchange_asked") and any(e.category == pack.category for e in ctx.facts.snap.exchange)):
         ctx.x["exchange_asked"] = True
         ctx.x["pending_close"] = True
@@ -85,6 +93,7 @@ async def _payment_matters(ctx: SkillContext) -> bool:
     return bool(PV.live_offers_for(ctx, p)) or bool(await ctx.facts.finance(p.category))
 
 
+@step(7)
 async def set_pay(ctx: SkillContext, how: str) -> Reply:
     ctx.x["pay"] = how if how in ("card", "upi", "emi") else "upi"
     ctx.x.pop("bank", None)
@@ -125,6 +134,7 @@ def bank_list(ctx: SkillContext, pay: str) -> OutMessage:
                       allowed_numbers=ctx.reg.allowed())
 
 
+@step(7)
 async def set_bank(ctx: SkillContext, bank: str) -> Reply:
     ctx.x["bank"] = bank
     if not ctx.x.get("pay"):
@@ -132,6 +142,7 @@ async def set_bank(ctx: SkillContext, bank: str) -> Reply:
     return await offers(ctx)
 
 
+@step(7)
 async def quote(ctx: SkillContext, alt: bool = False) -> Reply:
     s = ctx.session
     sku = _sku(ctx)
@@ -271,6 +282,7 @@ def offer_card(ctx: SkillContext, p, res, q, extras: int, total_str: str, pay: s
     )
 
 
+@step(7)
 async def send_to_customer(ctx: SkillContext) -> Reply:
     """[Customer ko bhejo]: the offer + finance summary to the customer (consent first, as for the Parivaar Card)."""
     s = ctx.session
@@ -329,6 +341,7 @@ def finance_sentence(ctx: SkillContext, q: finance.FinanceQuote, lang: str) -> s
     )
 
 
+@step(7)
 async def delivery(ctx: SkillContext) -> Reply:
     p = ctx.facts.product_sync(_sku(ctx))
     d1 = today() + timedelta(days=max(1, p.delivery_days if p.qty == 0 else 1))
@@ -353,6 +366,7 @@ async def delivery(ctx: SkillContext) -> Reply:
     return ctx.reply(coach_reply(ctx, say, ctx.t("kyun_close_choice"), cites, btns, do="do_close_choice"))
 
 
+@step(7)
 async def set_delivery(ctx: SkillContext, iso: str) -> Reply:
     """A day picked = sold. Rishta starts at once: consent (QR) → the summary card on their WhatsApp."""
     from datetime import date
@@ -369,6 +383,7 @@ async def set_delivery(ctx: SkillContext, iso: str) -> Reply:
     return await follow.parivaar(ctx, note=ctx.t("delivery_booked", day=txt))
 
 
+@step(7)
 async def not_today(ctx: SkillContext) -> Reply:
     """'Not today': ask what is holding them back, as one list of the real reasons."""
     from chanakya.channel.limits import truncate, truncate_title
@@ -411,6 +426,7 @@ OBJECTION_BUTTONS = {
 }
 
 
+@step(7)
 async def objection(ctx: SkillContext, oid: str) -> Reply:
     ob = ctx.packs.objection(oid) or {}
     s = ctx.session
@@ -453,6 +469,7 @@ def is_discount_ask(ctx: SkillContext, text: str) -> bool:
     return contains_any(text, words) or bool(__import__("re").search(r"\d+\s*%\s*(off|discount|छूट|सूट)", text.lower()))
 
 
+@step(7)
 async def no_invented_discount(ctx: SkillContext) -> Reply:
     ctx.ev("guard_discount")
     sid = ctx.sid if ctx.session else None
@@ -468,6 +485,7 @@ async def no_invented_discount(ctx: SkillContext) -> Reply:
                                  do="do_no_discount"))
 
 
+@step(7)
 async def ask_manager(ctx: SkillContext) -> Reply:
     s = ctx.session
     managers = await repo.staff_by_role("manager")

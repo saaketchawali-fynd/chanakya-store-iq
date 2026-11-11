@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from chanakya.brain import packs as P
 from chanakya.core import state
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import coach_reply, info_reply, step
 from chanakya.core.contracts import Card, OutMessage, Reply, Step
 from chanakya.skills import common as C
 from chanakya.skills.base import SkillContext
@@ -12,6 +12,7 @@ from chanakya.skills.recommend import gate_price_reply, show_options
 from chanakya.truth import fmt, hisaab
 
 
+@step(6)
 async def choose(ctx: SkillContext, label: str) -> Reply:
     s = ctx.session
     if not s.option_labels:
@@ -24,6 +25,7 @@ async def choose(ctx: SkillContext, label: str) -> Reply:
     return await _after_choice(ctx)
 
 
+@step(6)
 async def choose_sku(ctx: SkillContext, sku: str) -> Reply:
     s = ctx.session
     if ctx.facts.product_sync(sku) is None:
@@ -70,6 +72,7 @@ def _pending_site_slot(ctx: SkillContext) -> str | None:
     return None
 
 
+@step(6)
 async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
     s = ctx.session
     pack = ctx.pack
@@ -131,6 +134,7 @@ async def show_cost(ctx: SkillContext, resend: bool = False) -> Reply:
     return ctx.reply(msg)
 
 
+@step(6)
 async def remove_menu(ctx: SkillContext) -> Reply:
     """'Remove an item': the suggested / optional lines and what they added, one tap each; required charges cannot be
     removed."""
@@ -162,6 +166,7 @@ async def remove_menu(ctx: SkillContext) -> Reply:
                                 allowed_numbers=ctx.reg.allowed()))
 
 
+@step(6)
 async def drop_line(ctx: SkillContext, code: str) -> Reply:
     s = ctx.session
     x = ctx.x
@@ -307,6 +312,7 @@ def install_notes(ctx: SkillContext, lang: str) -> list[str]:
     return out
 
 
+@step(6)
 async def resend_card(ctx: SkillContext) -> Reply:
     s = ctx.session
     if not s.cost_snapshot:
@@ -333,6 +339,7 @@ async def resend_card(ctx: SkillContext) -> Reply:
     return ctx.reply(msg)
 
 
+@step(6)
 async def toggle_suggestions(ctx: SkillContext) -> Reply:
     ctx.x["suggestions_off"] = not ctx.x.get("suggestions_off")
     r = await show_cost(ctx)

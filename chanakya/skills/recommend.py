@@ -8,7 +8,7 @@ from chanakya.brain.fit import fit
 from chanakya.brain.options import OptionSet, compute_options
 from chanakya.core import state
 from chanakya.core.buttons import encode
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import coach_reply, info_reply, step
 from chanakya.core.contracts import Button, Card, OutMessage, Reply, Step
 from chanakya.skills import common as C
 from chanakya.skills import fitview as FV
@@ -21,6 +21,12 @@ def _tryon_ok(ctx: SkillContext) -> bool:
     from chanakya.skills.tryon_flow import can_offer
 
     return can_offer(ctx)
+
+
+def _tryon_next(ctx: SkillContext) -> bool:
+    """'Ghar mein dekho' as a way on: only while it has not been done or declined (no photo), never offered again."""
+    s = ctx.session
+    return _tryon_ok(ctx) and not s.tryon_done and not ctx.x.get("photo_asked")
 
 
 def gate_options_reply(ctx: SkillContext) -> Reply:
@@ -264,6 +270,7 @@ def meaning_labels(ctx: SkillContext, lang: str | None = None) -> list[str]:
     return out
 
 
+@step(5)
 async def more_menu(ctx: SkillContext) -> Reply:
     """'Tell me more' with the products: only what the note (or the answers) did not cover yet, from the questions
     the data can act on; then the offers on these, and a different budget or brand."""
@@ -311,45 +318,43 @@ async def more_menu(ctx: SkillContext) -> Reply:
 
 
 def uncovered(ctx: SkillContext) -> list[str]:
-    """The questions the note and the answers did not cover, that the data can act on (slot ids; 'dq' = the next
-    question about what the models on sale differ on). Same rules as 'Tell me more'."""
+    """'More details' after a voice note (user, 11 Nov 2026): the product's own home questions (its 4) that the note
+    and the answers did not cover and today's stock can act on, in their fixed order; for a question the stock cannot
+    act on, the next question about what the models on sale differ on ('dq'). At most FOLLOWUPS_MAX."""
     from chanakya.brain import data_questions as DQ
-    from chanakya.brain import highlights as HL
 
     s, pack, home = ctx.session, ctx.pack, ctx.session.home
     skip, avail = C.skipped(ctx), C._avail(ctx)
-    cands = list(dict.fromkeys([*pack.ask_order, *pack.required_slots]))
-    for th in HL.themes(pack.category):
-        cands += [n.slot for n in th.needs if n.slot and n.w >= HL.STRONG and HL.informative(th, avail)]
     out = []
-    for sid in dict.fromkeys(cands):
+    for sid in pack.order:
         sd = pack.slot(sid)
-        if sd is None or P.known(home, sid) or sid in skip or sd.phase in ("site", "close"):
-            continue
-        if sid in ("trigger", "old_size") and (home.existing or P.known(home, "trigger")):
+        if sd is None or P.known(home, sid) or sid in skip:
             continue
         if sd.ask_if and not P.eval_slot_cond(home, sd.ask_if["slot"], {k: v for k, v in sd.ask_if.items() if k != "slot"},
                                               pack):
             continue
-        if any(th.id in home.asks for th in HL.themes(pack.category) if any(n.slot == sid for n in th.needs)):
-            continue
         out.append(sid)
-    if DQ.next_data_question(pack, avail, set(s.extra.get("dq_done") or []), s.extra.get("wants") or {}) is not None:
+    if skip & set(pack.order) and DQ.next_data_question(pack, avail, set(s.extra.get("dq_done") or []),
+                                                        s.extra.get("wants") or {}) is not None:
         out.append("dq")
-    return out
+    return out[:FOLLOWUPS_MAX]
 
 
-FOLLOWUPS_MAX = 2
+FOLLOWUPS_MAX = 3
 
 
+@step(5)
 async def more_options(ctx: SkillContext) -> Reply:
     """'More options' after the note (user, 4 Nov 2026): a follow-up or two the note did not cover, then the earlier
     best fits stay and the new (or broader) fits join, so they see all of them."""
     s = ctx.session
+    asked = bool(s.extra.get("details_done") or s.extra.get("assess_closed"))  # More details done, or Proceed said
+    s.extra["details_done"] = True  # offered once: after it, only the way on (never the same questions again)
     ctx.x["keep_options"] = dict(s.option_labels)
     ctx.x["keep_roles"] = dict(s.extra.get("option_roles") or {})
     ctx.x["keep_reasons"] = dict(s.extra.get("option_reason_keys") or {})
-    ctx.x["followups"] = 0
+    ctx.x["followups"] = FOLLOWUPS_MAX if asked else 0  # then 'More options' only widens the picks, no questions
+    ctx.x["followups_total"] = len(uncovered(ctx))
     ctx.ev("more_options_asked", shown=list(s.option_labels.values()))
     return await _next_followup(ctx)
 
@@ -361,7 +366,11 @@ async def _next_followup(ctx: SkillContext) -> Reply:
         return await show_options(ctx, override_checked=True)
     q = todo[0]
     ctx.x["more_q"] = "chain:" + q
-    lead = ctx.t("followup_lead", n=ctx.reg.num(int(ctx.x.get("followups") or 0) + 1, "followup:no"))
+    ctx.scratch["step_no"] = 2  # a home question: Assess, even with the products out
+    done = int(ctx.x.get("followups") or 0)
+    total = max(done + len(todo), int(ctx.x.get("followups_total") or 0))
+    lead = ctx.t("followup_lead", n=ctx.reg.num(done + 1, "followup:no"),
+                 total=ctx.reg.num(min(total, FOLLOWUPS_MAX), "followup:total"))
     if q == "dq":
         m = C.data_question(ctx, force=True)
         if m is None:
@@ -373,11 +382,32 @@ async def _next_followup(ctx: SkillContext) -> Reply:
     return ctx.reply(m)
 
 
+@step(5)
 async def followup_answered(ctx: SkillContext) -> Reply:
     ctx.x["followups"] = int(ctx.x.get("followups") or 0) + 1
     return await _next_followup(ctx)
 
 
+@step(5)
+async def proceed(ctx: SkillContext) -> Reply:
+    """'Proceed' with the products (user, 11 Nov 2026): Assess is over, no home question is asked again. On to
+    showing them in the customer's own space: drawn on the room photo when there is one; else the photo is asked
+    for once (two answers); then side by side and the demo."""
+    from chanakya.skills import tryon_flow
+
+    s = ctx.session
+    s.extra["assess_closed"] = True
+    ctx.x.pop("more_q", None)
+    ctx.ev("proceed", from_note=bool(s.extra.get("from_note")))
+    if not s.shortlist:
+        return await show_options(ctx, assessed=True)
+    if tryon_flow.can_offer(ctx) and not await tryon_flow.has_room(ctx) and not ctx.x.get("photo_asked"):
+        s.extra["tryon_after_photo"] = "cmp" if len(s.option_labels) >= 2 else "auto"
+        return ctx.reply(C.photo_question(ctx))
+    return await side_by_side(ctx)
+
+
+@step(5)
 async def side_by_side(ctx: SkillContext) -> Reply:
     """The shortlisted products side by side: on their own wall when a room photo is there (each drawn alone),
     else their product photos; their needs, benefits, features, cost and offers in one table."""
@@ -387,20 +417,24 @@ async def side_by_side(ctx: SkillContext) -> Reply:
     if len(s.option_labels) < 2:
         return await demo(ctx)
     if tryon_flow.can_offer(ctx) and await tryon_flow.has_room(ctx):  # their room: draw each one in it, then compare
+        ctx.x["sbs_shown"] = True
         return await tryon_flow.choose(ctx, "cmp", None)
     best = state.best_label(s)
     labs = [best] + [x for x in sorted(s.option_labels) if x != best]
     card = sidebyside.build(ctx, labs)
     if card is None:
         return await prefer(ctx)
+    ctx.x["sbs_shown"] = True
     btns = [ctx.b("b_demo_guide", ctx.sid("demo")),
-            ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_ok(ctx) else ctx.b("b_they_chose", ctx.sid("prefer")),
+            ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_next(ctx) else ctx.b("b_they_chose", ctx.sid("prefer")),
             ctx.b("b_more_options", ctx.sid("moreopts"))]
     return ctx.reply(info_reply(ctx, sidebyside.summary(ctx, labs), btns, card=card))
 
 
+@step(5)
 async def ask_more(ctx: SkillContext, slot: str | None) -> Reply:
     """One question from 'Tell me more'; the answer re-picks the products at once."""
+    ctx.scratch["step_no"] = 2
     ctx.x["more_q"] = slot or "dq"
     if slot is None:
         m = C.data_question(ctx, force=True)
@@ -547,12 +581,15 @@ def _note_reasons(ctx: SkillContext, p, note_slots: set[str], wants: dict, n: in
     return out[: n + 1]
 
 
-async def show_options(ctx: SkillContext, override_checked: bool = False, note: dict | None = None) -> Reply:
+@step(5)
+async def show_options(ctx: SkillContext, override_checked: bool = False, note: dict | None = None,
+                       assessed: bool = False, footer: str | None = None) -> Reply:
     """note: the associate described the needs in one voice note ({'slots': [...], 'wants': {...}}): the fixed
-    questions are skipped and the reply says the picks come from that note, each with the reasons it matched."""
+    questions are skipped and the reply says the picks come from that note, each with the reasons it matched.
+    assessed: the home questions are done (Assess ends here, user 11 Nov 2026): the products, no gate."""
     s = ctx.session
     pack = ctx.pack
-    if note is None and not state.options_gate_open(s, pack):
+    if note is None and not assessed and not state.options_gate_open(s, pack):
         return gate_options_reply(ctx)
     if not ctx.facts.snap.products:  # nothing loaded from the backend (yet): say so, not "no model fits"
         return ctx.reply(info_reply(ctx, ctx.t("catalog_unavailable")))
@@ -602,13 +639,22 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
         ctx.ev("options_widened", kind=merged, added=[o.product.sku for o in opts.options if o.role in ("new", "broader")])
     else:
         why_b = []
+        facts = C.readback_facts(ctx, ctx.lang)
+        if facts:  # what the home questions told, said back in one line (the Home Card above shows it all)
+            blocks.append(ctx.t("opts_home", facts=facts))
         blocks.append(ctx.t("opts_head", n=ctx.reg.num(len(opts.options), "options:count"),
                             cat=ctx.t(f"brief_cat_{pack.category}")))
     # one product page per product (user, 5 Nov 2026: not cramped in one card), its own why-for-them as the caption;
     # after the follow-ups only the products that joined get a page (the earlier ones were just shown)
     from chanakya.skills.translate import product_card_en
 
-    pages = [info_reply(ctx, "\n".join(x for x in blocks if x))]  # what was understood, and how many: ≤ 2 lines
+    head = info_reply(ctx, "\n".join(x for x in blocks if x))  # what was understood, and how many: ≤ 2 lines
+    if not merged and s.home.slots:  # the contest's Assess ends in a card of the customer's home: with the products
+        head.card = C.english(ctx, lambda: C.home_card(ctx))
+        head.kind = "image"
+    if footer:
+        head.footer = footer
+    pages = [head]
     for o in [o for o in opts.options if not merged or o.role in ("new", "broader")] or opts.options:
         cap = option_block(ctx, o, opts, why_b if o.role == "best" else None)
         off = PV.offer_line(ctx, o.product, ctx.lang)["text"].replace(" · ", ", ")
@@ -617,23 +663,25 @@ async def show_options(ctx: SkillContext, override_checked: bool = False, note: 
             chip = ctx.t(f"pdp_role_{o.role}") if i18n_has(f"pdp_role_{o.role}") else ctx.t("pdp_role_option")
         card = await product_card_en(ctx, o.product, chip=chip, chip_label=o.label, chip_kind=o.role)
         pages.append(info_reply(ctx, cap, card=card))
-    blocks = [ctx.t("opts_hint")]
     demo = pick_demo(opts, s.home, pack, ctx.facts.snap.guides)
+    diff = None
     if demo:
         d, other, _ = demo
         s.demo_recipe = d.id
         ctx.x["demo_other"] = other
         ctx.x["demos_sent"] = [d.id]
-    many = len(opts.options) >= 2
-    if note is not None:  # after a note: are these right for them? yes → see them side by side; no → more options
-        blocks = [ctx.t("note_ask_happy")]
-        btns = [ctx.b("b_happy", ctx.sid("cmpall") if many else ctx.sid("demo")),
-                ctx.b("b_more_options", ctx.sid("moreopts")), ctx.b("b_demo_guide", ctx.sid("demo"))]
-    else:  # the next steps with the products (user, 4 Nov 2026): compare in their home, the demo, or more
-        btns = [ctx.b("b_compare_all", ctx.sid("cmpall")) if many else ctx.b("b_demo_guide", ctx.sid("demo")),
-                ctx.b("b_demo_guide", ctx.sid("demo")) if many else (
-                    ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_ok(ctx) else ctx.b("b_they_chose", ctx.sid("prefer"))),
-                ctx.b("b_more_needs", ctx.sid("more"))]
+        title = ctx.pick(d.title) if d.title else None
+        if title and other and other in s.option_labels:  # the contest: which difference to show the customer
+            diff = ctx.t("opts_show_diff", what=ctx.reg.static(title), a=state.best_label(s), b=other)
+    # one clear choice (user, 11 Nov 2026): Proceed (on to showing them in their home, then the demo); after a
+    # voice note, once, 'More details': the 2-3 home questions the note did not cover; else other options. The
+    # customer's doubt (Validate) is one tap here, where doubts come up.
+    details = note is not None and not merged and not s.extra.get("details_done") and not s.extra.get("assess_closed") \
+        and bool(uncovered(ctx))
+    blocks = [ctx.t("opts_next_note" if details else "opts_next")] + ([diff] if diff else [])
+    btns = [ctx.b("b_proceed", ctx.sid("proceed")),
+            ctx.b("b_more_details", ctx.sid("moreopts")) if details else ctx.b("b_more_options", ctx.sid("moreopts")),
+            ctx.b("b_cust_doubt", ctx.sid("doubt"))]
     last = info_reply(ctx, "\n".join(blocks), btns)  # the next steps, last, so the buttons sit at the bottom
     if ctx.x.pop("rerank_note", None):
         last.footer = ctx.t(f"rr_footer_{ctx.x.get('rerank_last', 'lower')}")
@@ -782,6 +830,7 @@ def _values(ctx: SkillContext, key: str | None, best_lab: str, bp, other_lab: st
     return ctx.t("demo_vals", a=best_lab, va=vb, b=other_lab, vb=vo) if vb and vo else ""
 
 
+@step(5)
 async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
     """The demo guide in ONE message (user, 4 Nov 2026): the guide card, and under it, for each product, numbered
     steps to run one after another: their need first (the wow), then the rest. No 'Demo 1/2' messages."""
@@ -800,9 +849,12 @@ async def demo(ctx: SkillContext, i: int | None = None) -> Reply:
     body = await demo_guide_text(ctx)
     ctx.x["demo_guide_for"] = key
     ctx.ev("demo_guide_sent", products=len(card.data["products"]) if card else 0)
-    btns = [ctx.b("b_shown", ctx.sid("shown")),
-            ctx.b("b_compare_all", ctx.sid("cmpall")) if len(s.option_labels) >= 2 else ctx.b("b_they_chose", ctx.sid("prefer")),
-            ctx.b("b_tryon", ctx.sid("tryon")) if _tryon_ok(ctx) else ctx.b("b_more_needs", ctx.sid("more"))]
+    # the way on is 'Shown': nothing already seen or declined is offered again (side by side, their own space)
+    btns = [ctx.b("b_shown", ctx.sid("shown")), ctx.b("b_cust_doubt", ctx.sid("doubt"))]
+    if _tryon_next(ctx):
+        btns.append(ctx.b("b_tryon", ctx.sid("tryon")))
+    elif len(s.option_labels) >= 2 and not ctx.x.get("sbs_shown"):
+        btns.append(ctx.b("b_compare_all", ctx.sid("cmpall")))
     msg = info_reply(ctx, body, btns, card=card)
     msg.footer = ctx.t("guide_footer")
     return ctx.reply(msg)
@@ -973,6 +1025,7 @@ def _demo_buttons(ctx: SkillContext, has_next: bool) -> list:
     return btns
 
 
+@step(5)
 async def prefer(ctx: SkillContext) -> Reply:
     """'Which one felt right for your home?' — the three options and 'none of these', as one list."""
     from chanakya.channel.limits import truncate, truncate_title
@@ -1014,6 +1067,7 @@ async def prefer(ctx: SkillContext) -> Reply:
     return ctx.reply(msg)
 
 
+@step(5)
 async def none_fit(ctx: SkillContext) -> Reply:
     btns = [ctx.b("b_rr_lower", ctx.sid("rerank", "lower")), ctx.b("b_rr_higher", ctx.sid("rerank", "higher")),
             ctx.b("b_rr_brand", ctx.sid("rerank", "brand"))]
@@ -1021,6 +1075,7 @@ async def none_fit(ctx: SkillContext) -> Reply:
     return ctx.reply(coach_reply(ctx, ctx.tc("bolo_missing"), ctx.t("kyun_missing"), C.known_cites(ctx), btns, do="do_missing"))
 
 
+@step(5)
 async def rerank(ctx: SkillContext, how: str) -> Reply:
     """New options from what the customer said was missing: lower cost, bigger / more, or another brand."""
     s = ctx.session
@@ -1079,6 +1134,7 @@ def demo_message(ctx: SkillContext, d, other_label: str | None, reason_key: str 
     return coach_reply(ctx, say, why, cites, _demo_buttons(ctx, has_next), do="do_demo")
 
 
+@step(5)
 async def shown(ctx: SkillContext) -> Reply:
     """Demo done (the price gate opens): ask which one felt right."""
     s = ctx.session
@@ -1137,6 +1193,7 @@ def tryon_buttons(ctx: SkillContext, skus: list[str]) -> list[Button]:
     return out
 
 
+@step(5)
 async def offers_view(ctx: SkillContext) -> Reply:
     """'Offers' next to the products: every live offer on each option (or the product being looked at), as one
     list; one tap gives the line to say. Only offers from the data; nothing is invented when there are none."""
@@ -1182,6 +1239,7 @@ async def offers_view(ctx: SkillContext) -> Reply:
                                 footer=ctx.t("offers_list_footer"), allowed_numbers=ctx.reg.allowed()))
 
 
+@step(5)
 async def offer_detail(ctx: SkillContext, offer_id: str, label: str) -> Reply:
     """One offer, tapped from the list: what it gives and till when (from its row), and the line to say."""
     from chanakya.skills.brief import _offer_detail
@@ -1244,6 +1302,7 @@ def _lower1(s: str) -> str:
     return s[0].lower() + s[1:] if len(s) > 1 and s[0].isupper() and s[1].islower() else s
 
 
+@step(5)
 async def upgrade_view(ctx: SkillContext) -> Reply:
     """'Is the extra money worth it?': each step up, what it costs (and per day over 5 years), and what it really
     adds for this home. When it adds nothing for them, it says so: the honest answer that wins trust."""

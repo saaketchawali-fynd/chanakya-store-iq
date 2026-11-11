@@ -42,11 +42,10 @@ async def test_ghar_mein_dekho_asks_photo_then_draws(h):
 async def test_photo_during_questions_never_interrupts(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:en")
-    await h.voice("assess_1")
-    await h.tap("s:C1:slot:trigger:new_home")
-    await h.tap("s:C1:photo_yes")
-    out = await h.photo("room_living.jpg")
-    assert len(out) == 1 and not out[0].image_bytes and out[0].footer  # the next step + 'Photo saved'
+    await h.pick("s:C1:cat:tv")
+    out = await h.photo("room_living.jpg")  # a room photo during Assess: kept for later, the questions go on
+    assert len(out) == 1 and not out[0].image_bytes and out[0].footer  # the next question + 'Photo saved'
+    assert button_ids(out)[0].startswith("s:C1:slot:room:")
     s = await h.rt.svc.sessions.by_code("919000000001", "C1")
     assert s.extra.get("room_read")  # read in the background: the picture is instant at the options
 

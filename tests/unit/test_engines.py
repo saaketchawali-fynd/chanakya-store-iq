@@ -137,14 +137,15 @@ def test_options_out_of_stock_uses_nearby(rt):
 
 
 def test_next_question_golden(rt):
-    """Assess runs in a fixed order: why now → (old size, if replacing) → room → distance → light → content."""
+    """Assess is the product's 4 home questions in a fixed order (user, 11 Nov 2026): room → distance → light →
+    content; no 'why now' or old size."""
     pack, g = rt.packs.get("tv"), rt.facts.snap.guides
     prods = rt.facts.products_sync("tv")
     h = shah(rt)
-    assert ordered_next(h, pack) == "trigger"
-    assert ordered_next(shah(rt, trigger="replace"), pack) == "old_size"
-    assert ordered_next(shah(rt, trigger="new_home"), pack) == "room"  # old size only when replacing
-    assert ordered_next(shah(rt, trigger="new_home", room="living"), pack) is None  # all 4 known: the gate is open
+    assert pack.order == ["room", "seat_distance", "room_light", "content"]
+    assert ordered_next(h, pack) == "room"
+    assert ordered_next(shah(rt, trigger="replace"), pack) == "room"  # why now is no longer asked
+    assert ordered_next(shah(rt, room="living"), pack) is None  # all 4 known: the gate is open
     assert pack.known_required(shah(rt, room="living")) == 4
     # the info-gain picker (spec 10.6) still ranks the extra questions
     ranked = dict(score_slots(shah(rt, trigger="new_home", room="living"), pack, prods, g, 4, False))

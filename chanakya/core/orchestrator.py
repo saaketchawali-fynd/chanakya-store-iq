@@ -224,6 +224,11 @@ class Orchestrator:
                 if out is None:  # blocked on its way to the customer: nothing to them, the associate is told
                     await self._customer_blocked(ctx)
                     continue
+                if out.to == ctx.actor_wa_id and out.kind in ("buttons", "list") and out.card is None \
+                        and not out.media_id and not out.image_bytes and not out.header:
+                    from chanakya.core.coach import step_header
+
+                    out.header = step_header(ctx)  # which of the 9 steps this is, as the message's bold header
                 if holder and first and m.to == ctx.actor_wa_id and out.card is None:
                     holder["done"].set()  # a plain message is on its way now: no holding line
                 await self.svc.deliver(out)

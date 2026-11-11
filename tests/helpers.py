@@ -59,27 +59,31 @@ COMPLETE_ANSWERS = ("mounting:wall", "wall_type:concrete", "soundbar:has", "outd
                     "wall_hole:existing")
 
 
-async def assess_tv(h, clang: str | None = "mr", trigger: str = "new_home"):
-    """New customer → (customer language) → the Shah voice note (room, distance, light, content, budget) → why now."""
+async def assess_tv(h, clang: str | None = "mr", trigger: str | None = "new_home", photo=None):
+    """New customer → (customer language) → TV → (a room photo) → the Shah voice note (room, distance, light,
+    content, budget): the 4 home questions are all in it, so the products come at once (user, 11 Nov 2026). `trigger`
+    records why now (no longer a question in Assess; it decides the exchange question at Close)."""
     await h.tap("g:new")
     if clang:
         await h.tap(f"s:C1:lang:{clang}")
-    await h.voice("assess_1")
-    return await h.tap(f"s:C1:slot:trigger:{trigger}")
+    await h.pick("s:C1:cat:tv")
+    if photo:
+        await h.photo(photo)
+    out = await h.voice("assess_1")
+    if trigger:
+        await h.tap(f"s:C1:slot:trigger:{trigger}")
+    return out
 
 
-async def assess_steps(h, clang: str | None = "mr", trigger: str = "new_home"):
-    """The question-by-question path: a short note (room, distance, budget), then why now, light and content by tap,
-    until the photo question. (A note that tells the needs in full skips straight to the products instead.)"""
+async def assess_steps(h, clang: str | None = "mr"):
+    """The question-by-question path: TV, then the 4 home questions by tap, until the products."""
     await h.tap("g:new")
     if clang:
         await h.tap(f"s:C1:lang:{clang}")
-    out = await h.voice("assess_short")
-    answers = (f"trigger:{trigger}", "old_size:o43", "room_light:sunny", "content:sports")
+    out = await h.pick("s:C1:cat:tv")
+    answers = ("room:living", "seat_distance:d8_10", "room_light:sunny", "content:sports")
     for _ in range(5):
         ids = button_ids(out)
-        if "s:C1:photo_no" in ids:
-            return out
         nxt = next((f"s:C1:slot:{a}" for a in answers if f"s:C1:slot:{a}" in ids), None)
         if nxt is None:
             return out
@@ -88,15 +92,8 @@ async def assess_steps(h, clang: str | None = "mr", trigger: str = "new_home"):
 
 
 async def to_options(h, photo=None, clang: str | None = "mr"):
-    """…→ room photo (or none) → read it back → no doubts → the options."""
-    await assess_tv(h, clang)
-    if photo:
-        await h.tap("s:C1:photo_yes")
-        await h.photo(photo)
-    else:
-        await h.tap("s:C1:photo_no")
-    await h.tap("s:C1:readback_ok")
-    return await h.tap("s:C1:options")
+    """…→ (a room photo) → the note → the options (Assess is the 4 home questions, then the products)."""
+    return await assess_tv(h, clang, photo=photo)
 
 
 async def answer_complete(h, out, addons: str = "none"):

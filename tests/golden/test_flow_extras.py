@@ -81,22 +81,22 @@ async def test_option_features_by_voice(h):
 async def test_old_tv_on_wall_asks_its_size_then_draws(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:hi")
-    await h.voice("assess_1")
-    await h.tap("s:C1:slot:trigger:new_home")
+    await h.pick("s:C1:cat:tv")
+    await h.voice("assess_1")  # the products
+    out = await h.tap("s:C1:proceed")  # on to their own space: the room photo
+    assert button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"]
     await h.tap("s:C1:photo_yes")
     out = await h.photo("wall_with_tv.jpg")
-    assert not any(m.image_bytes for m in out)  # during the questions the photo is only read
-    out = await h.tap("s:C1:tryon")
-    ask = next(m for m in out if m.kind == "list")
+    ask = next(m for m in out if m.kind == "list")  # a TV on that wall: its size first, the reference for true scale
     rows = [r.id for sec in ask.sections for r in sec.rows]
     assert "s:C1:oldtv:32" in rows and "s:C1:oldtv:none" in rows
     assert not any(m.image_bytes for m in out)  # nothing drawn until the reference size is known
     out = await h.pick("s:C1:oldtv:32")
     check_floor(out)
-    assert any(m.image_bytes for m in out)
+    assert any(m.image_bytes or (m.card and m.card.template == "homecompare") for m in out)
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     assert s.home.slots["existing_tv_in"][-1].number == 32
-    assert (await repo.events_for(s.id, ["tryon_sent"]))
+    assert (await repo.events_for(s.id, ["tryon_sent", "tryon_ab_sent"]))  # each option drawn on their wall
 
 
 async def test_label_scan_before_and_after_home_is_understood(h):
@@ -136,6 +136,11 @@ async def test_compare_two_labels_for_this_home(h):
 async def test_voice_note_shows_what_was_understood(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:mr")
-    out = await h.voice("assess_short")  # a short note: the next question, and what was understood below it
+    out = await h.voice("assess_short")  # room and distance: the products from the note, what was understood first
+    cap = out[0].caption or out[0].body
+    assert cap.startswith("*Note se samjha:*") and "10 ft" in cap
+    await h.tap("g:new")
+    await h.pick("s:C2:cat:tv")
+    out = await h.say("sofa se 10 feet door hai")  # one fact: the next question, and what was understood below it
     f = out[0].footer
     assert f.startswith("Samjha: ") and "10 ft" in f and len(f) <= 60

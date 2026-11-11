@@ -1,7 +1,7 @@
 category: tv
 label: {hi: "TV", mr: "टीव्ही", en: "TV"}
 required_slots: [room, seat_distance, room_light, content]
-ask_order: [trigger, old_size, room, seat_distance, room_light, content]
+ask_order: [room, seat_distance, room_light, content]  # the product's 4 home questions, nothing else (user, 11 Nov 2026)
 complete_slots: [mounting, wall_type, soundbar]
 placeable: true
 gate_min_slots: 4

@@ -76,7 +76,9 @@ def _options(ctx: SkillContext) -> str | None:
 def _cost(ctx: SkillContext) -> str | None:
     """Replacing an old one and the exchange is not asked yet; or a protection plan exists for this product."""
     s = ctx.session
-    if "replace" in P.values(s.home, "trigger") and ctx.pack.slot("exchange_old") and not P.known(s.home, "exchange_old"):
+    from chanakya.skills.close import may_exchange
+
+    if may_exchange(s.home) and ctx.pack.slot("exchange_old") and not P.known(s.home, "exchange_old"):
         if any(e.category == ctx.pack.category for e in ctx.facts.snap.exchange):
             return _once(ctx, "exchange", ctx.t("tip_exchange"))
     from chanakya.truth.hisaab import filter_holds

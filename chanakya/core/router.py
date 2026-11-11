@@ -606,6 +606,7 @@ async def session_action(ctx: SkillContext, action: str, args: list[str]) -> Rep
         "photo_yes": lambda: assess.photo_yes(ctx),
         "photo_no": lambda: assess.photo_no(ctx),
         "options": lambda: recommend.show_options(ctx),
+        "proceed": lambda: recommend.proceed(ctx),
         "shown": lambda: recommend.shown(ctx),
         "demo2": lambda: recommend.demo(ctx),  # older messages: the guide again (one message now)
         "tryon": lambda: tryon_flow.tryon_request(ctx),
@@ -780,10 +781,12 @@ async def reread_note(ctx: SkillContext, transcript: str) -> Reply:
 
 
 async def on_speech(ctx: SkillContext) -> Reply:
+    had_products = bool(ctx.session and ctx.session.shortlist)
     r = await _on_speech(ctx)
     s = ctx.session
     if s is not None and s.home.customer_name and not s.extra.get("ret_offered") and ctx.role == "associate":
-        m = await returning.name_match(ctx)  # 'Shah ji came 3 days ago: liked B…' — carry on, no re-asking
+        # 'Shah ji came 3 days ago: liked B…' — carry on, no re-asking (also when this note brought the products)
+        m = await returning.name_match(ctx, new_shortlist=not had_products)
         if m is not None:
             r.messages.insert(0, m)
     return r
@@ -965,7 +968,10 @@ def _requirements_note(ctx: SkillContext, tr: str, n_new: int, intents: set, u=N
     n_new = n_new or 0
     new = new or {}
     asked = "request_options" in intents
-    rich = n_new >= 3 or (new and (n_new >= 1 or len(new) >= 2)) or (asked and (n_new >= 1 or new))
+    told = {e.payload.get("slot") for e in ctx.events if e.type == "slot_filled"} - {None}
+    # the needs told by voice (user, 11 Nov 2026): two home facts or more, or what they want, and the products come
+    # from the note at once, with 'More details' for the home questions it did not cover
+    rich = len(told) >= 2 or n_new >= 3 or (new and (n_new >= 1 or len(new) >= 2)) or (asked and (n_new >= 1 or new))
     if not rich or (s.shortlist and not (n_new >= 2 or new)):
         return None
     slots = list(dict.fromkeys(e.payload.get("slot") for e in ctx.events if e.type == "slot_filled"))
@@ -1025,7 +1031,7 @@ async def voice_step(ctx: SkillContext, u, intents: set) -> Reply | None:
     if "next_step" in intents:
         from chanakya.skills import common as C
 
-        return ctx.reply(C.next_question_or_options(ctx)) if not s.shortlist else await assess.status(ctx)
+        return await C.next_step(ctx) if not s.shortlist else await assess.status(ctx)
     return None
 
 

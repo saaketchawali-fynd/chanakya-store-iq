@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 from typing import TYPE_CHECKING
 
 from chanakya.core.contracts import Button, Card, OutMessage
@@ -13,6 +14,38 @@ if TYPE_CHECKING:
 
 def _one_line(s: str) -> str:
     return " ".join((s or "").split())
+
+
+# The contest's 9 steps, in its order (user, 11 Nov 2026: "stick to the 9 steps clearly"). Each skill entry point is
+# marked with the step it serves; the associate's message names it in its header ("Step 2 of 9 · Assess"). A call
+# into another step's skill (Close showing the full cost first) names that step: the last one wins.
+SESSION_STEP = {"assess": 2, "recommend": 5, "demonstrated": 5, "complete": 6, "close": 7, "follow": 8, "closed": 9}
+
+
+def step(n: int):
+    def wrap(fn):
+        @functools.wraps(fn)
+        async def inner(ctx, *a, **k):
+            ctx.scratch["step_no"] = n
+            return await fn(ctx, *a, **k)
+
+        return inner
+
+    return wrap
+
+
+def step_header(ctx: SkillContext) -> str | None:
+    """'Step 5 of 9 · Recommend and demonstrate' for the associate's message (None for other roles)."""
+    if ctx.role != "associate":
+        return None
+    n = ctx.scratch.get("step_no")
+    if n is None and ctx.session is not None:
+        n = SESSION_STEP.get(getattr(ctx.session.step, "value", ctx.session.step))
+    if not n:
+        return None
+    from chanakya.i18n.lang import t
+
+    return t("step_hdr", ctx.lang, None, n=n, name=t(f"step_{n}", ctx.lang))
 
 
 # Message layout (user, 5 Nov 2026: the contest's floor rules, strictly): at most 3 lines, no blank lines, 3 buttons.

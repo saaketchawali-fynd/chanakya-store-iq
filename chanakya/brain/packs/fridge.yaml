@@ -1,7 +1,7 @@
 category: fridge
 label: {hi: "Fridge", mr: "फ्रिज", en: "Fridge"}
 required_slots: [family_size, shopping, space_width, power_cuts]
-ask_order: [trigger, family_size, shopping, space_width, power_cuts]
+ask_order: [family_size, shopping, space_width, power_cuts]  # the product's 4 home questions, nothing else (user, 11 Nov 2026)
 complete_slots: []
 placeable: true
 gate_min_slots: 4

@@ -270,16 +270,17 @@ async def test_languages(h, assoc, cust):
     await h.say(f"lang {assoc}")
     await h.tap("g:new")
     await h.tap(f"s:C1:lang:{cust}")
-    out = await h.voice("assess_short")
+    out = await h.voice("assess_short")  # room and distance: the products from the note, More details for the rest
     check_floor(out)
     from chanakya.i18n.lang import raw
 
-    assert raw("label_kyun", assoc) in out[0].body
-    for b in ("s:C1:slot:trigger:new_home", "s:C1:slot:room_light:sunny", "s:C1:slot:content:sports"):
-        await h.tap(b)
-    await h.tap("s:C1:photo_no")
-    await h.tap("s:C1:readback_ok")
-    out = await h.tap("s:C1:options")
+    assert raw("label_kyun", assoc) in (out[1].body or out[1].caption)  # the associate's language on each page
+    out = await h.tap("s:C1:moreopts")
+    assert raw("label_kyun", assoc) in out[0].body and raw("label_bolo", assoc) in out[0].body
+    for b in ("s:C1:slot:room_light:sunny", "s:C1:slot:content:sports"):
+        out = await h.tap(b)
+        check_floor(out)
+    out = await h.tap("s:C1:options")  # the picks for the whole home
     check_floor(out)
     await h.tap("s:C1:shown")
     out = await pick(h)
@@ -300,10 +301,10 @@ async def test_language_picker_then_single_language(tmp_path):
         out = await hh.tap("g:new")
         assert "नवीन ग्राहक" in out[0].body + (out[0].footer or "")  # Marathi from now on
         out = await hh.tap("s:C1:lang:hi")  # customer speaks Hindi: only the Bolo line follows the customer
-        out = await hh.voice("assess_short")
+        out = await hh.pick("s:C1:cat:tv")  # the first home question
         body = out[0].body
         assert "*बोला*" in body and "*का*" in body  # associate labels stay Marathi
-        assert "Purana TV" in body  # the line to say (why now?) is in the customer's Hindi, Roman Hinglish
+        assert "TV kis kamre mein lagega?" in body  # the line to say is in the customer's Hindi, Roman Hinglish
         await hh.say("language")
         assert [b.id for b in hh.ch.sent[-1].msg.buttons] == ["g:alang:en", "g:alang:hi", "g:alang:mr"]
     finally:

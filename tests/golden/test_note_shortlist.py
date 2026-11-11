@@ -32,7 +32,8 @@ async def test_a_full_note_gives_the_products_at_once(h):
     body = "\n\n".join(x.body or x.caption or "" for x in out)
     assert options_view(out) and (m.body or m.caption).startswith("*Note se samjha:*")  # bullets, then each page
     assert "10 ft" in body and "Dhoop mein bhi saaf" in body  # the reasons are the note's own needs
-    assert button_ids(out) == ["s:C1:cmpall", "s:C1:moreopts", "s:C1:demo"]  # happy? / more options / demo
+    assert button_ids(out) == ["s:C1:proceed", "s:C1:moreopts", "s:C1:doubt"]  # one clear choice (11 Nov 2026)
+    assert out[-1].buttons[1].title == "Aur options"  # all 4 home facts told: nothing left for 'More details'
     s = await session(h)
     prices = [f"₹{p.price:,}" for p in (h.rt.facts.product_sync(x) for x in s.option_labels.values())]
     assert prices and not any(pr in body for pr in prices)  # the offers are with the products; no price yet
@@ -54,11 +55,12 @@ async def test_explicit_asks_pick_the_products(h):
     assert "₹" not in texts(out, footer=False)
 
 
-async def test_a_short_note_still_goes_one_question_at_a_time(h):
+async def test_a_short_note_gives_the_products_and_more_details(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:en")
-    out = await h.voice("assess_short")  # room and distance only
-    assert out[0].body.startswith("*Bolo*:") and "s:C1:slot:trigger:replace" in button_ids(out)
+    out = await h.voice("assess_short")  # room and distance only (user, 11 Nov 2026: the products from the note)
+    assert options_view(out) and button_ids(out) == ["s:C1:proceed", "s:C1:moreopts", "s:C1:doubt"]
+    assert out[-1].buttons[1].title == "Aur jaankari"  # More details: the home questions the note did not cover
 
 
 # ---------- the needs by voice, the product not named (user, 6 Nov 2026: "when the associate defines the home
@@ -93,7 +95,8 @@ async def test_a_note_that_does_not_name_the_product_gives_the_products(h):
     check_floor(out)
     s = await session(h)
     assert s.home.category == "ac" and s.home.start_level_inr == 40000 and len(s.shortlist) == 3
-    assert out[0].body.startswith("*Note se samjha:*") and "₹40,000" in out[0].body
+    cap = out[0].body or out[0].caption
+    assert cap.startswith("*Note se samjha:*") and "₹40,000" in cap and out[0].card.template == "home"
     assert sum(1 for m in out if m.card is not None and m.card.template == "product") == 3
 
 

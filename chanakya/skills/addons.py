@@ -15,7 +15,7 @@ down is not suggested again. One English card for the customer; the message in t
 from __future__ import annotations
 
 from chanakya.core import state
-from chanakya.core.coach import coach_reply, info_reply
+from chanakya.core.coach import coach_reply, info_reply, step
 from chanakya.core.contracts import Card, ListRow, ListSection, Reply
 from chanakya.skills import common as C
 from chanakya.skills import product_view as PV
@@ -200,6 +200,7 @@ def _added_line(ctx: SkillContext, r: dict) -> dict:
             "source": f"calc:addon:{r['code']}" if b else r["source"], "reason": reason}
 
 
+@step(6)
 async def choose(ctx: SkillContext, what: str) -> Reply:
     """'all' / 'none' / 'pick' (the list) / a row's code (add that one, then the rest or the full cost)."""
     from chanakya.skills.complete import show_cost

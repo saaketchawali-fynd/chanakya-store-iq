@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from chanakya.core import repo
 from chanakya.core.buttons import encode
-from chanakya.core.coach import info_reply
+from chanakya.core.coach import info_reply, step
 from chanakya.core.contracts import Card, Event, Reply, Step
 from chanakya.skills.base import SkillContext
 
@@ -68,6 +68,7 @@ def score(events: list[Event], extra: dict) -> tuple[dict[str, int], dict]:
     }, facts
 
 
+@step(9)
 async def khatam(ctx: SkillContext) -> Reply:
     if ctx.x.get("outcome") == "sold":  # already known (a delivery day was booked): don't ask again
         return await outcome(ctx, "sold")
@@ -81,6 +82,7 @@ async def khatam(ctx: SkillContext) -> Reply:
     return ctx.reply(info_reply(ctx, ctx.t("review_ask", name=_cust_name(ctx)), btns))
 
 
+@step(9)
 async def outcome(ctx: SkillContext, out: str) -> Reply:
     ctx.x["outcome"] = out
     if "price_first_by" not in ctx.x:
@@ -93,6 +95,7 @@ async def outcome(ctx: SkillContext, out: str) -> Reply:
     return await _after_outcome(ctx)
 
 
+@step(9)
 async def price_first(ctx: SkillContext, who: str) -> Reply:
     ctx.x["price_first_by"] = who
     ctx.ev("price_first_by", who=who, minute=None, from_review=True)

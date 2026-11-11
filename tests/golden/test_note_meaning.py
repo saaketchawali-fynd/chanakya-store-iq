@@ -64,7 +64,7 @@ async def test_the_tv_they_have_is_never_the_fit(tmp_path, monkeypatch):
         card = options_view(out)
         assert all(o["points"] for o in card.data["options"])  # every option's page says why it fits them
         assert "Abhi: Sony 43" in texts(out) and "Naye features chahiye" in texts(out)  # the note said back
-        assert set(button_ids(out)) >= {"s:C1:moreopts", "s:C1:demo"}  # happy with these? / more options
+        assert set(button_ids(out)) >= {"s:C1:proceed", "s:C1:moreopts"}  # Proceed / More details
     finally:
         await h.close()
 
@@ -115,7 +115,7 @@ async def test_more_options_keeps_the_best_and_adds(h):
     await h.tap("g:new")
     await h.tap("s:C1:lang:en")
     out = await h.voice("assess_1")  # the needs in one note → the best fits at once
-    assert "s:C1:moreopts" in button_ids(out) and "Customer ko ye sahi lag rahe hain?" in out[-1].body
+    assert button_ids(out)[-3:] == ["s:C1:proceed", "s:C1:moreopts", "s:C1:doubt"] and out[-1].body.startswith("*Aage:*")
     s = await h.rt.svc.sessions.by_code(PHONES["associate"], "C1")
     before = dict(s.option_labels)
     best_before = s.option_labels[next(k for k, r in s.extra["option_roles"].items() if r == "best")]
@@ -124,7 +124,7 @@ async def test_more_options_keeps_the_best_and_adds(h):
     for _ in range(3):
         if options_view(out) is not None:
             break
-        assert out[-1].footer.startswith("Follow-up")  # which follow-up, in the footer; the question stays 3 lines
+        assert out[-1].footer.startswith("Aur jaankari")  # which one, in the footer; the question stays 3 lines
         nxt = next(b.id for b in out[-1].buttons if ":slot:" in b.id or ":dq:" in b.id)
         rows = [r.id for m in out for sec in (m.sections or []) for r in sec.rows]
         out = await (h.pick(nxt) if nxt in rows else h.tap(nxt))

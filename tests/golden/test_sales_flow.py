@@ -1,6 +1,6 @@
-"""The sales flow as agreed: one question at a time (product → why now → 4 home questions → photo → comfort range →
-read it back → doubts → options → demo → which felt right → cost questions → full cost → payment → offer card →
-a choice of two days, or 'not today' → the real reason). Fridge end to end, plus the side paths."""
+"""The sales flow in the contest's 9 steps (user, 11 Nov 2026): product → the 4 home questions → the products (Home
+Card, one page each, Proceed) → their own space → demo → which felt right → cost questions → full cost → payment →
+offer card → a choice of two days, or 'not today' → the real reason. Fridge end to end, plus the side paths."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from chanakya.config import ROOT
 from chanakya.core import repo
 from chanakya.i18n.lang import strings
 from chanakya.sim.harness import PHONES
-from tests.helpers import answer_complete, button_ids, check_floor, pick, texts, to_options
+from tests.helpers import answer_complete, button_ids, check_floor, pick, to_options
 
 
 def rows(msg):
@@ -23,9 +23,8 @@ async def test_fridge_end_to_end(h):
     out = await h.tap("g:new")
     out = await h.pick("s:C1:cat:fridge")
     check_floor(out)
-    assert button_ids(out) == ["s:C1:slot:trigger:replace", "s:C1:slot:trigger:new_home", "s:C1:voiceq:trigger"]
+    assert button_ids(out)[0] == "s:C1:slot:family_size:f1_2"  # Assess: the fridge's own home questions, no 'why now'
     for bid, nxt in (
-        ("s:C1:slot:trigger:replace", "s:C1:slot:family_size:f1_2"),
         ("s:C1:slot:family_size:f3_4", "s:C1:slot:shopping:daily"),
         ("s:C1:slot:shopping:weekly", "s:C1:slot:space_width:w_lt65"),
         ("s:C1:slot:space_width:w_lt65", "s:C1:slot:power_cuts:yes"),
@@ -33,22 +32,19 @@ async def test_fridge_end_to_end(h):
         out = await h.tap(bid)
         check_floor(out)
         assert len(out) == 1 and button_ids(out)[0] == nxt  # one question at a time, in order
-    out = await h.tap("s:C1:slot:power_cuts:yes")
-    assert button_ids(out) == ["s:C1:photo_yes", "s:C1:photo_no"] and "Ghar 4/4" in (out[0].footer or "")
-    out = await h.tap("s:C1:photo_no")
-    r = rows(out[0])
-    assert out[0].kind == "list" and r[-1] == "s:C1:budget:none" and "₹" in texts(out) + str(out[0].sections)
-    out = await h.pick("s:C1:budget:none")
-    assert out[0].card.template == "home" and button_ids(out) == ["s:C1:readback_ok", "s:C1:readback_edit"]
-    await h.tap("s:C1:readback_ok")
-    out = await h.tap("s:C1:doubt")
-    assert "s:C1:myth:fr_stabiliser_needed" in rows(out[0])
-    out = await h.tap("s:C1:options")
+    out = await h.tap("s:C1:slot:power_cuts:yes")  # the 4th answer: the products at once
     check_floor(out)
+    assert out[0].card.template == "home" and "Ghar 4/4" in (out[0].footer or "")
+    assert button_ids(out)[-3:] == ["s:C1:proceed", "s:C1:moreopts", "s:C1:doubt"]
     s = await session(h)
     for sku in s.option_labels.values():
         p = h.rt.svc.facts.product_sync(sku)
         assert p.category == "fridge" and p.spec("width_mm") <= 620  # never wider than the kitchen spot
+    out = await h.tap("s:C1:doubt")  # the customer's doubt (Validate), one tap away
+    assert "s:C1:myth:fr_stabiliser_needed" in rows(out[0])
+    out = await h.tap("s:C1:proceed")
+    if "s:C1:photo_no" in button_ids(out):  # their own space: the photo, asked once
+        out = await h.tap("s:C1:photo_no")
     out = await h.tap("s:C1:demo")
     assert len(out) == 1 and out[0].card.template == "demo" and out[0].body.startswith("*Demo guide*")
     out = await h.tap("s:C1:shown")
@@ -57,7 +53,7 @@ async def test_fridge_end_to_end(h):
     k = next(m for m in out if m.card and m.card.template == "kharcha")
     assert k.card.data["lifetime_text"]  # the running cost of a fridge that runs all day
     out = await h.tap("s:C1:offers")
-    assert button_ids(out)[0] == "s:C1:slot:exchange_old:yes_working"  # replacing → the exchange question
+    assert button_ids(out)[0] == "s:C1:slot:exchange_old:yes_working"  # not known to be a first one: exchange?
     await h.tap("s:C1:slot:exchange_old:yes_dead")
     out = await h.tap("s:C1:pay:upi")
     oc = out[0].card
@@ -71,22 +67,6 @@ async def test_fridge_end_to_end(h):
     out = await h.tap("s:C1:presale")
     assert "s:C1:qr" in button_ids(out)  # consent first, then the family card
     assert (await session(h)).extra["presale_parivaar"] is True
-
-
-async def test_readback_change_something(h):
-    await h.tap("g:new")
-    await h.tap("s:C1:lang:en")
-    await h.voice("assess_short")
-    for b in ("s:C1:slot:trigger:new_home", "s:C1:slot:room_light:sunny", "s:C1:slot:content:sports"):
-        await h.tap(b)
-    out = await h.tap("s:C1:photo_no")
-    out = await h.tap("s:C1:readback_edit")
-    r = rows(out[0])
-    assert "s:C1:slotask:seat_distance" in r and "s:C1:slotask:room" in r
-    out = await h.pick("s:C1:slotask:seat_distance")
-    assert button_ids(out)[0] == "s:C1:slot:seat_distance:d6_8"
-    out = await h.tap("s:C1:slot:seat_distance:d6_8")  # the new answer → the read-back again, updated
-    assert button_ids(out) == ["s:C1:readback_ok", "s:C1:readback_edit"] and "6-8 ft" in out[0].body
 
 
 async def test_none_of_these_reranks(h):

@@ -37,7 +37,7 @@ async def test_one_product_page_per_option(h):
     assert best.card.data["chip"] == "Best fit for your home"
     assert (pages[0].body or pages[0].caption).startswith("*")  # the heading rides on the first page
     assert out[-1].buttons and not out[-1].card  # the next steps last, so the buttons sit at the bottom
-    assert "s:C1:cmpall" in button_ids(out)
+    assert button_ids(out)[-3:] == ["s:C1:proceed", "s:C1:moreopts", "s:C1:doubt"]  # one clear way on
 
 
 async def _to_choice(h, soundbar: str):

@@ -19,6 +19,7 @@ from chanakya.truth import fmt
 
 WINDOW_DAYS = 30
 CARRY = ("wants", "dq_done", "dq_vals", "option_roles", "seen_prices", "seen_offers", "readback_done", "photo_asked",
+         "assess_closed", "details_done",
          "budget_asked", "doubts_asked", "range_bands", "range_id", "chosen_label", "tryon_skus", "interest",
          "from_note", "skip_slots", "skip_key", "dq_avail")
 
@@ -150,14 +151,16 @@ async def resume(ctx: SkillContext, old_id: str) -> Reply:
         s.step = Step.RECOMMEND
         nxt = await recommend.show_options(ctx, override_checked=True)
         return ctx.reply(head, *nxt.messages)
-    return ctx.reply(head, C.next_question_or_options(ctx))
+    nxt = await C.next_step(ctx)
+    return ctx.reply(head, *nxt.messages)
 
 
-async def name_match(ctx: SkillContext) -> OutMessage | None:
-    """A note named the customer, and the store saw that customer before (another day): offer to carry on."""
+async def name_match(ctx: SkillContext, new_shortlist: bool = False) -> OutMessage | None:
+    """A note named the customer, and the store saw that customer before (another day): offer to carry on.
+    new_shortlist: this same note brought the products (user, 11 Nov 2026): the offer still comes, first."""
     s = ctx.session
     name = (s.home.customer_name or "").strip().lower()
-    if not name or s.shortlist or s.extra.get("ret_offered"):
+    if not name or (s.shortlist and not new_shortlist) or s.extra.get("ret_offered"):
         return None
     first = name.split()[0]
     for row, st in await recent(ctx, exclude=s.id):
