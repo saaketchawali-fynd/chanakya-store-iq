@@ -125,6 +125,8 @@ async def load_logic(seed_dir: Path = SEED_DIR, exclude: tuple[str, ...] = ("tar
 async def upsert_staff(settings: Settings) -> None:
     people = [
         (settings.associate_phone, settings.associate_name, "associate", "tv"),
+        # more associates (EXTRA_ASSOCIATE_PHONES): each is asked their own name at first contact
+        *[(ph, "", "associate", "tv") for ph in settings.associate_phones[1:]],
         (settings.manager_phone, settings.manager_name, "manager", "all"),
         (settings.expert_phone, settings.expert_name, "expert", "tv"),
         (settings.visitor_phone, "Visitor", "visitor", "all"),

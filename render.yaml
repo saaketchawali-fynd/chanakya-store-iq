@@ -25,6 +25,8 @@ services:
         sync: false
       - key: ASSOCIATE_PHONE
         sync: false
+      - key: EXTRA_ASSOCIATE_PHONES       # more associates for the demo, comma-separated
+        sync: false
       - key: CUSTOMER_PHONE
         sync: false
       - key: MANAGER_PHONE

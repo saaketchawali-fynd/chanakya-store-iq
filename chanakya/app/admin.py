@@ -60,6 +60,8 @@ async def health(request: Request):
         "manager": s.manager_phone,
         "expert": s.expert_phone,
         "test_number": s.wa_test_number,
+        # the extra associates, masked: enough to check they are set, not to read the numbers
+        "extra_associates": [f"{p[:2]}{'*' * max(0, len(p) - 6)}{p[-4:]}" for p in s.associate_phones[1:]],
     }
     config = {
         "wa_token_set": bool(s.wa_token),

@@ -60,6 +60,7 @@ class Settings(BaseSettings):
 
     associate_phone: str = ""
     associate_name: str = ""  # no dummy name: the associate is asked their name at first contact
+    extra_associate_phones: str = ""  # more associates (demo), comma-separated: '919870279367, 9876543210'
     customer_phone: str = ""
     manager_phone: str = ""
     manager_name: str = "Meena"
@@ -100,6 +101,12 @@ class Settings(BaseSettings):
         if len(d) == 10:
             d = "91" + d
         return d
+
+    @property
+    def associate_phones(self) -> list[str]:
+        """Every associate number: ASSOCIATE_PHONE first, then EXTRA_ASSOCIATE_PHONES, normalised, no repeats."""
+        out = [self.associate_phone] + [self._digits_only(p) for p in self.extra_associate_phones.split(",")]
+        return list(dict.fromkeys(p for p in out if p))
 
     @property
     def role_switch_phones(self) -> set[str]:
